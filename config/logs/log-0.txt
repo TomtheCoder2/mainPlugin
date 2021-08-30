@@ -188,3 +188,102 @@
 [08-30-2021 14:27:27] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: hello
 [08-30-2021 14:27:38] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 2>
 [08-30-2021 14:27:44] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /maps>
+[08-30-2021 14:37:55] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rtv>
+[08-30-2021 14:38:00] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rtv poll>
+[08-30-2021 14:38:06] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help>
+[08-30-2021 14:38:10] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 3>
+[08-30-2021 14:38:15] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 2>
+[08-30-2021 14:38:24] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /nominate poll>
+[08-30-2021 14:38:28] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rtv>
+[08-30-2021 14:41:24] [I] Game over! Reached wave 1 with 1 players online on map Fork.
+[08-30-2021 14:41:24] [I] Selected next map to be V130: Polluted river: Crux.
+[08-30-2021 14:42:22] [I] Shutting down server.
+[08-30-2021 14:42:30] [I] 1 mods loaded.
+[08-30-2021 14:42:30] [I] Server loaded. Type 'help' for help.
+[08-30-2021 14:42:33] [E] Command not found. Did you mean "host"?
+[08-30-2021 14:42:34] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 14:42:34] [I] Loading map...
+[08-30-2021 14:42:35] [I] Map loaded.
+[08-30-2021 14:42:35] [I] Opened a server on port 6567.
+[08-30-2021 14:42:37] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 14:42:45] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /nominate poll>
+[08-30-2021 14:45:39] [I] 1 mods loaded.
+[08-30-2021 14:45:39] [I] Server loaded. Type 'help' for help.
+[08-30-2021 14:45:39] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 14:45:39] [I] Loading map...
+[08-30-2021 14:45:39] [I] Map loaded.
+[08-30-2021 14:45:39] [I] Opened a server on port 6567.
+[08-30-2021 14:45:43] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 14:45:46] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /nominate poll>
+[08-30-2021 14:48:05] [I] Shutting down server.
+[08-30-2021 14:48:14] [I] 1 mods loaded.
+[08-30-2021 14:48:14] [I] Server loaded. Type 'help' for help.
+[08-30-2021 14:48:14] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 14:48:14] [I] Loading map...
+[08-30-2021 14:48:15] [I] Map loaded.
+[08-30-2021 14:48:15] [I] Opened a server on port 6567.
+[08-30-2021 14:48:18] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 14:48:20] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /nominate poll>
+[08-30-2021 14:48:45] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /votekick Nautilus>
+[08-30-2021 14:51:02] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /label 10 test>
+[08-30-2021 14:51:20] [I] Game over! Reached wave 3 with 1 players online on map V130: Polluted river: Crux.
+[08-30-2021 14:51:20] [I] Selected next map to be V130: Polluted river: Crux.
+[08-30-2021 14:51:25] [I] Changed admin status of player: [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us
+[08-30-2021 14:51:32] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /label 10 test>
+[08-30-2021 14:51:37] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /label 10 test>
+[08-30-2021 14:51:40] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /label 10 test>
+[08-30-2021 14:58:01] [I] Game over! Reached wave 6 with 1 players online on map V130: Polluted river: Crux.
+[08-30-2021 14:58:01] [I] Selected next map to be V130: Polluted river: Crux.
+[08-30-2021 15:01:50] [I] Shutting down server.
+[08-30-2021 15:02:01] [I] 1 mods loaded.
+[08-30-2021 15:02:01] [I] Server loaded. Type 'help' for help.
+[08-30-2021 15:02:01] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 15:02:01] [I] Loading map...
+[08-30-2021 15:02:01] [I] Map loaded.
+[08-30-2021 15:02:01] [I] Opened a server on port 6567.
+[08-30-2021 15:02:20] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 15:02:23] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /maps>
+[08-30-2021 15:04:34] [I] Shutting down server.
+[08-30-2021 15:04:41] [I] 1 mods loaded.
+[08-30-2021 15:04:41] [I] Server loaded. Type 'help' for help.
+[08-30-2021 15:04:42] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 15:04:42] [I] Loading map...
+[08-30-2021 15:04:42] [I] Map loaded.
+[08-30-2021 15:04:42] [I] Opened a server on port 6567.
+[08-30-2021 15:05:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 15:05:11] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /maps>
+[08-30-2021 15:10:02] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr>
+[08-30-2021 15:14:51] [I] 1 mods loaded.
+[08-30-2021 15:14:51] [I] Server loaded. Type 'help' for help.
+[08-30-2021 15:14:57] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[08-30-2021 15:14:57] [I] Loading map...
+[08-30-2021 15:14:57] [I] Map loaded.
+[08-30-2021 15:14:57] [I] Opened a server on port 6567.
+[08-30-2021 15:15:05] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 15:22:06] [I] 1 mods loaded.
+[08-30-2021 15:22:06] [I] Server loaded. Type 'help' for help.
+[08-30-2021 15:22:51] [I] 1 mods loaded.
+[08-30-2021 15:22:51] [I] Server loaded. Type 'help' for help.
+[08-30-2021 15:27:40] [I] 1 mods loaded.
+[08-30-2021 15:27:40] [I] Server loaded. Type 'help' for help.
+[08-30-2021 15:29:22] [I] 1 mods loaded.
+[08-30-2021 15:29:22] [I] Server loaded. Type 'help' for help.
+[08-30-2021 15:37:02] [I] 1 mods loaded.
+[08-30-2021 15:37:02] [I] Server loaded. Type 'help' for help.
+[08-30-2021 15:38:28] [I] 1 mods loaded.
+[08-30-2021 15:38:28] [I] Server loaded. Type 'help' for help.
+[08-30-2021 15:44:11] [I] 1 mods loaded.
+[08-30-2021 15:44:11] [I] Server loaded. Type 'help' for help.
+[08-30-2021 17:08:03] [E] Command not found. Did you mean "host"?
+[08-30-2021 17:08:04] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 17:08:04] [I] Loading map...
+[08-30-2021 17:08:05] [I] Map loaded.
+[08-30-2021 17:08:05] [I] Opened a server on port 6567.
+[08-30-2021 17:08:08] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 17:08:17] [I] 'motd' is currently off.
+[08-30-2021 17:08:25] [I] motd set to true.
+[08-30-2021 17:08:28] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[08-30-2021 17:08:31] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 17:08:47] [I] motd set to off.
+[08-30-2021 17:08:51] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[08-30-2021 17:08:53] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]

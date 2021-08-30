@@ -11,6 +11,8 @@ import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.net.Packets;
 
+import java.util.Formatter;
+
 import static mindustry.Vars.netServer;
 //import static mindustry.Vars.Groups.player;
 
@@ -29,7 +31,11 @@ public class VoteSession{
         this.map = map;
         this.task = Timer.schedule(() -> {
             if(!checkPass()){
-                Call.sendMessage(Strings.format("[lightgray]Vote failed. Not enough votes to switch map to[accent] {0}[lightgray].", target.name()));
+                StringBuilder sbuf = new StringBuilder();
+                Formatter fmt = new Formatter(sbuf);
+                fmt.format("[lightgray]Vote failed. Not enough votes to switch map to[accent] %b[lightgray].",
+                        target.name());
+                Call.sendMessage(sbuf.toString());
                 map[0] = null;
                 task.cancel();
             }
@@ -43,14 +49,20 @@ public class VoteSession{
     void vote(Player player, int d){
         votes += d;
         voted.addAll(player.uuid(), netServer.admins.getInfo(player.uuid()).lastIP);
-
-        Call.sendMessage(Strings.format("[orange]{0}[lightgray] has voted to change the map to[orange] {1}[].[accent] ({2}/{3})\n[lightgray]Type[orange] /rtv to agree.",
-                player.name, target.name(), votes, votesRequired()));
+        StringBuilder sbuf = new StringBuilder();
+        Formatter fmt = new Formatter(sbuf);
+        fmt.format("[orange]%s[lightgray] has voted to change the map to[orange] %s[].[accent] (%d/%d)\n[lightgray]Type[orange] /rtv to agree.",
+                player.name, target.name(), votes, votesRequired());
+        Call.sendMessage(sbuf.toString());
     }
 
     boolean checkPass(){
         if(votes >= votesRequired()){
-            Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] changing map to {0}.", target.name()));
+            StringBuilder sbuf = new StringBuilder();
+            Formatter fmt = new Formatter(sbuf);
+            fmt.format("[orange]Vote passed.[scarlet] changing map to %s.", target.name());
+            Call.sendMessage(sbuf.toString());
+//            Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] changing map to %s.", target.name()));
             Utils.changeMap(target);
             map[0] = null;
             task.cancel();

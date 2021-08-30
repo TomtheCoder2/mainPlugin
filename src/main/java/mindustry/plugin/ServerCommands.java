@@ -169,8 +169,9 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("changemap") {
                 {
-                    help = "<mapname/mapid> Change the current map to the one provided.";
+                    help = "Change the current map to the one provided.";
                     role = banRole;
+                    usage = "<mapname/mapid>";
                 }
 
                 public void run(Context ctx) {
@@ -203,8 +204,9 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("announce") {
                 {
-                    help = "<message> Announces a message to in-game chat.";
+                    help = "Announces a message to in-game chat.";
                     role = banRole;
+                    usage = "<message>";
                 }
 
                 public void run(Context ctx) {
@@ -231,8 +233,9 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("event") {
                 {
-                    help = "<ip/none> Changes the event command ip.";
+                    help = "Changes the event command ip.";
                     role = banRole;
+                    usage = "<ip/none>";
                 }
 
                 public void run(Context ctx) {
@@ -266,8 +269,9 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("alert") {
                 {
-                    help = "<playerid|ip|name|teamid> <message> Alerts a player(s) using on-screen messages.";
+                    help = "Alerts a player(s) using on-screen messages.";
                     role = banRole;
+                    usage = "<playerid|ip|name|teamid> <message>";
                 }
 
                 public void run(Context ctx) {
@@ -566,10 +570,10 @@ public class ServerCommands {
 //                    EmbedBuilder eb = new EmbedBuilder();
 //                    String target = ctx.args[1];
 //
-//                    Administration.PlayerInfo info = null;
+////                    Administration.PlayerInfo info = null;
 //                    Player player = findPlayer(target);
 //                    if (player != null) {
-//                        info = netServer.admins.getInfo(player.uuid);
+//                        info = netServer.admins.getInfo(player.uuid());
 //                    } else{
 //                        info = netServer.admins.getInfoOptional(target);
 //                    }
@@ -673,8 +677,9 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("changeteam") {
                 {
-                    help = "<playerid|ip|all|name|teamid> <team> Change the provided player's team into the provided one.";
+                    help = "Change the provided player's team into the provided one.";
                     role = banRole;
+                    usage = "<playerid|ip|all|name|teamid> <team>";
                 }
 
                 public void run(Context ctx) {
@@ -726,8 +731,9 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("changeteamid") {
                 {
-                    help = "<playerid|ip|all|name> <team> Change the provided player's team into a generated int.";
+                    help = "Change the provided player's team into a generated int.";
                     role = banRole;
+                    usage = "<playerid|ip|all|name> <team>";
                 }
 
                 public void run(Context ctx) {
@@ -770,8 +776,9 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("rename") {
                 {
-                    help = "<playerid|ip|name> <name> Rename the provided player";
+                    help = "Rename the provided player";
                     role = banRole;
+                    usage = "<playerid|ip|name> <name>";
                 }
 
                 public void run(Context ctx) {
@@ -796,8 +803,9 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("motd") {
                 {
-                    help = "<newmessage> Change / set a welcome message";
+                    help = "Change / set a welcome message";
                     role = banRole;
+                    usage = "<newmessage>";
                 }
 
                 public void run(Context ctx) {
@@ -878,8 +886,9 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("statmessage") {
                 {
-                    help = "<newmessage> Change / set a stat message";
+                    help = "Change / set a stat message";
                     role = banRole;
+                    usage = "<newmessage>";
                 }
 
                 public void run(Context ctx) {
@@ -1007,8 +1016,9 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("setblock") {
                 {
-                    help = "<playerid|ip|name> <block> Create a block at the player's current location and on the player's current team.";
+                    help = "Create a block at the player's current location and on the player's current team.";
                     role = banRole;
+                    usage = "<playerid|ip|name> <block>";
                 }
 
                 public void run(Context ctx) {
@@ -1129,8 +1139,9 @@ public class ServerCommands {
             String reviewerRole = data.getString("mapSubmissions_roleid");
             handler.registerCommand(new RoleRestrictedCommand("uploadmap") {
                 {
-                    help = "<.msav attachment> Upload a new map (Include a .msav file with command message)";
+                    help = "Upload a new map (Include a .msav file with command message)";
                     role = reviewerRole;
+                    usage = "<.msav attachment>";
                 }
 
                 public void run(Context ctx) {
@@ -1179,10 +1190,12 @@ public class ServerCommands {
                     //Utils.LogAction("uploadmap", "Uploaded a new map", ctx.author, null);
                 }
             });
+
             handler.registerCommand(new RoleRestrictedCommand("removemap") {
                 {
-                    help = "<mapname/mapid> Remove a map from the playlist (use mapname/mapid retrieved from the %maps command)".replace("%", ioMain.prefix);
+                    help = "Remove a map from the playlist (use mapname/mapid retrieved from the %maps command)".replace("%", ioMain.prefix);
                     role = reviewerRole;
+                    usage = "<mapname/mapid>";
                 }
 
                 @Override
@@ -1218,7 +1231,8 @@ public class ServerCommands {
             TextChannel tc = ioMain.getTextChannel(ioMain.data.getString("mapSubmissions_id"));
             handler.registerCommand(new Command("submitmap") {
                 {
-                    help = "<.msav attachment> Submit a new map to be added into the server playlist in a .msav file format.";
+                    help = " Submit a new map to be added into the server playlist in a .msav file format.";
+                    usage = "<.msav attachment>";
                 }
 
                 public void run(Context ctx) {
@@ -1265,6 +1279,7 @@ public class ServerCommands {
                             .setTimestampToNow()
                             .addField("Name", ml.get(0).getFileName())
                             .addField("URL", String.valueOf(ml.get(0).getUrl()));
+                    assert tc != null;
                     tc.sendMessage(eb2);
                 }
             });

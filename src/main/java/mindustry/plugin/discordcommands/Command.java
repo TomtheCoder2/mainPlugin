@@ -5,6 +5,7 @@ public abstract class Command {
     public String name;
     /** Help for this command, shown by the help command */
     public String help = ":v no information was provided for this command";
+    public String usage = "";
 
     public Command(String name) {
         // always ALWAYS lowercase command names
@@ -14,6 +15,7 @@ public abstract class Command {
     /**
      * This method is called when the command is run
      * @param ctx
+     * Context
      */
     public abstract void run(Context ctx);
 

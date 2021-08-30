@@ -1,6 +1,7 @@
 package mindustry.plugin;
 
 import arc.files.Fi;
+import arc.util.Strings;
 import mindustry.Vars;
 import mindustry.content.Items;
 import mindustry.game.Team;
@@ -15,15 +16,12 @@ import mindustry.plugin.discordcommands.DiscordCommands;
 import mindustry.plugin.discordcommands.RoleRestrictedCommand;
 import mindustry.world.modules.ItemModule;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.permission.Role;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.awt.*;
 
 import static mindustry.Vars.state;
-import static mindustry.Vars.world;
 import static mindustry.plugin.Utils.*;
 import static mindustry.plugin.ioMain.getTextChannel;
 
@@ -31,7 +29,8 @@ public class ComCommands {
     public void registerCommands(DiscordCommands handler) {
         handler.registerCommand(new Command("chat") {
             {
-                help = "<message> Sends a message to in-game chat.";
+                help = "Sends a message to in-game chat.";
+                usage = "<message>";
             }
 
             public void run(Context ctx) {
@@ -51,7 +50,8 @@ public class ComCommands {
         });
         handler.registerCommand(new Command("downloadmap") {
             {
-                help = "<mapname/mapid> Preview and download a server map in a .msav file format.";
+                help = "Preview and download a server map in a .msav file format.";
+                usage = "<mapname/mapid>";
             }
 
             public void run(Context ctx) {
@@ -87,7 +87,36 @@ public class ComCommands {
                     msg.append("· ").append(escapeCharacters(player.name)).append(" : ").append(player.id).append("\n");
                 }
                 msg.append("```");
-                ctx.channel.sendMessage(msg.toString());
+//                ctx.channel.sendMessage(msg.toString());
+                StringBuilder lijst = new StringBuilder();
+//                StringBuilder admins = new StringBuilder();
+                EmbedBuilder eb = new EmbedBuilder()
+                        .setTitle("Players: " + Groups.player.size());
+//                lijst.append("Players: " + Groups.player.size() + "\n");
+//                admins.append(" ");
+//                if (Groups.player.count(p -> p.admin) > 0) {
+//                    admins.append("online admins: ");// + Vars.playerGroup.all().count(p->p.isAdmin)+"\n");
+//                }
+                if (Groups.player.size() == 0) {
+                    lijst.append("No players are currently in the server.");// + Vars.playerGroup.all().count(p->p.isAdmin)+"\n");
+                }
+                for (Player p : Groups.player) {
+                    if (p.admin()) {
+                        lijst.append("`").append(Strings.stripColors(p.name.trim())).append(" : ").append("admin").append("`\n");
+                    } else {
+                        lijst.append("`").append(Strings.stripColors(p.name.trim())).append(" : ").append(String.format("%-5d", p.id)).append("`\n");
+                    }
+                }
+
+                new MessageBuilder()
+                        .setEmbed(new EmbedBuilder()
+                                .setTitle("Players online: " + Groups.player.size())
+//                                    .setDescription( "Info about the Server: ")
+                                .setDescription(lijst.toString())
+//                                .addField("Admins: ", admins+" ")
+//                                .addField("Players:", lijst.toString())
+                                .setColor(Color.ORANGE))
+                        .send(ctx.channel);
             }
         });
         handler.registerCommand(new Command("info") {
@@ -150,22 +179,43 @@ public class ComCommands {
         handler.registerCommand(new Command("help") {
             {
                 help = "Display all available commands and their usage.";
+                usage = "[command]";
             }
 
             public void run(Context ctx) {
-                EmbedBuilder embed = new EmbedBuilder()
-                        .setTitle("Public commands:");
-                EmbedBuilder embed2 = new EmbedBuilder()
-                        .setTitle("Restricted commands:");
-                for (Command command : handler.getAllCommands()) {
-                    if (command instanceof RoleRestrictedCommand) {
-                        embed2.addField("**" + command.name + "**", command.help);
-                    } else {
-                        embed.addField("**" + command.name + "**", command.help);
+                if (ctx.args.length == 1) {
+                    StringBuilder publicCommands = new StringBuilder();
+                    StringBuilder restrictedCommands = new StringBuilder();
+                    for (Command command : handler.getAllCommands()) {
+                        if (command instanceof RoleRestrictedCommand) {
+                            restrictedCommands.append("**").append(command.name).append("** ");
+                            if (!command.usage.equals("")) {
+                                restrictedCommands.append(command.usage);
+                            }
+                            restrictedCommands.append("\n");
+                        } else {
+                            publicCommands.append("**").append(command.name).append("** ");
+                            if (!command.usage.equals("")) {
+                                publicCommands.append(command.usage);
+                            }
+                            publicCommands.append("\n");
+                        }
                     }
+                    EmbedBuilder embed = new EmbedBuilder()
+                            .setTitle("Commands:")
+                            .addField("**__Public commands:__**", publicCommands.toString(), true)
+                            .addField("**__Restricted commands:__**", restrictedCommands.toString(), true);
+                    ctx.channel.sendMessage(embed);
+                } else {
+                    EmbedBuilder embed = new EmbedBuilder();
+                    for (Command command : handler.getAllCommands()) {
+                        if (command.name.equals(ctx.args[1])) {
+                            embed.setTitle(command.name)
+                                    .setDescription(command.help);
+                        }
+                    }
+                    ctx.channel.sendMessage(embed);
                 }
-                ctx.channel.sendMessage(embed2);
-                ctx.channel.sendMessage(embed);
             }
         });
 
@@ -224,9 +274,9 @@ public class ComCommands {
 //
 //        });
 
-        TextChannel warningsChannel = null;
-        if (ioMain.data.has("warnings_chat_channel_id")) {
-            warningsChannel = getTextChannel(ioMain.data.getString("warnings_chat_channel_id"));
-        }
+//        TextChannel warningsChannel = null;
+//        if (ioMain.data.has("warnings_chat_channel_id")) {
+//            warningsChannel = getTextChannel(ioMain.data.getString("warnings_chat_channel_id"));
+//        }
     }
 }
