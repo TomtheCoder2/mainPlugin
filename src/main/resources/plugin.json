@@ -1,0 +1,7 @@
+{
+  "name": "DiscordPlugin",
+  "author": "Nautilus",
+  "main": "mindustry.plugin.ioMain",
+  "description": "interaction with discord",
+  "version": 1.130
+}

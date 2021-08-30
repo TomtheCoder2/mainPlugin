@@ -1,0 +1,52 @@
+apply plugin: "java"
+
+
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    maven { url 'https://www.jitpack.io' }
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+    mavenCentral()
+}
+
+ext {
+    //the build number that this plugin is made for
+    arcVersion = 'v130.1'
+    mindustryVersion = 'getMapScreenshot'
+}
+
+dependencies {
+    compileOnly("com.github.Anuken.Arc:arc-core:$arcVersion")
+    compileOnly("com.github.Anuken.Mindustry:core:$arcVersion")
+    compileOnly("com.github.fuzzbuck.Mindustry:core:$mindustryVersion")
+    compileOnly("com.github.fuzzbuck.Mindustry:server:$mindustryVersion")
+    implementation group: 'org.json', name: 'json', version: '20190722'
+    compileOnly "org.springframework.data:spring-data-redis:1.8.0.RELEASE"
+    compileOnly "redis.clients:jedis:2.9.0"
+    compileOnly("org.glassfish.jersey.core:jersey-client:2.25.1")
+//    compileOnly("redis.clients:jedis:3.2.0")
+    compileOnly("org.apache.commons:commons-pool2:2.6.0")
+    compileOnly('redis.clients:jedis:2.10.2')
+
+    implementation('org.javacord:javacord:3.3.2')
+    compileOnly("javax.ws.rs:javax.ws.rs-api:2.0.1")
+    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation("net.dv8tion:JDA:4.3.0_277")
+
+}
+
+jar {
+    version = null
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from {
+        configurations.runtimeClasspath.findAll { !it.name.endsWith('pom') }.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+}

@@ -1,0 +1,190 @@
+[08-30-2021 09:14:39] [I] Server loaded. Type 'help' for help.
+[08-30-2021 09:14:42] [I] Shutting down server.
+[08-30-2021 09:15:23] [I] Server loaded. Type 'help' for help.
+[08-30-2021 09:15:37] [I] Version: Mindustry 7-pre-alpha official / build 130.1
+[08-30-2021 09:15:37] [I] Java Version: 16.0.1
+[08-30-2021 09:18:57] [I] Shutting down server.
+[08-30-2021 09:19:01] [I] Server loaded. Type 'help' for help.
+[08-30-2021 09:19:42] [I] Shutting down server.
+[08-30-2021 09:19:48] [I] 1 mods loaded.
+[08-30-2021 09:19:48] [I] Server loaded. Type 'help' for help.
+[08-30-2021 09:20:19] [I] Randomized next map to be Mud Flats.
+[08-30-2021 09:20:19] [I] Loading map...
+[08-30-2021 09:20:19] [I] Map loaded.
+[08-30-2021 09:20:19] [I] Opened a server on port 6567.
+[08-30-2021 09:20:23] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 09:20:27] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help>
+[08-30-2021 09:20:30] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 2>
+[08-30-2021 09:20:36] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /maps>
+[08-30-2021 09:21:01] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /label 3 test>
+[08-30-2021 09:21:05] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /info>
+[08-30-2021 09:24:57] [I] 1 new map(s) found and reloaded.
+[08-30-2021 09:27:38] [I] 1 mods loaded.
+[08-30-2021 09:27:38] [I] Server loaded. Type 'help' for help.
+[08-30-2021 09:27:46] [I] Loading map...
+[08-30-2021 09:27:46] [I] Map loaded.
+[08-30-2021 09:27:46] [I] Opened a server on port 6567.
+[08-30-2021 09:27:51] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 09:28:32] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[08-30-2021 09:28:35] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 09:29:16] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rules>
+[08-30-2021 09:47:41] [I] Shutting down server.
+[08-30-2021 09:51:11] [I] Server loaded. Type 'help' for help.
+[08-30-2021 09:55:13] [I] Shutting down server.
+[08-30-2021 09:55:18] [I] Server loaded. Type 'help' for help.
+[08-30-2021 09:55:47] [I] Server loaded. Type 'help' for help.
+[08-30-2021 09:57:24] [I] Shutting down server.
+[08-30-2021 09:57:29] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:01:08] [I] Shutting down server.
+[08-30-2021 10:01:12] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:02:57] [I] Shutting down server.
+[08-30-2021 10:03:02] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:03:23] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:04:09] [I] Shutting down server.
+[08-30-2021 10:04:14] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:04:37] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:05:34] [I] 1 mods loaded.
+[08-30-2021 10:05:34] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:06:00] [I] Shutting down server.
+[08-30-2021 10:06:12] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:06:23] [I] Shutting down server.
+[08-30-2021 10:06:32] [I] 1 mods loaded.
+[08-30-2021 10:06:32] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:14:22] [I] 1 mods loaded.
+[08-30-2021 10:14:22] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:14:27] [E] Command not found. Did you mean "host"?
+[08-30-2021 10:14:28] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 10:14:28] [I] Loading map...
+[08-30-2021 10:14:29] [I] Map loaded.
+[08-30-2021 10:14:29] [I] Opened a server on port 6567.
+[08-30-2021 10:15:00] [I] Shutting down server.
+[08-30-2021 10:15:09] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:20:16] [E] Command not found. Did you mean "exit"?
+[08-30-2021 10:20:17] [I] Shutting down server.
+[08-30-2021 10:20:26] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:24:30] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:26:01] [I] Server loaded. Type 'help' for help.
+[08-30-2021 10:49:38] [I] Shutting down server.
+[08-30-2021 10:49:46] [I] Server loaded. Type 'help' for help.
+[08-30-2021 11:47:00] [I] Shutting down server.
+[08-30-2021 11:47:43] [I] Server loaded. Type 'help' for help.
+[08-30-2021 12:23:41] [I] 1 mods loaded.
+[08-30-2021 12:23:41] [I] Server loaded. Type 'help' for help.
+[08-30-2021 12:27:24] [I] 1 mods loaded.
+[08-30-2021 12:27:24] [I] Server loaded. Type 'help' for help.
+[08-30-2021 12:29:33] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 12:29:33] [I] Loading map...
+[08-30-2021 12:29:34] [I] Map loaded.
+[08-30-2021 12:29:34] [I] Opened a server on port 6567.
+[08-30-2021 12:29:38] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 12:35:29] [I] 1 mods loaded.
+[08-30-2021 12:35:29] [I] Server loaded. Type 'help' for help.
+[08-30-2021 12:35:35] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 12:35:35] [I] Loading map...
+[08-30-2021 12:35:36] [I] Map loaded.
+[08-30-2021 12:35:36] [I] Opened a server on port 6567.
+[08-30-2021 12:35:39] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 12:35:43] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /w naut hello>
+[08-30-2021 12:35:47] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr>
+[08-30-2021 12:35:56] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr 4700 test>
+[08-30-2021 12:36:00] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr #4700 test>
+[08-30-2021 12:36:00] [E] java.lang.NullPointerException: Cannot invoke "org.javacord.api.entity.permission.Role.getMentionTag()" because "ro" is null
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$9(ioMain.java:466)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:230)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[08-30-2021 12:52:30] [I] Game over! Reached wave 16 with 1 players online on map V130: Polluted river: Crux.
+[08-30-2021 12:52:30] [I] Selected next map to be V130: Polluted river: Crux.
+[08-30-2021 12:55:31] [I] 1 mods loaded.
+[08-30-2021 12:55:31] [I] Server loaded. Type 'help' for help.
+[08-30-2021 12:55:32] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 12:55:32] [I] Loading map...
+[08-30-2021 12:55:33] [I] Map loaded.
+[08-30-2021 12:55:33] [I] Opened a server on port 6567.
+[08-30-2021 12:55:38] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 12:55:40] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr>
+[08-30-2021 12:55:54] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr #4700 test>
+[08-30-2021 12:55:54] [E] java.lang.NullPointerException: Cannot invoke "org.javacord.api.entity.permission.Role.getMentionTag()" because "ro" is null
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$9(ioMain.java:466)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:230)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[08-30-2021 13:00:18] [I] 1 mods loaded.
+[08-30-2021 13:00:18] [I] Server loaded. Type 'help' for help.
+[08-30-2021 13:00:20] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 13:00:20] [I] Loading map...
+[08-30-2021 13:00:21] [I] Map loaded.
+[08-30-2021 13:00:21] [I] Opened a server on port 6567.
+[08-30-2021 13:00:23] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 13:00:26] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr>
+[08-30-2021 13:00:33] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr #4700 test>
+[08-30-2021 13:00:33] [E] java.lang.NullPointerException: Cannot invoke "org.javacord.api.entity.permission.Role.getMentionTag()" because "ro" is null
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$9(ioMain.java:465)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:230)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[08-30-2021 13:09:49] [I] Shutting down server.
+[08-30-2021 13:10:02] [I] 1 mods loaded.
+[08-30-2021 13:10:02] [I] Server loaded. Type 'help' for help.
+[08-30-2021 13:10:02] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-30-2021 13:10:02] [I] Loading map...
+[08-30-2021 13:10:03] [I] Map loaded.
+[08-30-2021 13:10:03] [I] Opened a server on port 6567.
+[08-30-2021 13:10:07] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 13:10:16] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr #4700 test>
+[08-30-2021 13:10:16] [E] java.lang.NullPointerException: Cannot invoke "org.javacord.api.entity.channel.TextChannel.getApi()" because "channel" is null
+	at org.javacord.core.entity.message.MessageBuilderDelegateImpl.send(MessageBuilderDelegateImpl.java:425)
+	at org.javacord.api.entity.message.MessageBuilder.send(MessageBuilder.java:606)
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$9(ioMain.java:471)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:230)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[08-30-2021 13:29:24] [I] Game over! Reached wave 19 with 1 players online on map V130: Polluted river: Crux.
+[08-30-2021 13:29:24] [I] Selected next map to be V130: Polluted river: Crux.
+[08-30-2021 13:44:28] [I] Game over! Reached wave 14 with 1 players online on map V130: Polluted river: Crux.
+[08-30-2021 13:44:28] [I] Selected next map to be V130: Polluted river: Crux.
+[08-30-2021 14:06:26] [I] Game over! Reached wave 21 with 1 players online on map V130: Polluted river: Crux.
+[08-30-2021 14:06:26] [I] Selected next map to be V130: Polluted river: Crux.
+[08-30-2021 14:23:00] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /d test>
+[08-30-2021 14:23:49] [I] 1 mods loaded.
+[08-30-2021 14:23:49] [I] Server loaded. Type 'help' for help.
+[08-30-2021 14:23:53] [I] Loading map...
+[08-30-2021 14:23:53] [I] Map loaded.
+[08-30-2021 14:23:53] [I] Opened a server on port 6567.
+[08-30-2021 14:23:57] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 14:24:00] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr>
+[08-30-2021 14:24:06] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr #41 test>
+[08-30-2021 14:24:31] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /gr #41 test>
+[08-30-2021 14:27:17] [I] 1 mods loaded.
+[08-30-2021 14:27:17] [I] Server loaded. Type 'help' for help.
+[08-30-2021 14:27:21] [I] Loading map...
+[08-30-2021 14:27:21] [I] Map loaded.
+[08-30-2021 14:27:21] [I] Opened a server on port 6567.
+[08-30-2021 14:27:25] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 14:27:27] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: hello
+[08-30-2021 14:27:38] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 2>
+[08-30-2021 14:27:44] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /maps>
