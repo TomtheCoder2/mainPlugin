@@ -66,6 +66,7 @@ public class BotThread extends Thread {
                 }
                 if(Mathf.chance(0.01f)){
                     api.updateActivity("( ͡° ͜ʖ ͡°)");
+                    System.out.println("( ͡° ͜ʖ ͡°)");
                 } else {
                     api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
                 }

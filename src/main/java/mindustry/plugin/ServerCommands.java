@@ -25,7 +25,6 @@ import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
-import redis.clients.util.IOUtils;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -272,6 +271,37 @@ public class ServerCommands {
                 }
             });
 
+            handler.registerCommand(new RoleRestrictedCommand("admin") {
+                {
+                    help = "Toggle the admin status on a player.";
+                    role = banRole;
+                    usage = "<playerid|ip|name|teamid> <message>";
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1].toLowerCase();
+
+                    Player p = findPlayer(target);
+                    if (p != null) {
+//                        Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
+                        p.admin = !p.admin;
+                        eb.setTitle("Command executed!");
+                        if (p.admin) {
+                            eb.setDescription("Promoted " + escapeCharacters(p.name) + " to admin");
+                        } else {
+                            eb.setDescription("Demoted " + escapeCharacters(p.name) + " to admin");
+                        }
+                    } else {
+                        eb.setTitle("Command terminated!");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("Player could not be found or is offline.");
+
+                    }
+                    ctx.channel.sendMessage(eb);
+                }
+            });
+
             handler.registerCommand(new RoleRestrictedCommand("alert") {
                 {
                     help = "Alerts a player(s) using on-screen messages.";
@@ -305,14 +335,13 @@ public class ServerCommands {
                             Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
                             eb.setTitle("Command executed");
                             eb.setDescription("Alert was sent to " + escapeCharacters(p.name));
-                            ctx.channel.sendMessage(eb);
                         } else {
                             eb.setTitle("Command terminated");
                             eb.setColor(Pals.error);
                             eb.setDescription("Player could not be found or is offline.");
-                            ctx.channel.sendMessage(eb);
 
                         }
+                        ctx.channel.sendMessage(eb);
                     }
                 }
             });
@@ -889,31 +918,31 @@ public class ServerCommands {
 //                }
 //            });
 
-            handler.registerCommand(new RoleRestrictedCommand("statmessage") {
-                {
-                    help = "Change / set a stat message";
-                    role = banRole;
-                    usage = "<newmessage>";
-                }
-
-                public void run(Context ctx) {
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.setTitle("Command executed successfully");
-                    String message = ctx.message;
-                    if (message.length() > 0) {
-                        statMessage = message;
-                        Core.settings.put("statMessage", message);
-                        Core.settings.autosave();
-                        eb.setDescription("Changed stat message.");
-                        ctx.channel.sendMessage(eb);
-                    } else {
-                        eb.setTitle("Command terminated");
-                        eb.setDescription("No message provided.");
-                        ctx.channel.sendMessage(eb);
-                    }
-                }
-
-            });
+//            handler.registerCommand(new RoleRestrictedCommand("statmessage") {
+//                {
+//                    help = "Change / set a stat message";
+//                    role = banRole;
+//                    usage = "<newmessage>";
+//                }
+//
+//                public void run(Context ctx) {
+//                    EmbedBuilder eb = new EmbedBuilder();
+//                    eb.setTitle("Command executed successfully");
+//                    String message = ctx.message;
+//                    if (message.length() > 0) {
+//                        statMessage = message;
+//                        Core.settings.put("statMessage", message);
+//                        Core.settings.autosave();
+//                        eb.setDescription("Changed stat message.");
+//                        ctx.channel.sendMessage(eb);
+//                    } else {
+//                        eb.setTitle("Command terminated");
+//                        eb.setDescription("No message provided.");
+//                        ctx.channel.sendMessage(eb);
+//                    }
+//                }
+//
+//            });
 
             handler.registerCommand(new RoleRestrictedCommand("rulemessage") {
                 {
@@ -1311,16 +1340,16 @@ public class ServerCommands {
                                 .setDescription(escapeCharacters(mapData.get(5)))
 //                                .setAuthor(escapeCharacters(mapData.get(1)))
                                 .setAuthor(ctx.author.getName(), ctx.author.getAvatar().getUrl().toString(), ctx.author.getAvatar().getUrl().toString())
-                                .setImage("attachment://" + mapData.get(6)+".png");
+                                .setImage("attachment://" + mapData.get(6) + ".png");
                         MessageBuilder mb = new MessageBuilder();
                         mb.addEmbed(embed);
 //                        mb.addFile(new File(mapData.get(0)));
                         InputStream PNG = new FileInputStream(mapData.get(0));
-                        mb.addFile(PNG, mapData.get(6)+".png");
+                        mb.addFile(PNG, mapData.get(6) + ".png");
 //                        mb.addFile(new File("./temp/upload.msav"));
                         InputStream initialStream = new FileInputStream(
                                 new File("./temp/upload.msav"));
-                        mb.addFile(initialStream, mapData.get(6)+".msav");
+                        mb.addFile(initialStream, mapData.get(6) + ".msav");
                         mb.send(tc);
                     } catch (Exception e) {
                         System.out.println(e);

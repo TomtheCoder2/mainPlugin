@@ -25,8 +25,6 @@ import java.io.File;
 import static mindustry.Vars.state;
 import static mindustry.plugin.Utils.*;
 
-import mindustry.plugin.ioMain.*;
-
 public class ComCommands {
 //    public static ContentHandler contentHandler = new ContentHandler();
 
@@ -230,6 +228,9 @@ public class ComCommands {
                         if (command.name.equals(ctx.args[1])) {
                             embed.setTitle(command.name)
                                     .setDescription(command.help);
+                            if (!command.usage.equals("")) {
+                                embed.addField("Usage:", ioMain.prefix + command.name + " " + command.usage);
+                            }
                         }
                     }
                     ctx.channel.sendMessage(embed);

@@ -354,3 +354,27 @@
 [08-31-2021 17:42:34] [I] Server loaded. Type 'help' for help.
 [08-31-2021 17:46:20] [I] 1 mods loaded.
 [08-31-2021 17:46:20] [I] Server loaded. Type 'help' for help.
+[08-31-2021 18:17:14] [I] 1 mods loaded.
+[08-31-2021 18:17:14] [I] Server loaded. Type 'help' for help.
+[08-31-2021 18:17:30] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[08-31-2021 18:17:30] [I] Loading map...
+[08-31-2021 18:17:30] [I] Map loaded.
+[08-31-2021 18:17:30] [I] Opened a server on port 6567.
+[08-31-2021 18:17:51] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-31-2021 18:17:54] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 2>
+[08-31-2021 18:17:58] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rules>
+[08-31-2021 18:18:05] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[08-31-2021 18:35:35] [I] 1 mods loaded.
+[08-31-2021 18:35:35] [I] Server loaded. Type 'help' for help.
+[08-31-2021 18:35:58] [I] Randomized next map to be V130: Polluted river: Crux.
+[08-31-2021 18:35:58] [I] Loading map...
+[08-31-2021 18:35:58] [I] Map loaded.
+[08-31-2021 18:35:58] [I] Opened a server on port 6567.
+[08-31-2021 18:36:01] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-31-2021 18:36:45] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[08-31-2021 18:40:19] [I] 1 mods loaded.
+[08-31-2021 18:40:19] [I] Server loaded. Type 'help' for help.
+[08-31-2021 18:41:40] [I] 1 mods loaded.
+[08-31-2021 18:41:40] [I] Server loaded. Type 'help' for help.
+[08-31-2021 18:42:23] [I] 1 mods loaded.
+[08-31-2021 18:42:23] [I] Server loaded. Type 'help' for help.

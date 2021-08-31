@@ -1,24 +1,20 @@
 package mindustry.plugin;
 
-import java.awt.*;
-import java.io.File;
-import java.util.*;
-
+import arc.Core;
+import arc.Events;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.util.*;
-import arc.util.Timer;
 import com.google.gson.Gson;
+import mindustry.Vars;
 import mindustry.core.NetClient;
-//import mindustry.entities.Effects;
-//import mindustry.entities.traits.Entity;
-//import mindustry.entities.type.BaseUnit;
+import mindustry.game.EventType;
+import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration;
 import mindustry.net.Administration.Config;
-import mindustry.plugin.requests.GetMap;
 import mindustry.world.Tile;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
@@ -29,14 +25,10 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
-import arc.Core;
-import arc.Events;
-import mindustry.Vars;
-//import mindustry.entities.type.Player;
-import mindustry.game.EventType;
-import mindustry.gen.Call;
 import redis.clients.jedis.JedisPool;
+
+import java.awt.*;
+import java.util.Optional;
 
 import static mindustry.Vars.*;
 import static mindustry.plugin.Utils.*;
@@ -48,26 +40,23 @@ public class ioMain extends Plugin {
 //    public GetMap map = new GetMap();
 
     public static JedisPool pool;
-    static Gson gson = new Gson();
-
-    private final long CDT = 300L;
-    private ObjectMap<Long, String> cooldowns = new ObjectMap<>(); //uuid
     public static DiscordApi api = null;
     public static String prefix = ".";
     public static String serverName = "<untitled>";
-
-//    public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
-
-
-    public ObjectMap<String, Role> discRoles = new ObjectMap<>();
-    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
-
-    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
-    private JSONObject alldata;
     public static JSONObject data; //token, channel_id, role_id
     public static String apiKey = "";
+    static Gson gson = new Gson();
 
+//    public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
+    private final long CDT = 300L;
+    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
+    public ObjectMap<String, Role> discRoles = new ObjectMap<>();
+    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
     protected Interval timer = new Interval(1);
+    //cooldown between votes
+    int voteCooldown = 120 * 1;
+    private ObjectMap<Long, String> cooldowns = new ObjectMap<>(); //uuid
+    private JSONObject alldata;
 
     //register event handlers and create variables in the constructor
     public ioMain() {
@@ -82,7 +71,7 @@ public class ioMain extends Plugin {
         try {
             api = new DiscordApiBuilder().setToken(alldata.getString("token")).login().join();
             Log.info("logged in as: " + api.getYourself());
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.err("Couldn't log into discord.");
         }
         BotThread bt = new BotThread(api, Thread.currentThread(), alldata);
@@ -102,8 +91,8 @@ public class ioMain extends Plugin {
         try {
 //            pool = new JedisPool(new JedisPoolConfig(), "localhost");
 //            pool = new JedisPool();
-            Log.info("jedis database loaded");
-        } catch (Exception e){
+//            Log.info("jedis database loaded");
+        } catch (Exception e) {
             e.printStackTrace();
             Core.app.exit();
         }
@@ -122,7 +111,7 @@ public class ioMain extends Plugin {
             Log.warn("No server name setting detected!");
         }
 
-        if(data.has("api_key")){
+        if (data.has("api_key")) {
             apiKey = data.getString("api_key");
             Log.info("api_key set successfully");
         }
@@ -134,7 +123,7 @@ public class ioMain extends Plugin {
 
         Timer.schedule(() -> {
             int currentInc = 0;
-            for(String msg : onScreenMessages){
+            for (String msg : onScreenMessages) {
                 Call.infoPopup(msg, duration, 20, 50, 20, start + currentInc, 0);
                 currentInc = currentInc + increment;
             }
@@ -309,36 +298,27 @@ public class ioMain extends Plugin {
 //        });
     }
 
-    //register commands that run on the server
-    @Override
-    public void registerServerCommands(CommandHandler handler){
-
-    }
-
-    //cooldown between votes
-    int voteCooldown = 120 * 1;
-
     public static boolean checkChatRatelimit(String message, Player player) {
         // copied almost exactly from mindustry core, will probably need updating
         // will also update the user's global chat ratelimits
         long resetTime = Config.messageRateLimit.num() * 1000;
-        if(Config.antiSpam.bool() && !player.isLocal() && !player.admin){
+        if (Config.antiSpam.bool() && !player.isLocal() && !player.admin) {
             //prevent people from spamming messages quickly
-            if(resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime){
+            if (resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime) {
                 //supress message
                 player.sendMessage("[scarlet]You may only send messages every " + Config.messageRateLimit.num() + " seconds.");
-                player.getInfo().messageInfractions ++;
+                player.getInfo().messageInfractions++;
                 //kick player for spamming and prevent connection if they've done this several times
-                if(player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0){
+                if (player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0) {
                     player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
                 }
                 return false;
-            }else{
+            } else {
                 player.getInfo().messageInfractions = 0;
             }
 
             //prevent players from sending the same message twice in the span of 50 seconds
-            if(message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50){
+            if (message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50) {
                 player.sendMessage("[scarlet]You may not send the same message twice.");
                 return false;
             }
@@ -349,9 +329,29 @@ public class ioMain extends Plugin {
         return true;
     }
 
+    public static TextChannel getTextChannel(String id) {
+        Optional<Channel> dc = api.getChannelById(id);
+        if (dc.isEmpty()) {
+            Log.err("[ERR!] discordplugin: channel not found! " + id);
+            return null;
+        }
+        Optional<TextChannel> dtc = dc.get().asTextChannel();
+        if (dtc.isEmpty()) {
+            Log.err("[ERR!] discordplugin: textchannel not found! " + id);
+            return null;
+        }
+        return dtc.get();
+    }
+
+    //register commands that run on the server
+    @Override
+    public void registerServerCommands(CommandHandler handler) {
+
+    }
+
     //register commands that player can invoke in-game
     @Override
-    public void registerClientCommands(CommandHandler handler){
+    public void registerClientCommands(CommandHandler handler) {
         if (api != null) {
             handler.removeCommand("t");
             handler.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
@@ -380,9 +380,9 @@ public class ioMain extends Plugin {
                 StringBuilder builder = new StringBuilder();
                 builder.append("[orange]List of players: \n");
                 for (Player p : Groups.player) {
-                    if(p.admin) {
+                    if (p.admin) {
                         builder.append("[accent]");
-                    } else{
+                    } else {
                         builder.append("[lightgray]");
                     }
                     builder.append(p.name).append("[accent] : ").append(p.id).append("\n");
@@ -397,7 +397,7 @@ public class ioMain extends Plugin {
                 Player other = Utils.findPlayer(args[0]);
 
                 //give error message with scarlet-colored text if player isn't found
-                if(other == null){
+                if (other == null) {
                     player.sendMessage("[scarlet]No player by that name found!");
                     return;
                 }
@@ -620,41 +620,41 @@ public class ioMain extends Plugin {
 //                }
 //            });
 
-//            handler.<Player>register("rules", "Server rules. Please read carefully.", (args, player) -> { // self info
+            handler.<Player>register("rules", "Server rules. Please read carefully.", (args, player) -> { // self info
 //                PlayerData pd = getData(player.uuid());
-//                if (pd != null) {
-//                    Call.onInfoMessage(player.con, formatMessage(player, ruleMessage));
-//                }
-//            });
 
-//            handler.<Player>register("event", "Join an ongoing event (if there is one)", (args, player) -> { // self info
-//                if(eventIp.length() > 0){
-//                    Call.onConnect(player.con, eventIp, eventPort);
-//                } else{
-//                    player.sendMessage("[accent]There is no ongoing event at this time.");
-//                }
-//            });
+                Call.infoMessage(player.con,ruleMessage);
 
-            handler.<Player>register("maps","[page]", "Display all maps in the playlist.", (args, player) -> { // self info
-                if(args.length > 0 && !Strings.canParseInt(args[0])){
+            });
+
+            handler.<Player>register("event", "Join an ongoing event (if there is one)", (args, player) -> { // self info
+                if(eventIp.length() > 0){
+                    Call.connect(player.con, eventIp, eventPort);
+                } else{
+                    player.sendMessage("[scarlet]There is no ongoing event at this time.");
+                }
+            });
+
+            handler.<Player>register("maps", "[page]", "Display all maps in the playlist.", (args, player) -> { // self info
+                if (args.length > 0 && !Strings.canParseInt(args[0])) {
                     player.sendMessage("[scarlet]'page' must be a number.");
                     return;
                 }
                 int commandsPerPage = 6;
                 int page = args.length > 0 ? Strings.parseInt(args[0]) : 1;
-                int pages = Mathf.ceil((float)Vars.maps.customMaps().size / commandsPerPage);
+                int pages = Mathf.ceil((float) Vars.maps.customMaps().size / commandsPerPage);
 
-                page --;
+                page--;
 
-                if(page >= pages || page < 0){
+                if (page >= pages || page < 0) {
                     player.sendMessage("[scarlet]'page' must be a number between[orange] 1[] and[orange] " + pages + "[scarlet].");
                     return;
                 }
 
                 StringBuilder result = new StringBuilder();
-                result.append(Strings.format("[orange]-- Maps Page[lightgray] {0}[gray]/[lightgray]{1}[orange] --\n\n", (page+1), pages));
+                result.append(Strings.format("[orange]-- Maps Page[lightgray] {0}[gray]/[lightgray]{1}[orange] --\n\n", (page + 1), pages));
 
-                for(int i = commandsPerPage * page; i < Math.min(commandsPerPage * (page + 1), Vars.maps.customMaps().size); i++){
+                for (int i = commandsPerPage * page; i < Math.min(commandsPerPage * (page + 1), Vars.maps.customMaps().size); i++) {
                     mindustry.maps.Map map = Vars.maps.customMaps().get(i);
                     result.append("[white] - [accent]").append(escapeColorCodes(map.name())).append("\n");
                 }
@@ -665,27 +665,27 @@ public class ioMain extends Plugin {
 
             VoteSession[] currentlyKicking = {null};
 
-            handler.<Player>register("nominate","[map...]", "[veteran+] Vote to change to a specific map.", (args, player) -> {
-                if(!state.rules.pvp || player.admin) {
+            handler.<Player>register("nominate", "[map...]", "[veteran+] Vote to change to a specific map.", (args, player) -> {
+                if (!state.rules.pvp || player.admin) {
 //                    PlayerData pd = getData(player.uuid());
 //                    if (pd != null && pd.rank >= 2) {
 
-                        mindustry.maps.Map found = getMapBySelector(args[0]);
+                    mindustry.maps.Map found = getMapBySelector(args[0]);
 
-                        if(found != null){
-                            if(!vtime.get()){
-                                player.sendMessage("[scarlet]You must wait " + voteCooldown/20 + " minutes between nominations.");
-                                return;
-                            }
-
-                            VoteSession session = new VoteSession(currentlyKicking, found);
-
-                            session.vote(player, 1);
-                            vtime.reset();
-                            currentlyKicking[0] = session;
-                        }else{
-                            player.sendMessage("[scarlet]No map[orange]'" + args[0] + "'[scarlet] found.");
+                    if (found != null) {
+                        if (!vtime.get()) {
+                            player.sendMessage("[scarlet]You must wait " + voteCooldown / 20 + " minutes between nominations.");
+                            return;
                         }
+
+                        VoteSession session = new VoteSession(currentlyKicking, found);
+
+                        session.vote(player, 1);
+                        vtime.reset();
+                        currentlyKicking[0] = session;
+                    } else {
+                        player.sendMessage("[scarlet]No map[orange]'" + args[0] + "'[scarlet] found.");
+                    }
 //                    } else {
 //                        player.sendMessage(noPermissionMessage);
 //                    }
@@ -695,11 +695,11 @@ public class ioMain extends Plugin {
             });
 
             handler.<Player>register("rtv", "Vote to change the map.", (args, player) -> { // self info
-                if(currentlyKicking[0] == null){
+                if (currentlyKicking[0] == null) {
                     player.sendMessage("[scarlet]No map is being voted on.");
-                }else{
+                } else {
                     //hosts can vote all they want
-                    if(player.uuid() != null && (currentlyKicking[0].voted.contains(player.uuid()) || currentlyKicking[0].voted.contains(netServer.admins.getInfo(player.uuid()).lastIP))){
+                    if (player.uuid() != null && (currentlyKicking[0].voted.contains(player.uuid()) || currentlyKicking[0].voted.contains(netServer.admins.getInfo(player.uuid()).lastIP))) {
                         player.sendMessage("[scarlet]You've already voted. Sit down.");
                         return;
                     }
@@ -709,7 +709,8 @@ public class ioMain extends Plugin {
             });
 
             handler.<Player>register("label", "<duration> <text...>", "[admin only] Create an in-world label at the current position.", (args, player) -> {
-                if(args[0].length() <= 0 || args[1].length() <= 0) player.sendMessage("[scarlet]Invalid arguments provided.");
+                if (args[0].length() <= 0 || args[1].length() <= 0)
+                    player.sendMessage("[scarlet]Invalid arguments provided.");
                 if (player.admin) {
                     float x = player.getX();
                     float y = player.getY();
@@ -723,20 +724,6 @@ public class ioMain extends Plugin {
 
         }
 
-    }
-
-    public static TextChannel getTextChannel(String id){
-        Optional<Channel> dc = api.getChannelById(id);
-        if (dc.isEmpty()) {
-            Log.err("[ERR!] discordplugin: channel not found! " + id);
-            return null;
-        }
-        Optional<TextChannel> dtc = dc.get().asTextChannel();
-        if (dtc.isEmpty()){
-            Log.err("[ERR!] discordplugin: textchannel not found! " + id);
-            return null;
-        }
-        return dtc.get();
     }
 
 }
