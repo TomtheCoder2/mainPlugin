@@ -17,16 +17,20 @@ import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
 import mindustry.plugin.discordcommands.RoleRestrictedCommand;
+import mindustry.plugin.requests.GetMap;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAttachment;
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
+import redis.clients.util.IOUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.zip.InflaterInputStream;
 
@@ -34,6 +38,7 @@ import static mindustry.Vars.*;
 import static mindustry.plugin.Utils.*;
 
 public class ServerCommands {
+    public GetMap map = new GetMap();
 
     private JSONObject data;
 
@@ -59,7 +64,7 @@ public class ServerCommands {
                     eb.addField(m.name(), m.width + " x " + m.height);
                 }
                 msg.append("```");
-                ctx.channel.sendMessage(msg.toString());
+//                ctx.channel.sendMessage(msg.toString());
                 ctx.channel.sendMessage(eb);
             }
         });
@@ -1279,8 +1284,49 @@ public class ServerCommands {
                             .setTimestampToNow()
                             .addField("Name", ml.get(0).getFileName())
                             .addField("URL", String.valueOf(ml.get(0).getUrl()));
+
+                    try {
+//                        byte[] data = cf.get();
+//                        CompletableFuture<byte[]> data = ml.get(0).downloadAsByteArray();
+                        InputStream data = ml.get(0).downloadAsInputStream();
+//                        data.exceptionally(error -> { // handle possible errors
+//                            error.printStackTrace();
+//                            return null;
+//                        });
+                        File outFile = new File("./temp/upload.msav");
+//                        Files.write(Paths.get("./temp/upload.msav"), data);
+//                        DataOutputStream dout = new DataOutputStream(outFile);
+//                        dout.write(data);
+                        java.nio.file.Files.copy(
+                                data,
+                                outFile.toPath(),
+                                StandardCopyOption.REPLACE_EXISTING);
+
+//                        IOUtils.closeQuietly(data);
+                        List<String> mapData = map.getMap(new Fi("./temp/upload.msav"));
+                        System.out.println(mapData.get(0));
+
+                        EmbedBuilder embed = new EmbedBuilder()
+                                .setTitle(escapeCharacters(mapData.get(6)))
+                                .setDescription(escapeCharacters(mapData.get(5)))
+//                                .setAuthor(escapeCharacters(mapData.get(1)))
+                                .setAuthor(ctx.author.getName(), ctx.author.getAvatar().getUrl().toString(), ctx.author.getAvatar().getUrl().toString())
+                                .setImage("attachment://" + mapData.get(6)+".png");
+                        MessageBuilder mb = new MessageBuilder();
+                        mb.addEmbed(embed);
+//                        mb.addFile(new File(mapData.get(0)));
+                        InputStream PNG = new FileInputStream(mapData.get(0));
+                        mb.addFile(PNG, mapData.get(6)+".png");
+//                        mb.addFile(new File("./temp/upload.msav"));
+                        InputStream initialStream = new FileInputStream(
+                                new File("./temp/upload.msav"));
+                        mb.addFile(initialStream, mapData.get(6)+".msav");
+                        mb.send(tc);
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
                     assert tc != null;
-                    tc.sendMessage(eb2);
+//                    tc.sendMessage(eb2);
                 }
             });
         }

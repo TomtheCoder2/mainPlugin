@@ -1,37 +1,25 @@
 package mindustry.plugin;
 
 import java.awt.*;
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
-import java.time.Instant;
+import java.io.File;
 import java.util.*;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.IntStream;
 
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.util.*;
 import arc.util.Timer;
 import com.google.gson.Gson;
-import arc.util.Timer.Task;
-import mindustry.content.*;
 import mindustry.core.NetClient;
 //import mindustry.entities.Effects;
 //import mindustry.entities.traits.Entity;
 //import mindustry.entities.type.BaseUnit;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
-import mindustry.graphics.Pal;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration;
 import mindustry.net.Administration.Config;
-import mindustry.type.UnitType;
-import mindustry.world.Build;
-import mindustry.type.UnitType;
+import mindustry.plugin.requests.GetMap;
 import mindustry.world.Tile;
-import mindustry.game.Team;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.channel.Channel;
@@ -39,7 +27,6 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.user.User;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -50,15 +37,16 @@ import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.MediaType;
 
 import static mindustry.Vars.*;
 import static mindustry.plugin.Utils.*;
 
 public class ioMain extends Plugin {
+//    public static final File prefsFile = new File("prefs.properties");
+//    public static Net net = new Net();
+//    public static Prefs prefs = new Prefs(prefsFile);
+//    public GetMap map = new GetMap();
+
     public static JedisPool pool;
     static Gson gson = new Gson();
 
@@ -739,12 +727,12 @@ public class ioMain extends Plugin {
 
     public static TextChannel getTextChannel(String id){
         Optional<Channel> dc = api.getChannelById(id);
-        if (!dc.isPresent()) {
+        if (dc.isEmpty()) {
             Log.err("[ERR!] discordplugin: channel not found! " + id);
             return null;
         }
         Optional<TextChannel> dtc = dc.get().asTextChannel();
-        if (!dtc.isPresent()){
+        if (dtc.isEmpty()){
             Log.err("[ERR!] discordplugin: textchannel not found! " + id);
             return null;
         }

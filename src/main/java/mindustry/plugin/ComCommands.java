@@ -14,18 +14,24 @@ import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
 import mindustry.plugin.discordcommands.RoleRestrictedCommand;
+import mindustry.plugin.requests.GetMap;
 import mindustry.world.modules.ItemModule;
-import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;
+import java.io.File;
 
 import static mindustry.Vars.state;
 import static mindustry.plugin.Utils.*;
-import static mindustry.plugin.ioMain.getTextChannel;
+
+import mindustry.plugin.ioMain.*;
 
 public class ComCommands {
+//    public static ContentHandler contentHandler = new ContentHandler();
+
+    GetMap map = new GetMap();
+
     public void registerCommands(DiscordCommands handler) {
         handler.registerCommand(new Command("chat") {
             {
@@ -48,7 +54,7 @@ public class ComCommands {
                 }
             }
         });
-        handler.registerCommand(new Command("downloadmap") {
+        handler.registerCommand(new Command("map") {
             {
                 help = "Preview and download a server map in a .msav file format.";
                 usage = "<mapname/mapid>";
@@ -66,14 +72,26 @@ public class ComCommands {
                     return;
                 }
 
-                Fi mapFile = found.file;
+                Fi mapfile = found.file;
+                try {
+                    String absolute = map.getMap(mapfile).get(0);
+                    System.out.println(absolute);
 
-                EmbedBuilder embed = new EmbedBuilder()
-                        .setTitle(escapeCharacters(found.name()))
-                        .setDescription(escapeCharacters(found.description()))
-                        .setAuthor(escapeCharacters(found.author()));
-                // TODO: .setImage(mapPreviewImage)
-                ctx.channel.sendMessage(embed, mapFile.file());
+                    EmbedBuilder embed = new EmbedBuilder()
+                            .setTitle(escapeCharacters(found.name()))
+                            .setDescription(escapeCharacters(found.description()))
+                            .setAuthor(escapeCharacters(found.author()))
+                            .setImage("attachment://output.png");
+                    MessageBuilder mb = new MessageBuilder();
+                    mb.addEmbed(embed);
+                    mb.addFile(new File(absolute));
+                    mb.addAttachment(mapfile.file());
+                    mb.send(ctx.channel);
+                } catch (Exception e) {
+                    String err = Strings.neatError(e, true);
+                    int max = 900;
+//                    errDelete(msg, "Error parsing map.", err.length() < max ? err : err.substring(0, max));
+                }
             }
         });
         handler.registerCommand(new Command("players") {

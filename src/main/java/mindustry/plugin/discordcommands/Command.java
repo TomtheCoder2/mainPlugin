@@ -1,5 +1,7 @@
 package mindustry.plugin.discordcommands;
 
+import java.io.IOException;
+
 /** Represents a command */
 public abstract class Command {
     public String name;

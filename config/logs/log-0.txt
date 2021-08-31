@@ -287,3 +287,70 @@
 [08-30-2021 17:08:47] [I] motd set to off.
 [08-30-2021 17:08:51] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
 [08-30-2021 17:08:53] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[08-30-2021 17:15:23] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[08-30-2021 17:24:11] [I] Game over! Reached wave 16 with 0 players online on map V130: Polluted river: Crux.
+[08-30-2021 17:24:11] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[08-30-2021 17:29:05] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[08-30-2021 17:29:05] [I] Selected next map to be Mision 12 - Base pretrolera.
+[08-30-2021 17:34:21] [I] 1 mods loaded.
+[08-30-2021 17:34:21] [I] Server loaded. Type 'help' for help.
+[08-30-2021 17:34:24] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[08-30-2021 17:34:24] [I] Loading map...
+[08-30-2021 17:34:25] [I] Map loaded.
+[08-30-2021 17:34:25] [I] Opened a server on port 6567.
+[08-30-2021 17:39:07] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[08-30-2021 17:39:07] [I] Selected next map to be Mision 12 - Base pretrolera.
+[08-30-2021 18:15:29] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[08-30-2021 18:15:29] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[08-30-2021 18:19:22] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[08-30-2021 18:19:22] [I] Selected next map to be Mision 12 - Base pretrolera.
+[08-30-2021 18:56:07] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[08-30-2021 18:56:07] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[08-30-2021 18:59:29] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[08-30-2021 18:59:29] [I] Selected next map to be Mision 12 - Base pretrolera.
+[08-30-2021 19:35:19] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[08-30-2021 19:35:19] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[08-30-2021 19:39:27] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[08-30-2021 19:39:27] [I] Selected next map to be Mision 12 - Base pretrolera.
+[08-30-2021 20:10:48] [I] 1 mods loaded.
+[08-30-2021 20:10:48] [I] Server loaded. Type 'help' for help.
+[08-30-2021 21:46:41] [I] 1 mods loaded.
+[08-30-2021 21:46:41] [I] Server loaded. Type 'help' for help.
+[08-31-2021 14:28:58] [I] 1 mods loaded.
+[08-31-2021 14:28:58] [I] Server loaded. Type 'help' for help.
+[08-31-2021 14:49:06] [I] 1 mods loaded.
+[08-31-2021 14:49:06] [I] Server loaded. Type 'help' for help.
+[08-31-2021 14:50:17] [I] 1 mods loaded.
+[08-31-2021 14:50:17] [I] Server loaded. Type 'help' for help.
+[08-31-2021 14:51:57] [I] 1 mods loaded.
+[08-31-2021 14:51:57] [I] Server loaded. Type 'help' for help.
+[08-31-2021 14:59:28] [I] 1 mods loaded.
+[08-31-2021 14:59:28] [I] Server loaded. Type 'help' for help.
+[08-31-2021 15:05:01] [I] 1 mods loaded.
+[08-31-2021 15:05:01] [I] Server loaded. Type 'help' for help.
+[08-31-2021 15:51:06] [I] 1 mods loaded.
+[08-31-2021 15:51:06] [I] Server loaded. Type 'help' for help.
+[08-31-2021 15:51:47] [I] 1 mods loaded.
+[08-31-2021 15:51:47] [I] Server loaded. Type 'help' for help.
+[08-31-2021 16:48:09] [I] 1 mods loaded.
+[08-31-2021 16:48:09] [I] Server loaded. Type 'help' for help.
+[08-31-2021 17:02:43] [I] 1 mods loaded.
+[08-31-2021 17:02:43] [I] Server loaded. Type 'help' for help.
+[08-31-2021 17:04:46] [I] 1 mods loaded.
+[08-31-2021 17:04:46] [I] Server loaded. Type 'help' for help.
+[08-31-2021 17:05:40] [I] 1 mods loaded.
+[08-31-2021 17:05:40] [I] Server loaded. Type 'help' for help.
+[08-31-2021 17:25:38] [I] 1 mods loaded.
+[08-31-2021 17:25:38] [I] Server loaded. Type 'help' for help.
+[08-31-2021 17:27:05] [I] 1 mods loaded.
+[08-31-2021 17:27:05] [I] Server loaded. Type 'help' for help.
+[08-31-2021 17:34:19] [I] 1 mods loaded.
+[08-31-2021 17:34:19] [I] Server loaded. Type 'help' for help.
+[08-31-2021 17:39:55] [I] 1 mods loaded.
+[08-31-2021 17:39:55] [I] Server loaded. Type 'help' for help.
+[08-31-2021 17:41:20] [I] 1 mods loaded.
+[08-31-2021 17:41:20] [I] Server loaded. Type 'help' for help.
+[08-31-2021 17:42:34] [I] 1 mods loaded.
+[08-31-2021 17:42:34] [I] Server loaded. Type 'help' for help.
+[08-31-2021 17:46:20] [I] 1 mods loaded.
+[08-31-2021 17:46:20] [I] Server loaded. Type 'help' for help.

@@ -22,6 +22,7 @@ public class Context {
         this.message = message;
         this.channel = event.getChannel();
         this.author = event.getMessageAuthor();
+
     }
 
     /**
