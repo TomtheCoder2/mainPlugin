@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import mindustry.gen.Call;
 import mindustry.plugin.ioMain;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -45,6 +46,10 @@ public class DiscordCommands implements MessageCreateListener {
      * @param event Source event associated with the message
      */
     public void onMessageCreate(MessageCreateEvent event) {
+        if (event.getChannel().getId() == 881300954845179914L && !event.getMessageAuthor().isBotUser()) {
+            System.out.println(event.getMessageContent());
+            Call.sendMessage("[sky]" + event.getMessageAuthor().getName() + " @discord >[] " + event.getMessage().getContent());
+        }
         for(MessageCreatedListener listener: messageCreatedListenerRegistry) listener.run(event);
 
         String message = event.getMessageContent();

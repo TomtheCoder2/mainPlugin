@@ -38,6 +38,7 @@ dependencies {
     compileOnly("javax.ws.rs:javax.ws.rs-api:2.0.1")
     implementation 'com.google.code.gson:gson:2.8.8'
     implementation("net.dv8tion:JDA:4.3.0_277")
+    implementation 'org.postgresql:postgresql:42.2.10'
 
 }
 

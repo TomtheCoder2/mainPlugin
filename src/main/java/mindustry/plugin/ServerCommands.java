@@ -13,6 +13,8 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.io.SaveIO;
 import mindustry.maps.Map;
+import mindustry.net.Administration;
+import mindustry.net.Packets;
 import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
@@ -24,11 +26,13 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.user.User;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.zip.InflaterInputStream;
@@ -69,43 +73,89 @@ public class ServerCommands {
         });
         if (data.has("administrator_roleid")) {
             String adminRole = data.getString("administrator_roleid");
-//            handler.registerCommand(new RoleRestrictedCommand("setrank"){
-//                {
-//                    help = "<playerid|ip|name> <rank> Change the player's rank to the provided one.";
-//                    role = adminRole;
-//                }
-//
-//                public void run(Context ctx) {
-//                    CompletableFuture.runAsync(() -> {
-//                        EmbedBuilder eb = new EmbedBuilder();
-//                        String target = ctx.args[1];
-//                        int targetRank = Integer.parseInt(ctx.args[2]);
-//                        if (target.length() > 0 && targetRank > -1 && targetRank < 6) {
-//                            Player player = findPlayer(target);
-//                            if (player == null) {
-//                                eb.setTitle("Command terminated");
-//                                eb.setDescription("Player not found.");
-//                                eb.setColor(Pals.error);
-//                                ctx.channel.sendMessage(eb);
-//                                return;
-//                            }
-//
-//                            PlayerData pd = getData(player.uuid);
-//                            if (pd != null) {
-//                                pd.rank = targetRank;
-//                                setData(player.uuid, pd);
-//                                eb.setTitle("Command executed successfully");
+            handler.registerCommand(new RoleRestrictedCommand("setrank") {
+                {
+                    help = "Change the player's rank to the provided one.";
+                    usage = "<playerid|ip|name> <rank>";
+                    role = adminRole;
+                }
+
+                public void run(Context ctx) {
+                    CompletableFuture.runAsync(() -> {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        String target = ctx.args[1];
+                        int targetRank = Integer.parseInt(ctx.args[2]);
+                        if (target.length() > 0 && targetRank > -1 && targetRank < 6) {
+                            Player player = findPlayer(target);
+                            if (player == null) {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("Player not found.");
+                                eb.setColor(Pals.error);
+                                ctx.channel.sendMessage(eb);
+                                return;
+                            }
+
+                            PlayerData pd = getData(player.uuid());
+                            if (pd != null) {
+                                pd.rank = targetRank;
+                                setData(player.uuid(), pd);
+                                eb.setTitle("Command executed successfully");
+                                eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + targetRank);
+                                ctx.channel.sendMessage(eb);
+                                player.con.kick("Your rank was modified, please rejoin.", 0);
+                            }
+
+                            if (targetRank == 5) netServer.admins.adminPlayer(player.uuid(), player.usid());
+                        }
+                    });
+                }
+
+            });
+            handler.registerCommand(new RoleRestrictedCommand("setstats") {
+                {
+                    help = "Change the player's statistics to the provided one.";
+                    usage = "<playerid|ip|name> <rank> <playTime> <buildingsBuilt> <gamesPlayed>";
+                    role = adminRole;
+                }
+
+                public void run(Context ctx) {
+                    CompletableFuture.runAsync(() -> {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        String target = ctx.args[1];
+                        int targetRank = Integer.parseInt(ctx.args[2]);
+                        int playTime = Integer.parseInt(ctx.args[3]);
+                        int buildingsBuilt = Integer.parseInt(ctx.args[4]);
+                        int gamesPlayed = Integer.parseInt(ctx.args[5]);
+                        if (target.length() > 0 && targetRank > -1 && targetRank < 6) {
+                            Player player = findPlayer(target);
+                            if (player == null) {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("Player not found.");
+                                eb.setColor(Pals.error);
+                                ctx.channel.sendMessage(eb);
+                                return;
+                            }
+
+                            PlayerData pd = getData(player.uuid());
+                            if (pd != null) {
+                                pd.buildingsBuilt = buildingsBuilt;
+                                pd.gamesPlayed = gamesPlayed;
+                                pd.playTime = playTime;
+                                pd.rank = targetRank;
+                                setData(player.uuid(), pd);
+                                eb.setTitle("Command executed successfully");
+                                eb.setDescription(String.format("Set stats of %s to:\nPlaytime: %d\nGames played: %d\nBuildings built: %d", escapeColorCodes(player.name), playTime, gamesPlayed, buildingsBuilt));
 //                                eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + targetRank);
-//                                ctx.channel.sendMessage(eb);
+                                ctx.channel.sendMessage(eb);
 //                                player.con.kick("Your rank was modified, please rejoin.", 0);
-//                            }
-//
-//                            if (targetRank == 5) netServer.admins.adminPlayer(player.uuid, player.usid);
-//                        }
-//                    });
-//                }
-//
-//            });
+                            }
+
+                            if (targetRank == 5) netServer.admins.adminPlayer(player.uuid(), player.usid());
+                        }
+                    });
+                }
+
+            });
         }
 
         if (data.has("exit_roleid")) {
@@ -365,301 +415,316 @@ public class ServerCommands {
                 }
             });
 
-//            handler.registerCommand(new RoleRestrictedCommand("ban"){
-//                {
-//                    help = "<player> [reason..] Ban the provided player with a specific reason.";
-//                    role = banRole;
-//                }
+            handler.registerCommand(new RoleRestrictedCommand("ban") {
+                {
+                    help = "Ban the provided player with a specific reason.";
+                    usage = "<player> [reason..]";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    CompletableFuture.runAsync(() -> {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        String target = ctx.args[1];
+                        String reason = ctx.message.substring(target.length() + 1);
+
+                        Player player = findPlayer(target);
+                        if (player != null) {
+                            String uuid = player.uuid();
+                            String banId = uuid.substring(0, 4);
+                            PlayerData pd = getData(uuid);
+                            if (pd != null) {
+                                pd.banned = true;
+                                pd.banReason = reason + "\n[accent]Ban ID:[] " + banId;
+                                setData(uuid, pd);
+                            }
+                            netServer.admins.banPlayerIP(player.con.address);
+                            eb.setTitle("Banned `" + escapeCharacters(player.name) + "` permanently.");
+                            eb.addField("UUID", uuid);
+                            eb.addField("Ban ID", banId);
+                            eb.addField("IP", player.con.address);
+                            eb.addInlineField("Reason", reason);
+                            ctx.channel.sendMessage(eb);
+
+                            player.con.kick(Packets.KickReason.banned);
+                        } else {
+                            eb.setTitle("Player `" + escapeCharacters(target) + "` not found.");
+                            eb.setColor(Pals.error);
+                            ctx.channel.sendMessage(eb);
+                        }
+                    });
+                }
+            });
 //
-//                public void run(Context ctx) {
-//                    CompletableFuture.runAsync(() -> {
-//                        EmbedBuilder eb = new EmbedBuilder();
-//                        String target = ctx.args[1];
-//                        String reason = ctx.message.substring(target.length() + 1);
-//
-//                        Player player = findPlayer(target);
-//                        if (player != null) {
-//                            String uuid = player.uuid();
-//                            String banId = uuid.substring(0, 4);
-//                            PlayerData pd = getData(uuid);
-//                            if (pd != null) {
-//                                pd.banned = true;
-//                                pd.banReason = reason + "\n[accent]Ban ID:[] " + banId;
-//                                setData(uuid, pd);
-//                            }
-//                            netServer.admins.banPlayerIP(player.con.address);
-//                            eb.setTitle("Banned `" + escapeCharacters(player.name) + "` permanently.");
-//                            eb.addField("UUID", uuid);
-//                            eb.addField("Ban ID", banId);
-//                            eb.addField("IP", player.con.address);
-//                            eb.addInlineField("Reason", reason);
-//                            ctx.channel.sendMessage(eb);
-//
-//                            player.con.kick(Packets.KickReason.banned);
-//                        } else {
-//                            eb.setTitle("Player `" + escapeCharacters(target) + "` not found.");
-//                            eb.setColor(Pals.error);
-//                            ctx.channel.sendMessage(eb);
-//                        }
-//                    });
-//                }
-//            });
-//
-//            handler.registerCommand(new RoleRestrictedCommand("blacklist") {
-//                {
-//                    help = "<uuid> Ban a player by the provided uuid.";
-//                    role = banRole;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder()
-//                            .setTimestampToNow();
-//                    String target = ctx.args[1];
-//                    PlayerData pd = getData(target);
-//                    Administration.PlayerInfo info = netServer.admins.getInfoOptional(target);
-//
-//                    if (pd != null && info != null) {
-//                        pd.banned = true;
-//                        setData(target, pd);
-//                        eb.setTitle("Blacklisted successfully.");
-//                        eb.setDescription("`" + escapeCharacters(info.lastName) + "` was banned.");
-//                    } else {
-//                        eb.setTitle("Command terminated");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("UUID `" + escapeCharacters(target) + "` was not found in the database.");
-//                    }
-//                    ctx.channel.sendMessage(eb);
-//                }
-//            });
+            handler.registerCommand(new RoleRestrictedCommand("blacklist") {
+                {
+                    help = "Ban a player by the provided uuid.";
+                    usage = "<uuid>";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTimestampToNow();
+                    String target = ctx.args[1];
+                    PlayerData pd = getData(target);
+                    Administration.PlayerInfo info = netServer.admins.getInfoOptional(target);
+
+                    if (pd != null && info != null) {
+                        pd.banned = true;
+                        setData(target, pd);
+                        eb.setTitle("Blacklisted successfully.");
+                        eb.setDescription("`" + escapeCharacters(info.lastName) + "` was banned.");
+                    } else {
+                        eb.setTitle("Command terminated");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("UUID `" + escapeCharacters(target) + "` was not found in the database.");
+                    }
+                    ctx.channel.sendMessage(eb);
+                }
+            });
 //
 //
-//            handler.registerCommand(new RoleRestrictedCommand("expel"){
-//                {
-//                    help = "<player> <duration (minutes)> [reason..] Ban the provided player for a specific duration with a specific reason.";
-//                    role = banRole;
-//                }
+            handler.registerCommand(new RoleRestrictedCommand("expel") {
+                {
+                    help = "Ban the provided player for a specific duration with a specific reason.";
+                    usage = "<player> <duration (minutes)> [reason..]";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    CompletableFuture.runAsync(() -> {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        String target = ctx.args[1];
+                        String targetDuration = ctx.args[2];
+                        String reason = ctx.message.substring(target.length() + targetDuration.length() + 2);
+                        long now = Instant.now().getEpochSecond();
+
+                        Player player = findPlayer(target);
+                        if (player != null) {
+                            String uuid = player.uuid();
+                            String banId = uuid.substring(0, 4);
+                            PlayerData pd = getData(uuid);
+                            long until = now + Integer.parseInt(targetDuration) * 60;
+                            if (pd != null) {
+                                pd.bannedUntil = until;
+                                pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
+                                setData(uuid, pd);
+                            }
+
+                            eb.setTitle("Banned `" + escapeCharacters(player.name) + "` permanently.");
+                            eb.addField("UUID", uuid);
+                            eb.addField("Ban ID", banId);
+                            eb.addField("For", targetDuration + " minutes.");
+                            eb.addField("Until", epochToString(until));
+                            eb.addInlineField("Reason", reason);
+                            ctx.channel.sendMessage(eb);
+
+                            player.con.kick(Packets.KickReason.banned);
+                        } else {
+                            eb.setTitle("Player `" + escapeCharacters(target) + "` not found.");
+                            eb.setColor(Pals.error);
+                            ctx.channel.sendMessage(eb);
+                        }
+                    });
+                }
+            });
 //
-//                public void run(Context ctx) {
-//                    CompletableFuture.runAsync(() -> {
-//                        EmbedBuilder eb = new EmbedBuilder();
-//                        String target = ctx.args[1];
-//                        String targetDuration = ctx.args[2];
-//                        String reason = ctx.message.substring(target.length() + targetDuration.length() + 2);
-//                        long now = Instant.now().getEpochSecond();
+            handler.registerCommand(new RoleRestrictedCommand("kick") {
+                {
+                    help = "Kick the provided player with a specific reason.";
+                    usage = "<player> [reason..]";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1];
+                    String reason = ctx.message.substring(target.length() + 1);
+
+                    Player player = findPlayer(target);
+                    if (player != null) {
+                        String uuid = player.uuid();
+                        eb.setTitle("Kicked `" + escapeCharacters(player.name) + "`.");
+                        eb.addField("UUID", uuid);
+                        eb.addInlineField("Reason", reason);
+                        ctx.channel.sendMessage(eb);
+
+                        player.con.kick(Packets.KickReason.kick);
+                    } else {
+                        eb.setTitle("Player `" + escapeCharacters(target) + "` not found.");
+                        eb.setColor(Pals.error);
+                        ctx.channel.sendMessage(eb);
+                    }
+                }
+            });
 //
-//                        Player player = findPlayer(target);
-//                        if (player != null) {
-//                            String uuid = player.uuid;
-//                            String banId = uuid.substring(0, 4);
-//                            PlayerData pd = getData(uuid);
-//                            long until = now + Integer.parseInt(targetDuration) * 60;
-//                            if (pd != null) {
-//                                pd.bannedUntil = until;
-//                                pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
-//                                setData(uuid, pd);
-//                            }
+            handler.registerCommand(new RoleRestrictedCommand("unban") {
+                {
+                    help = "Unban the player by the provided uuid.";
+                    usage = "<uuid>";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1];
+                    PlayerData pd = getData(target);
+
+                    if (pd != null) {
+                        pd.banned = false;
+                        pd.bannedUntil = 0;
+                        Administration.PlayerInfo info = netServer.admins.getInfo(target);
+                        netServer.admins.unbanPlayerID(target);
+                        eb.setTitle("Unbanned `" + escapeCharacters(info.lastName) + "`.");
+                        ctx.channel.sendMessage(eb);
+                        setData(target, pd);
+                    } else {
+                        eb.setTitle("UUID `" + escapeCharacters(target) + "` not found in the database.");
+                        eb.setColor(Pals.error);
+                        ctx.channel.sendMessage(eb);
+                    }
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("unbanip") {
+                {
+                    help = "Unban the player by the provided IP.";
+                    usage = "<uuid>";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1];
+                    if (!netServer.admins.isIPBanned(target)) {
+                        eb.setTitle("IP `" + escapeCharacters(target) + "` was not banned");
+                        eb.setColor(Pals.error);
+                    } else {
+                        netServer.admins.unbanPlayerIP(target);
+                        eb.setTitle("Unbanned IP `" + escapeCharacters(target) + "`");
+                    }
+                    ctx.channel.sendMessage(eb);
+                }
+            });
 //
-//                            eb.setTitle("Banned `" + escapeCharacters(player.name) + "` permanently.");
-//                            eb.addField("UUID", uuid);
-//                            eb.addField("Ban ID", banId);
-//                            eb.addField("For", targetDuration + " minutes.");
-//                            eb.addField("Until", epochToString(until));
-//                            eb.addInlineField("Reason", reason);
-//                            ctx.channel.sendMessage(eb);
+            handler.registerCommand(new RoleRestrictedCommand("unvotekick") {
+                EmbedBuilder eb = new EmbedBuilder();
+
+                {
+                    help = "Unvotekickban the specified player";
+                    usage = "<uuid>";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    String target = ctx.args[1];
+                    Administration.PlayerInfo info = netServer.admins.getInfo(target);
+
+                    if (info != null) {
+                        info.lastKicked = 0;
+                        eb.setTitle("Command executed.");
+                        eb.setDescription("Unvotekickbanned `" + target + "` succeessfully.");
+                    } else {
+                        eb.setTitle("Command terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("That ID isn't votekickbanned!");
+                    }
+                    ctx.channel.sendMessage(eb);
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("playersinfo") {
+                {
+                    help = "Check the information about all players on the server.";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    StringBuilder msg = new StringBuilder("**Players online: " + Groups.player.size() + "**\n```\n");
+                    for (Player player : Groups.player) {
+                        msg.append("· ").append(escapeCharacters(player.name));
+                        if (!player.admin) {
+                            msg.append(" : ").append(player.con.address).append(" : ").append(player.uuid()).append("\n");
+                        } else {
+                            msg.append("\n");
+                        }
+                    }
+                    msg.append("```");
+
+                    ctx.channel.sendMessage(msg.toString());
+                }
+            });
 //
-//                            player.con.kick(Packets.KickReason.banned);
-//                        } else {
-//                            eb.setTitle("Player `" + escapeCharacters(target) + "` not found.");
-//                            eb.setColor(Pals.error);
-//                            ctx.channel.sendMessage(eb);
-//                        }
-//                    });
-//                }
-//            });
-//
-//            handler.registerCommand(new RoleRestrictedCommand("kick"){
-//                {
-//                    help = "<player> [reason..] Kick the provided player with a specific reason.";
-//                    role = banRole;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1];
-//                    String reason = ctx.message.substring(target.length() + 1);
-//
-//                    Player player = findPlayer(target);
-//                    if (player != null) {
-//                        String uuid = player.uuid;
-//                        eb.setTitle("Kicked `" + escapeCharacters(player.name) + "`.");
-//                        eb.addField("UUID", uuid);
-//                        eb.addInlineField("Reason", reason);
-//                        ctx.channel.sendMessage(eb);
-//
-//                        player.con.kick(Packets.KickReason.kick);
-//                    } else{
-//                        eb.setTitle("Player `" + escapeCharacters(target) + "` not found.");
-//                        eb.setColor(Pals.error);
-//                        ctx.channel.sendMessage(eb);
-//                    }
-//                }
-//            });
-//
-//            handler.registerCommand(new RoleRestrictedCommand("unban"){
-//                {
-//                    help = "<uuid> Unban the player by the provided uuid.";
-//                    role = banRole;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1];
-//                    PlayerData pd = getData(target);
-//
-//                    if (pd != null) {
-//                        pd.banned = false;
-//                        pd.bannedUntil = 0;
-//                        Administration.PlayerInfo info = netServer.admins.getInfo(target);
-//                        netServer.admins.unbanPlayerID(target);
-//                        eb.setTitle("Unbanned `" + escapeCharacters(info.lastName) + "`.");
-//                        ctx.channel.sendMessage(eb);
-//                        setData(target, pd);
-//                    } else{
-//                        eb.setTitle("UUID `" + escapeCharacters(target) + "` not found in the database.");
-//                        eb.setColor(Pals.error);
-//                        ctx.channel.sendMessage(eb);
-//                    }
-//                }
-//            });
-//
-//            handler.registerCommand(new RoleRestrictedCommand("unbanip"){
-//                {
-//                    help = "<uuid> Unban the player by the provided IP.";
-//                    role = banRole;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1];
-//                    if (!netServer.admins.isIPBanned(target)) {
-//                        eb.setTitle("IP `" + escapeCharacters(target) + "` was not banned");
-//                        eb.setColor(Pals.error);
-//                    } else {
-//                        netServer.admins.unbanPlayerIP(target);
-//                        eb.setTitle("Unbanned IP `" + escapeCharacters(target) + "`");
-//                    }
-//                    ctx.channel.sendMessage(eb);
-//                }
-//            });
-//
-//            handler.registerCommand(new RoleRestrictedCommand("unvotekick") {
-//                EmbedBuilder eb = new EmbedBuilder();
-//                {
-//                    help = "<uuid> Unvotekickban the specified player";
-//                    role = banRole;
-//                }
-//                public void run(Context ctx) {
-//                    String target = ctx.args[1];
-//                    Administration.PlayerInfo info = netServer.admins.getInfo(target);
-//
-//                    if (info != null) {
-//                        info.lastKicked = 0;
-//                        eb.setTitle("Command executed.");
-//                        eb.setDescription("Unvotekickbanned `" + target + "` succeessfully.");
-//                    } else {
-//                        eb.setTitle("Command terminated.");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("That ID isn't votekickbanned!");
-//                    }
-//                    ctx.channel.sendMessage(eb);
-//                }
-//            });
-//            handler.registerCommand(new RoleRestrictedCommand("playersinfo") {
-//                {
-//                    help = "Check the information about all players on the server.";
-//                    role = banRole;
-//                }
-//                public void run(Context ctx) {
-//                    StringBuilder msg = new StringBuilder("**Players online: " + playerGroup.size() + "**\n```\n");
-//                    for (Player player : Groups.player) {
-//                        msg.append("· ").append(escapeCharacters(player.name));
-//                        if(!player.isAdmin) {
-//                            msg.append(" : ").append(player.con.address).append(" : ").append(player.uuid).append("\n");
-//                        } else {
-//                            msg.append("\n");
-//                        }
-//                    }
-//                    msg.append("```");
-//
-//                    ctx.channel.sendMessage(msg.toString());
-//                }
-//            });
-//
-//            handler.registerCommand(new RoleRestrictedCommand("lookup") {
-//                {
-//                    help = "<player> Check all information about the specified player.";
-//                    role = banRole;
-//                }
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1];
-//
-////                    Administration.PlayerInfo info = null;
-//                    Player player = findPlayer(target);
-//                    if (player != null) {
-//                        info = netServer.admins.getInfo(player.uuid());
-//                    } else{
-//                        info = netServer.admins.getInfoOptional(target);
-//                    }
-//
-//                    if(info != null) {
-//                        eb.setTitle(escapeCharacters(info.lastName) + "'s lookup");
-//                        eb.addField("UUID", info.id);
-//                        eb.addField("Last used ip", info.lastIP);
-//                        eb.addField("Times kicked", String.valueOf(info.timesKicked));
-//
-//                        PlayerData pd = getData(info.id);
-//                        if(pd != null){
-//                            eb.addField("Rank", rankNames.get(pd.rank).name);
-//                            eb.addField("Playtime", pd.playTime + " minutes");
-//                            eb.addField("Games", String.valueOf(pd.gamesPlayed));
-//                            eb.addField("Buildings built", String.valueOf(pd.buildingsBuilt));
-//
-//                            CompletableFuture<User> user = ioMain.api.getUserById(pd.discordLink);
-//                            user.thenAccept(user1 -> {
-//                                eb.addField("Discord Link", user1.getDiscriminatedName());
-//                            });
-//                        }
-//                        StringBuilder s = new StringBuilder();
-//                        s.append("**All used names: **\n");
-//                        for (String name : info.names) {
-//                            s.append(escapeCharacters(name)).append(" / ");
-//                        }
-//                        s.append("\n\n**All used IPs: **\n");
-//                        for (String ip : info.ips) {
-//                            s.append(escapeCharacters(ip)).append(" / ");
-//                        }
-//                        eb.setDescription(s.toString());
-//                        ctx.channel.sendMessage(eb);
-//                    }
-//                }
-//            });
-//            handler.registerCommand(new RoleRestrictedCommand("syncserver") {
-//                {
-//                    help = "Tell everyone to resync.";
-//                    role = banRole;
-//                }
-//                public void run(Context ctx) {
-//                    for(Player p : Groups.player) {
-//                        Call.onWorldDataBegin(p.con);
-//                        netServer.sendWorldData(p);
-//                    }
-//                    EmbedBuilder eb = new EmbedBuilder()
-//                            .setTitle("Command executed.")
-//                            .setDescription("Synchronized every player's client with the server.");
-//                    ctx.channel.sendMessage(eb);
-//                }
-//            });
+            handler.registerCommand(new RoleRestrictedCommand("lookup") {
+                {
+                    help = "Check all information about the specified player.";
+                    usage = "<player>";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1];
+
+                    Administration.PlayerInfo info = null;
+                    Player player = findPlayer(target);
+                    if (player != null) {
+                        info = netServer.admins.getInfo(player.uuid());
+                    } else {
+                        info = netServer.admins.getInfoOptional(target);
+                    }
+
+                    if (info != null) {
+                        eb.setTitle(escapeCharacters(info.lastName) + "'s lookup");
+                        eb.addField("UUID", info.id);
+                        eb.addField("Last used ip", info.lastIP);
+                        eb.addField("Times kicked", String.valueOf(info.timesKicked));
+
+                        PlayerData pd = getData(info.id);
+                        if (pd != null) {
+                            eb.addField("Rank", rankNames.get(pd.rank).name);
+                            eb.addField("Playtime", pd.playTime + " minutes");
+                            eb.addField("Games", String.valueOf(pd.gamesPlayed));
+                            eb.addField("Buildings built", String.valueOf(pd.buildingsBuilt));
+
+                            CompletableFuture<User> user = ioMain.api.getUserById(pd.discordLink);
+                            user.thenAccept(user1 -> {
+                                eb.addField("Discord Link", user1.getDiscriminatedName());
+                            });
+                        }
+                        StringBuilder s = new StringBuilder();
+                        s.append("**All used names: **\n");
+                        for (String name : info.names) {
+                            s.append(escapeCharacters(name)).append(" / ");
+                        }
+                        s.append("\n\n**All used IPs: **\n");
+                        for (String ip : info.ips) {
+                            s.append(escapeCharacters(ip)).append(" / ");
+                        }
+                        eb.setDescription(s.toString());
+                        ctx.channel.sendMessage(eb);
+                    }
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("syncserver") {
+                {
+                    help = "Tell everyone to resync.";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    for (Player p : Groups.player) {
+                        Call.worldDataBegin(p.con);
+                        netServer.sendWorldData(p);
+                    }
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("Command executed.")
+                            .setDescription("Synchronized every player's client with the server.");
+                    ctx.channel.sendMessage(eb);
+                }
+            });
 //
 //            handler.registerCommand(new RoleRestrictedCommand("mech") {
 //                {
@@ -918,31 +983,31 @@ public class ServerCommands {
 //                }
 //            });
 
-//            handler.registerCommand(new RoleRestrictedCommand("statmessage") {
-//                {
-//                    help = "Change / set a stat message";
-//                    role = banRole;
-//                    usage = "<newmessage>";
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    eb.setTitle("Command executed successfully");
-//                    String message = ctx.message;
-//                    if (message.length() > 0) {
-//                        statMessage = message;
-//                        Core.settings.put("statMessage", message);
-//                        Core.settings.autosave();
-//                        eb.setDescription("Changed stat message.");
-//                        ctx.channel.sendMessage(eb);
-//                    } else {
-//                        eb.setTitle("Command terminated");
-//                        eb.setDescription("No message provided.");
-//                        ctx.channel.sendMessage(eb);
-//                    }
-//                }
-//
-//            });
+            handler.registerCommand(new RoleRestrictedCommand("statmessage") {
+                {
+                    help = "Change / set a stat message";
+                    role = banRole;
+                    usage = "<newmessage>";
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    eb.setTitle("Command executed successfully");
+                    String message = ctx.message;
+                    if (message.length() > 0) {
+                        statMessage = message;
+                        Core.settings.put("statMessage", message);
+                        Core.settings.autosave();
+                        eb.setDescription("Changed stat message.");
+                        ctx.channel.sendMessage(eb);
+                    } else {
+                        eb.setTitle("Command terminated");
+                        eb.setDescription("No message provided.");
+                        ctx.channel.sendMessage(eb);
+                    }
+                }
+
+            });
 
             handler.registerCommand(new RoleRestrictedCommand("rulemessage") {
                 {
@@ -954,17 +1019,18 @@ public class ServerCommands {
                     EmbedBuilder eb = new EmbedBuilder();
                     eb.setTitle("Command executed successfully");
                     String message = ctx.message;
-                    if (message.length() > 0) {
+                    if (message != null) {
                         ruleMessage = message;
                         Core.settings.put("ruleMessage", message);
                         Core.settings.autosave();
                         eb.setDescription("Changed rules.");
-                        ctx.channel.sendMessage(eb);
+                        eb.setColor(Pals.success);
                     } else {
                         eb.setTitle("Command terminated");
                         eb.setDescription("No message provided.");
-                        ctx.channel.sendMessage(eb);
+                        eb.setColor(Pals.error);
                     }
+                    ctx.channel.sendMessage(eb);
                 }
 
             });

@@ -14,9 +14,11 @@ import mindustry.plugin.discordcommands.DiscordCommands;
 import java.util.HashMap;
 import java.util.Map;
 
+import mindustry.plugin.Utils.*;
+
 import static mindustry.Vars.netServer;
 //import static mindustry.Vars.playerGroup;
-//import static mindustry.plugin.Utils.*;
+import static mindustry.plugin.Utils.*;
 
 public class BotThread extends Thread {
     public DiscordApi api;
@@ -43,26 +45,26 @@ public class BotThread extends Thread {
 
                 for (Player p : Groups.player) {
 
-//                    PlayerData pd = getData(p.uuid);
-//                    if (pd == null) return;
+                    PlayerData pd = getData(p.uuid());
+                    if (pd == null) return;
 //
-//                    // update buildings built
-//                    PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(p.uuid, null));
-//                    if (tdata != null){
-//                        if (tdata.bbIncrementor > 0){
-//                            pd.buildingsBuilt = pd.buildingsBuilt + tdata.bbIncrementor;
-//                            tdata.bbIncrementor = 0;
-//                        }
-//                    }
+                    // update buildings built
+                    PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(p.uuid(), null));
+                    if (tdata != null){
+                        if (tdata.bbIncrementor > 0){
+                            pd.buildingsBuilt = pd.buildingsBuilt + tdata.bbIncrementor;
+                            tdata.bbIncrementor = 0;
+                        }
+                    }
 //
 //
-//                    pd.playTime++;
-//                    if(pd.rank <= 0 && pd.playTime >= activeRequirements.playtime && pd.buildingsBuilt >= activeRequirements.buildingsBuilt && pd.gamesPlayed >= activeRequirements.gamesPlayed){
-//                        Call.onInfoMessage(p.con, Utils.formatMessage(p, promotionMessage));
-//                        if (pd.rank < 1) pd.rank = 1;
-//                    }
-//                    setData(p.uuid, pd);
-//                    ioMain.playerDataGroup.put(p.uuid, tdata); // update tdata with the new stuff
+                    pd.playTime++;
+                    if(pd.rank <= 0 && pd.playTime >= activeRequirements.playtime && pd.buildingsBuilt >= activeRequirements.buildingsBuilt && pd.gamesPlayed >= activeRequirements.gamesPlayed){
+                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+                        if (pd.rank < 1) pd.rank = 1;
+                    }
+                    setData(p.uuid(), pd);
+                    ioMain.playerDataGroup.put(p.uuid(), tdata); // update tdata with the new stuff
                 }
                 if(Mathf.chance(0.01f)){
                     api.updateActivity("( ͡° ͜ʖ ͡°)");

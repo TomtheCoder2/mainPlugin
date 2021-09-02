@@ -5,7 +5,6 @@ import arc.Events;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.util.*;
-import com.google.gson.Gson;
 import mindustry.Vars;
 import mindustry.core.NetClient;
 import mindustry.game.EventType;
@@ -25,9 +24,11 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import redis.clients.jedis.JedisPool;
 
 import java.awt.*;
+import java.sql.SQLException;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.Optional;
 
 import static mindustry.Vars.*;
@@ -39,15 +40,15 @@ public class ioMain extends Plugin {
 //    public static Prefs prefs = new Prefs(prefsFile);
 //    public GetMap map = new GetMap();
 
-    public static JedisPool pool;
+    //    public static JedisPool pool;
     public static DiscordApi api = null;
     public static String prefix = ".";
     public static String serverName = "<untitled>";
     public static JSONObject data; //token, channel_id, role_id
     public static String apiKey = "";
-    static Gson gson = new Gson();
+//    static Gson gson = new Gson();
 
-//    public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
+    public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
     private final long CDT = 300L;
     private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public ObjectMap<String, Role> discRoles = new ObjectMap<>();
@@ -60,6 +61,15 @@ public class ioMain extends Plugin {
 
     //register event handlers and create variables in the constructor
     public ioMain() {
+        try {
+            connect();
+            connect();
+            connect();
+            connect();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            System.out.println(throwables);
+        }
         Utils.init();
 
         try {
@@ -133,62 +143,74 @@ public class ioMain extends Plugin {
 
 
         // player joined
-//        Events.on(EventType.PlayerJoin.class, event -> {
-//            Player player = event.player;
-//            if(bannedNames.contains(player.name)) {
-//                player.con.kick("[scarlet]Download the game from legitimate sources to join.\n[accent]https://anuke.itch.io/mindustry");
-//                return;
-//            }
-//
-//            PlayerData pd = getData(player.uuid());
-//
-//            if (!playerDataGroup.containsKey(player.uuid())) {
-//                PersistentPlayerData data = new PersistentPlayerData();
-//                playerDataGroup.put(player.uuid(), data);
-//            }
-//
-//            if(pd != null) {
+        TextChannel log_channel = getTextChannel("882342315438526525");
+        Events.on(EventType.PlayerJoin.class, event -> {
+            Player player = event.player;
+            if (bannedNames.contains(player.name)) {
+                player.con.kick("[scarlet]Download the game from legitimate sources to join.\n[accent]https://anuke.itch.io/mindustry");
+                return;
+            }
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setTitle("Player Join Log");
+            eb.setDescription(String.format("`%s • %d `:%s", player.uuid(), player.id, escapeColorCodes(player.name)));
+            assert log_channel != null;
+            log_channel.sendMessage(eb);
+            PlayerData pd = getData(player.uuid());
+            System.out.println(pd);
+
+            if (!playerDataGroup.containsKey(player.uuid())) {
+                PersistentPlayerData data = new PersistentPlayerData();
+                playerDataGroup.put(player.uuid(), data);
+            }
+
+            if (pd != null) {
 //                try {
 //                    if (pd.discordLink == null) {
 //                        pd.reprocess();
 //                        setData(player.uuid(), pd);
 //                    }
-//                } catch (Exception ignored){
+//                } catch (Exception ignored) {
 //                    pd.reprocess();
 //                    setData(player.uuid(), pd);
 //                }
-//                if(pd.banned || pd.bannedUntil > Instant.now().getEpochSecond()){
-//                    player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason);
-//                }
-//                int rank = pd.rank;
-//                switch (rank) { // apply new tag
-//                    case 0:
-//                        break;
-//                    case 1:
-//                        Call.sendMessage("[#91f063]Active player [] " + player.name + " joined the server!");
+                if (pd.banned || pd.bannedUntil > Instant.now().getEpochSecond()) {
+                    player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason);
+                }
+                int rank = pd.rank;
+                switch (rank) { // apply new tag
+                    case 0:
+                        break;
+                    case 1:
+                        Call.sendMessage("[#91f063]Active player [] " + player.name + " joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
-//                        break;
-//                    case 2:
-//                        Call.sendMessage("[#dfd06e]Veteran player[] " + player.name + " joined the server!");
-//                        player.name = "[white][][accent][] " + player.name;
-//                        break;
-//                    case 3:
-//                        Call.sendMessage("[#bf7134]Contributor [] " + player.name + " joined the server!");
+                        player.name = rankNames.get(1).tag + player.name;
+                        break;
+                    case 2:
+                        Call.sendMessage("[#dfd06e]Veteran player[] " + player.name + " joined the server!");
+//                        player.name = "[white][\uE800][accent][] " + player.name;
+                        player.name = rankNames.get(2).tag + player.name;
+                        break;
+                    case 3:
+                        Call.sendMessage("[#bf7134]Contributor [] " + player.name + " joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
-//                        break;
-//                    case 4:
-//                        Call.sendMessage("[orange]<[][white]io [#9c59ce]Moderator[][orange]>[] " + player.name + " joined the server!");
+                        player.name = rankNames.get(3).tag + player.name;
+                        break;
+                    case 4:
+                        Call.sendMessage("[orange]<[][#9c59ce]Moderator[][orange]>[] " + player.name + " joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
-//                        break;
-//                    case 5:
-//                        Call.sendMessage("[orange]<[][white]io [#00f8fd]Admin[][orange]>[] " + player.name + " joined the server!");
+                        player.name = rankNames.get(4).tag + player.name;
+                        break;
+                    case 5:
+                        Call.sendMessage("[orange]<[][#00f8fd]Admin[][orange]>[] " + player.name + " joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
-//                        break;
-//                }
-//            } else { // not in database
-//                setData(player.uuid(), new PlayerData(0));
-//                Call.onInfoMessage(player.con, formatMessage(player, welcomeMessage));
-//            }
+                        player.name = rankNames.get(5).tag + player.name;
+                        break;
+                }
+            } else { // not in database
+                System.out.println("new player connected: " + escapeColorCodes(event.player.name));
+                setData(player.uuid(), new PlayerData(0));
+                Call.infoMessage(player.con, formatMessage(player, welcomeMessage));
+            }
 //
 //            CompletableFuture.runAsync(() -> {
 //                if(verification) {
@@ -214,21 +236,24 @@ public class ioMain extends Plugin {
 //                    }
 //                }
 //            });
-//        });
+        });
 
         // player built building
-//        Events.on(EventType.BlockBuildEndEvent.class, event -> {
-//            if (event.player == null) return;
-//            if (event.breaking) return;
-//            PlayerData pd = getData(event.player.uuid());
-//            PersistentPlayerData td = (playerDataGroup.getOrDefault(event.player.uuid(), null));
-//            if (pd == null || td == null) return;
-//            if (event.tile.entity != null) {
-//                if (!activeRequirements.bannedBlocks.contains(event.tile.block())) {
-//                    td.bbIncrementor++;
-//                }
-//            }
-//        });
+        Events.on(EventType.BlockBuildEndEvent.class, event -> {
+            if (event.unit.getPlayer() == null) return;
+            if (event.breaking) return;
+            PlayerData pd = getData(event.unit.getPlayer().uuid());
+            PersistentPlayerData td = (playerDataGroup.getOrDefault(event.unit.getPlayer().uuid(), null));
+            if (pd == null || td == null) return;
+            if (event.tile.block() != null) {
+                if (!activeRequirements.bannedBlocks.contains(event.tile.block())) {
+                    td.bbIncrementor++;
+//                    System.out.println(escapeColorCodes(event.unit.getPlayer().name) + " built a block");
+//                    pd.buildingsBuilt++;
+//                    setData(event.unit.getPlayer().uuid(), pd);
+                }
+            }
+        });
 
         Events.on(EventType.ServerLoadEvent.class, event -> {
             // action filter
@@ -242,66 +267,63 @@ public class ioMain extends Plugin {
             });
         });
 
-//        Events.on(EventType.GameOverEvent.class, event -> {
-//            for (Player p : playerGroup.all()) {
-//                PlayerData pd = getData(p.uuid());
-//                if (pd != null) {
-//                    pd.gamesPlayed++;
-//                    setData(p.uuid(), pd);
-//                    Call.onInfoToast(p.con, "[accent]+1 games played", 10);
-//                }
-//            }
-//        });
+        Events.on(EventType.GameOverEvent.class, event -> {
+            for (Player p : Groups.player) {
+                PlayerData pd = getData(p.uuid());
+                if (pd != null) {
+                    pd.gamesPlayed++;
+                    setData(p.uuid(), pd);
+                    Call.infoMessage(p.con, "[accent]+1 games played");
+                }
+            }
+        });
 
 //        Events.on(EventType.WorldLoadEvent.class, event -> {
 //            Timer.schedule(MapRules::run, 5); // idk
 //        });
 
         // TODO: remove this when MapRules is back in use
-//        Events.on(EventType.ServerLoadEvent.class, event -> {
-//            // action filter
-//            Vars.netServer.admins.addActionFilter(action -> {
-//                Player player = action.player;
-//                if (player == null) return true;
-//
-//                // disable checks for admins
-//                if (player.isAdmin) return true;
-//
-//                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(action.player.uuid(), null));
-//                if (tdata == null) { // should never happen
-//                    player.sendMessage("[scarlet]You may not build right now due to a server error, please tell an administrator");
-//                    return false;
-//                }
-//
-//                switch (action.type) {
-//                    case rotate: {
-//                        boolean hit = tdata.rotateRatelimit.get();
-//                        if (hit) {
-//                            player.sendMessage("[scarlet]Rotate ratelimit exceeded, please rotate slower");
-//                            return false;
-//                        }
-//                        break;
-//                    }
-//
-//                    case configure: {
-//                        boolean hit = tdata.configureRatelimit.get();
-//                        if (hit) {
-//                            player.sendMessage("[scarlet]Configure ratelimit exceeded, please configure slower");
-//                            return false;
-//                        }
-//                        break;
-//                    }
-//                }
-//
-//                return true;
-//            });
-//        });
+        Events.on(EventType.ServerLoadEvent.class, event -> {
+            // action filter
+            Vars.netServer.admins.addActionFilter(action -> {
+                Player player = action.player;
+                if (player == null) return true;
+
+                // disable checks for admins
+                if (player.admin) return true;
+
+                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(action.player.uuid(), null));
+                if (tdata == null) { // should never happen
+                    player.sendMessage("[scarlet]You may not build right now due to a server error, please tell an administrator");
+                    return false;
+                }
+
+                switch (action.type) {
+                    case rotate -> {
+                        boolean hit = tdata.rotateRatelimit.get();
+                        if (hit) {
+                            player.sendMessage("[scarlet]Rotate ratelimit exceeded, please rotate slower");
+                            return false;
+                        }
+                    }
+                    case configure -> {
+                        boolean hit = tdata.configureRatelimit.get();
+                        if (hit) {
+                            player.sendMessage("[scarlet]Configure ratelimit exceeded, please configure slower");
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            });
+        });
     }
 
     public static boolean checkChatRatelimit(String message, Player player) {
         // copied almost exactly from mindustry core, will probably need updating
         // will also update the user's global chat ratelimits
-        long resetTime = Config.messageRateLimit.num() * 1000;
+        long resetTime = Config.messageRateLimit.num() * 1000L;
         if (Config.antiSpam.bool() && !player.isLocal() && !player.admin) {
             //prevent people from spamming messages quickly
             if (resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime) {
@@ -413,8 +435,7 @@ public class ioMain extends Plugin {
                 for (Long key : cooldowns.keys()) {
                     if (key + CDT < System.currentTimeMillis() / 1000L) {
                         cooldowns.remove(key);
-                        continue;
-                    } else if (player.uuid() == cooldowns.get(key)) {
+                    } else if (player.uuid().equals(cooldowns.get(key))) {
                         player.sendMessage("[scarlet]This command is on a 5 minute cooldown!");
                         return;
                     }
@@ -460,22 +481,26 @@ public class ioMain extends Plugin {
                                 new MessageBuilder()
                                         .setEmbed(new EmbedBuilder()
                                                 .setTitle("Potential griefer online")
-                                                .setDescription("<@&861523420076179457>")
+//                                                .setDescription("<@&861523420076179457>")
                                                 .addField("name", escapeColorCodes(found.name))
                                                 .addField("reason", args[1])
                                                 .setColor(Color.RED)
                                                 .setFooter("Reported by " + player.name))
                                         .send(tc_c);
+                                assert tc_c != null;
+                                tc_c.sendMessage("<@&882340213551140935>");
                             } else {
                                 Role ro = discRoles.get("861523420076179457");
                                 new MessageBuilder()
                                         .setEmbed(new EmbedBuilder()
                                                 .setTitle("Potential griefer online")
-                                                .setDescription("<@&861523420076179457>")
+//                                                .setDescription("<@&861523420076179457>")
                                                 .addField("name", escapeColorCodes(found.name))
                                                 .setColor(Color.RED)
                                                 .setFooter("Reported by " + player.name))
                                         .send(tc_c);
+                                assert tc_c != null;
+                                tc_c.sendMessage("<@&882340213551140935>");
                             }
                             Call.sendMessage(found.name + "[sky] is reported to discord.");
                             cooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
@@ -597,40 +622,40 @@ public class ioMain extends Plugin {
 //                }
 //            });
 
-//            handler.<Player>register("stats", "<player>", "Display stats of the specified player.", (args, player) -> {
-//                if(args[0].length() > 0) {
-//                    Player p = findPlayer(args[0]);
-//                    if(p != null){
-//                        PlayerData pd = getData(p.uuid());
-//                        if (pd != null) {
-//                            Call.onInfoMessage(player.con, formatMessage(p, statMessage));
-//                        }
-//                    } else {
-//                        player.sendMessage("[scarlet]Error: Player not found or offline");
-//                    }
-//                } else {
-//                    Call.onInfoMessage(player.con, formatMessage(player, statMessage));
-//                }
-//            });
+            handler.<Player>register("stats", "[player]", "Display stats of the specified player.", (args, player) -> {
+                if (args.length > 0) {
+                    Player p = findPlayer(args[0]);
+                    if (p != null) {
+                        PlayerData pd = getData(p.uuid());
+                        if (pd != null) {
+                            Call.infoMessage(player.con, formatMessage(p, statMessage));
+                        }
+                    } else {
+                        player.sendMessage("[scarlet]Error: Player not found or offline");
+                    }
+                } else {
+                    Call.infoMessage(player.con, formatMessage(player, statMessage));
+                }
+            });
 
-//            handler.<Player>register("info", "Display your stats.", (args, player) -> { // self info
-//                PlayerData pd = getData(player.uuid());
-//                if (pd != null) {
-//                    Call.onInfoMessage(player.con, formatMessage(player, statMessage));
-//                }
-//            });
+            handler.<Player>register("info", "Display your stats.", (args, player) -> { // self info
+                PlayerData pd = getData(player.uuid());
+                if (pd != null) {
+                    Call.infoMessage(player.con, formatMessage(player, statMessage));
+                }
+            });
 
             handler.<Player>register("rules", "Server rules. Please read carefully.", (args, player) -> { // self info
 //                PlayerData pd = getData(player.uuid());
 
-                Call.infoMessage(player.con,ruleMessage);
+                Call.infoMessage(player.con, ruleMessage);
 
             });
 
             handler.<Player>register("event", "Join an ongoing event (if there is one)", (args, player) -> { // self info
-                if(eventIp.length() > 0){
+                if (eventIp.length() > 0) {
                     Call.connect(player.con, eventIp, eventPort);
-                } else{
+                } else {
                     player.sendMessage("[scarlet]There is no ongoing event at this time.");
                 }
             });
@@ -665,7 +690,7 @@ public class ioMain extends Plugin {
 
             VoteSession[] currentlyKicking = {null};
 
-            handler.<Player>register("nominate", "[map...]", "[veteran+] Vote to change to a specific map.", (args, player) -> {
+            handler.<Player>register("nominate", "[map...]", " Vote to change to a specific map.", (args, player) -> {
                 if (!state.rules.pvp || player.admin) {
 //                    PlayerData pd = getData(player.uuid());
 //                    if (pd != null && pd.rank >= 2) {
