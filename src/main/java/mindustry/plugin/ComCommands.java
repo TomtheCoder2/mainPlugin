@@ -100,7 +100,7 @@ public class ComCommands {
             public void run(Context ctx) {
                 StringBuilder msg = new StringBuilder("**Players online: " + Groups.player.size() + "**\n```\n");
                 for (Player player : Groups.player) {
-                    msg.append("· ").append(escapeCharacters(player.name)).append(" : ").append(player.id).append("\n");
+                    msg.append("· ").append(escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "")).append(" : ").append(player.id).append("\n");
                 }
                 msg.append("```");
 //                ctx.channel.sendMessage(msg.toString());
@@ -118,9 +118,9 @@ public class ComCommands {
                 }
                 for (Player p : Groups.player) {
                     if (p.admin()) {
-                        lijst.append("`").append(Strings.stripColors(p.name.trim())).append(" : ").append("admin").append("`\n");
+                        lijst.append("`").append(escapeColorCodes(p.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "")).append(" : ").append("admin").append("`\n");
                     } else {
-                        lijst.append("`").append(Strings.stripColors(p.name.trim())).append(" : ").append(String.format("%-5d", p.id)).append("`\n");
+                        lijst.append("`").append(escapeColorCodes(p.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "")).append(" : ").append(String.format("%-5d", p.id)).append("`\n");
                     }
                 }
 

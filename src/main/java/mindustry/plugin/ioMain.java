@@ -62,6 +62,18 @@ public class ioMain extends Plugin {
     //register event handlers and create variables in the constructor
     public ioMain() {
         try {
+            String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
+            JSONObject alldata;
+            JSONObject data;
+            data = alldata = new JSONObject(new JSONTokener(pureJson));
+            url = alldata.getString("url");
+            user = alldata.getString("user");
+            password = alldata.getString("password");
+            System.out.printf("url: %s, user: %s, password: %s%n", url, user, password);
+        } catch (Exception e) {
+            Log.err("Couldn't read settings.json file.");
+        }
+        try {
             connect();
             connect();
             connect();
@@ -92,7 +104,7 @@ public class ioMain extends Plugin {
         if (tc != null) {
             Events.on(EventType.PlayerChatEvent.class, event -> {
                 if (event.message.charAt(0) != '/') {
-                    tc.sendMessage("**" + Strings.stripColors(event.player.name) + "**: " + event.message);
+                    tc.sendMessage("**" + escapeColorCodes(event.player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + "**: " + event.message);
                 }
             });
         }

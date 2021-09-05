@@ -5,12 +5,14 @@ import arc.Events;
 import arc.files.Fi;
 import arc.struct.Seq;
 import mindustry.content.Blocks;
+import mindustry.content.UnitTypes;
 import mindustry.core.GameState;
 import mindustry.game.EventType.GameOverEvent;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.gen.Unit;
 import mindustry.io.SaveIO;
 import mindustry.maps.Map;
 import mindustry.net.Administration;
@@ -20,6 +22,7 @@ import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
 import mindustry.plugin.discordcommands.RoleRestrictedCommand;
 import mindustry.plugin.requests.GetMap;
+import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import org.javacord.api.entity.channel.TextChannel;
@@ -29,6 +32,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.StandardCopyOption;
@@ -100,7 +104,7 @@ public class ServerCommands {
                                 pd.rank = targetRank;
                                 setData(player.uuid(), pd);
                                 eb.setTitle("Command executed successfully");
-                                eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + targetRank);
+                                eb.setDescription("Promoted " + escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + " to " + targetRank);
                                 ctx.channel.sendMessage(eb);
                                 player.con.kick("Your rank was modified, please rejoin.", 0);
                             }
@@ -144,7 +148,7 @@ public class ServerCommands {
                                 pd.rank = targetRank;
                                 setData(player.uuid(), pd);
                                 eb.setTitle("Command executed successfully");
-                                eb.setDescription(String.format("Set stats of %s to:\nPlaytime: %d\nGames played: %d\nBuildings built: %d", escapeColorCodes(player.name), playTime, gamesPlayed, buildingsBuilt));
+                                eb.setDescription(String.format("Set stats of %s to:\nPlaytime: %d\nGames played: %d\nBuildings built: %d", escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", ""), playTime, gamesPlayed, buildingsBuilt));
 //                                eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + targetRank);
                                 ctx.channel.sendMessage(eb);
 //                                player.con.kick("Your rank was modified, please rejoin.", 0);
@@ -338,9 +342,9 @@ public class ServerCommands {
                         p.admin = !p.admin;
                         eb.setTitle("Command executed!");
                         if (p.admin) {
-                            eb.setDescription("Promoted " + escapeCharacters(p.name) + " to admin");
+                            eb.setDescription("Promoted " + escapeColorCodes(p.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + " to admin");
                         } else {
-                            eb.setDescription("Demoted " + escapeCharacters(p.name) + " to admin");
+                            eb.setDescription("Demoted " + escapeColorCodes(p.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + " to admin");
                         }
                     } else {
                         eb.setTitle("Command terminated!");
@@ -384,7 +388,7 @@ public class ServerCommands {
                         if (p != null) {
                             Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
                             eb.setTitle("Command executed");
-                            eb.setDescription("Alert was sent to " + escapeCharacters(p.name));
+                            eb.setDescription("Alert was sent to " + escapeColorCodes(p.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", ""));
                         } else {
                             eb.setTitle("Command terminated");
                             eb.setColor(Pals.error);
@@ -643,7 +647,7 @@ public class ServerCommands {
                 public void run(Context ctx) {
                     StringBuilder msg = new StringBuilder("**Players online: " + Groups.player.size() + "**\n```\n");
                     for (Player player : Groups.player) {
-                        msg.append("· ").append(escapeCharacters(player.name));
+                        msg.append("· ").append(escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", ""));
                         if (!player.admin) {
                             msg.append(" : ").append(player.con.address).append(" : ").append(player.uuid()).append("\n");
                         } else {
@@ -652,7 +656,32 @@ public class ServerCommands {
                     }
                     msg.append("```");
 
-                    ctx.channel.sendMessage(msg.toString());
+                    StringBuilder lijst = new StringBuilder();
+//                StringBuilder admins = new StringBuilder();
+
+                    if (Groups.player.size() == 0) {
+                        lijst.append("No players are currently in the server.");// + Vars.playerGroup.all().count(p->p.isAdmin)+"\n");
+                    }
+                    for (Player player : Groups.player) {
+                        lijst.append("`* ").append(escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", ""));
+                        if (player.admin()) {
+                            lijst.append("`\n");
+                        } else {
+                            lijst.append(" : ").append(player.con.address).append(" : ").append(player.uuid()).append("`\n");
+                        }
+                    }
+
+                    new MessageBuilder()
+                            .setEmbed(new EmbedBuilder()
+                                    .setTitle("Players online: " + Groups.player.size())
+//                                    .setDescription( "Info about the Server: ")
+                                    .setDescription(lijst.toString())
+//                                .addField("Admins: ", admins+" ")
+//                                .addField("Players:", lijst.toString())
+                                    .setColor(Color.ORANGE))
+                            .send(ctx.channel);
+
+//                    ctx.channel.sendMessage(msg.toString());
                 }
             });
 //
@@ -696,7 +725,7 @@ public class ServerCommands {
                         StringBuilder s = new StringBuilder();
                         s.append("**All used names: **\n");
                         for (String name : info.names) {
-                            s.append(escapeCharacters(name)).append(" / ");
+                            s.append(escapeColorCodes(name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "")).append(" / ");
                         }
                         s.append("\n\n**All used IPs: **\n");
                         for (String ip : info.ips) {
@@ -726,53 +755,55 @@ public class ServerCommands {
                 }
             });
 //
-//            handler.registerCommand(new RoleRestrictedCommand("mech") {
-//                {
-//                    help = "<mechname> <playerid|ip|all|name|teamid> Change the provided player into a specific mech.";
-//                    role = banRole;
-//                }
-//                public void run(Context ctx) {
-//                    String target = ctx.args[1];
-//                    String targetMech = ctx.args[2];
+            handler.registerCommand(new RoleRestrictedCommand("convert") {
+                {
+                    help = "Change the provided player into a specific unit.";
+                    role = banRole;
+                    usage = "<playerid|ip|all|name|teamid> <unit>";
+                }
+                public void run(Context ctx) {
+                    String target = ctx.args[1];
+                    String targetMech = ctx.args[2];
 //                    Mech desiredMech = Mechs.alpha;
-//                    if(target.length() > 0 && targetMech.length() > 0) {
-//                        try {
-//                            Field field = Mechs.class.getDeclaredField(targetMech);
-//                            desiredMech = (Mech)field.get(null);
-//                        } catch (NoSuchFieldException | IllegalAccessException ignored) {}
-//
-//                        EmbedBuilder eb = new EmbedBuilder();
-//
-//                        if(target.equals("all")) {
-//                            for (Player p : Groups.player) {
-//                                p.mech = desiredMech;
-//                            }
-//                            eb.setTitle("Command executed successfully.");
-//                            eb.setDescription("Changed everyone's mech into " + desiredMech.name);
-//                            ctx.channel.sendMessage(eb);
-//                            return;
-//                        }
-//                        else if(target.matches("[0-9]+") && target.length()==1){
-//                            for(Player p : Groups.player){
-//                                if(p.getTeam().id== Byte.parseByte(target)){
-//                                    p.mech = desiredMech;
-//                                }
-//                            }
-//                            eb.setTitle("Command executed successfully.");
-//                            eb.setDescription("Changed everyone's mech into " + desiredMech.name);
-//                            ctx.channel.sendMessage(eb);
-//                            return;
-//                        }
-//                        Player player = findPlayer(target);
-//                        if(player!=null){
-//                            player.mech = desiredMech;
-//                            eb.setTitle("Command executed successfully.");
-//                            eb.setDescription("Changed " + escapeCharacters(player.name) + "s mech into " + desiredMech.name);
-//                            ctx.channel.sendMessage(eb);
-//                        }
-//                    }
-//                }
-//            });
+                    UnitType desiredUnit = UnitTypes.alpha;
+                    if(target.length() > 0 && targetMech.length() > 0) {
+                        try {
+                            Field field = UnitTypes.class.getDeclaredField(targetMech);
+                            desiredUnit = (UnitType) field.get(null);
+                        } catch (NoSuchFieldException | IllegalAccessException ignored) {}
+
+                        EmbedBuilder eb = new EmbedBuilder();
+
+                        if(target.equals("all")) {
+                            for (Player p : Groups.player) {
+                                p.unit(desiredUnit.spawn(p.team(), p.x, p.y));
+                            }
+                            eb.setTitle("Command executed successfully.");
+                            eb.setDescription("Changed everyone's unit into " + desiredUnit.name);
+                            ctx.channel.sendMessage(eb);
+                            return;
+                        }
+                        else if(target.matches("[0-9]+") && target.length()==1){
+                            for(Player p : Groups.player){
+                                if(p.team().id== Byte.parseByte(target)){
+                                    p.unit(desiredUnit.spawn(p.team(), p.x, p.y));
+                                }
+                            }
+                            eb.setTitle("Command executed successfully.");
+                            eb.setDescription("Changed everyone's unit into " + desiredUnit.name);
+                            ctx.channel.sendMessage(eb);
+                            return;
+                        }
+                        Player player = findPlayer(target);
+                        if(player!=null){
+                            player.unit(desiredUnit.spawn(player.team(), player.x, player.y));
+                            eb.setTitle("Command executed successfully.");
+                            eb.setDescription("Changed " + escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + "s unit into " + desiredUnit.name);
+                            ctx.channel.sendMessage(eb);
+                        }
+                    }
+                }
+            });
 
             handler.registerCommand(new RoleRestrictedCommand("changeteam") {
                 {
@@ -821,7 +852,7 @@ public class ServerCommands {
                             player.team(desiredTeam);
 //                            player.spawner = getCore(player.getTeam());
                             eb.setTitle("Command executed successfully.");
-                            eb.setDescription("Changed " + escapeCharacters(player.name) + "s team to " + desiredTeam.name);
+                            eb.setDescription("Changed " + escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + "s team to " + desiredTeam.name);
                             ctx.channel.sendMessage(eb);
                         }
                     }

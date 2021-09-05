@@ -3,6 +3,7 @@ package mindustry.plugin;
 import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.Strings;
 import mindustry.content.Blocks;
 import mindustry.game.EventType;
@@ -12,6 +13,8 @@ import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.maps.Maps;
 import mindustry.world.Block;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -26,9 +29,9 @@ import static mindustry.Vars.maps;
 //import java.sql.*;
 
 public class Utils {
-    static final String url = "jdbc:postgresql://localhost/mindustrydata";
-    static final String user = "postgres";
-    static final String password = "Nautilus2021#";
+    static String url = null;
+    static String user = null;
+    static String password = null;
     public static int chatMessageMaxSize = 256;
     static String welcomeMessage = "";
     static String statMessage = "";
@@ -125,8 +128,13 @@ public class Utils {
             if (player.uuid() == null) return null;
             if (player.con == null) return null;
             if (player.con.address == null) return null;
+//            System.out.println(escapeColorCodes(player.name.toLowerCase().replaceAll(" ", "").replaceAll("<.*?>", "")).replaceAll("\\[accent\\]", ""));
+//            System.out.println(escapeColorCodes(player.name.toLowerCase().replaceAll(" ", "").replaceAll("<.*?>", "")).replaceAll("\\[.*?\\]", ""));
 
-            if (player.con.address.equals(identifier.replaceAll(" ", "")) || String.valueOf(player.id).equals(identifier.replaceAll(" ", "")) || player.uuid().equals(identifier.replaceAll(" ", "")) || escapeColorCodes(player.name.toLowerCase().replaceAll(" ", "")).replaceAll("<.*?>", "").startsWith(identifier.toLowerCase().replaceAll(" ", ""))) {
+            if (player.con.address.equals(identifier.replaceAll(" ", "")) ||
+                    String.valueOf(player.id).equals(identifier.replaceAll(" ", "")) ||
+                    player.uuid().equals(identifier.replaceAll(" ", "")) ||
+                    escapeColorCodes(player.name.toLowerCase().replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "").startsWith(identifier.toLowerCase().replaceAll(" ", ""))) {
                 found = player;
             }
         }
