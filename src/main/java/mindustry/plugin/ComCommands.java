@@ -205,25 +205,62 @@ public class ComCommands {
                 if (ctx.args.length == 1) {
                     StringBuilder publicCommands = new StringBuilder();
                     StringBuilder restrictedCommands = new StringBuilder();
+                    StringBuilder management = new StringBuilder();
+                    StringBuilder moderation = new StringBuilder();
+                    StringBuilder mapReviewer = new StringBuilder();
+
+
                     for (Command command : handler.getAllCommands()) {
-                        if (command instanceof RoleRestrictedCommand) {
-                            restrictedCommands.append("**").append(command.name).append("** ");
-                            if (!command.usage.equals("")) {
-                                restrictedCommands.append(command.usage);
+//                        if (command instanceof RoleRestrictedCommand) {
+//                            restrictedCommands.append("**").append(command.name).append("** ");
+//                            if (!command.usage.equals("")) {
+//                                restrictedCommands.append(command.usage);
+//                            }
+//                            restrictedCommands.append("\n");
+//                        } else {
+//                            publicCommands.append("**").append(command.name).append("** ");
+//                            if (!command.usage.equals("")) {
+//                                publicCommands.append(command.usage);
+//                            }
+//                            publicCommands.append("\n");
+//                        }
+                        switch (command.category) {
+                            case "moderation" -> {
+                                moderation.append("**").append(command.name).append("** ");
+//                                if (!command.usage.equals("")) {
+//                                    moderation.append(command.usage);
+//                                }
+                                moderation.append("\n");
                             }
-                            restrictedCommands.append("\n");
-                        } else {
-                            publicCommands.append("**").append(command.name).append("** ");
-                            if (!command.usage.equals("")) {
-                                publicCommands.append(command.usage);
+                            case "management" -> {
+                                management.append("**").append(command.name).append("** ");
+//                                if (!command.usage.equals("")) {
+//                                    management.append(command.usage);
+//                                }
+                                management.append("\n");
                             }
-                            publicCommands.append("\n");
+                            case "mapReviewer" -> {
+                                mapReviewer.append("**").append(command.name).append("** ");
+//                                if (!command.usage.equals("")) {
+//                                    mapReviewer.append(command.usage);
+//                                }
+                                mapReviewer.append("\n");
+                            }
+                            default -> {
+                                publicCommands.append("**").append(command.name).append("** ");
+//                                if (!command.usage.equals("")) {
+//                                    publicCommands.append(command.usage);
+//                                }
+                                publicCommands.append("\n");
+                            }
                         }
                     }
                     EmbedBuilder embed = new EmbedBuilder()
                             .setTitle("Commands:")
-                            .addField("**__Public commands:__**", publicCommands.toString(), true)
-                            .addField("**__Restricted commands:__**", restrictedCommands.toString(), true);
+                            .addField("**__Public:__**", publicCommands.toString(), true)
+                            .addField("**__Moderation:__**", moderation.toString(), true)
+                            .addField("**__Management:__**", management.toString(), true)
+                            .addField("**__Map reviewer:__**", mapReviewer.toString(), true);
                     ctx.channel.sendMessage(embed);
                 } else {
                     EmbedBuilder embed = new EmbedBuilder();
@@ -234,6 +271,7 @@ public class ComCommands {
                             if (!command.usage.equals("")) {
                                 embed.addField("Usage:", ioMain.prefix + command.name + " " + command.usage);
                             }
+                            embed.addField("Category:", command.category);
                         }
                     }
                     ctx.channel.sendMessage(embed);

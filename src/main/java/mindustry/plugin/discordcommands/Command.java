@@ -8,6 +8,7 @@ public abstract class Command {
     /** Help for this command, shown by the help command */
     public String help = ":v no information was provided for this command";
     public String usage = "";
+    public String category = "public";
 
     public Command(String name) {
         // always ALWAYS lowercase command names

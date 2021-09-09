@@ -10,8 +10,8 @@ public class PersistentPlayerData implements Serializable {
     public String origName;
 //    public Array<BaseUnit> draugPets = new Array<>();
     public int bbIncrementor = 0;
-    public boolean spawnedLichPet;
-    public boolean spawnedPowerGen;
+//    public boolean spawnedLichPet;
+//    public boolean spawnedPowerGen;
 
     // 50 configures per 1000 ms
     public Ratelimit configureRatelimit = new Ratelimit(50, 1000);

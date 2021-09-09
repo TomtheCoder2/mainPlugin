@@ -37,8 +37,10 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.IntStream;
 import java.util.zip.InflaterInputStream;
 
 import static mindustry.Vars.*;
@@ -77,6 +79,7 @@ public class ServerCommands {
         });
         if (data.has("administrator_roleid")) {
             String adminRole = data.getString("administrator_roleid");
+            // TODO: make an update command
         }
 
         if (data.has("exit_roleid")) {
@@ -96,48 +99,50 @@ public class ServerCommands {
         if (data.has("apprentice_roleid")) {
             String apprenticeRole = data.getString("apprentice_roleid");
 
-//            handler.registerCommand(new RoleRestrictedCommand("banish"){
-//                {
-//                    help = "<player> <duration (minutes)> [reason..] Ban the provided player for a specific duration with a specific reason.";
-//                    role = apprenticeRole;
-//                }
-//
-//                public void run(Context ctx) {
-//                    CompletableFuture.runAsync(() -> {
-//                        EmbedBuilder eb = new EmbedBuilder();
-//                        String target = ctx.args[1];
-//                        String targetDuration = ctx.args[2];
-//                        String reason = ctx.message.substring(target.length() + targetDuration.length() + 2);
-//                        long now = Instant.now().getEpochSecond();
-//
-//                        Player player = findPlayer(target);
-//                        if (player != null) {
-//                            String uuid = player.uuid;
-//                            String banId = uuid.substring(0, 4);
-//                            PlayerData pd = getData(uuid);
-//                            long until = now + Integer.parseInt(targetDuration) * 60;
-//                            if (pd != null) {
-//                                pd.bannedUntil = until;
-//                                pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
-//                                setData(uuid, pd);
-//                            }
-//
-//                            eb.setTitle("Banned" + escapeCharacters(player.name) + " for " + targetDuration + " minutes. ");
-//                            eb.addField("Ban ID", banId);
-//                            eb.addField("For", targetDuration + " minutes.");
-//                            eb.addField("Until", epochToString(until));
-//                            eb.addInlineField("Reason", reason);
-//                            ctx.channel.sendMessage(eb);
-//
-//                            player.con.kick(Packets.KickReason.banned);
-//                        } else {
-//                            eb.setTitle("Player `" + escapeCharacters(target) + "` not found.");
-//                            eb.setColor(Pals.error);
-//                            ctx.channel.sendMessage(eb);
-//                        }
-//                    });
-//                }
-//            });
+            handler.registerCommand(new RoleRestrictedCommand("banish") {
+                {
+                    help = "Ban the provided player for a specific duration with a specific reason.";
+                    role = apprenticeRole;
+                    usage = "<player> <duration (minutes)> [reason...]";
+                    category = "moderation";
+                }
+
+                public void run(Context ctx) {
+                    CompletableFuture.runAsync(() -> {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        String target = ctx.args[1];
+                        String targetDuration = ctx.args[2];
+                        String reason = ctx.message.substring(target.length() + targetDuration.length() + 2);
+                        long now = Instant.now().getEpochSecond();
+
+                        Player player = findPlayer(target);
+                        if (player != null) {
+                            String uuid = player.uuid();
+                            String banId = uuid.substring(0, 4);
+                            PlayerData pd = getData(uuid);
+                            long until = now + Integer.parseInt(targetDuration) * 60L;
+                            if (pd != null) {
+                                pd.bannedUntil = until;
+                                pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
+                                setData(uuid, pd);
+                            }
+
+                            eb.setTitle("Banned" + escapeCharacters(player.name) + " for " + targetDuration + " minutes. ");
+                            eb.addField("Ban ID", banId);
+                            eb.addField("For", targetDuration + " minutes.");
+                            eb.addField("Until", epochToString(until));
+                            eb.addInlineField("Reason", reason);
+                            ctx.channel.sendMessage(eb);
+
+                            player.con.kick(Packets.KickReason.banned);
+                        } else {
+                            eb.setTitle("Player `" + escapeCharacters(target) + "` not found.");
+                            eb.setColor(Pals.error);
+                            ctx.channel.sendMessage(eb);
+                        }
+                    });
+                }
+            });
         }
         if (data.has("moderator_roleid")) {
             String banRole = data.getString("moderator_roleid");
@@ -147,6 +152,7 @@ public class ServerCommands {
                     help = "Change the current map to the one provided.";
                     role = banRole;
                     usage = "<mapname/mapid>";
+                    category = "management";
                 }
 
                 public void run(Context ctx) {
@@ -182,6 +188,7 @@ public class ServerCommands {
                     help = "Announces a message to in-game chat.";
                     role = banRole;
                     usage = "<message>";
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -211,6 +218,7 @@ public class ServerCommands {
                     help = "Changes the event command ip.";
                     role = banRole;
                     usage = "<ip/none>";
+                    category = "admin";
                 }
 
                 public void run(Context ctx) {
@@ -247,6 +255,7 @@ public class ServerCommands {
                     help = "Toggle the admin status on a player.";
                     role = banRole;
                     usage = "<playerid|ip|name|teamid> <message>";
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -278,6 +287,7 @@ public class ServerCommands {
                     help = "Alerts a player(s) using on-screen messages.";
                     role = banRole;
                     usage = "<playerid|ip|name|teamid> <message>";
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -321,6 +331,7 @@ public class ServerCommands {
                 {
                     help = "Force a game over.";
                     role = banRole;
+                    category = "management";
                 }
 
                 public void run(Context ctx) {
@@ -341,6 +352,7 @@ public class ServerCommands {
                     help = "Ban the provided player with a specific reason.";
                     usage = "<player> [reason..]";
                     role = banRole;
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -382,6 +394,7 @@ public class ServerCommands {
                     help = "Ban a player by the provided uuid.";
                     usage = "<uuid>";
                     role = banRole;
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -411,6 +424,7 @@ public class ServerCommands {
                     help = "Ban the provided player for a specific duration with a specific reason.";
                     usage = "<player> <duration (minutes)> [reason..]";
                     role = banRole;
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -456,6 +470,7 @@ public class ServerCommands {
                     help = "Kick the provided player with a specific reason.";
                     usage = "<player> [reason..]";
                     role = banRole;
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -485,6 +500,7 @@ public class ServerCommands {
                     help = "Unban the player by the provided uuid.";
                     usage = "<uuid>";
                     role = banRole;
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -513,6 +529,7 @@ public class ServerCommands {
                     help = "Unban the player by the provided IP.";
                     usage = "<uuid>";
                     role = banRole;
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -536,6 +553,7 @@ public class ServerCommands {
                     help = "Unvotekickban the specified player";
                     usage = "<uuid>";
                     role = banRole;
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -559,6 +577,7 @@ public class ServerCommands {
                 {
                     help = "Check the information about all players on the server.";
                     role = banRole;
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -607,6 +626,7 @@ public class ServerCommands {
                     help = "Check all information about the specified player.";
                     usage = "<player>";
                     role = banRole;
+                    category = "moderation";
                 }
 
                 public void run(Context ctx) {
@@ -658,6 +678,7 @@ public class ServerCommands {
                 {
                     help = "Tell everyone to resync.";
                     role = banRole;
+                    category = "management";
                 }
 
                 public void run(Context ctx) {
@@ -677,21 +698,24 @@ public class ServerCommands {
                     help = "Change the provided player into a specific unit.";
                     role = banRole;
                     usage = "<playerid|ip|all|name|teamid> <unit>";
+                    category = "management";
                 }
+
                 public void run(Context ctx) {
                     String target = ctx.args[1];
                     String targetMech = ctx.args[2];
 //                    Mech desiredMech = Mechs.alpha;
                     UnitType desiredUnit = UnitTypes.alpha;
-                    if(target.length() > 0 && targetMech.length() > 0) {
+                    if (target.length() > 0 && targetMech.length() > 0) {
                         try {
                             Field field = UnitTypes.class.getDeclaredField(targetMech);
                             desiredUnit = (UnitType) field.get(null);
-                        } catch (NoSuchFieldException | IllegalAccessException ignored) {}
+                        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                        }
 
                         EmbedBuilder eb = new EmbedBuilder();
 
-                        if(target.equals("all")) {
+                        if (target.equals("all")) {
                             for (Player p : Groups.player) {
                                 p.unit(desiredUnit.spawn(p.team(), p.x, p.y));
                             }
@@ -699,10 +723,9 @@ public class ServerCommands {
                             eb.setDescription("Changed everyone's unit into " + desiredUnit.name);
                             ctx.channel.sendMessage(eb);
                             return;
-                        }
-                        else if(target.matches("[0-9]+") && target.length()==1){
-                            for(Player p : Groups.player){
-                                if(p.team().id== Byte.parseByte(target)){
+                        } else if (target.matches("[0-9]+") && target.length() == 1) {
+                            for (Player p : Groups.player) {
+                                if (p.team().id == Byte.parseByte(target)) {
                                     p.unit(desiredUnit.spawn(p.team(), p.x, p.y));
                                 }
                             }
@@ -712,7 +735,7 @@ public class ServerCommands {
                             return;
                         }
                         Player player = findPlayer(target);
-                        if(player!=null){
+                        if (player != null) {
                             player.unit(desiredUnit.spawn(player.team(), player.x, player.y));
                             eb.setTitle("Command executed successfully.");
                             eb.setDescription("Changed " + escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + "s unit into " + desiredUnit.name);
@@ -727,6 +750,7 @@ public class ServerCommands {
                     help = "Change the provided player's team into the provided one.";
                     role = banRole;
                     usage = "<playerid|ip|all|name|teamid> <team>";
+                    category = "management";
                 }
 
                 public void run(Context ctx) {
@@ -781,6 +805,7 @@ public class ServerCommands {
                     help = "Change the provided player's team into a generated int.";
                     role = banRole;
                     usage = "<playerid|ip|all|name> <team>";
+                    category = "management";
                 }
 
                 public void run(Context ctx) {
@@ -826,6 +851,7 @@ public class ServerCommands {
                     help = "Rename the provided player";
                     role = banRole;
                     usage = "<playerid|ip|name> <name>";
+                    category = "management";
                 }
 
                 public void run(Context ctx) {
@@ -853,6 +879,7 @@ public class ServerCommands {
                     help = "Change / set a welcome message";
                     role = banRole;
                     usage = "<newmessage>";
+                    category = "management";
                 }
 
                 public void run(Context ctx) {
@@ -873,210 +900,301 @@ public class ServerCommands {
 
             });
 
-//            handler.registerCommand(new RoleRestrictedCommand("screenmessage") {
+            handler.registerCommand(new RoleRestrictedCommand("screenmessage") {
+                {
+                    help = "List, remove or add on-screen messages.";
+                    role = banRole;
+                    usage = "<list/remove/add> <message>";
+                    category = "moderation";
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1].toLowerCase();
+                    String message = "";
+                    if (!target.equals("list")) {
+                        message = ctx.message.split(" ", 2)[1];
+                    }
+
+                    switch (target) {
+                        case "list" -> {
+                            eb.setTitle("All on-screen messages:");
+                            for (String msg : onScreenMessages) {
+                                eb.addField(String.valueOf(onScreenMessages.indexOf(msg)), msg);
+                            }
+                            ctx.channel.sendMessage(eb);
+                        }
+                        case "remove" -> {
+                            if (onScreenMessages.get(Integer.parseInt(message.trim())) != null) {
+                                onScreenMessages.remove(Integer.parseInt(message.trim()));
+                                eb.setTitle("Command executed");
+                                eb.setDescription("Removed provided on-screen message.");
+                            } else {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("That on-screen message does not exist.");
+                                eb.setColor(Pals.error);
+                            }
+                            ctx.channel.sendMessage(eb);
+                        }
+                        case "add" -> {
+                            if (message.length() > 0) {
+                                onScreenMessages.add(message);
+                                eb.setTitle("Command executed");
+                                eb.setDescription("Added on-screen message `" + message + "`.");
+                            } else {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("On-screen messages must be longer than 0 characters.");
+                                eb.setColor(Pals.error);
+                            }
+                            ctx.channel.sendMessage(eb);
+                        }
+                        default -> {
+                            eb.setTitle("Command terminated");
+                            eb.setDescription("Invalid arguments provided.");
+                            eb.setColor(Pals.error);
+                            ctx.channel.sendMessage(eb);
+                        }
+                    }
+                }
+            });
+            handler.registerCommand(new RoleRestrictedCommand("edit") {
+                {
+                    help = "Change / set a message";
+                    role = banRole;
+                    usage = "<stats|rank|req|rule> <newmessage>";
+                    category = "management";
+                }
+
+                public void run(Context ctx) {
+                    String target = ctx.args[1].toLowerCase();
+                    switch (target) {
+                        case "stats" -> {
+                            EmbedBuilder eb = new EmbedBuilder();
+                            eb.setTitle("Command executed successfully");
+                            String message = ctx.message.split(" ", 2)[1];
+//                        message = message.split(" ", 2)[1];
+                            if (message.length() > 0) {
+                                System.out.println("new stat message: " + message);
+                                statMessage = message;
+                                Core.settings.put("statMessage", message);
+                                Core.settings.autosave();
+                                eb.setDescription("Changed stat message.");
+                            } else {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("No message provided.");
+                            }
+                            ctx.channel.sendMessage(eb);
+                        }
+                        case "req" -> {
+                            EmbedBuilder eb = new EmbedBuilder();
+                            eb.setTitle("Command executed successfully");
+                            String message = ctx.message.split(" ", 2)[1];
+                            if (message.length() > 0) {
+                                reqMessage = message;
+                                Core.settings.put("reqMessage", message);
+                                Core.settings.autosave();
+                                eb.setDescription("Changed reqMessage.");
+                            } else {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("No message provided.");
+                            }
+                            ctx.channel.sendMessage(eb);
+                        }
+                        case "rank" -> {
+                            EmbedBuilder eb = new EmbedBuilder();
+                            eb.setTitle("Command executed successfully");
+                            String message = ctx.message.split(" ", 2)[1];
+                            if (message.length() > 0) {
+                                rankMessage = message;
+                                Core.settings.put("rankMessage", message);
+                                Core.settings.autosave();
+                                eb.setDescription("Changed rankMessage.");
+                            } else {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("No message provided.");
+                            }
+                            ctx.channel.sendMessage(eb);
+                        }
+                        case "rule" -> {
+                            EmbedBuilder eb = new EmbedBuilder();
+                            eb.setTitle("Command executed successfully");
+                            String message = ctx.message.split(" ", 2)[1];
+                            if (message != null) {
+                                ruleMessage = message;
+                                Core.settings.put("ruleMessage", message);
+                                Core.settings.autosave();
+                                eb.setDescription("Changed rules.");
+                                eb.setColor(Pals.success);
+                            } else {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("No message provided.");
+                                eb.setColor(Pals.error);
+                            }
+                            ctx.channel.sendMessage(eb);
+                        }
+                        default -> {
+                            EmbedBuilder eb = new EmbedBuilder();
+                            eb.setTitle("Please select a message to edit!");
+                            eb.setColor(Pals.error);
+                            ctx.channel.sendMessage(eb);
+                        }
+                    }
+                }
+            });
+
+//            handler.registerCommand(new RoleRestrictedCommand("statmessage") {
 //                {
-//                    help = "<list/remove/add> <message> List, remove or add on-screen messages.";
+//                    help = "Change / set a stat message";
 //                    role = banRole;
+//                    usage = "<newmessage>";
+//                    category = "management";
 //                }
+//
 //                public void run(Context ctx) {
 //                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1].toLowerCase();
-//                    String message = "";
-//                    if(!target.equals("list")) {
-//                        message = ctx.message.split(" ", 2)[1];
-//                    }
-//
-//                    switch (target) {
-//                        case "list":
-//                            eb.setTitle("All on-screen messages:");
-//                            for (String msg :) {
-//                                eb.addField(String.valueOf(onScreenMessages.indexOf(msg)), msg);
-//                            }
-//                            ctx.channel.sendMessage(eb);
-//                            break;
-//
-//                        case "remove":
-//                            if (onScreenMessages.get(Integer.parseInt(message.trim())) != null) {
-//                                onScreenMessages.remove(Integer.parseInt(message.trim()));
-//                                eb.setTitle("Command executed");
-//                                eb.setDescription("Removed provided on-screen message.");
-//                            } else {
-//                                eb.setTitle("Command terminated");
-//                                eb.setDescription("That on-screen message does not exist.");
-//                                eb.setColor(Pals.error);
-//                            }
-//                            ctx.channel.sendMessage(eb);
-//                            break;
-//
-//                        case "add":
-//                            if (message.length() > 0) {
-//                                onScreenMessages.add(message);
-//                                eb.setTitle("Command executed");
-//                                eb.setDescription("Added on-screen message `" + message + "`.");
-//                            } else {
-//                                eb.setTitle("Command terminated");
-//                                eb.setDescription("On-screen messages must be longer than 0 characters.");
-//                                eb.setColor(Pals.error);
-//                            }
-//                            ctx.channel.sendMessage(eb);
-//                            break;
-//
-//                        default:
-//                            eb.setTitle("Command terminated");
-//                            eb.setDescription("Invalid arguments provided.");
-//                            eb.setColor(Pals.error);
-//                            ctx.channel.sendMessage(eb);
-//                            break;
-//                    }
-//                }
-//            });
-
-            handler.registerCommand(new RoleRestrictedCommand("statmessage") {
-                {
-                    help = "Change / set a stat message";
-                    role = banRole;
-                    usage = "<newmessage>";
-                }
-
-                public void run(Context ctx) {
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.setTitle("Command executed successfully");
-                    String message = ctx.message;
-                    if (message.length() > 0) {
-                        statMessage = message;
-                        Core.settings.put("statMessage", message);
-                        Core.settings.autosave();
-                        eb.setDescription("Changed stat message.");
-                        ctx.channel.sendMessage(eb);
-                    } else {
-                        eb.setTitle("Command terminated");
-                        eb.setDescription("No message provided.");
-                        ctx.channel.sendMessage(eb);
-                    }
-                }
-
-            });
-
-            handler.registerCommand(new RoleRestrictedCommand("reqMessage") {
-                {
-                    help = "Change / set a requirement Message";
-                    role = banRole;
-                    usage = "<newmessage>";
-                }
-
-                public void run(Context ctx) {
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.setTitle("Command executed successfully");
-                    String message = ctx.message;
-                    if (message.length() > 0) {
-                        reqMessage = message;
-                        Core.settings.put("reqMessage", message);
-                        Core.settings.autosave();
-                        eb.setDescription("Changed reqMessage.");
-                        ctx.channel.sendMessage(eb);
-                    } else {
-                        eb.setTitle("Command terminated");
-                        eb.setDescription("No message provided.");
-                        ctx.channel.sendMessage(eb);
-                    }
-                }
-
-            });
-
-            handler.registerCommand(new RoleRestrictedCommand("rankMessage") {
-                {
-                    help = "Change / set a rank Message";
-                    role = banRole;
-                    usage = "<newmessage>";
-                }
-
-                public void run(Context ctx) {
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.setTitle("Command executed successfully");
-                    String message = ctx.message;
-                    if (message.length() > 0) {
-                        rankMessage = message;
-                        Core.settings.put("rankMessage", message);
-                        Core.settings.autosave();
-                        eb.setDescription("Changed rankMessage.");
-                    } else {
-                        eb.setTitle("Command terminated");
-                        eb.setDescription("No message provided.");
-                    }
-                    ctx.channel.sendMessage(eb);
-                }
-
-            });
-
-            handler.registerCommand(new RoleRestrictedCommand("rulemessage") {
-                {
-                    help = "Change server rules. Use approriate prefix";
-                    role = banRole;
-                }
-
-                public void run(Context ctx) {
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.setTitle("Command executed successfully");
-                    String message = ctx.message;
-                    if (message != null) {
-                        ruleMessage = message;
-                        Core.settings.put("ruleMessage", message);
-                        Core.settings.autosave();
-                        eb.setDescription("Changed rules.");
-                        eb.setColor(Pals.success);
-                    } else {
-                        eb.setTitle("Command terminated");
-                        eb.setDescription("No message provided.");
-                        eb.setColor(Pals.error);
-                    }
-                    ctx.channel.sendMessage(eb);
-                }
-
-            });
-
-
-//            handler.registerCommand(new RoleRestrictedCommand("spawn") {
-//                {
-//                    help = "<playerid|ip|name> <unit> <amount> Spawn x units at the location of the specified player";
-//                    role = banRole;
-//                }
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1];
-//                    String targetUnit = ctx.args[2];
-//                    int amount = Integer.parseInt(ctx.args[3]);
-//                    UnitType desiredUnit = UnitTypes.dagger;
-//                    if(target.length() > 0 && targetUnit.length() > 0 && amount > 0 && amount < 1000) {
-//                        try {
-//                            Field field = UnitTypes.class.getDeclaredField(targetUnit);
-//                            desiredUnit = (UnitType)field.get(null);
-//                        } catch (NoSuchFieldException | IllegalAccessException ignored) {}
-//
-//                        Player player = findPlayer(target);
-//                        if(player!=null){
-//                            UnitType finalDesiredUnit = desiredUnit;
-//                            IntStream.range(0, amount).forEach(i -> {
-//                                BaseUnit unit = finalDesiredUnit.create(player.getTeam());
-//                                unit.set(player.getX(), player.getY());
-//                                unit.add();
-//                            });
-//                            eb.setTitle("Command executed successfully.");
-//                            eb.setDescription("Spawned " + amount + " " + targetUnit + " near " + Utils.escapeCharacters(player.name) + ".");
-//                            ctx.channel.sendMessage(eb);
-//                        }
-//                    } else{
+//                    eb.setTitle("Command executed successfully");
+//                    String message = ctx.message;
+//                    if (message.length() > 0) {
+//                        statMessage = message;
+//                        Core.settings.put("statMessage", message);
+//                        Core.settings.autosave();
+//                        eb.setDescription("Changed stat message.");
+//                    } else {
 //                        eb.setTitle("Command terminated");
-//                        eb.setDescription("Invalid arguments provided.");
-//                        eb.setColor(Pals.error);
-//                        ctx.channel.sendMessage(eb);
+//                        eb.setDescription("No message provided.");
 //                    }
+//                    ctx.channel.sendMessage(eb);
 //                }
+//
 //            });
+
+//            handler.registerCommand(new RoleRestrictedCommand("reqMessage") {
+//                {
+//                    help = "Change / set a requirement Message";
+//                    role = banRole;
+//                    usage = "<newmessage>";
+//                    category = "management";
+//                }
+//
+//                public void run(Context ctx) {
+//                    EmbedBuilder eb = new EmbedBuilder();
+//                    eb.setTitle("Command executed successfully");
+//                    String message = ctx.message;
+//                    if (message.length() > 0) {
+//                        reqMessage = message;
+//                        Core.settings.put("reqMessage", message);
+//                        Core.settings.autosave();
+//                        eb.setDescription("Changed reqMessage.");
+//                    } else {
+//                        eb.setTitle("Command terminated");
+//                        eb.setDescription("No message provided.");
+//                    }
+//                    ctx.channel.sendMessage(eb);
+//                }
+//
+//            });
+//
+//            handler.registerCommand(new RoleRestrictedCommand("rankMessage") {
+//                {
+//                    help = "Change / set a rank Message";
+//                    role = banRole;
+//                    usage = "<newmessage>";
+//                    category = "management";
+//                }
+//
+//                public void run(Context ctx) {
+//                    EmbedBuilder eb = new EmbedBuilder();
+//                    eb.setTitle("Command executed successfully");
+//                    String message = ctx.message;
+//                    if (message.length() > 0) {
+//                        rankMessage = message;
+//                        Core.settings.put("rankMessage", message);
+//                        Core.settings.autosave();
+//                        eb.setDescription("Changed rankMessage.");
+//                    } else {
+//                        eb.setTitle("Command terminated");
+//                        eb.setDescription("No message provided.");
+//                    }
+//                    ctx.channel.sendMessage(eb);
+//                }
+//
+//            });
+
+//            handler.registerCommand(new RoleRestrictedCommand("rulemessage") {
+//                {
+//                    help = "Change server rules. Use approriate prefix";
+//                    role = banRole;
+//                    category = "management";
+//                }
+//
+//                public void run(Context ctx) {
+//                    EmbedBuilder eb = new EmbedBuilder();
+//                    eb.setTitle("Command executed successfully");
+//                    String message = ctx.message;
+//                    if (message != null) {
+//                        ruleMessage = message;
+//                        Core.settings.put("ruleMessage", message);
+//                        Core.settings.autosave();
+//                        eb.setDescription("Changed rules.");
+//                        eb.setColor(Pals.success);
+//                    } else {
+//                        eb.setTitle("Command terminated");
+//                        eb.setDescription("No message provided.");
+//                        eb.setColor(Pals.error);
+//                    }
+//                    ctx.channel.sendMessage(eb);
+//                }
+//
+//            });
+
+
+            handler.registerCommand(new RoleRestrictedCommand("spawn") {
+                {
+                    help = "Spawn x units at the location of the specified player";
+                    role = banRole;
+                    category = "management";
+                    usage = "<playerid|ip|name> <unit> <amount>";
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1];
+                    String targetUnit = ctx.args[2];
+                    int amount = Integer.parseInt(ctx.args[3]);
+                    UnitType desiredUnit = UnitTypes.dagger;
+                    if (target.length() > 0 && targetUnit.length() > 0 && amount > 0 && amount < 1000) {
+                        try {
+                            Field field = UnitTypes.class.getDeclaredField(targetUnit);
+                            desiredUnit = (UnitType) field.get(null);
+                        } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                        }
+
+                        Player player = findPlayer(target);
+                        if (player != null) {
+                            UnitType finalDesiredUnit = desiredUnit;
+                            IntStream.range(0, amount).forEach(i -> {
+                                Unit unit = finalDesiredUnit.create(player.team());
+                                unit.set(player.getX(), player.getY());
+                                unit.add();
+                            });
+                            eb.setTitle("Command executed successfully.");
+                            eb.setDescription("Spawned " + amount + " " + targetUnit + " near " + Utils.escapeCharacters(player.name) + ".");
+                            ctx.channel.sendMessage(eb);
+                        }
+                    } else {
+                        eb.setTitle("Command terminated");
+                        eb.setDescription("Invalid arguments provided.");
+                        eb.setColor(Pals.error);
+                        ctx.channel.sendMessage(eb);
+                    }
+                }
+            });
 
 //            handler.registerCommand(new RoleRestrictedCommand("killunits") {
 //                {
 //                    help = "<playerid|ip|name> <unit> Kills all units of the team of the specified player";
 //                    role = banRole;
+//                    category = "management";
 //                }
 //                public void run(Context ctx) {
 //                    EmbedBuilder eb = new EmbedBuilder();
@@ -1092,16 +1210,16 @@ public class ServerCommands {
 //                        Player player = findPlayer(target);
 //                        if(player!=null){
 //                            int amount = 0;
-//                            for(BaseUnit unit : Vars.unitGroup.all()) {
-//                                if(unit.getTeam() == player.getTeam()){
-//                                    if(unit.getType() == desiredUnit) {
+//                            for(Unit unit : ) {
+//                                if(unit.team == player.team()){
+//                                    if(unit.type == desiredUnit) {
 //                                        unit.kill();
 //                                        amount++;
 //                                    }
 //                                }
 //                            }
 //                            eb.setTitle("Command executed successfully.");
-//                            eb.setDescription("Killed " + amount + " " + targetUnit + "s on team " + player.getTeam());
+//                            eb.setDescription("Killed " + amount + " " + targetUnit + "s on team " + player.team());
 //                            ctx.channel.sendMessage(eb);
 //                        }
 //                    } else{
@@ -1118,6 +1236,7 @@ public class ServerCommands {
                     help = "Create a block at the player's current location and on the player's current team.";
                     role = banRole;
                     usage = "<playerid|ip|name> <block>";
+                    category = "management";
                 }
 
                 public void run(Context ctx) {
@@ -1177,6 +1296,7 @@ public class ServerCommands {
 //                                if(player!=null) { // what???    ...    how does this happen
 //                                    try {
 //                                        if (desiredBullet == null) {
+//                                            player.unit().wea
 //                                            player.bt = null;
 //                                        } else {
 //                                            player.bt = desiredBullet;
@@ -1215,11 +1335,14 @@ public class ServerCommands {
 //                    }
 //                }
 //            });
+
+
             handler.registerCommand(new RoleRestrictedCommand("setrank") {
                 {
                     help = "Change the player's rank to the provided one.";
                     usage = "<playerid|ip|name> <rank>";
                     role = banRole;
+                    category = "management";
                 }
 
                 public void run(Context ctx) {
@@ -1258,6 +1381,7 @@ public class ServerCommands {
                     help = "Change the player's statistics to the provided one.";
                     usage = "<playerid|ip|name> <rank> <playTime> <buildingsBuilt> <gamesPlayed>";
                     role = banRole;
+                    category = "management";
                 }
 
                 public void run(Context ctx) {
@@ -1286,7 +1410,7 @@ public class ServerCommands {
                                 pd.rank = targetRank;
                                 setData(player.uuid(), pd);
                                 eb.setTitle("Command executed successfully");
-                                eb.setDescription(String.format("Set stats of %s to:\nPlaytime: %d\nGames played: %d\nBuildings built: %d", escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", ""), playTime, gamesPlayed, buildingsBuilt));
+                                eb.setDescription(String.format("Set stats of %s to:\nPlaytime: %d\nBuildings built: %d\nGames played: %d", escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", ""), playTime, buildingsBuilt, gamesPlayed));
 //                                eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + targetRank);
                                 ctx.channel.sendMessage(eb);
 //                                player.con.kick("Your rank was modified, please rejoin.", 0);
@@ -1324,6 +1448,7 @@ public class ServerCommands {
                     help = "Upload a new map (Include a .msav file with command message)";
                     role = reviewerRole;
                     usage = "<.msav attachment>";
+                    category = "mapReviewer";
                 }
 
                 public void run(Context ctx) {
@@ -1378,6 +1503,7 @@ public class ServerCommands {
                     help = "Remove a map from the playlist (use mapname/mapid retrieved from the %maps command)".replace("%", ioMain.prefix);
                     role = reviewerRole;
                     usage = "<mapname/mapid>";
+                    category = "mapReviewer";
                 }
 
                 @Override

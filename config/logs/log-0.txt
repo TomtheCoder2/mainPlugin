@@ -3401,3 +3401,38 @@
 [09-08-2021 19:52:22] [I] Selected next map to be Mision 14 - Atacar y zarpar.
 [09-08-2021 19:57:21] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
 [09-08-2021 19:57:21] [I] Selected next map to be V130: Polluted river: Crux.
+[09-09-2021 19:16:38] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-09-2021 19:16:38] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-09-2021 19:16:38] [I] 1 mods loaded.
+[09-09-2021 19:16:38] [I] Server loaded. Type 'help' for help.
+[09-09-2021 19:17:14] [E] Command not found. Did you mean "js"?
+[09-09-2021 19:17:14] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-09-2021 19:17:14] [I] Loading map...
+[09-09-2021 19:17:15] [I] Map loaded.
+[09-09-2021 19:17:15] [I] Opened a server on port 6567.
+[09-09-2021 19:21:56] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-09-2021 19:21:56] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-09-2021 19:47:33] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-09-2021 19:47:33] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-09-2021 19:47:33] [I] 1 mods loaded.
+[09-09-2021 19:47:33] [I] Server loaded. Type 'help' for help.
+[09-09-2021 19:48:14] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-09-2021 19:48:14] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-09-2021 19:48:15] [I] 1 mods loaded.
+[09-09-2021 19:48:15] [I] Server loaded. Type 'help' for help.
+[09-09-2021 19:49:45] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-09-2021 19:49:45] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-09-2021 19:49:45] [I] 1 mods loaded.
+[09-09-2021 19:49:45] [I] Server loaded. Type 'help' for help.
+[09-09-2021 20:02:58] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-09-2021 20:02:58] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-09-2021 20:02:58] [I] 1 mods loaded.
+[09-09-2021 20:02:58] [I] Server loaded. Type 'help' for help.
+[09-09-2021 20:03:53] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-09-2021 20:03:53] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-09-2021 20:03:53] [I] 1 mods loaded.
+[09-09-2021 20:03:53] [I] Server loaded. Type 'help' for help.
+[09-09-2021 20:05:11] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-09-2021 20:05:11] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-09-2021 20:05:11] [I] 1 mods loaded.
+[09-09-2021 20:05:11] [I] Server loaded. Type 'help' for help.
