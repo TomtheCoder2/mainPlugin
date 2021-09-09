@@ -3296,3 +3296,108 @@
 [09-04-2021 23:20:02] [I] Selected next map to be V130: Polluted river: Crux.
 [09-05-2021 10:40:56] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
 [09-05-2021 10:40:56] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-05-2021 11:17:05] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[09-05-2021 11:17:05] [I] Selected next map to be V130: Polluted river: Crux.
+[09-05-2021 11:36:29] [I] Game over! Reached wave 19 with 0 players online on map V130: Polluted river: Crux.
+[09-05-2021 11:36:29] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-05-2021 16:31:03] [I] Game over! Reached wave 3 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-05-2021 16:31:03] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-05-2021 17:15:16] [I] Game over! Reached wave 20 with 0 players online on map Mision 12   Base pretrolera.
+[09-05-2021 17:15:16] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-05-2021 17:20:26] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-05-2021 17:20:26] [I] Selected next map to be V130: Polluted river: Crux.
+[09-05-2021 18:05:50] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-05-2021 18:05:50] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-05-2021 18:10:48] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-05-2021 18:10:48] [I] Selected next map to be V130: Polluted river: Crux.
+[09-05-2021 18:24:13] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-05-2021 18:24:13] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-05-2021 18:24:13] [I] 1 mods loaded.
+[09-05-2021 18:24:13] [I] Server loaded. Type 'help' for help.
+[09-05-2021 18:24:32] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[09-05-2021 18:24:32] [I] Loading map...
+[09-05-2021 18:24:32] [I] Map loaded.
+[09-05-2021 18:24:32] [I] Opened a server on port 6567.
+[09-05-2021 18:24:36] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-05-2021 18:24:41] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /maps>
+[09-05-2021 18:24:46] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /nominate mision>
+[09-05-2021 18:24:47] [I] Game over! Reached wave 1 with 1 players online on map Mision 12   Base pretrolera.
+[09-05-2021 18:24:47] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-05-2021 21:43:06] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[09-08-2021 14:54:01] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-08-2021 14:54:01] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-08-2021 14:54:01] [I] 1 mods loaded.
+[09-08-2021 14:54:01] [I] Server loaded. Type 'help' for help.
+[09-08-2021 14:54:05] [E] Command not found. Did you mean "host"?
+[09-08-2021 14:54:09] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[09-08-2021 14:54:09] [I] Loading map...
+[09-08-2021 14:54:09] [I] Map loaded.
+[09-08-2021 14:54:09] [I] Opened a server on port 6567.
+[09-08-2021 14:55:12] [I] Kicking connection 192.168.80.1 / AAAAAAAA; Reason: [accent]Incompatible mods![]  Unnecessary mods:[lightgray] > [orange]expanded-[gray]industries:1.1 Full
+[09-08-2021 14:55:12] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-08-2021 14:55:20] [I] Kicking connection 192.168.80.1 / AAAAAAAA; Reason: [accent]Incompatible mods![]  Unnecessary mods:[lightgray] > [orange]expanded-[gray]industries:1.1 Full
+[09-08-2021 14:55:20] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-08-2021 14:55:45] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-08-2021 14:57:44] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-08-2021 15:30:28] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-08-2021 15:30:28] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-08-2021 15:36:23] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-08-2021 15:36:23] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-08-2021 16:12:43] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-08-2021 16:12:43] [I] Selected next map to be V130: Polluted river: Crux.
+[09-08-2021 16:29:47] [I] Game over! Reached wave 16 with 0 players online on map V130: Polluted river: Crux.
+[09-08-2021 16:29:47] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-08-2021 16:34:41] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-08-2021 16:34:41] [I] Selected next map to be V130: Polluted river: Crux.
+[09-08-2021 16:51:04] [I] Game over! Reached wave 16 with 0 players online on map V130: Polluted river: Crux.
+[09-08-2021 16:51:04] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-08-2021 17:27:22] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-08-2021 17:27:22] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-08-2021 17:33:17] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-08-2021 17:33:17] [I] Selected next map to be V130: Polluted river: Crux.
+[09-08-2021 17:49:08] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-08-2021 17:49:08] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-08-2021 17:49:08] [I] 1 mods loaded.
+[09-08-2021 17:49:08] [I] Server loaded. Type 'help' for help.
+[09-08-2021 17:49:15] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[09-08-2021 17:49:15] [I] Loading map...
+[09-08-2021 17:49:15] [I] Map loaded.
+[09-08-2021 17:49:15] [I] Opened a server on port 6567.
+[09-08-2021 17:49:33] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-08-2021 17:49:36] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[09-08-2021 17:53:51] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-08-2021 17:53:51] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-08-2021 17:53:51] [I] 1 mods loaded.
+[09-08-2021 17:53:51] [I] Server loaded. Type 'help' for help.
+[09-08-2021 17:53:55] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-08-2021 17:53:55] [I] Loading map...
+[09-08-2021 17:53:55] [I] Map loaded.
+[09-08-2021 17:53:55] [I] Opened a server on port 6567.
+[09-08-2021 17:54:23] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-08-2021 17:54:25] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[09-08-2021 17:55:18] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-08-2021 17:55:18] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-08-2021 17:55:18] [I] 1 mods loaded.
+[09-08-2021 17:55:18] [I] Server loaded. Type 'help' for help.
+[09-08-2021 17:55:18] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-08-2021 17:55:18] [I] Loading map...
+[09-08-2021 17:55:18] [I] Map loaded.
+[09-08-2021 17:55:18] [I] Opened a server on port 6567.
+[09-08-2021 17:55:25] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-08-2021 17:55:26] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[09-08-2021 17:55:33] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[09-08-2021 17:56:42] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rank>
+[09-08-2021 17:56:45] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[09-08-2021 17:59:12] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[09-08-2021 17:59:12] [I] Selected next map to be V130: Polluted river: Crux.
+[09-08-2021 17:59:32] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-08-2021 18:21:39] [I] Game over! Reached wave 22 with 0 players online on map V130: Polluted river: Crux.
+[09-08-2021 18:21:39] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-08-2021 18:57:08] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[09-08-2021 18:57:08] [I] Selected next map to be V130: Polluted river: Crux.
+[09-08-2021 19:16:10] [I] Game over! Reached wave 18 with 0 players online on map V130: Polluted river: Crux.
+[09-08-2021 19:16:10] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-08-2021 19:52:22] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[09-08-2021 19:52:22] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-08-2021 19:57:21] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-08-2021 19:57:21] [I] Selected next map to be V130: Polluted river: Crux.

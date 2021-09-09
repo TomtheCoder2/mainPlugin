@@ -1,7 +1,6 @@
 package mindustry.plugin;
 
 import arc.math.Mathf;
-import mindustry.Vars;
 //import mindustry.entities.type.Player;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -10,11 +9,6 @@ import org.javacord.api.DiscordApi;
 import org.json.JSONObject;
 
 import mindustry.plugin.discordcommands.DiscordCommands;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import mindustry.plugin.Utils.*;
 
 import static mindustry.Vars.netServer;
 //import static mindustry.Vars.playerGroup;
@@ -59,9 +53,21 @@ public class BotThread extends Thread {
 //
 //
                     pd.playTime++;
-                    if(pd.rank <= 0 && pd.playTime >= activeRequirements.playtime && pd.buildingsBuilt >= activeRequirements.buildingsBuilt && pd.gamesPlayed >= activeRequirements.gamesPlayed){
+                    if(pd.rank <= 0 && pd.playTime >= privateRequirements.playtime && pd.buildingsBuilt >= privateRequirements.buildingsBuilt && pd.gamesPlayed >= privateRequirements.gamesPlayed){
                         Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
                         if (pd.rank < 1) pd.rank = 1;
+                    }
+                    if(pd.rank <= 1 && pd.playTime >= generalRequirements.playtime && pd.buildingsBuilt >= generalRequirements.buildingsBuilt && pd.gamesPlayed >= generalRequirements.gamesPlayed){
+                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+                        if (pd.rank < 2) pd.rank = 2;
+                    }
+                    if(pd.rank <= 2 && pd.playTime >= corporalRequirements.playtime && pd.buildingsBuilt >= corporalRequirements.buildingsBuilt && pd.gamesPlayed >= corporalRequirements.gamesPlayed){
+                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+                        if (pd.rank < 3) pd.rank = 3;
+                    }
+                    if(pd.rank <= 3 && pd.playTime >= sargentRequirements.playtime && pd.buildingsBuilt >= sargentRequirements.buildingsBuilt && pd.gamesPlayed >= sargentRequirements.gamesPlayed){
+                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+                        if (pd.rank < 4) pd.rank = 4;
                     }
                     setData(p.uuid(), pd);
                     ioMain.playerDataGroup.put(p.uuid(), tdata); // update tdata with the new stuff

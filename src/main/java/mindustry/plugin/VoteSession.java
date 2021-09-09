@@ -54,6 +54,7 @@ public class VoteSession{
         fmt.format("[orange]%s[lightgray] has voted to change the map to[orange] %s[].[accent] (%d/%d)\n[lightgray]Type[orange] /rtv to agree.",
                 player.name, target.name(), votes, votesRequired());
         Call.sendMessage(sbuf.toString());
+        checkPass();
     }
 
     boolean checkPass(){

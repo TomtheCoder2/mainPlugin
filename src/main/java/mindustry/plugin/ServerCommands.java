@@ -77,89 +77,6 @@ public class ServerCommands {
         });
         if (data.has("administrator_roleid")) {
             String adminRole = data.getString("administrator_roleid");
-            handler.registerCommand(new RoleRestrictedCommand("setrank") {
-                {
-                    help = "Change the player's rank to the provided one.";
-                    usage = "<playerid|ip|name> <rank>";
-                    role = adminRole;
-                }
-
-                public void run(Context ctx) {
-                    CompletableFuture.runAsync(() -> {
-                        EmbedBuilder eb = new EmbedBuilder();
-                        String target = ctx.args[1];
-                        int targetRank = Integer.parseInt(ctx.args[2]);
-                        if (target.length() > 0 && targetRank > -1 && targetRank < 6) {
-                            Player player = findPlayer(target);
-                            if (player == null) {
-                                eb.setTitle("Command terminated");
-                                eb.setDescription("Player not found.");
-                                eb.setColor(Pals.error);
-                                ctx.channel.sendMessage(eb);
-                                return;
-                            }
-
-                            PlayerData pd = getData(player.uuid());
-                            if (pd != null) {
-                                pd.rank = targetRank;
-                                setData(player.uuid(), pd);
-                                eb.setTitle("Command executed successfully");
-                                eb.setDescription("Promoted " + escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + " to " + targetRank);
-                                ctx.channel.sendMessage(eb);
-                                player.con.kick("Your rank was modified, please rejoin.", 0);
-                            }
-
-                            if (targetRank == 5) netServer.admins.adminPlayer(player.uuid(), player.usid());
-                        }
-                    });
-                }
-
-            });
-            handler.registerCommand(new RoleRestrictedCommand("setstats") {
-                {
-                    help = "Change the player's statistics to the provided one.";
-                    usage = "<playerid|ip|name> <rank> <playTime> <buildingsBuilt> <gamesPlayed>";
-                    role = adminRole;
-                }
-
-                public void run(Context ctx) {
-                    CompletableFuture.runAsync(() -> {
-                        EmbedBuilder eb = new EmbedBuilder();
-                        String target = ctx.args[1];
-                        int targetRank = Integer.parseInt(ctx.args[2]);
-                        int playTime = Integer.parseInt(ctx.args[3]);
-                        int buildingsBuilt = Integer.parseInt(ctx.args[4]);
-                        int gamesPlayed = Integer.parseInt(ctx.args[5]);
-                        if (target.length() > 0 && targetRank > -1 && targetRank < 6) {
-                            Player player = findPlayer(target);
-                            if (player == null) {
-                                eb.setTitle("Command terminated");
-                                eb.setDescription("Player not found.");
-                                eb.setColor(Pals.error);
-                                ctx.channel.sendMessage(eb);
-                                return;
-                            }
-
-                            PlayerData pd = getData(player.uuid());
-                            if (pd != null) {
-                                pd.buildingsBuilt = buildingsBuilt;
-                                pd.gamesPlayed = gamesPlayed;
-                                pd.playTime = playTime;
-                                pd.rank = targetRank;
-                                setData(player.uuid(), pd);
-                                eb.setTitle("Command executed successfully");
-                                eb.setDescription(String.format("Set stats of %s to:\nPlaytime: %d\nGames played: %d\nBuildings built: %d", escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", ""), playTime, gamesPlayed, buildingsBuilt));
-//                                eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + targetRank);
-                                ctx.channel.sendMessage(eb);
-//                                player.con.kick("Your rank was modified, please rejoin.", 0);
-                            }
-
-                            if (targetRank == 5) netServer.admins.adminPlayer(player.uuid(), player.usid());
-                        }
-                    });
-                }
-
-            });
         }
 
         if (data.has("exit_roleid")) {
@@ -1040,6 +957,57 @@ public class ServerCommands {
 
             });
 
+            handler.registerCommand(new RoleRestrictedCommand("reqMessage") {
+                {
+                    help = "Change / set a requirement Message";
+                    role = banRole;
+                    usage = "<newmessage>";
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    eb.setTitle("Command executed successfully");
+                    String message = ctx.message;
+                    if (message.length() > 0) {
+                        reqMessage = message;
+                        Core.settings.put("reqMessage", message);
+                        Core.settings.autosave();
+                        eb.setDescription("Changed reqMessage.");
+                        ctx.channel.sendMessage(eb);
+                    } else {
+                        eb.setTitle("Command terminated");
+                        eb.setDescription("No message provided.");
+                        ctx.channel.sendMessage(eb);
+                    }
+                }
+
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("rankMessage") {
+                {
+                    help = "Change / set a rank Message";
+                    role = banRole;
+                    usage = "<newmessage>";
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    eb.setTitle("Command executed successfully");
+                    String message = ctx.message;
+                    if (message.length() > 0) {
+                        rankMessage = message;
+                        Core.settings.put("rankMessage", message);
+                        Core.settings.autosave();
+                        eb.setDescription("Changed rankMessage.");
+                    } else {
+                        eb.setTitle("Command terminated");
+                        eb.setDescription("No message provided.");
+                    }
+                    ctx.channel.sendMessage(eb);
+                }
+
+            });
+
             handler.registerCommand(new RoleRestrictedCommand("rulemessage") {
                 {
                     help = "Change server rules. Use approriate prefix";
@@ -1247,6 +1215,89 @@ public class ServerCommands {
 //                    }
 //                }
 //            });
+            handler.registerCommand(new RoleRestrictedCommand("setrank") {
+                {
+                    help = "Change the player's rank to the provided one.";
+                    usage = "<playerid|ip|name> <rank>";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    CompletableFuture.runAsync(() -> {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        String target = ctx.args[1];
+                        int targetRank = Integer.parseInt(ctx.args[2]);
+                        if (target.length() > 0 && targetRank > -1 && targetRank < 6) {
+                            Player player = findPlayer(target);
+                            if (player == null) {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("Player not found.");
+                                eb.setColor(Pals.error);
+                                ctx.channel.sendMessage(eb);
+                                return;
+                            }
+
+                            PlayerData pd = getData(player.uuid());
+                            if (pd != null) {
+                                pd.rank = targetRank;
+                                setData(player.uuid(), pd);
+                                eb.setTitle("Command executed successfully");
+                                eb.setDescription("Promoted " + escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + " to " + targetRank);
+                                ctx.channel.sendMessage(eb);
+                                player.con.kick("Your rank was modified, please rejoin.", 0);
+                            }
+
+                            if (targetRank == 5) netServer.admins.adminPlayer(player.uuid(), player.usid());
+                        }
+                    });
+                }
+
+            });
+            handler.registerCommand(new RoleRestrictedCommand("setstats") {
+                {
+                    help = "Change the player's statistics to the provided one.";
+                    usage = "<playerid|ip|name> <rank> <playTime> <buildingsBuilt> <gamesPlayed>";
+                    role = banRole;
+                }
+
+                public void run(Context ctx) {
+                    CompletableFuture.runAsync(() -> {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        String target = ctx.args[1];
+                        int targetRank = Integer.parseInt(ctx.args[2]);
+                        int playTime = Integer.parseInt(ctx.args[3]);
+                        int buildingsBuilt = Integer.parseInt(ctx.args[4]);
+                        int gamesPlayed = Integer.parseInt(ctx.args[5]);
+                        if (target.length() > 0 && targetRank > -1 && targetRank < 6) {
+                            Player player = findPlayer(target);
+                            if (player == null) {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("Player not found.");
+                                eb.setColor(Pals.error);
+                                ctx.channel.sendMessage(eb);
+                                return;
+                            }
+
+                            PlayerData pd = getData(player.uuid());
+                            if (pd != null) {
+                                pd.buildingsBuilt = buildingsBuilt;
+                                pd.gamesPlayed = gamesPlayed;
+                                pd.playTime = playTime;
+                                pd.rank = targetRank;
+                                setData(player.uuid(), pd);
+                                eb.setTitle("Command executed successfully");
+                                eb.setDescription(String.format("Set stats of %s to:\nPlaytime: %d\nGames played: %d\nBuildings built: %d", escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", ""), playTime, gamesPlayed, buildingsBuilt));
+//                                eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + targetRank);
+                                ctx.channel.sendMessage(eb);
+//                                player.con.kick("Your rank was modified, please rejoin.", 0);
+                            }
+
+                            if (targetRank == 5) netServer.admins.adminPlayer(player.uuid(), player.usid());
+                        }
+                    });
+                }
+
+            });
 
         }
 

@@ -29,6 +29,7 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static mindustry.Vars.*;
@@ -258,7 +259,7 @@ public class ioMain extends Plugin {
             PersistentPlayerData td = (playerDataGroup.getOrDefault(event.unit.getPlayer().uuid(), null));
             if (pd == null || td == null) return;
             if (event.tile.block() != null) {
-                if (!activeRequirements.bannedBlocks.contains(event.tile.block())) {
+                if (!privateRequirements.bannedBlocks.contains(event.tile.block())) {
                     td.bbIncrementor++;
 //                    System.out.println(escapeColorCodes(event.unit.getPlayer().name) + " built a block");
 //                    pd.buildingsBuilt++;
@@ -743,6 +744,25 @@ public class ioMain extends Plugin {
 
                     currentlyKicking[0].vote(player, 1);
                 }
+            });
+
+            handler.<Player>register("req","Show the requirements for all ranks", (args, player) -> { // self info
+//                for (Map.Entry<Integer, Rank> rank : rankNames.entrySet()) {
+////                    if(rank.getValue().name.equals(args[1])) {
+////                        player.sendMessage("");
+////                    }
+//                }
+                Call.infoMessage(player.con, formatMessage(player, reqMessage));
+
+            });
+
+            handler.<Player>register("ranks","Show for all ranks.", (args, player) -> { // self info
+//                for (Map.Entry<Integer, Rank> rank : rankNames.entrySet()) {
+////                    if(rank.getValue().name.equals(args[1])) {
+////                        player.sendMessage("");
+////                    }
+//                }
+                Call.infoMessage(player.con, formatMessage(player, rankMessage));
             });
 
             handler.<Player>register("label", "<duration> <text...>", "[admin only] Create an in-world label at the current position.", (args, player) -> {

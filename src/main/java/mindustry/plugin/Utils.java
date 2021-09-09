@@ -3,7 +3,6 @@ package mindustry.plugin;
 import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
-import arc.util.Log;
 import arc.util.Strings;
 import mindustry.content.Blocks;
 import mindustry.game.EventType;
@@ -13,8 +12,6 @@ import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.maps.Maps;
 import mindustry.world.Block;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -35,6 +32,8 @@ public class Utils {
     public static int chatMessageMaxSize = 256;
     static String welcomeMessage = "";
     static String statMessage = "";
+    static String reqMessage = "";
+    static String rankMessage = "";
     static String ruleMessage = "";
     static String noPermissionMessage = "You don't have the required rank for this command. Learn more about ranks [pink]/info[]";
     // wheter ip verification is in place (detect vpns, disallow their build rights)
@@ -63,11 +62,14 @@ public class Utils {
     public static void init() {
 //        "\uE816";
         rankNames.put(0, new Rank("[#7d7d7d][]", "none"));
-        rankNames.put(1, new Rank("[accent]<[white]\uE800[accent]>[]", "active"));
-        rankNames.put(2, new Rank("[accent]<[white]\uE813[accent]>[]", "veteran"));
-        rankNames.put(3, new Rank("[accent]<[white][accent]>[]", "contributor"));
-        rankNames.put(4, new Rank("[accent]<[white][accent]>[]", "moderator"));
-        rankNames.put(5, new Rank("[accent]<[white][accent]>[]", "admin"));
+        rankNames.put(1, new Rank("[accent]<[white]\uE800[accent]>[]", "private"));
+        rankNames.put(2, new Rank("[accent]<[white]\uE813[accent]>[]", "general"));
+        rankNames.put(3, new Rank("[accent]<[white]\uE814[accent]>[]", "sargent"));
+        rankNames.put(4, new Rank("[accent]<[white]\uE814[accent]>[]", "corporal"));
+        rankNames.put(5, new Rank("[accent]<[white]\uE815[accent]>[]", "pro"));
+        rankNames.put(6, new Rank("[accent]<[white][accent]>[]", "contributor"));
+        rankNames.put(7, new Rank("[accent]<[white]\uE817[accent]>[]", "moderator"));
+        rankNames.put(8, new Rank("[accent]<[white][accent]>[]", "admin"));
 
         rankRoles.put("627985513600516109", 1);
         rankRoles.put("636968410441318430", 2);
@@ -82,12 +84,14 @@ public class Utils {
         bannedNames.add("IgruhaOrg");
         bannedNames.add("андрей");
 
-        activeRequirements.bannedBlocks.add(Blocks.conveyor);
-        activeRequirements.bannedBlocks.add(Blocks.titaniumConveyor);
-        activeRequirements.bannedBlocks.add(Blocks.junction);
-        activeRequirements.bannedBlocks.add(Blocks.router);
+        privateRequirements.bannedBlocks.add(Blocks.conveyor);
+        privateRequirements.bannedBlocks.add(Blocks.titaniumConveyor);
+        privateRequirements.bannedBlocks.add(Blocks.junction);
+        privateRequirements.bannedBlocks.add(Blocks.router);
 
         statMessage = Core.settings.getString("statMessage");
+        reqMessage = Core.settings.getString("reqMessage");
+        rankMessage = Core.settings.getString("rankMessage");
         welcomeMessage = Core.settings.getString("welcomeMessage");
         ruleMessage = Core.settings.getString("ruleMessage");
     }
@@ -397,10 +401,31 @@ public class Utils {
         public static Color success = (Color.getHSBColor(108, 80, 100));
     }
 
-    public static class activeRequirements {
+    public static class privateRequirements {
         public static Seq<Block> bannedBlocks = new Seq<>();
-        public static int playtime = 75 * 10;
-        public static int buildingsBuilt = 1500 * 10;
-        public static int gamesPlayed = 10;
+        public static int playtime = 1000;
+        public static int buildingsBuilt = 3 * 1000;
+        public static int gamesPlayed = 5;
+    }
+
+    public static class generalRequirements {
+        public static Seq<Block> bannedBlocks = new Seq<>();
+        public static int playtime = 2500;
+        public static int buildingsBuilt = 5 * 1000;
+        public static int gamesPlayed = 15;
+    }
+
+    public static class corporalRequirements {
+        public static Seq<Block> bannedBlocks = new Seq<>();
+        public static int playtime = 10 * 1000;
+        public static int buildingsBuilt = 15 * 1000;
+        public static int gamesPlayed = 25;
+    }
+
+    public static class sargentRequirements {
+        public static Seq<Block> bannedBlocks = new Seq<>();
+        public static int playtime = 20 * 1000;
+        public static int buildingsBuilt = 35 * 1000;
+        public static int gamesPlayed = 50;
     }
 }

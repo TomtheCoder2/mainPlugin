@@ -16,11 +16,14 @@ import mindustry.plugin.discordcommands.DiscordCommands;
 import mindustry.plugin.discordcommands.RoleRestrictedCommand;
 import mindustry.plugin.requests.GetMap;
 import mindustry.world.modules.ItemModule;
+import net.dv8tion.jda.api.entities.Role;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 
 import static mindustry.Vars.state;
 import static mindustry.plugin.Utils.*;
@@ -268,10 +271,10 @@ public class ComCommands {
 //                        }
 //                        Player player = findPlayer(target);
 //                        if (player != null && rank > 0) {
-//                            PlayerData pd = getData(player.uuid);
+//                            PlayerData pd = getData(player.uuid());
 //                            if (pd != null) {
 //                                pd.rank = rank;
-//                                setData(player.uuid, pd);
+//                                setData(player.uuid(), pd);
 //                            }
 //                            eb.setTitle("Command executed successfully");
 //                            eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + escapeColorCodes(rankNames.get(rank).name) + ".");
