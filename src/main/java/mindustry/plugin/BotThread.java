@@ -19,7 +19,12 @@ public class BotThread extends Thread {
     private Thread mt;
     private JSONObject data;
     public DiscordCommands commandHandler = new DiscordCommands();
-
+    /**
+     * start the bot thread
+     * @param api the discordApi to operate with
+     * @param mt the main Thread
+     * @param data the data from settings.json
+     * */
     public BotThread(DiscordApi api, Thread mt, JSONObject data) {
         this.api = api; //new DiscordApiBuilder().setToken(data.get(0)).login().join();
         this.mt = mt;

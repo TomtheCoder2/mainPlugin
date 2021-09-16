@@ -60,7 +60,7 @@ public class ioMain extends Plugin {
     private ObjectMap<Long, String> cooldowns = new ObjectMap<>(); //uuid
     private JSONObject alldata;
 
-    //register event handlers and create variables in the constructor
+    // register event handlers and create variables in the constructor
     public ioMain() {
         try {
             String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
@@ -352,7 +352,7 @@ public class ioMain extends Plugin {
                 player.getInfo().messageInfractions = 0;
             }
 
-            //prevent players from sending the same message twice in the span of 50 seconds
+            // prevent players from sending the same message twice in the span of 50 seconds
             if (message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50) {
                 player.sendMessage("[scarlet]You may not send the same message twice.");
                 return false;
@@ -364,7 +364,7 @@ public class ioMain extends Plugin {
         return true;
     }
 
-    public static TextChannel getTextChannel(String id) {
+    public static TextChannel  getTextChannel(String id) {
         Optional<Channel> dc = api.getChannelById(id);
         if (dc.isEmpty()) {
             Log.err("[ERR!] discordplugin: channel not found! " + id);
@@ -431,13 +431,13 @@ public class ioMain extends Plugin {
 
                 Player other = Utils.findPlayer(args[0]);
 
-                //give error message with scarlet-colored text if player isn't found
+                // give error message with scarlet-colored text if player isn't found
                 if (other == null) {
                     player.sendMessage("[scarlet]No player by that name found!");
                     return;
                 }
 
-                //send the other player a message, using [lightgray] for gray text color and [] to reset color
+                // send the other player a message, using [lightgray] for gray text color and [] to reset color
                 other.sendMessage("[orange][[[gray]whisper from [#ffd37f]" + Strings.stripColors(player.name) + "[orange]]: [gray]" + args[1]);
                 player.sendMessage("[orange][[[gray]whisper to [#ffd37f]" + Strings.stripColors(other.name) + "[orange]]: [gray]" + args[1]);
             });

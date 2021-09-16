@@ -21,24 +21,24 @@ ext {
 }
 
 dependencies {
-    implementation "org.jsoup:jsoup:1.7.2"
+    implementation 'org.jsoup:jsoup:1.14.2'
     compileOnly("com.github.Anuken.Arc:arc-core:$arcVersion")
     compileOnly("com.github.Anuken.Mindustry:core:$arcVersion")
 //    compileOnly("com.github.fuzzbuck.Mindustry:core:$mindustryVersion")
 //    compileOnly("com.github.fuzzbuck.Mindustry:server:$mindustryVersion")
-    implementation group: 'org.json', name: 'json', version: '20190722'
-    compileOnly "org.springframework.data:spring-data-redis:1.8.0.RELEASE"
-    compileOnly "redis.clients:jedis:2.9.0"
-    compileOnly("org.glassfish.jersey.core:jersey-client:2.25.1")
+    implementation group: 'org.json', name: 'json', version: '20210307'
+    compileOnly 'org.springframework.data:spring-data-redis:2.5.4'
+    compileOnly 'redis.clients:jedis:3.6.3'
+    compileOnly('org.glassfish.jersey.core:jersey-client:3.0.2')
 //    compileOnly("redis.clients:jedis:3.2.0")
-    compileOnly("org.apache.commons:commons-pool2:2.6.0")
-    compileOnly('redis.clients:jedis:2.10.2')
+    compileOnly('org.apache.commons:commons-pool2:2.10.0')
+    compileOnly('redis.clients:jedis:3.6.3')
 
     implementation('org.javacord:javacord:3.3.2')
-    compileOnly("javax.ws.rs:javax.ws.rs-api:2.0.1")
+    compileOnly('javax.ws.rs:javax.ws.rs-api:2.1.1')
     implementation 'com.google.code.gson:gson:2.8.8'
     implementation("net.dv8tion:JDA:4.3.0_277")
-    implementation 'org.postgresql:postgresql:42.2.10'
+    implementation 'org.postgresql:postgresql:42.2.23.jre7'
 
 }
 

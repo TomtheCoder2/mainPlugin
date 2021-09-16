@@ -16,6 +16,8 @@ public class Context {
     public TextChannel channel;
     public MessageAuthor author;
 
+    /**
+     * set the context of the message to execute the command*/
     public Context(MessageCreateEvent event, String[] args, String message) {
         this.event = event;
         this.args = args;
@@ -27,7 +29,7 @@ public class Context {
 
     /**
      * Send a message back to the user who invoked the command
-     * @param message
+     * @param message reply with this message
      */
     public void reply(MessageBuilder message) {
         message.send(channel);
@@ -35,7 +37,7 @@ public class Context {
 
     /**
      * Send a plaintext message back
-     * @param message
+     * @param message the message to send
      */
     public void reply(String message) {
         MessageBuilder mb = new MessageBuilder();

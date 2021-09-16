@@ -1,22 +1,17 @@
 package mindustry.plugin;
 
 import arc.struct.ObjectSet;
-import arc.util.Strings;
-import arc.util.Time;
 import arc.util.Timer;
-//import mindustry.entities.type.Player;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.maps.Map;
-import mindustry.net.Packets;
 
 import java.util.Formatter;
 
 import static mindustry.Vars.netServer;
-//import static mindustry.Vars.Groups.player;
 
-public class VoteSession{
+public class VoteSession {
     Map target;
     ObjectSet<String> voted = new ObjectSet<>();
     VoteSession[] map;
@@ -26,11 +21,11 @@ public class VoteSession{
     //voting round duration in seconds
     float voteDuration = 3f * 60;
 
-    public VoteSession(VoteSession[] map, Map target){
+    public VoteSession(VoteSession[] map, Map target) {
         this.target = target;
         this.map = map;
         this.task = Timer.schedule(() -> {
-            if(!checkPass()){
+            if (!checkPass()) {
                 StringBuilder sbuf = new StringBuilder();
                 Formatter fmt = new Formatter(sbuf);
                 fmt.format("[lightgray]Vote failed. Not enough votes to switch map to[accent] %b[lightgray].",
@@ -42,11 +37,11 @@ public class VoteSession{
         }, voteDuration);
     }
 
-    public int votesRequired(){
+    public int votesRequired() {
         return (int) (Groups.player.size() / 1.5f);
     }
 
-    void vote(Player player, int d){
+    void vote(Player player, int d) {
         votes += d;
         voted.addAll(player.uuid(), netServer.admins.getInfo(player.uuid()).lastIP);
         StringBuilder sbuf = new StringBuilder();
@@ -57,8 +52,8 @@ public class VoteSession{
         checkPass();
     }
 
-    boolean checkPass(){
-        if(votes >= votesRequired()){
+    boolean checkPass() {
+        if (votes >= votesRequired()) {
             StringBuilder sbuf = new StringBuilder();
             Formatter fmt = new Formatter(sbuf);
             fmt.format("[orange]Vote passed.[scarlet] changing map to %s.", target.name());

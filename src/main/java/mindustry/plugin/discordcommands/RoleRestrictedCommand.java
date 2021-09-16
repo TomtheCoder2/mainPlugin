@@ -15,6 +15,9 @@ public abstract class RoleRestrictedCommand extends Command {
         super(name);
     }
 
+    /**
+     * check if a user has permissions to execute this command
+     */
     @Override
     public boolean hasPermission(Context ctx) {
         if (role == null) return false;
@@ -28,7 +31,7 @@ public abstract class RoleRestrictedCommand extends Command {
         return ctx.event.getMessageAuthor().asUser().get().getRoles(ctx.event.getServer().get()).contains(resolvedRole);
     }
 
-    public Role getRole(DiscordApi api, String id){
+    public Role getRole(DiscordApi api, String id) {
         Optional<Role> r1 = api.getRoleById(id);
         if (!r1.isPresent()) {
             Log.err("Error: discord role " + id + " not found");

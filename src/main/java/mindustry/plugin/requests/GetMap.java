@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 public class GetMap {
+    /**
+     * Generate an image for a map (.msav)
+     * @implNote this sends a http request to the MindServer from Traqun. */
     public List<String> getMap(Fi file) {
         try {
             var client = HttpClient.newBuilder().build();
@@ -56,9 +59,10 @@ public class GetMap {
 
         return null;
     }
-
+    /**
+     * just converts a byte[] to a png
+     * @param data the byte stream of the picture*/
     private static void convertToPNG(byte[] data) throws IOException {
-//        System.out.println(data.toString());
         ByteArrayInputStream bis = new ByteArrayInputStream(data);
         BufferedImage bImage2 = ImageIO.read(bis);
         ImageIO.write(bImage2, "png", new File("./temp/output.png"));

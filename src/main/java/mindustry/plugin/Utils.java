@@ -61,13 +61,14 @@ public class Utils {
 
     public static void init() {
 //        "\uE816";
+        // set all ranks
         rankNames.put(0, new Rank("[#7d7d7d][]", "none"));
-        rankNames.put(1, new Rank("[accent]<[white]\uE800[accent]>[]", "private"));
+        rankNames.put(1, new Rank("[accent]<[white]\uE802[accent]>[]", "private"));
         rankNames.put(2, new Rank("[accent]<[white]\uE813[accent]>[]", "general"));
-        rankNames.put(3, new Rank("[accent]<[white]\uE814[accent]>[]", "sargent"));
-        rankNames.put(4, new Rank("[accent]<[white]\uE814[accent]>[]", "corporal"));
-        rankNames.put(5, new Rank("[accent]<[white]\uE815[accent]>[]", "pro"));
-        rankNames.put(6, new Rank("[accent]<[white][accent]>[]", "contributor"));
+        rankNames.put(3, new Rank("[accent]<[white]\uE824[accent]>[]", "sargent"));
+        rankNames.put(4, new Rank("[accent]<[white]\uE815[accent]>[]", "corporal"));
+        rankNames.put(5, new Rank("[accent]<[white]\uE819[accent]>[]", "pro"));
+        rankNames.put(6, new Rank("[accent]<[white]\uE809[accent]>[]", "contributor"));
         rankNames.put(7, new Rank("[accent]<[white]\uE817[accent]>[]", "moderator"));
         rankNames.put(8, new Rank("[accent]<[white][accent]>[]", "admin"));
 
@@ -96,18 +97,36 @@ public class Utils {
         ruleMessage = Core.settings.getString("ruleMessage");
     }
 
+    /**
+     * Connect to the PostgreSQL Server
+     */
     public static Connection connect() throws SQLException {
         return DriverManager.getConnection(url, user, password);
     }
 
+    /**
+     * replace all color codes, ` and @
+     *
+     * @param string the original string
+     */
     public static String escapeCharacters(String string) {
         return escapeColorCodes(string.replaceAll("`", "").replaceAll("@", ""));
     }
 
+    /**
+     * Remove all color codes
+     *
+     * @param string the input string (for example a name or a message)
+     */
     public static String escapeColorCodes(String string) {
         return Strings.stripColors(string);
     }
 
+    /**
+     * Get a map by name
+     *
+     * @param query the map name
+     */
     public static Map getMapBySelector(String query) {
         Map found = null;
         try {
@@ -125,15 +144,18 @@ public class Utils {
         return found;
     }
 
+    /**
+     * Find a player by name
+     *
+     * @param identifier the name, id, uuid, con or con.address
+     */
     public static Player findPlayer(String identifier) {
         Player found = null;
         for (Player player : Groups.player) {
-            if (player == null) return null;
+            if (player == null) return null; // how does that even happen wtf
             if (player.uuid() == null) return null;
             if (player.con == null) return null;
             if (player.con.address == null) return null;
-//            System.out.println(escapeColorCodes(player.name.toLowerCase().replaceAll(" ", "").replaceAll("<.*?>", "")).replaceAll("\\[accent\\]", ""));
-//            System.out.println(escapeColorCodes(player.name.toLowerCase().replaceAll(" ", "").replaceAll("<.*?>", "")).replaceAll("\\[.*?\\]", ""));
 
             if (player.con.address.equals(identifier.replaceAll(" ", "")) ||
                     String.valueOf(player.id).equals(identifier.replaceAll(" ", "")) ||
@@ -145,6 +167,11 @@ public class Utils {
         return found;
     }
 
+    /**
+     * Change the current map
+     *
+     * @param found map
+     */
     public static void changeMap(Map found) {
         Class<Maps> mapsClass = Maps.class;
         Field mapsField;
@@ -181,12 +208,19 @@ public class Utils {
         maps.reload();
     }
 
+    /**
+     * Convert a long to formatted time.
+     *
+     * @param epoch the time in long.
+     * @return formatted time
+     */
     public static String epochToString(long epoch) {
         Date date = new Date(epoch * 1000L);
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
         return format.format(date) + " UTC";
     }
+
 
     public static String getKeyByValue(HashMap<String, Integer> map, Integer value) {
         for (java.util.Map.Entry<String, Integer> entry : map.entrySet()) {
@@ -197,6 +231,12 @@ public class Utils {
         return null;
     }
 
+    /**
+     * Replace %player% with player name, %discord% with the discord link etc
+     *
+     * @param message the message to replace
+     * @param player  for the stats
+     */
     public static String formatMessage(Player player, String message) {
         try {
             message = message.replaceAll("%player%", escapeCharacters(player.name));
@@ -249,6 +289,11 @@ public class Utils {
 //        }
 //    }
 
+    /**
+     * Get Data from a specific player
+     *
+     * @param uuid the uuid of the player
+     */
     public static PlayerData getData(String uuid) {
 //        System.out.println(uuid);
         // search for the uuid
@@ -290,6 +335,12 @@ public class Utils {
         return null;
     }
 
+    /**
+     * Set Data for a specific player
+     *
+     * @param uuid uuid of the player
+     * @param pd   player Data
+     */
     public static void setData(String uuid, PlayerData pd) {
         if (getData(uuid) == null) {
             // define all variables
@@ -367,17 +418,26 @@ public class Utils {
         }
     }
 
+    /**
+     * create and save Ranks
+     */
     public static class Rank {
         public String tag = "";
         public String name = "";
 
+        /**
+         * Create a new rank
+         *
+         * @param t name tag (gets displayed before the player names starts, for example: <*>Nautilus
+         * @param n name of the rank (for example: Moderator)
+         */
         Rank(String t, String n) {
             this.tag = t;
             this.name = n;
         }
     }
 
-//    public static CoreBlock.CoreEntity getCore(Team team){
+    //    public static CoreBlock.CoreEntity getCore(Team team){
 //        Tile[][] tiles = world.getTiles();
 //        for (int x = 0; x < tiles.length; ++x) {
 //            for(int y = 0; y < tiles[0].length; ++y) {
@@ -393,7 +453,7 @@ public class Utils {
 //        }
 //        return null;
 //    }
-
+    // colors for errors, info, warning etc messages
     public static class Pals {
         public static Color warning = (Color.getHSBColor(5, 85, 95));
         public static Color info = (Color.getHSBColor(45, 85, 95));
@@ -401,6 +461,7 @@ public class Utils {
         public static Color success = (Color.getHSBColor(108, 80, 100));
     }
 
+    // Requirements for the different ranks
     public static class privateRequirements {
         public static Seq<Block> bannedBlocks = new Seq<>();
         public static int playtime = 1000;

@@ -65,8 +65,8 @@ public class DiscordCommands implements MessageCreateListener {
     }
     /**
      * Run a command
-     * @param name
-     * @param ctx
+     * @param name the name of the command
+     * @param ctx the context of the command
      */
     public void runCommand(String name, Context ctx) {
         Command command = registry.get(name.toLowerCase());
@@ -84,23 +84,23 @@ public class DiscordCommands implements MessageCreateListener {
     }
     /**
      * Get a command by name
-     * @param name
-     * @return
+     * @param name the requested command name
+     * @return the command
      */
     public Command getCommand(String name) {
         return registry.get(name.toLowerCase());
     }
     /**
      * Get all commands in the registry
-     * @return
+     * @return all commands
      */
     public Collection<Command> getAllCommands() {
         return registry.values();
     }
     /**
      * Check if a command exists in the registry
-     * @param name
-     * @return
+     * @param name command name
+     * @return return true if there is a command, else return false
      */
     public boolean isCommand(String name) {
         return registry.containsKey(name.toLowerCase());

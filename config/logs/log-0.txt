@@ -3436,3 +3436,55 @@
 [09-09-2021 20:05:11] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
 [09-09-2021 20:05:11] [I] 1 mods loaded.
 [09-09-2021 20:05:11] [I] Server loaded. Type 'help' for help.
+[09-09-2021 20:11:45] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-09-2021 20:11:45] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-09-2021 20:11:45] [I] 1 mods loaded.
+[09-09-2021 20:11:45] [I] Server loaded. Type 'help' for help.
+[09-12-2021 15:48:24] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-12-2021 15:48:25] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-12-2021 15:48:25] [I] 1 mods loaded.
+[09-12-2021 15:48:25] [I] Server loaded. Type 'help' for help.
+[09-12-2021 15:48:25] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-12-2021 15:48:25] [I] Loading map...
+[09-12-2021 15:48:25] [I] Map loaded.
+[09-12-2021 15:48:25] [I] Opened a server on port 6567.
+[09-12-2021 15:48:50] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-12-2021 15:48:53] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /stats>
+[09-12-2021 15:49:05] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-12-2021 15:49:05] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-12-2021 15:49:05] [I] 1 mods loaded.
+[09-12-2021 15:49:05] [I] Server loaded. Type 'help' for help.
+[09-12-2021 15:49:05] [I] Loading map...
+[09-12-2021 15:49:06] [I] Map loaded.
+[09-12-2021 15:49:06] [I] Opened a server on port 6567.
+[09-12-2021 15:49:07] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-12-2021 15:49:11] [I] -25
+[09-12-2021 15:49:53] [I] 0.0
+[09-12-2021 19:49:06] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-13-2021 13:52:37] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-13-2021 13:52:37] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-13-2021 13:52:37] [I] 1 mods loaded.
+[09-13-2021 13:52:37] [I] Server loaded. Type 'help' for help.
+[09-13-2021 13:52:59] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-13-2021 13:52:59] [I] Loading map...
+[09-13-2021 13:52:59] [I] Map loaded.
+[09-13-2021 13:52:59] [I] Opened a server on port 6567.
+[09-13-2021 13:53:02] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-13-2021 13:53:06] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /stats>
+[09-13-2021 13:57:07] [I] Game over! Reached wave 2 with 1 players online on map Mision 14   Atacar y zarpar.
+[09-13-2021 13:57:07] [I] Selected next map to be V130: Polluted river: Crux.
+[09-13-2021 14:00:48] [I] Core destroyed.
+[09-13-2021 14:00:48] [I] Game over! Reached wave 3 with 1 players online on map V130: Polluted river: Crux.
+[09-13-2021 14:00:48] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-13-2021 14:08:32] [I] Game over! Reached wave 3 with 1 players online on map Mision 14   Atacar y zarpar.
+[09-13-2021 14:08:32] [I] Selected next map to be V130: Polluted river: Crux.
+[09-13-2021 14:11:19] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /stats>
+[09-13-2021 14:26:06] [I] Game over! Reached wave 17 with 1 players online on map V130: Polluted river: Crux.
+[09-13-2021 14:26:06] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-13-2021 14:27:01] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-13-2021 14:29:59] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-13-2021 14:29:59] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-13-2021 16:39:56] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-13-2021 16:39:56] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-13-2021 16:39:56] [I] 1 mods loaded.
+[09-13-2021 16:39:56] [I] Server loaded. Type 'help' for help.

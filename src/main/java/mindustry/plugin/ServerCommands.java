@@ -37,7 +37,6 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
@@ -49,7 +48,7 @@ import static mindustry.plugin.Utils.*;
 public class ServerCommands {
     public GetMap map = new GetMap();
 
-    private JSONObject data;
+    private final JSONObject data;
 
     public ServerCommands(JSONObject data) {
         this.data = data;
@@ -63,23 +62,19 @@ public class ServerCommands {
             }
 
             public void run(Context ctx) {
-                StringBuilder msg = new StringBuilder().append("**All available maps in the playlist:**\n```");
                 EmbedBuilder eb = new EmbedBuilder();
                 eb.setTitle("**All available maps in the playlist:**");
                 Seq<Map> mapList = maps.customMaps();
                 for (int i = 0; i < mapList.size; i++) {
                     Map m = mapList.get(i);
-                    msg.append(i).append(" : ").append(m.name()).append(" : ").append(m.width).append(" x ").append(m.height).append("\n");
                     eb.addField(m.name(), m.width + " x " + m.height);
                 }
-                msg.append("```");
-//                ctx.channel.sendMessage(msg.toString());
                 ctx.channel.sendMessage(eb);
             }
         });
         if (data.has("administrator_roleid")) {
             String adminRole = data.getString("administrator_roleid");
-            // TODO: make an update command
+            // TODO: make an update command to update the EI mod
         }
 
         if (data.has("exit_roleid")) {

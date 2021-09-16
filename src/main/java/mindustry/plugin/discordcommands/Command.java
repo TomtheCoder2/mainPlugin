@@ -1,7 +1,5 @@
 package mindustry.plugin.discordcommands;
 
-import java.io.IOException;
-
 /** Represents a command */
 public abstract class Command {
     public String name;
@@ -11,7 +9,7 @@ public abstract class Command {
     public String category = "public";
 
     public Command(String name) {
-        // always ALWAYS lowercase command names
+        // ALWAYS -> always lowercase command names
         this.name = name.toLowerCase();
     }
 

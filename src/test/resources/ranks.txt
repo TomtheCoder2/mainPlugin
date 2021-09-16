@@ -1,0 +1,8 @@
+.edit req [white] [accent][green]private: [accent]1k min 5 games 3k buildings
+[white] [accent][olive]general: [accent] 2.5k min 15 games 5k buildings
+[white] [accent][navy]corporal: [accent] 10k min 25 games 15k buildings
+[white] [accent][blue]Sargent: [accent] 20k min 50 games 35k buildings
+[white]  [accent][royal]pro player: [accent](decided by mod)
+[white] [accent][yellow]Contributor: [accent] help mods or make maps
+[white] [accent][purple]Moderator: [accent] (be mod)
+[white] [accent][cyan]Admin: [accent] (be admin)
