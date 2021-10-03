@@ -14,10 +14,10 @@
 ### Bugs? 
 Just report it here on github or on our discord server.
 
-###Feature Request
+### Feature Request
 Please suggest features on the discord server. I would appreciate feedback and suggestions.
 
-###Contributing
+### Contributing
 Everyone is welcome to contribute to this project, just send me a direct message on Discord (Nautilus#0100).
 
 
