@@ -63,14 +63,20 @@ public class Utils {
 //        "\uE816";
         // set all ranks
         rankNames.put(0, new Rank("[#7d7d7d][]", "none"));
-        rankNames.put(1, new Rank("[accent]<[white]\uE802[accent]>[]", "private"));
-        rankNames.put(2, new Rank("[accent]<[white]\uE813[accent]>[]", "general"));
-        rankNames.put(3, new Rank("[accent]<[white]\uE824[accent]>[]", "sargent"));
-        rankNames.put(4, new Rank("[accent]<[white]\uE815[accent]>[]", "corporal"));
-        rankNames.put(5, new Rank("[accent]<[white]\uE819[accent]>[]", "pro"));
-        rankNames.put(6, new Rank("[accent]<[white]\uE809[accent]>[]", "contributor"));
-        rankNames.put(7, new Rank("[accent]<[white]\uE817[accent]>[]", "moderator"));
-        rankNames.put(8, new Rank("[accent]<[white][accent]>[]", "admin"));
+//        rankNames.put(1, new Rank("[accent]<[white]\uE802[accent]>[]", "private"));
+//        rankNames.put(2, new Rank("[accent]<[white]\uE813[accent]>[]", "general"));
+//        rankNames.put(3, new Rank("[accent]<[white]\uE824[accent]>[]", "sargent"));
+//        rankNames.put(4, new Rank("[accent]<[white]\uE815[accent]>[]", "corporal"));
+//        rankNames.put(5, new Rank("[accent]<[white]\uE819[accent]>[]", "pro"));
+//        rankNames.put(6, new Rank("[accent]<[white]\uE809[accent]>[]", "contributor"));
+//        rankNames.put(7, new Rank("[accent]<[white]\uE817[accent]>[]", "moderator"));
+//        rankNames.put(8, new Rank("[accent]<[white][accent]>[]", "admin"));
+        rankNames.put(1, new Rank("[accent]<[white]\uE800[accent]>[] ", "newbie"));
+        rankNames.put(2, new Rank("[accent]<[white]\uE815[accent]>[] ", "active"));
+        rankNames.put(3, new Rank("[accent]<[white]\uE813[accent]>[] ", "veteran"));
+        rankNames.put(4, new Rank("[accent]<[white]\uE809[accent]>[] ", "map_creator:"));
+        rankNames.put(5, new Rank("[accent]<[white]\uE82C[accent]>[] ", "moderator"));
+
 
         rankRoles.put("627985513600516109", 1);
         rankRoles.put("636968410441318430", 2);
@@ -85,10 +91,10 @@ public class Utils {
         bannedNames.add("IgruhaOrg");
         bannedNames.add("андрей");
 
-        privateRequirements.bannedBlocks.add(Blocks.conveyor);
-        privateRequirements.bannedBlocks.add(Blocks.titaniumConveyor);
-        privateRequirements.bannedBlocks.add(Blocks.junction);
-        privateRequirements.bannedBlocks.add(Blocks.router);
+        activeRequirements.bannedBlocks.add(Blocks.conveyor);
+        activeRequirements.bannedBlocks.add(Blocks.titaniumConveyor);
+        activeRequirements.bannedBlocks.add(Blocks.junction);
+        activeRequirements.bannedBlocks.add(Blocks.router);
 
         statMessage = Core.settings.getString("statMessage");
         reqMessage = Core.settings.getString("reqMessage");
@@ -120,6 +126,24 @@ public class Utils {
      */
     public static String escapeColorCodes(String string) {
         return Strings.stripColors(string);
+    }
+
+    /**
+     * remove everything (rank symbol colors etc.)
+     *
+     * @param string the player name (in most cases)
+     */
+    public static String escapeEverything(String string) {
+        return escapeColorCodes(string.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "");
+    }
+
+    /**
+     * remove everything (rank symbol colors etc.)
+     *
+     * @param player the player
+     * */
+    public static String escapeEverything(Player player) {
+        return escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "");
     }
 
     /**
@@ -462,31 +486,64 @@ public class Utils {
     }
 
     // Requirements for the different ranks
-    public static class privateRequirements {
+    public static class newbieRequirements {
         public static Seq<Block> bannedBlocks = new Seq<>();
-        public static int playtime = 1000;
-        public static int buildingsBuilt = 3 * 1000;
+        public static int playtime = 500;
+        public static int buildingsBuilt = 1000;
         public static int gamesPlayed = 5;
+        public static String promotionMessage = """
+                [sky]%player%, you have been promoted to [sky]<newbie>[]!
+                [#4287f5]You reached a playtime of - %playtime% minutes! That's 500+ minutes!
+                [#f54263]You played a total of %games% games!
+                [#9342f5]You built a total of %buildings% buildings!
+                [scarlet]Please rejoin for the change to take effect.""";
     }
 
-    public static class generalRequirements {
+    public static class activeRequirements {
         public static Seq<Block> bannedBlocks = new Seq<>();
         public static int playtime = 2500;
         public static int buildingsBuilt = 5 * 1000;
         public static int gamesPlayed = 15;
+        public static String promotionMessage = """
+                [sky]%player%, you have been promoted to [sky]<active>[]!
+                [#4287f5]You reached a playtime of - %playtime% minutes! That's 2500+ minutes!
+                [#f54263]You played a total of %games% games!
+                [#9342f5]You built a total of %buildings% buildings!
+                [scarlet]Please rejoin for the change to take effect.""";
     }
 
-    public static class corporalRequirements {
-        public static Seq<Block> bannedBlocks = new Seq<>();
-        public static int playtime = 10 * 1000;
-        public static int buildingsBuilt = 15 * 1000;
-        public static int gamesPlayed = 25;
-    }
-
-    public static class sargentRequirements {
+    public static class veteranRequirements {
         public static Seq<Block> bannedBlocks = new Seq<>();
         public static int playtime = 20 * 1000;
         public static int buildingsBuilt = 35 * 1000;
         public static int gamesPlayed = 50;
+        public static String promotionMessage = """
+                [sky]%player%, you have been promoted to [sky]<veteran>[]!
+                [#4287f5]You reached a playtime of - %playtime% minutes! That's 20000+ minutes!
+                [#f54263]You played a total of %games% games!
+                [#9342f5]You built a total of %buildings% buildings!
+                [scarlet]Please rejoin for the change to take effect.""";
     }
+
+
+//    public static class generalRequirements {
+//        public static Seq<Block> bannedBlocks = new Seq<>();
+//        public static int playtime = 2500;
+//        public static int buildingsBuilt = 5 * 1000;
+//        public static int gamesPlayed = 15;
+//    }
+//
+//    public static class corporalRequirements {
+//        public static Seq<Block> bannedBlocks = new Seq<>();
+//        public static int playtime = 10 * 1000;
+//        public static int buildingsBuilt = 15 * 1000;
+//        public static int gamesPlayed = 25;
+//    }
+//
+//    public static class sargentRequirements {
+//        public static Seq<Block> bannedBlocks = new Seq<>();
+//        public static int playtime = 20 * 1000;
+//        public static int buildingsBuilt = 35 * 1000;
+//        public static int gamesPlayed = 50;
+//    }
 }

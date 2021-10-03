@@ -211,19 +211,7 @@ public class ComCommands {
 
 
                     for (Command command : handler.getAllCommands()) {
-//                        if (command instanceof RoleRestrictedCommand) {
-//                            restrictedCommands.append("**").append(command.name).append("** ");
-//                            if (!command.usage.equals("")) {
-//                                restrictedCommands.append(command.usage);
-//                            }
-//                            restrictedCommands.append("\n");
-//                        } else {
-//                            publicCommands.append("**").append(command.name).append("** ");
-//                            if (!command.usage.equals("")) {
-//                                publicCommands.append(command.usage);
-//                            }
-//                            publicCommands.append("\n");
-//                        }
+                        if (command.hidden) continue;
                         switch (command.category) {
                             case "moderation" -> {
                                 moderation.append("**").append(command.name).append("** ");

@@ -7,6 +7,7 @@ public abstract class Command {
     public String help = ":v no information was provided for this command";
     public String usage = "";
     public String category = "public";
+    public boolean hidden = false;
 
     public Command(String name) {
         // ALWAYS -> always lowercase command names

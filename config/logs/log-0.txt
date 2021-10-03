@@ -3488,3 +3488,1039 @@
 [09-13-2021 16:39:56] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
 [09-13-2021 16:39:56] [I] 1 mods loaded.
 [09-13-2021 16:39:56] [I] Server loaded. Type 'help' for help.
+[09-16-2021 20:50:03] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-16-2021 20:50:03] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-16-2021 20:50:03] [I] 1 mods loaded.
+[09-16-2021 20:50:03] [I] Server loaded. Type 'help' for help.
+[09-16-2021 20:50:03] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-16-2021 20:50:03] [I] Loading map...
+[09-16-2021 20:50:03] [I] Map loaded.
+[09-16-2021 20:50:03] [I] Opened a server on port 6567.
+[09-16-2021 20:54:43] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-16-2021 20:54:43] [I] Selected next map to be V130: Polluted river: Crux.
+[09-16-2021 21:09:38] [I] Game over! Reached wave 14 with 0 players online on map V130: Polluted river: Crux.
+[09-16-2021 21:09:38] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-16-2021 21:46:03] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-16-2021 21:46:03] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-16-2021 21:50:57] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-16-2021 21:50:57] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-17-2021 18:11:10] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-17-2021 18:11:10] [I] Selected next map to be V130: Polluted river: Crux.
+[09-17-2021 18:27:31] [I] Game over! Reached wave 16 with 0 players online on map V130: Polluted river: Crux.
+[09-17-2021 18:27:31] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-17-2021 18:32:40] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-17-2021 18:32:40] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-17-2021 19:09:26] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-17-2021 19:09:26] [I] Selected next map to be V130: Polluted river: Crux.
+[09-17-2021 19:22:06] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-17-2021 19:22:06] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-17-2021 19:22:06] [I] 1 mods loaded.
+[09-17-2021 19:22:06] [I] Server loaded. Type 'help' for help.
+[09-17-2021 19:26:28] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-17-2021 19:26:28] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-17-2021 19:26:28] [I] 1 mods loaded.
+[09-17-2021 19:26:28] [I] Server loaded. Type 'help' for help.
+[09-17-2021 19:26:30] [I] Version: Mindustry 7-pre-alpha official / build -1
+[09-17-2021 19:26:30] [I] Java Version: 16.0.1
+[09-17-2021 19:26:41] [I] Randomized next map to be V130: Polluted river: Crux.
+[09-17-2021 19:26:41] [I] Loading map...
+[09-17-2021 19:26:41] [I] Map loaded.
+[09-17-2021 19:26:41] [I] Opened a server on port 6567.
+[09-17-2021 19:27:06] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-17-2021 19:27:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-17-2021 19:27:19] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-17-2021 19:29:27] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-17-2021 19:37:27] [I] Game over! Reached wave 10 with 0 players online on map V130: Polluted river: Crux.
+[09-17-2021 19:37:27] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-17-2021 19:41:35] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-17-2021 19:41:35] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-17-2021 20:17:21] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[09-17-2021 20:17:21] [I] Selected next map to be V130: Polluted river: Crux.
+[09-17-2021 20:33:11] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[09-17-2021 20:33:11] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-17-2021 21:09:31] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-17-2021 21:09:31] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-17-2021 21:13:39] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-17-2021 21:13:39] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-17-2021 21:51:57] [I] Game over! Reached wave 19 with 0 players online on map Mision 12   Base pretrolera.
+[09-17-2021 21:51:57] [I] Selected next map to be V130: Polluted river: Crux.
+[09-17-2021 22:06:49] [I] Game over! Reached wave 14 with 0 players online on map V130: Polluted river: Crux.
+[09-17-2021 22:06:49] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-17-2021 23:37:50] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-17-2021 23:37:50] [I] Selected next map to be V130: Polluted river: Crux.
+[09-17-2021 23:51:25] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-17-2021 23:51:25] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-17-2021 23:55:33] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-17-2021 23:55:33] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 00:32:11] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 00:32:11] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 00:46:00] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 00:46:00] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 00:49:23] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 00:49:23] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 01:25:50] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 01:25:50] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 01:29:28] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 01:29:28] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 01:43:04] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 01:43:04] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 01:47:33] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 01:47:33] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 02:23:29] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 02:23:29] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 02:27:37] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 02:27:37] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 03:03:46] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 03:03:46] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 03:08:55] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 03:08:55] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 03:45:30] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 03:45:30] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 04:00:54] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 04:00:54] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 04:04:32] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 04:04:32] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 04:43:20] [I] Game over! Reached wave 19 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 04:43:20] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 04:56:26] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 04:56:26] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 05:32:56] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 05:32:56] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 05:48:01] [I] Game over! Reached wave 14 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 05:48:01] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 05:51:22] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 05:51:22] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 06:05:13] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 06:05:13] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 06:42:02] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 06:42:02] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 06:46:10] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 06:46:10] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 06:58:25] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 06:58:25] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 07:02:33] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 07:02:33] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 07:39:19] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 07:39:19] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 07:54:46] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 07:54:46] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 07:58:54] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 07:58:54] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 08:13:58] [I] Game over! Reached wave 14 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 08:13:58] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 08:50:47] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 08:50:47] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 08:56:43] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 08:56:43] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 09:09:32] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 09:09:32] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 09:45:42] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 09:45:42] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 09:49:04] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 09:49:04] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 10:04:44] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 10:05:06] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-18-2021 10:05:33] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 10:05:45] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /sync>
+[09-18-2021 10:05:49] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /stats>
+[09-18-2021 10:05:57] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-18-2021 10:21:09] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-18-2021 10:21:09] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-18-2021 10:21:09] [I] 1 mods loaded.
+[09-18-2021 10:21:09] [I] Server loaded. Type 'help' for help.
+[09-18-2021 10:21:09] [I] Randomized next map to be V130: Polluted river: Crux.
+[09-18-2021 10:21:09] [I] Loading map...
+[09-18-2021 10:21:09] [I] Map loaded.
+[09-18-2021 10:21:09] [I] Opened a server on port 6567.
+[09-18-2021 10:34:00] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 10:34:00] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 10:38:08] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 10:38:08] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 10:40:59] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-18-2021 10:40:59] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-18-2021 10:40:59] [I] 1 mods loaded.
+[09-18-2021 10:40:59] [I] Server loaded. Type 'help' for help.
+[09-18-2021 11:14:16] [E] Command not found. Did you mean "host"?
+[09-18-2021 11:14:18] [E] Command not found. Did you mean "js"?
+[09-18-2021 11:14:21] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 11:14:21] [I] Loading map...
+[09-18-2021 11:14:21] [I] Map loaded.
+[09-18-2021 11:14:21] [I] Opened a server on port 6567.
+[09-18-2021 11:14:30] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 11:14:50] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-18-2021 11:14:55] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 11:14:58] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-18-2021 11:15:47] [I] Version: Mindustry 7-pre-alpha official / build -1
+[09-18-2021 11:15:47] [I] Java Version: 16.0.1
+[09-18-2021 11:17:11] [I] All config values:
+[09-18-2021 11:17:11] [I] | name: Server
+[09-18-2021 11:17:11] [I] | | The server name as displayed on clients.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | desc: off
+[09-18-2021 11:17:11] [I] | | The server description, displayed under the name. Max 100 characters.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | port: 6567
+[09-18-2021 11:17:11] [I] | | The port to host on.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | autoUpdate: false
+[09-18-2021 11:17:11] [I] | | Whether to auto-update and exit when a new bleeding-edge update arrives.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | showConnectMessages: true
+[09-18-2021 11:17:11] [I] | | Whether to display connect/disconnect messages.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | enableVotekick: true
+[09-18-2021 11:17:11] [I] | | Whether votekick is enabled.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | startCommands: 
+[09-18-2021 11:17:11] [I] | | Commands run at startup. This should be a comma-separated list.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | crashReport: false
+[09-18-2021 11:17:11] [I] | | Whether to send crash reports.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | logging: true
+[09-18-2021 11:17:11] [I] | | Whether to log everything to files.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | strict: true
+[09-18-2021 11:17:11] [I] | | Whether strict mode is on - corrects positions and prevents duplicate UUIDs.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | antiSpam: true
+[09-18-2021 11:17:11] [I] | | Whether spammers are automatically kicked and rate-limited.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | interactRateWindow: 6
+[09-18-2021 11:17:11] [I] | | Block interaction rate limit window, in seconds.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | interactRateLimit: 25
+[09-18-2021 11:17:11] [I] | | Block interaction rate limit.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | interactRateKick: 60
+[09-18-2021 11:17:11] [I] | | How many times a player must interact inside the window to get kicked.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | messageRateLimit: 0
+[09-18-2021 11:17:11] [I] | | Message rate limit in seconds. 0 to disable.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | messageSpamKick: 3
+[09-18-2021 11:17:11] [I] | | How many times a player must send a message before the cooldown to get kicked. 0 to disable.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | socketInput: false
+[09-18-2021 11:17:11] [I] | | Allows a local application to control this server through a local TCP socket.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | socketInputPort: 6859
+[09-18-2021 11:17:11] [I] | | The port for socket input.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | socketInputAddress: localhost
+[09-18-2021 11:17:11] [I] | | The bind address for socket input.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | allowCustomClients: false
+[09-18-2021 11:17:11] [I] | | Whether custom clients are allowed to connect.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | whitelist: false
+[09-18-2021 11:17:11] [I] | | Whether the whitelist is used.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | motd: off
+[09-18-2021 11:17:11] [I] | | The message displayed to people on connection.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | autosave: false
+[09-18-2021 11:17:11] [I] | | Whether the periodically save the map when playing.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | autosaveAmount: 10
+[09-18-2021 11:17:11] [I] | | The maximum amount of autosaves. Older ones get replaced.
+[09-18-2021 11:17:11] [I] |
+[09-18-2021 11:17:11] [I] | autosaveSpacing: 300
+[09-18-2021 11:17:11] [I] | | Spacing between autosaves in seconds.
+[09-18-2021 11:17:12] [I] |
+[09-18-2021 11:17:12] [I] | debug: false
+[09-18-2021 11:17:12] [I] | | Enable debug logging
+[09-18-2021 11:17:12] [I] |
+[09-18-2021 11:18:23] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 11:18:23] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 11:19:13] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 11:19:16] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[09-18-2021 11:27:35] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[09-18-2021 11:29:02] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[09-18-2021 11:38:56] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[09-18-2021 11:39:03] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[09-18-2021 11:39:21] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: yea
+[09-18-2021 11:40:19] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[09-18-2021 11:49:15] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-18-2021 11:51:06] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 11:51:09] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rules>
+[09-18-2021 11:54:20] [I] Game over! Reached wave 17 with 1 players online on map Mision 12   Base pretrolera.
+[09-18-2021 11:54:20] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 12:07:06] [I] Game over! Reached wave 12 with 1 players online on map V130: Polluted river: Crux.
+[09-18-2021 12:07:06] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 12:07:37] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-18-2021 12:07:37] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-18-2021 12:07:37] [I] 1 mods loaded.
+[09-18-2021 12:07:37] [I] Server loaded. Type 'help' for help.
+[09-18-2021 12:08:26] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 12:08:26] [I] Loading map...
+[09-18-2021 12:08:26] [I] Map loaded.
+[09-18-2021 12:08:26] [I] Opened a server on port 6567.
+[09-18-2021 12:09:36] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 12:09:49] [I] All config values:
+[09-18-2021 12:09:49] [I] | name: Server
+[09-18-2021 12:09:49] [I] | | The server name as displayed on clients.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | desc: off
+[09-18-2021 12:09:49] [I] | | The server description, displayed under the name. Max 100 characters.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | port: 6567
+[09-18-2021 12:09:49] [I] | | The port to host on.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | autoUpdate: false
+[09-18-2021 12:09:49] [I] | | Whether to auto-update and exit when a new bleeding-edge update arrives.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | showConnectMessages: true
+[09-18-2021 12:09:49] [I] | | Whether to display connect/disconnect messages.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | enableVotekick: true
+[09-18-2021 12:09:49] [I] | | Whether votekick is enabled.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | startCommands: 
+[09-18-2021 12:09:49] [I] | | Commands run at startup. This should be a comma-separated list.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | crashReport: false
+[09-18-2021 12:09:49] [I] | | Whether to send crash reports.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | logging: true
+[09-18-2021 12:09:49] [I] | | Whether to log everything to files.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | strict: true
+[09-18-2021 12:09:49] [I] | | Whether strict mode is on - corrects positions and prevents duplicate UUIDs.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | antiSpam: true
+[09-18-2021 12:09:49] [I] | | Whether spammers are automatically kicked and rate-limited.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | interactRateWindow: 6
+[09-18-2021 12:09:49] [I] | | Block interaction rate limit window, in seconds.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | interactRateLimit: 25
+[09-18-2021 12:09:49] [I] | | Block interaction rate limit.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | interactRateKick: 60
+[09-18-2021 12:09:49] [I] | | How many times a player must interact inside the window to get kicked.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | messageRateLimit: 0
+[09-18-2021 12:09:49] [I] | | Message rate limit in seconds. 0 to disable.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | messageSpamKick: 3
+[09-18-2021 12:09:49] [I] | | How many times a player must send a message before the cooldown to get kicked. 0 to disable.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | socketInput: false
+[09-18-2021 12:09:49] [I] | | Allows a local application to control this server through a local TCP socket.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | socketInputPort: 6859
+[09-18-2021 12:09:49] [I] | | The port for socket input.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | socketInputAddress: localhost
+[09-18-2021 12:09:49] [I] | | The bind address for socket input.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | allowCustomClients: false
+[09-18-2021 12:09:49] [I] | | Whether custom clients are allowed to connect.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | whitelist: false
+[09-18-2021 12:09:49] [I] | | Whether the whitelist is used.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | motd: off
+[09-18-2021 12:09:49] [I] | | The message displayed to people on connection.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | autosave: false
+[09-18-2021 12:09:49] [I] | | Whether the periodically save the map when playing.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | autosaveAmount: 10
+[09-18-2021 12:09:49] [I] | | The maximum amount of autosaves. Older ones get replaced.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | autosaveSpacing: 300
+[09-18-2021 12:09:49] [I] | | Spacing between autosaves in seconds.
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:09:49] [I] | debug: false
+[09-18-2021 12:09:49] [I] | | Enable debug logging
+[09-18-2021 12:09:49] [I] |
+[09-18-2021 12:10:00] [I] motd set to true.
+[09-18-2021 12:10:04] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-18-2021 12:10:06] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 12:12:28] [I] Game over! Reached wave 2 with 1 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 12:12:28] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 12:15:55] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-18-2021 12:15:55] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-18-2021 12:15:55] [I] 1 mods loaded.
+[09-18-2021 12:15:55] [I] Server loaded. Type 'help' for help.
+[09-18-2021 12:15:56] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 12:15:56] [I] Loading map...
+[09-18-2021 12:15:56] [I] Map loaded.
+[09-18-2021 12:15:56] [I] Opened a server on port 6567.
+[09-18-2021 12:15:59] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 12:16:19] [I] motd set to false.
+[09-18-2021 12:16:24] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-18-2021 12:16:26] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 12:16:35] [I] All config values:
+[09-18-2021 12:16:35] [I] | name: Server
+[09-18-2021 12:16:35] [I] | | The server name as displayed on clients.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | desc: off
+[09-18-2021 12:16:35] [I] | | The server description, displayed under the name. Max 100 characters.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | port: 6567
+[09-18-2021 12:16:35] [I] | | The port to host on.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | autoUpdate: false
+[09-18-2021 12:16:35] [I] | | Whether to auto-update and exit when a new bleeding-edge update arrives.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | showConnectMessages: true
+[09-18-2021 12:16:35] [I] | | Whether to display connect/disconnect messages.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | enableVotekick: true
+[09-18-2021 12:16:35] [I] | | Whether votekick is enabled.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | startCommands: 
+[09-18-2021 12:16:35] [I] | | Commands run at startup. This should be a comma-separated list.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | crashReport: false
+[09-18-2021 12:16:35] [I] | | Whether to send crash reports.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | logging: true
+[09-18-2021 12:16:35] [I] | | Whether to log everything to files.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | strict: true
+[09-18-2021 12:16:35] [I] | | Whether strict mode is on - corrects positions and prevents duplicate UUIDs.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | antiSpam: true
+[09-18-2021 12:16:35] [I] | | Whether spammers are automatically kicked and rate-limited.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | interactRateWindow: 6
+[09-18-2021 12:16:35] [I] | | Block interaction rate limit window, in seconds.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | interactRateLimit: 25
+[09-18-2021 12:16:35] [I] | | Block interaction rate limit.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | interactRateKick: 60
+[09-18-2021 12:16:35] [I] | | How many times a player must interact inside the window to get kicked.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | messageRateLimit: 0
+[09-18-2021 12:16:35] [I] | | Message rate limit in seconds. 0 to disable.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | messageSpamKick: 3
+[09-18-2021 12:16:35] [I] | | How many times a player must send a message before the cooldown to get kicked. 0 to disable.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | socketInput: false
+[09-18-2021 12:16:35] [I] | | Allows a local application to control this server through a local TCP socket.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | socketInputPort: 6859
+[09-18-2021 12:16:35] [I] | | The port for socket input.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | socketInputAddress: localhost
+[09-18-2021 12:16:35] [I] | | The bind address for socket input.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | allowCustomClients: false
+[09-18-2021 12:16:35] [I] | | Whether custom clients are allowed to connect.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | whitelist: false
+[09-18-2021 12:16:35] [I] | | Whether the whitelist is used.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | motd: false
+[09-18-2021 12:16:35] [I] | | The message displayed to people on connection.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | autosave: false
+[09-18-2021 12:16:35] [I] | | Whether the periodically save the map when playing.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | autosaveAmount: 10
+[09-18-2021 12:16:35] [I] | | The maximum amount of autosaves. Older ones get replaced.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | autosaveSpacing: 300
+[09-18-2021 12:16:35] [I] | | Spacing between autosaves in seconds.
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:35] [I] | debug: false
+[09-18-2021 12:16:35] [I] | | Enable debug logging
+[09-18-2021 12:16:35] [I] |
+[09-18-2021 12:16:51] [I] 'motd' is currently false.
+[09-18-2021 12:17:00] [I] motd set to  .
+[09-18-2021 12:17:04] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-18-2021 12:17:07] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 12:17:45] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rules>
+[09-18-2021 12:19:57] [I] Game over! Reached wave 2 with 1 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 12:19:57] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 12:33:02] [I] Game over! Reached wave 12 with 1 players online on map V130: Polluted river: Crux.
+[09-18-2021 12:33:02] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 12:57:12] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-18-2021 12:57:12] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-18-2021 12:57:12] [I] 1 mods loaded.
+[09-18-2021 12:57:12] [I] Server loaded. Type 'help' for help.
+[09-18-2021 12:57:17] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[09-18-2021 12:57:17] [I] Loading map...
+[09-18-2021 12:57:17] [I] Map loaded.
+[09-18-2021 12:57:17] [I] Opened a server on port 6567.
+[09-18-2021 12:57:21] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 16:16:26] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (timeout)
+[09-18-2021 17:41:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 17:41:37] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[09-18-2021 17:43:52] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /stats>
+[09-18-2021 17:44:25] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /stats>
+[09-18-2021 17:44:33] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /stats>
+[09-18-2021 17:45:10] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /stats>
+[09-18-2021 17:45:22] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-18-2021 17:45:25] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 17:45:40] [I] <[accent]<[white][accent]>[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[09-18-2021 17:48:27] [I] <[accent]<[white][accent]>[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[09-18-2021 17:55:18] [I] Game over! Reached wave 18 with 1 players online on map Mision 12   Base pretrolera.
+[09-18-2021 17:55:18] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 17:59:26] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 17:59:26] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 18:03:54] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-18-2021 18:03:54] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-18-2021 18:03:54] [I] 1 mods loaded.
+[09-18-2021 18:03:54] [I] Server loaded. Type 'help' for help.
+[09-18-2021 18:06:16] [W] Your server is running a custom build, which means that client checking is disabled.
+[09-18-2021 18:06:16] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[09-18-2021 18:06:16] [I] 1 mods loaded.
+[09-18-2021 18:06:16] [I] Server loaded. Type 'help' for help.
+[09-18-2021 18:09:37] [I] name set to [scarlet]Online [yellow]Mindustry [cyan] Community.
+[09-18-2021 18:09:42] [I] Randomized next map to be V130: Polluted river: Crux.
+[09-18-2021 18:09:42] [I] Loading map...
+[09-18-2021 18:09:42] [I] Map loaded.
+[09-18-2021 18:09:42] [I] Opened a server on port 6567.
+[09-18-2021 18:10:31] [I] All config values:
+[09-18-2021 18:10:31] [I] | name: [scarlet]Online [yellow]Mindustry [cyan] Community
+[09-18-2021 18:10:31] [I] | | The server name as displayed on clients.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | desc: off
+[09-18-2021 18:10:31] [I] | | The server description, displayed under the name. Max 100 characters.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | port: 6567
+[09-18-2021 18:10:31] [I] | | The port to host on.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | autoUpdate: false
+[09-18-2021 18:10:31] [I] | | Whether to auto-update and exit when a new bleeding-edge update arrives.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | showConnectMessages: true
+[09-18-2021 18:10:31] [I] | | Whether to display connect/disconnect messages.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | enableVotekick: true
+[09-18-2021 18:10:31] [I] | | Whether votekick is enabled.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | startCommands: 
+[09-18-2021 18:10:31] [I] | | Commands run at startup. This should be a comma-separated list.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | crashReport: false
+[09-18-2021 18:10:31] [I] | | Whether to send crash reports.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | logging: true
+[09-18-2021 18:10:31] [I] | | Whether to log everything to files.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | strict: true
+[09-18-2021 18:10:31] [I] | | Whether strict mode is on - corrects positions and prevents duplicate UUIDs.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | antiSpam: true
+[09-18-2021 18:10:31] [I] | | Whether spammers are automatically kicked and rate-limited.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | interactRateWindow: 6
+[09-18-2021 18:10:31] [I] | | Block interaction rate limit window, in seconds.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | interactRateLimit: 25
+[09-18-2021 18:10:31] [I] | | Block interaction rate limit.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | interactRateKick: 60
+[09-18-2021 18:10:31] [I] | | How many times a player must interact inside the window to get kicked.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | messageRateLimit: 0
+[09-18-2021 18:10:31] [I] | | Message rate limit in seconds. 0 to disable.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | messageSpamKick: 3
+[09-18-2021 18:10:31] [I] | | How many times a player must send a message before the cooldown to get kicked. 0 to disable.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | socketInput: false
+[09-18-2021 18:10:31] [I] | | Allows a local application to control this server through a local TCP socket.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | socketInputPort: 6859
+[09-18-2021 18:10:31] [I] | | The port for socket input.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | socketInputAddress: localhost
+[09-18-2021 18:10:31] [I] | | The bind address for socket input.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | allowCustomClients: false
+[09-18-2021 18:10:31] [I] | | Whether custom clients are allowed to connect.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | whitelist: false
+[09-18-2021 18:10:31] [I] | | Whether the whitelist is used.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | motd:  
+[09-18-2021 18:10:31] [I] | | The message displayed to people on connection.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | autosave: false
+[09-18-2021 18:10:31] [I] | | Whether the periodically save the map when playing.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | autosaveAmount: 10
+[09-18-2021 18:10:31] [I] | | The maximum amount of autosaves. Older ones get replaced.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | autosaveSpacing: 300
+[09-18-2021 18:10:31] [I] | | Spacing between autosaves in seconds.
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:10:31] [I] | debug: false
+[09-18-2021 18:10:31] [I] | | Enable debug logging
+[09-18-2021 18:10:31] [I] |
+[09-18-2021 18:11:20] [E] Not a valid number: 1config messageRateLimit 1
+[09-18-2021 18:11:21] [I] messageRateLimit set to 1.
+[09-18-2021 18:15:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 18:21:27] [I] Game over! Reached wave 11 with 1 players online on map V130: Polluted river: Crux.
+[09-18-2021 18:21:27] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 18:25:04] [I] [accent]<[white][accent]>[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-18-2021 18:25:06] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 18:25:14] [I] <[accent]<[white][accent]>[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /players>
+[09-18-2021 18:58:29] [I] Game over! Reached wave 18 with 1 players online on map Mision 12   Base pretrolera.
+[09-18-2021 18:58:29] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 19:02:06] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 19:02:06] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 19:38:47] [I] Game over! Reached wave 18 with 1 players online on map Mision 12   Base pretrolera.
+[09-18-2021 19:38:47] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 19:42:24] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 19:42:24] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 19:44:57] [I] 1 mods loaded.
+[09-18-2021 19:44:57] [I] Server loaded. Type 'help' for help.
+[09-18-2021 19:45:02] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[09-18-2021 19:45:02] [I] Loading map...
+[09-18-2021 19:45:03] [I] Map loaded.
+[09-18-2021 19:45:03] [I] Opened a server on port 6567.
+[09-18-2021 19:45:26] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-18-2021 20:21:08] [I] Game over! Reached wave 18 with 1 players online on map Mision 12   Base pretrolera.
+[09-18-2021 20:21:08] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 20:21:57] [I] [accent]<[white][accent]>[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (error)
+[09-18-2021 20:34:20] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 20:34:20] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 20:38:34] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 20:38:34] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 20:52:42] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 20:52:42] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 20:56:49] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 20:56:49] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 21:10:54] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 21:10:54] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 21:48:19] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 21:48:19] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 22:02:11] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 22:02:11] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 22:06:18] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 22:06:18] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 22:19:26] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 22:19:26] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 22:23:34] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 22:23:34] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 22:36:52] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 22:36:52] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-18-2021 23:13:18] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-18-2021 23:13:18] [I] Selected next map to be V130: Polluted river: Crux.
+[09-18-2021 23:29:16] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[09-18-2021 23:29:16] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-18-2021 23:34:30] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-18-2021 23:34:30] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 00:31:01] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 00:31:01] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 00:43:20] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 00:43:20] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 01:19:55] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 01:19:55] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 01:35:04] [I] Game over! Reached wave 14 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 01:35:04] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 02:11:50] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 02:11:50] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 02:25:52] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 02:25:52] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 02:30:16] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 02:30:16] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 03:05:39] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 03:05:39] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 03:21:42] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 03:21:42] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 03:58:13] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 03:58:13] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 04:09:33] [I] Game over! Reached wave 11 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 04:09:33] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 04:12:55] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 04:12:55] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 04:48:54] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 04:48:54] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 04:52:37] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 04:52:37] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 05:06:13] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 05:06:13] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 05:44:58] [I] Game over! Reached wave 19 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 05:44:58] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 05:49:06] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 05:49:06] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 06:03:51] [I] Game over! Reached wave 14 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 06:03:51] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 06:07:28] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 06:07:28] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 06:23:35] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 06:23:35] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 06:59:07] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 06:59:07] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 07:13:02] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 07:13:02] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 07:16:24] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 07:16:24] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 07:54:09] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 07:54:09] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 08:06:47] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 08:06:47] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 08:44:26] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 08:44:26] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 08:57:20] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 08:57:20] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 09:33:46] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 09:33:46] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 09:45:40] [I] Game over! Reached wave 11 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 09:45:40] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 09:49:17] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 09:49:17] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 10:27:13] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 10:27:13] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 10:40:16] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 10:40:16] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 10:43:53] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 10:43:53] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 11:21:27] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 11:21:27] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 11:36:08] [I] Game over! Reached wave 14 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 11:36:08] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 11:39:31] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 11:39:31] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 12:16:06] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 12:16:06] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 12:28:52] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 12:28:52] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 12:32:14] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 12:32:14] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 12:46:15] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 12:46:16] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 12:50:24] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 12:50:24] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 13:03:14] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 13:03:14] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 13:06:51] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 13:06:51] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 13:20:42] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 13:20:42] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 13:58:26] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 13:58:26] [I] Selected next map to be V130: Polluted river: Crux.
+[09-19-2021 14:11:04] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[09-19-2021 14:11:04] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-19-2021 14:47:23] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[09-19-2021 14:47:23] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-19-2021 14:50:46] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-19-2021 14:50:46] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-22-2021 16:03:30] [I] 1 mods loaded.
+[09-22-2021 16:03:30] [I] Server loaded. Type 'help' for help.
+[09-22-2021 19:40:37] [I] 1 mods loaded.
+[09-22-2021 19:40:37] [I] Server loaded. Type 'help' for help.
+[09-22-2021 19:42:11] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-22-2021 19:42:11] [I] Loading map...
+[09-22-2021 19:42:11] [I] Map loaded.
+[09-22-2021 19:42:11] [I] Opened a server on port 6567.
+[09-22-2021 19:42:14] [I] Kicking connection 172.17.160.1 / AAAAAAAA; Reason: [accent]Incompatible mods![]  Unnecessary mods:[lightgray] > [orange]expanded-[gray]industries:1.2 Beta
+[09-22-2021 19:42:14] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[09-22-2021 19:42:38] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-22-2021 19:42:58] [I] [accent]<[white][accent]>[] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: h
+[09-22-2021 19:45:28] [I] 1 mods loaded.
+[09-22-2021 19:45:28] [I] Server loaded. Type 'help' for help.
+[09-22-2021 19:45:28] [I] Randomized next map to be V130: Polluted river: Crux.
+[09-22-2021 19:45:28] [I] Loading map...
+[09-22-2021 19:45:29] [I] Map loaded.
+[09-22-2021 19:45:29] [I] Opened a server on port 6567.
+[09-22-2021 19:45:31] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-22-2021 19:45:37] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: hello
+[09-22-2021 19:45:52] [I] [accent]<[white][accent]>[] Nautilus: hello
+[09-22-2021 19:45:56] [I] [accent]<[white][accent]>[] Nautilus: hmmm
+[09-22-2021 19:46:59] [I] 1 mods loaded.
+[09-22-2021 19:46:59] [I] Server loaded. Type 'help' for help.
+[09-22-2021 19:46:59] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-22-2021 19:46:59] [I] Loading map...
+[09-22-2021 19:47:00] [I] Map loaded.
+[09-22-2021 19:47:00] [I] Opened a server on port 6567.
+[09-22-2021 19:47:05] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-22-2021 19:47:18] [I] [accent]<[white][accent]>[] [accent][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: hello
+[09-22-2021 19:47:29] [I] [accent]<[white][accent]>[] [accent][][accent][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: asfd
+[09-22-2021 19:47:31] [I] [accent]<[white][accent]>[] [accent][][accent][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: testste
+[09-22-2021 19:47:33] [I] [accent]<[white][accent]>[] [accent][][accent][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: nioc
+[09-22-2021 19:47:36] [I] [accent]<[white][accent]>[] [accent][][accent][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: nice
+[09-22-2021 19:47:51] [I] [accent]<[white][accent]>[] [accent][][accent][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: but it works now
+[09-22-2021 19:50:10] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[09-22-2021 19:50:10] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-22-2021 19:53:39] [I] [accent]<[white][accent]>[] [accent][][accent][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: \uE2022
+[09-22-2021 20:01:56] [I] 1 mods loaded.
+[09-22-2021 20:01:56] [I] Server loaded. Type 'help' for help.
+[09-22-2021 20:01:56] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[09-22-2021 20:01:56] [I] Loading map...
+[09-22-2021 20:01:56] [I] Map loaded.
+[09-22-2021 20:01:56] [I] Opened a server on port 6567.
+[09-22-2021 20:02:00] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-22-2021 20:03:55] [I] 1 mods loaded.
+[09-22-2021 20:03:55] [I] Server loaded. Type 'help' for help.
+[09-22-2021 20:03:55] [E] Command not found. Did you mean "host"?
+[09-22-2021 20:04:00] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[09-22-2021 20:04:00] [I] Loading map...
+[09-22-2021 20:04:00] [I] Map loaded.
+[09-22-2021 20:04:00] [I] Opened a server on port 6567.
+[09-22-2021 20:04:03] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-22-2021 20:04:07] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: hello
+[09-22-2021 20:04:08] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: test
+[09-22-2021 20:04:10] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 123
+[09-22-2021 20:17:44] [I] 1 mods loaded.
+[09-22-2021 20:17:44] [I] Server loaded. Type 'help' for help.
+[09-22-2021 20:17:44] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[09-22-2021 20:17:44] [I] Loading map...
+[09-22-2021 20:17:45] [I] Map loaded.
+[09-22-2021 20:17:45] [I] Opened a server on port 6567.
+[09-22-2021 20:17:48] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-22-2021 20:17:51] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: test
+[09-22-2021 20:53:41] [I] Game over! Reached wave 18 with 1 players online on map Mision 12   Base pretrolera.
+[09-22-2021 20:53:41] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-22-2021 20:57:19] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[09-22-2021 20:57:19] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-22-2021 21:17:30] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[09-22-2021 21:19:23] [I] All config values:
+[09-22-2021 21:19:23] [I] | name: [scarlet]Online [yellow]Mindustry [cyan] Community
+[09-22-2021 21:19:23] [I] | | The server name as displayed on clients.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | desc: off
+[09-22-2021 21:19:23] [I] | | The server description, displayed under the name. Max 100 characters.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | port: 6567
+[09-22-2021 21:19:23] [I] | | The port to host on.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | autoUpdate: false
+[09-22-2021 21:19:23] [I] | | Whether to auto-update and exit when a new bleeding-edge update arrives.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | showConnectMessages: true
+[09-22-2021 21:19:23] [I] | | Whether to display connect/disconnect messages.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | enableVotekick: true
+[09-22-2021 21:19:23] [I] | | Whether votekick is enabled.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | startCommands: 
+[09-22-2021 21:19:23] [I] | | Commands run at startup. This should be a comma-separated list.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | crashReport: false
+[09-22-2021 21:19:23] [I] | | Whether to send crash reports.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | logging: true
+[09-22-2021 21:19:23] [I] | | Whether to log everything to files.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | strict: true
+[09-22-2021 21:19:23] [I] | | Whether strict mode is on - corrects positions and prevents duplicate UUIDs.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | antiSpam: true
+[09-22-2021 21:19:23] [I] | | Whether spammers are automatically kicked and rate-limited.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | interactRateWindow: 6
+[09-22-2021 21:19:23] [I] | | Block interaction rate limit window, in seconds.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | interactRateLimit: 25
+[09-22-2021 21:19:23] [I] | | Block interaction rate limit.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | interactRateKick: 60
+[09-22-2021 21:19:23] [I] | | How many times a player must interact inside the window to get kicked.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | messageRateLimit: 1
+[09-22-2021 21:19:23] [I] | | Message rate limit in seconds. 0 to disable.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | messageSpamKick: 3
+[09-22-2021 21:19:23] [I] | | How many times a player must send a message before the cooldown to get kicked. 0 to disable.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | socketInput: false
+[09-22-2021 21:19:23] [I] | | Allows a local application to control this server through a local TCP socket.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | socketInputPort: 6859
+[09-22-2021 21:19:23] [I] | | The port for socket input.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | socketInputAddress: localhost
+[09-22-2021 21:19:23] [I] | | The bind address for socket input.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | allowCustomClients: false
+[09-22-2021 21:19:23] [I] | | Whether custom clients are allowed to connect.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | whitelist: false
+[09-22-2021 21:19:23] [I] | | Whether the whitelist is used.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | motd:  
+[09-22-2021 21:19:23] [I] | | The message displayed to people on connection.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | autosave: false
+[09-22-2021 21:19:23] [I] | | Whether the periodically save the map when playing.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | autosaveAmount: 10
+[09-22-2021 21:19:23] [I] | | The maximum amount of autosaves. Older ones get replaced.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | autosaveSpacing: 300
+[09-22-2021 21:19:23] [I] | | Spacing between autosaves in seconds.
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:19:23] [I] | debug: false
+[09-22-2021 21:19:23] [I] | | Enable debug logging
+[09-22-2021 21:19:23] [I] |
+[09-22-2021 21:27:10] [I] 1 mods loaded.
+[09-22-2021 21:27:10] [I] Server loaded. Type 'help' for help.
+[09-22-2021 21:27:20] [I] Randomized next map to be V130: Polluted river: Crux.
+[09-22-2021 21:27:20] [I] Loading map...
+[09-22-2021 21:27:20] [I] Map loaded.
+[09-22-2021 21:27:21] [I] Opened a server on port 6567.
+[09-22-2021 21:27:22] [E] Already hosting. Type 'stop' to stop hosting first.
+[09-22-2021 21:38:56] [I] Game over! Reached wave 11 with 0 players online on map V130: Polluted river: Crux.
+[09-22-2021 21:38:56] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[09-22-2021 21:42:33] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[09-22-2021 21:42:33] [I] Selected next map to be Mision 12 - Base pretrolera.
+[09-26-2021 21:38:45] [I] 1 mods loaded.
+[09-26-2021 21:38:45] [I] Server loaded. Type 'help' for help.
+[09-26-2021 21:38:46] [I] Randomized next map to be V130: Polluted river: Crux.
+[09-26-2021 21:38:46] [I] Loading map...
+[09-26-2021 21:38:47] [I] Map loaded.
+[09-26-2021 21:38:47] [I] Opened a server on port 6567.
+[09-26-2021 21:38:50] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-26-2021 21:41:47] [I] 1 mods loaded.
+[09-26-2021 21:41:47] [I] Server loaded. Type 'help' for help.
+[09-26-2021 21:41:48] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[09-26-2021 21:41:48] [I] Loading map...
+[09-26-2021 21:41:48] [I] Map loaded.
+[09-26-2021 21:41:48] [I] Opened a server on port 6567.
+[09-26-2021 21:41:49] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[09-26-2021 21:42:20] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-02-2021 19:35:01] [I] 1 mods loaded.
+[10-02-2021 19:35:01] [I] Server loaded. Type 'help' for help.
+[10-02-2021 19:35:01] [E] Command not found. Did you mean "host"?
+[10-02-2021 19:35:10] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-02-2021 19:35:10] [I] Loading map...
+[10-02-2021 19:35:10] [I] Map loaded.
+[10-02-2021 19:35:10] [I] Opened a server on port 6567.
+[10-02-2021 19:35:29] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-02-2021 19:37:21] [I] 1 mods loaded.
+[10-02-2021 19:37:21] [I] Server loaded. Type 'help' for help.
+[10-02-2021 19:37:21] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-02-2021 19:37:21] [I] Loading map...
+[10-02-2021 19:37:21] [I] Map loaded.
+[10-02-2021 19:37:21] [I] Opened a server on port 6567.
+[10-02-2021 19:37:24] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-02-2021 19:39:40] [I] 1 mods loaded.
+[10-02-2021 19:39:40] [I] Server loaded. Type 'help' for help.
+[10-02-2021 19:41:38] [I] 1 mods loaded.
+[10-02-2021 19:41:38] [I] Server loaded. Type 'help' for help.
+[10-02-2021 19:41:41] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-02-2021 19:41:41] [I] Loading map...
+[10-02-2021 19:41:41] [I] Map loaded.
+[10-02-2021 19:41:41] [I] Opened a server on port 6567.
+[10-02-2021 19:41:51] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-02-2021 19:55:32] [I] Game over! Reached wave 13 with 1 players online on map V130: Polluted river: Crux.
+[10-02-2021 19:55:32] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-02-2021 20:00:22] [I] 1 mods loaded.
+[10-02-2021 20:00:22] [I] Server loaded. Type 'help' for help.
+[10-02-2021 20:00:22] [E] Invalid command. Type 'help' for help.
+[10-02-2021 20:00:27] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-02-2021 20:00:27] [I] Loading map...
+[10-02-2021 20:00:28] [I] Map loaded.
+[10-02-2021 20:00:28] [I] Opened a server on port 6567.
+[10-02-2021 20:00:31] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-02-2021 20:00:35] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help>
+[10-02-2021 20:00:37] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 4>
+[10-02-2021 20:00:40] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 3>
+[10-02-2021 20:00:43] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 2>
+[10-02-2021 20:00:57] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js UnitTypes.gamma.health = 10E9999999>
+[10-02-2021 20:01:11] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js UnitTypes.alpha.health = 10E9999999>
+[10-02-2021 20:01:37] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js UnitTypes.alpha.health>
+[10-02-2021 20:01:43] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js UnitTypes.alpha.>
+[10-02-2021 20:01:49] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js UnitTypes.alpha.health = asdf>
+[10-02-2021 20:01:55] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js UnitTypes.alpha.health = 10E99999999>
+[10-02-2021 20:02:36] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js Blocks.coreNucleus.health = 2147483647;>
+[10-02-2021 20:02:54] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (var i = 0; i < 10; i++) {    UnitTypes.gamma.weapons.add(UnitTypes.toxpid.weapons.get(i));}>
+[10-02-2021 20:03:02] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (var i = 0; i < 10; i++) {    UnitTypes.gamma.weapons.add(UnitTypes.toxopid.weapons.get(i));}>
+[10-02-2021 20:03:14] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (var i = 0; i < 3; i++) {    UnitTypes.gamma.weapons.add(UnitTypes.toxopid.weapons.get(i));}>
+[10-02-2021 20:04:30] [I] Game over! Reached wave 2 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-02-2021 20:04:30] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-02-2021 20:05:08] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (var i = 0; i < 3; i++) {    UnitTypes.gamma.weapons.add(UnitTypes.corvus.weapons.get(0));}>
+[10-02-2021 20:05:51] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js UnitTypes.corvus.weapons.get(0).bullet.lightningType = UnitTypes.quad.weapons.get(0).bullet>
+[10-02-2021 20:06:28] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.gamma.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:06:53] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.corvus.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:08:03] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.corvus.weapons        .get(0)        .bullet.createNet(Team.sharded, 109, 125, i, 1, 1, 100);}>
+[10-02-2021 20:08:34] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /sync>
+[10-02-2021 20:09:04] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:07] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:09] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:10] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:11] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:12] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:12] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:12] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:13] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:13] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:14] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:14] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:14] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:15] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:15] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:16] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:16] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:16] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:17] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:17] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:18] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:18] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:19] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:19] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:19] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:20] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:20] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:21] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:21] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:22] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:22] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:24] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 360; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:34] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:09:35] [I] Game over! Reached wave 2 with 1 players online on map Mision 12   Base pretrolera.
+[10-02-2021 20:09:35] [I] Selected next map to be V130: Polluted river: Crux.
+[10-02-2021 20:11:07] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:11:17] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:11:28] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:11:41] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.crux, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:12:40] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.crux, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:13:11] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.crux, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:13:20] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.crux, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:13:34] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.crux, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:13:37] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.crux, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:13:49] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:13:51] [I] Game over! Reached wave 3 with 1 players online on map V130: Polluted river: Crux.
+[10-02-2021 20:13:51] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-02-2021 20:18:08] [I] Game over! Reached wave 2 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-02-2021 20:18:08] [I] Selected next map to be V130: Polluted river: Crux.
+[10-02-2021 20:19:11] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js for (i = 0; i < 36000; i++) {    UnitTypes.reign.weapons        .get(0)        .bullet.createNet(Team.sharded, 277, 188, i, 1, 1, 100);}>
+[10-02-2021 20:20:50] [I] Game over! Reached wave 2 with 1 players online on map V130: Polluted river: Crux.
+[10-02-2021 20:20:50] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-02-2021 20:49:53] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-02-2021 21:37:01] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-02-2021 21:37:01] [I] Selected next map to be V130: Polluted river: Crux.
+[10-02-2021 21:52:21] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[10-02-2021 21:52:22] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-02-2021 22:28:58] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-02-2021 22:28:58] [I] Selected next map to be V130: Polluted river: Crux.
+[10-02-2021 22:42:33] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[10-02-2021 22:42:33] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-02-2021 22:46:11] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-02-2021 22:46:11] [I] Selected next map to be V130: Polluted river: Crux.
+[10-02-2021 23:02:09] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[10-02-2021 23:02:09] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-02-2021 23:38:34] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-02-2021 23:38:34] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-02-2021 23:42:49] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-02-2021 23:42:49] [I] Selected next map to be V130: Polluted river: Crux.
+[10-02-2021 23:56:31] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[10-02-2021 23:56:31] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-03-2021 17:19:58] [I] 1 mods loaded.
+[10-03-2021 17:19:58] [I] Server loaded. Type 'help' for help.
+[10-03-2021 17:21:06] [I] 1 mods loaded.
+[10-03-2021 17:21:06] [I] Server loaded. Type 'help' for help.
+[10-03-2021 17:23:39] [I] 1 mods loaded.
+[10-03-2021 17:23:39] [I] Server loaded. Type 'help' for help.
+[10-03-2021 17:30:27] [I] 1 mods loaded.
+[10-03-2021 17:30:27] [I] Server loaded. Type 'help' for help.
+[10-03-2021 17:35:41] [I] 1 mods loaded.
+[10-03-2021 17:35:41] [I] Server loaded. Type 'help' for help.
+[10-03-2021 17:42:38] [I] 1 mods loaded.
+[10-03-2021 17:42:38] [I] Server loaded. Type 'help' for help.
+[10-03-2021 17:44:41] [I] 1 mods loaded.
+[10-03-2021 17:44:41] [I] Server loaded. Type 'help' for help.
+[10-03-2021 17:46:59] [I] 1 mods loaded.
+[10-03-2021 17:46:59] [I] Server loaded. Type 'help' for help.

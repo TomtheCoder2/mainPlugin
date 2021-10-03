@@ -27,7 +27,7 @@ public abstract class RoleRestrictedCommand extends Command {
             resolvedRole = getRole(ctx.event.getApi(), role);
             if (resolvedRole == null) return false;
         }
-        // i am simply not going to touch this
+        // I am simply not going to touch this
         return ctx.event.getMessageAuthor().asUser().get().getRoles(ctx.event.getServer().get()).contains(resolvedRole);
     }
 

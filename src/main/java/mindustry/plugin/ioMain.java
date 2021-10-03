@@ -29,9 +29,10 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
+import static arc.util.Log.info;
 import static mindustry.Vars.*;
 import static mindustry.plugin.Utils.*;
 
@@ -44,6 +45,10 @@ public class ioMain extends Plugin {
     //    public static JedisPool pool;
     public static DiscordApi api = null;
     public static String prefix = ".";
+    public static String live_chat_channel_id = "";
+    public static String bot_channel_id = null;
+    public static String staff_bot_channel_id = null;
+    public static String admin_bot_channel_id = null;
     public static String serverName = "<untitled>";
     public static JSONObject data; //token, channel_id, role_id
     public static String apiKey = "";
@@ -67,14 +72,22 @@ public class ioMain extends Plugin {
             JSONObject alldata;
             JSONObject data;
             data = alldata = new JSONObject(new JSONTokener(pureJson));
+            // url, username and password to connect to the database
             url = alldata.getString("url");
             user = alldata.getString("user");
             password = alldata.getString("password");
+            // for the live chat between the discord server and the mindustry server
+            live_chat_channel_id = alldata.getString("live_chat_channel_id");
+            // bot channels
+            bot_channel_id = alldata.getString("bot_channel_id");
+            staff_bot_channel_id = alldata.getString("staff_bot_channel_id");
+            admin_bot_channel_id = alldata.getString("admin_bot_channel_id");
             System.out.printf("url: %s, user: %s, password: %s%n", url, user, password);
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
         }
         try {
+            // doesn't work on the first couple tries but after that it works, IDK why
             connect();
             connect();
             connect();
@@ -102,10 +115,16 @@ public class ioMain extends Plugin {
         bt.start();
 
         TextChannel tc = getTextChannel("881300954845179914");
+        if (!Objects.equals(live_chat_channel_id, "")) {
+            tc = getTextChannel(live_chat_channel_id);
+        } else {
+            System.err.println("couldn't fin live_chat_channel_id!");
+        }
         if (tc != null) {
+            TextChannel finalTc = tc;
             Events.on(EventType.PlayerChatEvent.class, event -> {
                 if (event.message.charAt(0) != '/') {
-                    tc.sendMessage("**" + escapeColorCodes(event.player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + "**: " + event.message);
+                    finalTc.sendMessage("**" + escapeColorCodes(event.player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + "**: " + event.message);
                 }
             });
         }
@@ -165,7 +184,7 @@ public class ioMain extends Plugin {
             }
             EmbedBuilder eb = new EmbedBuilder();
             eb.setTitle("Player Join Log");
-            eb.setDescription(String.format("`%s • %d `:%s", player.uuid(), player.id, escapeColorCodes(player.name)));
+            eb.setDescription(String.format("`%s` • `%d `:%s", player.uuid(), player.id, escapeColorCodes(player.name)));
             assert log_channel != null;
             log_channel.sendMessage(eb);
             PlayerData pd = getData(player.uuid());
@@ -249,6 +268,8 @@ public class ioMain extends Plugin {
 //                    }
 //                }
 //            });
+//            player.sendMessage(welcomeMessage);
+            Call.infoMessage(player.con, welcomeMessage);
         });
 
         // player built building
@@ -259,7 +280,7 @@ public class ioMain extends Plugin {
             PersistentPlayerData td = (playerDataGroup.getOrDefault(event.unit.getPlayer().uuid(), null));
             if (pd == null || td == null) return;
             if (event.tile.block() != null) {
-                if (!privateRequirements.bannedBlocks.contains(event.tile.block())) {
+                if (!activeRequirements.bannedBlocks.contains(event.tile.block())) {
                     td.bbIncrementor++;
 //                    System.out.println(escapeColorCodes(event.unit.getPlayer().name) + " built a block");
 //                    pd.buildingsBuilt++;
@@ -393,6 +414,14 @@ public class ioMain extends Plugin {
                 String message = args[0];
                 if (!checkChatRatelimit(message, player)) return;
                 Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(message, player, "[#" + player.team().color.toString() + "]<T>" + NetClient.colorizeName(player.id, player.name)));
+            });
+
+            handler.<Player>register("js", "<script...>", "Run arbitrary Javascript.", (arg, player) -> {
+                if (player.admin) {
+                    player.sendMessage(mods.getScripts().runConsole(arg[0]));
+                } else {
+                    player.sendMessage("[scarlet]This command is restricted to admins!");
+                }
             });
 
 //            handler.<Player>register("d", "<text...>", "Sends a message to moderators. Use when no moderators are online and there's a griefer.", (args, player) -> {

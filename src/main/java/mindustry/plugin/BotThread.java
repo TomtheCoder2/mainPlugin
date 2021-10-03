@@ -58,22 +58,37 @@ public class BotThread extends Thread {
 //
 //
                     pd.playTime++;
-                    if(pd.rank <= 0 && pd.playTime >= privateRequirements.playtime && pd.buildingsBuilt >= privateRequirements.buildingsBuilt && pd.gamesPlayed >= privateRequirements.gamesPlayed){
-                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+                    // check if someone gets promoted
+                    if(pd.rank <= 0 && pd.playTime >= newbieRequirements.playtime &&
+                            pd.buildingsBuilt >= newbieRequirements.buildingsBuilt &&
+                            pd.gamesPlayed >= newbieRequirements.gamesPlayed){
+                        Call.infoMessage(p.con, Utils.formatMessage(p, newbieRequirements.promotionMessage));
                         if (pd.rank < 1) pd.rank = 1;
                     }
-                    if(pd.rank <= 1 && pd.playTime >= generalRequirements.playtime && pd.buildingsBuilt >= generalRequirements.buildingsBuilt && pd.gamesPlayed >= generalRequirements.gamesPlayed){
-                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+                    if(pd.rank <= 1 && pd.playTime >= activeRequirements.playtime &&
+                            pd.buildingsBuilt >= activeRequirements.buildingsBuilt &&
+                            pd.gamesPlayed >= activeRequirements.gamesPlayed){
+                        Call.infoMessage(p.con, Utils.formatMessage(p, activeRequirements.promotionMessage));
                         if (pd.rank < 2) pd.rank = 2;
                     }
-                    if(pd.rank <= 2 && pd.playTime >= corporalRequirements.playtime && pd.buildingsBuilt >= corporalRequirements.buildingsBuilt && pd.gamesPlayed >= corporalRequirements.gamesPlayed){
-                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+                    if(pd.rank <= 2 && pd.playTime >= veteranRequirements.playtime &&
+                            pd.buildingsBuilt >= veteranRequirements.buildingsBuilt &&
+                            pd.gamesPlayed >= veteranRequirements.gamesPlayed){
+                        Call.infoMessage(p.con, Utils.formatMessage(p, veteranRequirements.promotionMessage));
                         if (pd.rank < 3) pd.rank = 3;
                     }
-                    if(pd.rank <= 3 && pd.playTime >= sargentRequirements.playtime && pd.buildingsBuilt >= sargentRequirements.buildingsBuilt && pd.gamesPlayed >= sargentRequirements.gamesPlayed){
-                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
-                        if (pd.rank < 4) pd.rank = 4;
-                    }
+//                    if(pd.rank <= 1 && pd.playTime >= generalRequirements.playtime && pd.buildingsBuilt >= generalRequirements.buildingsBuilt && pd.gamesPlayed >= generalRequirements.gamesPlayed){
+//                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+//                        if (pd.rank < 2) pd.rank = 2;
+//                    }
+//                    if(pd.rank <= 2 && pd.playTime >= corporalRequirements.playtime && pd.buildingsBuilt >= corporalRequirements.buildingsBuilt && pd.gamesPlayed >= corporalRequirements.gamesPlayed){
+//                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+//                        if (pd.rank < 3) pd.rank = 3;
+//                    }
+//                    if(pd.rank <= 3 && pd.playTime >= sargentRequirements.playtime && pd.buildingsBuilt >= sargentRequirements.buildingsBuilt && pd.gamesPlayed >= sargentRequirements.gamesPlayed){
+//                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+//                        if (pd.rank < 4) pd.rank = 4;
+//                    }
                     setData(p.uuid(), pd);
                     ioMain.playerDataGroup.put(p.uuid(), tdata); // update tdata with the new stuff
                 }

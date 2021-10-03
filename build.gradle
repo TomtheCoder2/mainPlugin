@@ -16,7 +16,7 @@ repositories {
 
 ext {
     //the build number that this plugin is made for
-    arcVersion = 'v130.1'
+    arcVersion = 'v131'
     mindustryVersion = 'getMapScreenshot'
 }
 
