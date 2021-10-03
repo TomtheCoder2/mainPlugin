@@ -9,6 +9,7 @@
 * Create a settings.json file in the same location as the plugin file.
 * Use the same format as the example in the exampleSettings.json file.
 * If you don't have a postgreSQL server some functions might not work.
+* Now run the `server-release.jar` file (you have to run this file, because it's a special version of the server to work with the postgreSQL server)
 ---
 ### Bugs? 
 Just report it here on github or on our discord server.
