@@ -4,10 +4,15 @@
 
 ### Instructions:
 
+#### Build:
+
 * Run `./gradlew jar` in the console
-* Put the output file (./build/libs/newPlugin.jar) in the /config/mods folder.
+* Put the output file (`./build/libs/newPlugin.jar`) in the `./config/mods` folder of your server.
+
+#### Run:
+* Put the `newPlugin.jar` file in the `./conifg/mods/` folder.
 * Create a settings.json file in the same location as the plugin file.
-* Use the same format as the example in the exampleSettings.json file.
+* Use the same format as the example in the `./config/mods/exampleSettings.json` file.
 * If you don't have a postgreSQL server some functions might not work.
 * Now run the `server-release.jar` file (you have to run this file, because it's a special version of the server to work with the postgreSQL server)
 ---
@@ -20,5 +25,9 @@ Please suggest features on the discord server. I would appreciate feedback and s
 ### Contributing
 Everyone is welcome to contribute to this project, just send me a direct message on Discord (Nautilus#0100).
 
+
+PS: The original Plugin is [here](https://github.com/TranquillyUnpleasant/ioplugin). 
+Please give some credits to [TranquillyUnpleasant
+](https://github.com/TranquillyUnpleasant)!
 
 ~~There are many bugs~~
