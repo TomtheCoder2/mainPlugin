@@ -1,5 +1,6 @@
 package mindustry.plugin.discordcommands;
 
+import java.awt.*;
 import java.util.*;
 
 import mindustry.gen.Call;
@@ -19,10 +20,11 @@ import static mindustry.plugin.ioMain.*;
  */
 public class DiscordCommands implements MessageCreateListener {
     private HashMap<String, Command> registry = new HashMap<>();
-    private Set<MessageCreatedListener> messageCreatedListenerRegistry = new HashSet<>();
-    private TextChannel admin_bot_channel = getTextChannel(admin_bot_channel_id);
-    private TextChannel staff_bot_channel = getTextChannel(staff_bot_channel_id);
-    private TextChannel bot_channel = getTextChannel(bot_channel_id);
+    private final Set<MessageCreatedListener> messageCreatedListenerRegistry = new HashSet<>();
+    private final TextChannel admin_bot_channel = getTextChannel(admin_bot_channel_id);
+    private final TextChannel staff_bot_channel = getTextChannel(staff_bot_channel_id);
+    private final TextChannel bot_channel = getTextChannel(bot_channel_id);
+    private final TextChannel error_log_channel = getTextChannel("891677596117504020");
 
 
     public DiscordCommands() {
@@ -139,7 +141,23 @@ public class DiscordCommands implements MessageCreateListener {
             ctx.channel.sendMessage(eb);
             return;
         }
-        command.run(ctx);
+        try {
+            command.run(ctx);
+        } catch (Exception error) {
+            System.out.println(Arrays.toString(error.getStackTrace()));
+            System.out.println(error.getMessage());
+            try {
+                EmbedBuilder eb = new EmbedBuilder()
+                        .setTitle("There was an error executing this command: " + name + "!")
+                        .setDescription(error.getStackTrace()[0].toString())
+                        .setColor(Color.decode("#ff0000"));
+                assert error_log_channel != null;
+                error_log_channel.sendMessage(eb);
+            } catch (Exception error2) {
+                System.out.println("There was an error at outputting the error!!!");
+                System.out.println(error2.toString());
+            }
+        }
     }
 
     /**

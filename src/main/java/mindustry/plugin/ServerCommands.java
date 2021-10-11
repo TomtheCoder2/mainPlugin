@@ -4,12 +4,15 @@ import arc.Core;
 import arc.Events;
 import arc.files.Fi;
 import arc.struct.Seq;
+import arc.util.Log;
+import arc.util.Strings;
 import mindustry.content.Blocks;
 import mindustry.content.Bullets;
 import mindustry.content.UnitTypes;
 import mindustry.core.GameState;
 import mindustry.entities.bullet.BulletType;
 import mindustry.game.EventType.GameOverEvent;
+import mindustry.game.Gamemode;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -18,6 +21,7 @@ import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
 import mindustry.io.SaveIO;
 import mindustry.maps.Map;
+import mindustry.maps.MapException;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.discordcommands.Command;
@@ -46,6 +50,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
 import java.util.zip.InflaterInputStream;
 
+import static arc.util.Log.err;
+import static arc.util.Log.info;
 import static mindustry.Vars.*;
 import static mindustry.plugin.Utils.*;
 
@@ -81,6 +87,77 @@ public class ServerCommands {
         if (data.has("administrator_roleid")) {
             String adminRole = data.getString("administrator_roleid");
             // TODO: make an update command to update the EI mod
+
+            handler.registerCommand(new RoleRestrictedCommand("start") {
+                {
+                    help = "Restart the server. Will default to survival and a random map if not specified.";
+                    role = data.getString("exit_roleid");
+                    category = "management";
+                    usage = "[mapname] [mode]";
+                }
+                public void run(Context ctx) {
+                    net.closeServer();
+                    state.set(GameState.State.menu);
+
+                    // start the server again
+                    EmbedBuilder eb = new EmbedBuilder();
+                    Gamemode preset = Gamemode.survival;
+
+                    if(ctx.args.length > 2){
+                        try{
+                            preset = Gamemode.valueOf(ctx.args[2]);
+                        }catch(IllegalArgumentException e){
+                            err("No gamemode '@' found.", ctx.args[2]);
+                            eb.setTitle("Command terminated.");
+                            eb.setColor(Pals.error);
+                            eb.setDescription("No gamemode " + ctx.args[2] + " found.");
+                            ctx.channel.sendMessage(eb);
+                            return;
+                        }
+                    }
+
+                    Map result;
+                    if(ctx.args.length > 1){
+                        result = getMapBySelector(ctx.args[1]);
+                        if (result == null) {
+                            eb.setTitle("Command terminated.");
+                            eb.setColor(Pals.error);
+                            eb.setDescription("Map \"" + escapeCharacters(ctx.args[1]) + "\" not found!");
+                            ctx.channel.sendMessage(eb);
+                            return;
+                        }
+                    }else{
+                        result = maps.getShuffleMode().next(preset, state.map);
+                        info("Randomized next map to be @.", result.name());
+                    }
+
+                    info("Loading map...");
+
+                    logic.reset();
+//                    lastMode = preset;
+//                    Core.settings.put("lastServerMode", lastMode.name());
+                    try{
+                        world.loadMap(result, result.applyRules(preset));
+                        state.rules = result.applyRules(preset);
+                        logic.play();
+
+                        info("Map loaded.");
+                        eb.setTitle("Map loaded!");
+                        eb.setColor(Pals.success);
+                        eb.setDescription("Hosting map: " + result.name());
+                        ctx.channel.sendMessage(eb);
+
+                        netServer.openServer();
+                    }catch(MapException e){
+                        Log.err(e.map.name() + ": " + e.getMessage());
+                        eb.setTitle("Command terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("e.map.name() + \": \" + e.getMessage()");
+                        ctx.channel.sendMessage(eb);
+                        return;
+                    }
+                }
+            });
         }
 
         if (data.has("exit_roleid")) {
@@ -1366,7 +1443,6 @@ public class ServerCommands {
 //            });
 
 
-
             handler.registerCommand(new RoleRestrictedCommand("js") {
                 {
                     help = "Run a js command!";
@@ -1401,42 +1477,55 @@ public class ServerCommands {
                         int targetRank = Integer.parseInt(ctx.args[2]);
                         if (target.length() > 0 && targetRank > -1 && targetRank < 6) {
                             Player player = findPlayer(target);
+                            String uuid = null;
                             if (player == null) {
+                                uuid = target;
+                            } else {
+                                uuid = player.uuid();
+                            }
+
+                            PlayerData pd = getData(uuid);
+                            if (pd != null) {
+                                pd.rank = targetRank;
+                                setData(uuid, pd);
+                                Administration.PlayerInfo info = null;
+                                if (player != null) {
+                                    info = netServer.admins.getInfo(player.uuid());
+                                } else {
+                                    info = netServer.admins.getInfoOptional(target);
+                                }
+                                eb.setTitle("Command executed successfully");
+                                eb.setDescription("Promoted " + escapeEverything(info.names.get(0)) + " to " + rankNames.get(targetRank).name);
+                                ctx.channel.sendMessage(eb);
+//                                player.con.kick("Your rank was modified, please rejoin.", 0);
+                                int rank = pd.rank;
+                                if (player != null) {
+                                    switch (rank) { // apply new tag
+                                        case 0:
+                                            break;
+                                        case 1:
+                                            player.name = rankNames.get(1).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
+                                            break;
+                                        case 2:
+                                            player.name = rankNames.get(2).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
+                                            break;
+                                        case 3:
+                                            player.name = rankNames.get(3).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
+                                            break;
+                                        case 4:
+                                            player.name = rankNames.get(4).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
+                                            break;
+                                        case 5:
+                                            player.name = rankNames.get(5).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
+                                            break;
+                                    }
+                                }
+                            } else {
                                 eb.setTitle("Command terminated");
                                 eb.setDescription("Player not found.");
                                 eb.setColor(Pals.error);
                                 ctx.channel.sendMessage(eb);
                                 return;
-                            }
-
-                            PlayerData pd = getData(player.uuid());
-                            if (pd != null) {
-                                pd.rank = targetRank;
-                                setData(player.uuid(), pd);
-                                eb.setTitle("Command executed successfully");
-                                eb.setDescription("Promoted " + escapeEverything(player.name) + " to " + rankNames.get(targetRank).name);
-                                ctx.channel.sendMessage(eb);
-//                                player.con.kick("Your rank was modified, please rejoin.", 0);
-                                int rank = pd.rank;
-                                switch (rank) { // apply new tag
-                                    case 0:
-                                        break;
-                                    case 1:
-                                        player.name = rankNames.get(1).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                        break;
-                                    case 2:
-                                        player.name = rankNames.get(2).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                        break;
-                                    case 3:
-                                        player.name = rankNames.get(3).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                        break;
-                                    case 4:
-                                        player.name = rankNames.get(4).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                        break;
-                                    case 5:
-                                        player.name = rankNames.get(5).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                        break;
-                                }
                             }
 
                             if (targetRank == 5) netServer.admins.adminPlayer(player.uuid(), player.usid());
@@ -1462,16 +1551,30 @@ public class ServerCommands {
                         int buildingsBuilt = Integer.parseInt(ctx.args[4]);
                         int gamesPlayed = Integer.parseInt(ctx.args[5]);
                         if (target.length() > 0 && targetRank > -1 && targetRank < 6) {
+//                            Player player = findPlayer(target);
+//                            if (player == null) {
+//                                eb.setTitle("Command terminated");
+//                                eb.setDescription("Player not found.");
+//                                eb.setColor(Pals.error);
+//                                ctx.channel.sendMessage(eb);
+//                                return;
+//                            }
+
+                            Administration.PlayerInfo info = null;
                             Player player = findPlayer(target);
-                            if (player == null) {
+                            if (player != null) {
+                                info = netServer.admins.getInfo(player.uuid());
+                            } else {
+                                info = netServer.admins.getInfoOptional(target);
+                            }
+                            if (info == null) {
                                 eb.setTitle("Command terminated");
                                 eb.setDescription("Player not found.");
                                 eb.setColor(Pals.error);
                                 ctx.channel.sendMessage(eb);
                                 return;
                             }
-
-                            PlayerData pd = getData(player.uuid());
+                            PlayerData pd = getData(info.id);
                             if (pd != null) {
                                 pd.buildingsBuilt = buildingsBuilt;
                                 pd.gamesPlayed = gamesPlayed;
@@ -1483,6 +1586,12 @@ public class ServerCommands {
 //                                eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + targetRank);
                                 ctx.channel.sendMessage(eb);
 //                                player.con.kick("Your rank was modified, please rejoin.", 0);
+                            } else {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("Player not found.");
+                                eb.setColor(Pals.error);
+                                ctx.channel.sendMessage(eb);
+                                return;
                             }
 
                             if (targetRank == 5) netServer.admins.adminPlayer(player.uuid(), player.usid());

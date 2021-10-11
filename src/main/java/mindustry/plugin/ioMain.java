@@ -213,27 +213,27 @@ public class ioMain extends Plugin {
                     case 0:
                         break;
                     case 1:
-                        Call.sendMessage("[#91f063]Active player [] " + player.name + " joined the server!");
+                        Call.sendMessage("[#91f063]Active player [] " + player.name + "[accent] joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
                         player.name = rankNames.get(1).tag + player.name;
                         break;
                     case 2:
-                        Call.sendMessage("[#dfd06e]Veteran player[] " + player.name + " joined the server!");
+                        Call.sendMessage("[#dfd06e]Veteran player[] " + player.name + "[accent] joined the server!");
 //                        player.name = "[white][\uE800][accent][] " + player.name;
                         player.name = rankNames.get(2).tag + player.name;
                         break;
                     case 3:
-                        Call.sendMessage("[#bf7134]Contributor [] " + player.name + " joined the server!");
+                        Call.sendMessage("[#bf7134]Contributor [] " + player.name + "[accent] joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
                         player.name = rankNames.get(3).tag + player.name;
                         break;
                     case 4:
-                        Call.sendMessage("[orange]<[][#9c59ce]Moderator[][orange]>[] " + player.name + " joined the server!");
+                        Call.sendMessage("[orange]<[][#9c59ce]Moderator[][orange]>[] " + player.name + "[accent] joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
                         player.name = rankNames.get(4).tag + player.name;
                         break;
                     case 5:
-                        Call.sendMessage("[orange]<[][#00f8fd]Admin[][orange]>[] " + player.name + " joined the server!");
+                        Call.sendMessage("[orange]<[][#00f8fd]Admin[][orange]>[] " + player.name + "[accent] joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
                         player.name = rankNames.get(5).tag + player.name;
                         break;
