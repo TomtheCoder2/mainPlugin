@@ -472,18 +472,22 @@ public class ServerCommands {
                 {
                     help = "Toggle the admin status on a player.";
                     role = banRole;
-                    usage = "<playerid|ip|name|teamid> <message>";
+                    usage = "<playerid|ip|name|teamid>";
                     category = "moderation";
                 }
 
                 public void run(Context ctx) {
                     EmbedBuilder eb = new EmbedBuilder();
+                    if (ctx.args.length < 2) tooFewArguments(ctx, this);
                     String target = ctx.args[1].toLowerCase();
 
                     Player p = findPlayer(target);
                     if (p != null) {
 //                        Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
                         p.admin = !p.admin;
+                        if (p.admin) {
+                            netServer.admins.adminPlayer(p.uuid(), p.usid());
+                        }
                         eb.setTitle("Command executed!");
                         if (p.admin) {
                             eb.setDescription("Promoted " + escapeEverything(p.name) + " to admin");
@@ -1623,7 +1627,10 @@ public class ServerCommands {
                                 return;
                             }
 
-                            if (targetRank == 5) netServer.admins.adminPlayer(player.uuid(), player.usid());
+                            if (targetRank == 6) {
+                                assert player != null;
+                                netServer.admins.adminPlayer(player.uuid(), player.usid());
+                            }
                         }
                     });
                 }
