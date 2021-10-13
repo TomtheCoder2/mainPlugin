@@ -5180,3 +5180,155 @@ Caused by: java.lang.IllegalArgumentException: Malformed param '[description'
 [10-13-2021 15:59:39] [I] Opened a server on port 6567.
 [10-13-2021 16:03:03] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
 [10-13-2021 16:03:03] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-13-2021 16:39:52] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-13-2021 16:39:52] [I] Selected next map to be UwU.
+[10-13-2021 17:16:45] [I] 1 mods loaded.
+[10-13-2021 17:16:45] [I] Server loaded. Type 'help' for help.
+[10-13-2021 17:17:03] [I] Randomized next map to be UwU.
+[10-13-2021 17:17:03] [I] Loading map...
+[10-13-2021 17:17:06] [I] Map loaded.
+[10-13-2021 17:17:06] [I] Opened a server on port 6567.
+[10-13-2021 17:17:11] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 17:17:11] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 13:56:02 UTC [accent]Ban ID:[] VA8X
+[10-13-2021 17:17:11] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 17:17:45] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 17:17:57] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
+[10-13-2021 17:17:57] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 17:18:35] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 17:18:35] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 15:17:56 UTC [accent]Ban ID:[] VA8X
+[10-13-2021 17:18:35] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 17:18:41] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 17:19:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 17:19:09] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 15:17:56 UTC [accent]Ban ID:[] VA8X
+[10-13-2021 17:19:09] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 17:35:26] [I] 1 mods loaded.
+[10-13-2021 17:35:26] [I] Server loaded. Type 'help' for help.
+[10-13-2021 17:35:26] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 17:35:26] [I] Loading map...
+[10-13-2021 17:35:27] [I] Map loaded.
+[10-13-2021 17:35:27] [I] Opened a server on port 6567.
+[10-13-2021 17:35:31] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 17:35:48] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
+[10-13-2021 17:35:48] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 17:35:56] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 17:35:59] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 17:37:05] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 17:37:06] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 15:36:48 UTC [accent]Ban ID:[] VA8X [white] If you what to appeal join our discord server: [cyan]https://discord.gg/qtjqCUbbdR
+[10-13-2021 17:37:06] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 17:37:17] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 17:50:42] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[10-13-2021 17:50:42] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 17:54:50] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 17:54:50] [I] Selected next map to be V130: Polluted river: Crux.
+[10-13-2021 18:08:53] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[10-13-2021 18:08:53] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-13-2021 18:45:11] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-13-2021 18:45:11] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 18:48:48] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 18:48:48] [I] Selected next map to be V130: Polluted river: Crux.
+[10-13-2021 19:01:38] [I] Game over! Reached wave 12 with 0 players online on map V130: Polluted river: Crux.
+[10-13-2021 19:01:38] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-13-2021 19:03:40] [I] 1 mods loaded.
+[10-13-2021 19:03:40] [I] Server loaded. Type 'help' for help.
+[10-13-2021 19:03:40] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 19:03:40] [I] Loading map...
+[10-13-2021 19:03:40] [I] Map loaded.
+[10-13-2021 19:03:40] [I] Opened a server on port 6567.
+[10-13-2021 19:03:42] [E] Already hosting. Type 'stop' to stop hosting first.
+[10-13-2021 19:03:45] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 19:03:45] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 15:36:48 UTC [accent]Ban ID:[] VA8X [white] If you what to appeal join our discord server: [cyan]https://discord.gg/qtjqCUbbdR
+[10-13-2021 19:03:45] [I] [#ff0085ff][accent]<[accent]> Nautilus has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 19:04:13] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 19:04:44] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 19:04:50] [E] java.lang.ArrayIndexOutOfBoundsException: Index 100 out of bounds for length 100
+	at mindustry.plugin.ioMain.lambda$new$2(ioMain.java:191)
+	at arc.util.Timer$2.run(Timer.java:101)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-13-2021 19:06:29] [I] 1 mods loaded.
+[10-13-2021 19:06:29] [I] Server loaded. Type 'help' for help.
+[10-13-2021 19:06:29] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 19:06:29] [I] Loading map...
+[10-13-2021 19:06:30] [I] Map loaded.
+[10-13-2021 19:06:30] [I] Opened a server on port 6567.
+[10-13-2021 19:06:37] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 19:06:39] [E] java.lang.ArrayIndexOutOfBoundsException: Index 100 out of bounds for length 100
+	at mindustry.plugin.ioMain.lambda$new$2(ioMain.java:192)
+	at arc.util.Timer$2.run(Timer.java:101)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-13-2021 19:07:14] [I] 1 mods loaded.
+[10-13-2021 19:07:14] [I] Server loaded. Type 'help' for help.
+[10-13-2021 19:07:14] [I] Randomized next map to be UwU.
+[10-13-2021 19:07:14] [I] Loading map...
+[10-13-2021 19:07:16] [I] Map loaded.
+[10-13-2021 19:07:16] [I] Opened a server on port 6567.
+[10-13-2021 19:07:20] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 19:07:34] [I] <[#ffff3d00][accent]<[accent]> Nautilus: /rainbow>
+[10-13-2021 19:08:49] [I] 1 mods loaded.
+[10-13-2021 19:08:49] [I] Server loaded. Type 'help' for help.
+[10-13-2021 19:09:04] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 19:09:04] [I] Loading map...
+[10-13-2021 19:09:05] [I] Map loaded.
+[10-13-2021 19:09:05] [I] Opened a server on port 6567.
+[10-13-2021 19:09:08] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 19:10:17] [I] 1 mods loaded.
+[10-13-2021 19:10:17] [I] Server loaded. Type 'help' for help.
+[10-13-2021 19:10:17] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 19:10:17] [I] Loading map...
+[10-13-2021 19:10:17] [I] Map loaded.
+[10-13-2021 19:10:17] [I] Opened a server on port 6567.
+[10-13-2021 19:10:22] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 19:14:33] [I] 1 mods loaded.
+[10-13-2021 19:14:33] [I] Server loaded. Type 'help' for help.
+[10-13-2021 19:14:33] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 19:14:33] [I] Loading map...
+[10-13-2021 19:14:33] [I] Map loaded.
+[10-13-2021 19:14:33] [I] Opened a server on port 6567.
+[10-13-2021 19:14:38] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 19:16:31] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 19:16:31] [I] Selected next map to be UwU.
+[10-13-2021 19:17:48] [I] 1 mods loaded.
+[10-13-2021 19:17:48] [I] Server loaded. Type 'help' for help.
+[10-13-2021 19:17:48] [I] Randomized next map to be UwU.
+[10-13-2021 19:17:48] [I] Loading map...
+[10-13-2021 19:17:50] [I] Map loaded.
+[10-13-2021 19:17:50] [I] Opened a server on port 6567.
+[10-13-2021 19:17:55] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 19:18:01] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 21:20:35] [I] 1 mods loaded.
+[10-13-2021 21:20:35] [I] Server loaded. Type 'help' for help.
+[10-13-2021 21:20:35] [I] Randomized next map to be UwU.
+[10-13-2021 21:20:35] [I] Loading map...
+[10-13-2021 21:20:38] [I] Map loaded.
+[10-13-2021 21:20:38] [I] Opened a server on port 6567.
+[10-13-2021 21:20:43] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 21:22:10] [I] 1 mods loaded.
+[10-13-2021 21:22:10] [I] Server loaded. Type 'help' for help.
+[10-13-2021 21:24:58] [I] 1 mods loaded.
+[10-13-2021 21:24:58] [I] Server loaded. Type 'help' for help.
+[10-13-2021 21:25:15] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 21:25:15] [I] Loading map...
+[10-13-2021 21:25:15] [I] Map loaded.
+[10-13-2021 21:25:15] [I] Opened a server on port 6567.
+[10-13-2021 21:25:28] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 21:28:43] [I] 1 mods loaded.
+[10-13-2021 21:28:43] [I] Server loaded. Type 'help' for help.
+[10-13-2021 21:31:47] [I] 1 mods loaded.
+[10-13-2021 21:31:47] [I] Server loaded. Type 'help' for help.
+[10-13-2021 21:35:18] [I] 1 mods loaded.
+[10-13-2021 21:35:18] [I] Server loaded. Type 'help' for help.
+[10-13-2021 21:35:32] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 21:35:32] [I] Loading map...
+[10-13-2021 21:35:33] [I] Map loaded.
+[10-13-2021 21:35:33] [I] Opened a server on port 6567.
+[10-13-2021 21:35:36] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 21:35:54] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: kick
+[10-13-2021 21:35:54] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 21:36:50] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 21:37:23] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
+[10-13-2021 21:37:23] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)

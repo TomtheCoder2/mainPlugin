@@ -1,5 +1,6 @@
 package mindustry.plugin;
 
+import arc.Core;
 import arc.files.Fi;
 import arc.util.Strings;
 import mindustry.Vars;
@@ -151,7 +152,7 @@ public class ComCommands {
                             .addField("Players", String.valueOf(Groups.player.size()))
                             .addField("Map", Vars.state.map.name())
                             .addField("Wave", String.valueOf(state.wave))
-                            .addField("TPS", String.valueOf(state.serverTps))
+                            .addField("TPS", String.valueOf(Core.graphics.getFramesPerSecond()))
                             .addField("Next wave in", Math.round(state.wavetime / 60) + " seconds.");
 
                     ctx.channel.sendMessage(eb);
@@ -214,6 +215,7 @@ public class ComCommands {
 
                     for (Command command : handler.getAllCommands()) {
                         if (command.hidden) continue;
+                        if (!command.hasPermission(ctx)) continue;
                         switch (command.category) {
                             case "moderation" -> {
                                 moderation.append("**").append(command.name).append("** ");
@@ -246,11 +248,17 @@ public class ComCommands {
                         }
                     }
                     EmbedBuilder embed = new EmbedBuilder()
-                            .setTitle("Commands:")
-                            .addField("**__Public:__**", publicCommands.toString(), true)
-                            .addField("**__Moderation:__**", moderation.toString(), true)
-                            .addField("**__Management:__**", management.toString(), true)
-                            .addField("**__Map reviewer:__**", mapReviewer.toString(), true);
+                            .setTitle("Commands:");
+                    embed.addField("**__Public:__**", publicCommands.toString(), true);
+                    if (moderation.length() != 0) {
+                        embed.addField("**__Moderation:__**", moderation.toString(), true);
+                    }
+                    if (management.length() != 0) {
+                        embed.addField("**__Management:__**", management.toString(), true);
+                    }
+                    if (mapReviewer.length() != 0) {
+                        embed.addField("**__Map reviewer:__**", mapReviewer.toString(), true);
+                    }
                     ctx.channel.sendMessage(embed);
                 } else {
                     EmbedBuilder embed = new EmbedBuilder();

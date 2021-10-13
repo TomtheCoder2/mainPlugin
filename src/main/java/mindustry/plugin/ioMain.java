@@ -1,7 +1,5 @@
 package mindustry.plugin;
 
-import java.awt.*;
-
 import arc.Core;
 import arc.Events;
 import arc.math.Mathf;
@@ -28,12 +26,12 @@ import org.javacord.api.entity.permission.Role;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.awt.*;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.*;
 import java.awt.Color;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static arc.util.Log.info;
 import static mindustry.Vars.*;
@@ -50,6 +48,7 @@ public class ioMain extends Plugin {
     public static String prefix = ".";
     public static String live_chat_channel_id = "";
     public static String bot_channel_id = null;
+    public static String apprentice_bot_channel_id = null;
     public static String staff_bot_channel_id = null;
     public static String admin_bot_channel_id = null;
     public static String serverName = "<untitled>";
@@ -84,6 +83,7 @@ public class ioMain extends Plugin {
             live_chat_channel_id = alldata.getString("live_chat_channel_id");
             // bot channels
             bot_channel_id = alldata.getString("bot_channel_id");
+            apprentice_bot_channel_id = alldata.getString("apprentice_bot_channel");
             staff_bot_channel_id = alldata.getString("staff_bot_channel_id");
             admin_bot_channel_id = alldata.getString("admin_bot_channel_id");
             System.out.printf("url: %s, user: %s, password: %s%n", url, user, password);
@@ -175,6 +175,39 @@ public class ioMain extends Plugin {
             }
         }, 0, 10);
 
+        /** for now removed
+        // generate 100 colors for /rainbow
+        int ARRAY_SIZE = 100;
+        double jump = 360.0 / (ARRAY_SIZE * 1.0);
+        Color[] colors = new Color[ARRAY_SIZE];
+        for (int i = 0; i < colors.length; i++) {
+            System.out.println(jump * i);
+            colors[i] = new Color(Color.HSBtoRGB((float) (jump * i) / 360, 1.0f, 1.0f));
+        }
+        AtomicInteger iterator = new AtomicInteger();
+
+        Timer.schedule(() -> {
+            iterator.addAndGet(1);
+            if (ARRAY_SIZE <= iterator.get()) {
+                iterator.set(0);
+            }
+//            System.out.println(iterator);
+            for (Player player : Groups.player) {
+                PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
+                if (tdata.rainbowColor) {
+//                    System.out.println(Integer.toHexString(colors[iterator.get()].getRGB()));
+                    PlayerData pd = getData(player.uuid());
+                    String rankSymbol;
+                    if (pd != null) {
+                        int rank = pd.rank;
+                        player.name = "[#" + Integer.toHexString(colors[iterator.get()].getRGB()) + "]" + escapeEverything(rankNames.get(pd.rank).tag) + escapeEverything(player.name);
+//                    System.out.println(player.name);
+                    }
+                }
+            }
+        }, 0, (float) 0.1);
+         */
+
         // update every tick
 
 
@@ -213,7 +246,7 @@ public class ioMain extends Plugin {
 //                    setData(player.uuid(), pd);
 //                }
                 if (pd.banned || pd.bannedUntil > Instant.now().getEpochSecond()) {
-                    player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason);
+                    player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason + "\n[white] If you what to appeal join our discord server: [cyan]" + "https://discord.gg/qtjqCUbbdR");
                 }
                 int rank = pd.rank;
                 switch (rank) { // apply new tag
@@ -303,6 +336,8 @@ public class ioMain extends Plugin {
                 }
             }
         });
+
+
 
         Events.on(EventType.ServerLoadEvent.class, event -> {
             // action filter
@@ -704,43 +739,18 @@ public class ioMain extends Plugin {
 //                }
 //            });
 
-
+            /**
             handler.<Player>register("rainbow", "[veteran+] Change your colors to rainbow colors", (args, player) -> {
                 if (!state.rules.pvp || player.admin) {
                     PlayerData pd = getData(player.uuid());
                     if (pd != null && pd.rank >= 3) {
-                        String originalName = escapeEverything(player);
-                        StringBuilder finalName = new StringBuilder();
-
-                        final int ARRAY_SIZE = originalName.length();
-                        double jump = 360.0 / (ARRAY_SIZE * 1.0);
-                        Color[] colors = new Color[ARRAY_SIZE];
-                        for (int i = 0; i < colors.length; i++) {
-                            System.out.println(jump * i);
-                            colors[i] = new Color(Color.HSBtoRGB((float) (jump * i) / 360, 1.0f, 1.0f));
-                        }
-
-                        for (int i = 0; i < originalName.length(); i++) {
-                            finalName.append("[#").append(Integer.toHexString(colors[i].getRGB()).substring(2)).append("]").append(originalName.charAt(i));
-                        }
-                        System.out.println(Arrays.toString(colors));
-                        System.out.println(finalName);
-
-                        // apply the name with the rank
-                        int rank = pd.rank;
-                        switch (rank) { // apply new tag
-                            case 3:
-                                player.name = rankNames.get(3).tag + finalName;
-                            case 4:
-                                player.name = rankNames.get(4).tag + finalName;
-                            case 5:
-                                player.name = rankNames.get(5).tag + finalName;
-                        }
+                        PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
+                        tdata.rainbowColor = !tdata.rainbowColor;
                     } else {
                         player.sendMessage(noPermissionMessage);
                     }
                 }
-            });
+            });*/
 
             handler.<Player>register("stats", "[player]", "Display stats of the specified player.", (args, player) -> {
                 if (args.length > 0) {

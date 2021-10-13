@@ -12,6 +12,7 @@ public class PersistentPlayerData implements Serializable {
     public int bbIncrementor = 0;
 //    public boolean spawnedLichPet;
 //    public boolean spawnedPowerGen;
+    public boolean rainbowColor = false;
 
     // 50 configures per 1000 ms
     public Ratelimit configureRatelimit = new Ratelimit(50, 1000);

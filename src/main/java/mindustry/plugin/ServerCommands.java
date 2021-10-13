@@ -236,6 +236,7 @@ public class ServerCommands {
                     role = apprenticeRole;
                     usage = "<player> <duration (minutes)> [reason...]";
                     category = "moderation";
+                    apprenticeCommand = true;
                 }
 
                 public void run(Context ctx) {
@@ -267,6 +268,8 @@ public class ServerCommands {
                             ctx.channel.sendMessage(eb);
 
                             player.con.kick(Packets.KickReason.banned);
+                            Administration.PlayerInfo info = netServer.admins.getInfo(player.uuid());
+                            logBanMessage(info, ctx, reason, "Banned");
                         } else {
                             eb.setTitle("Player `" + escapeEverything(target) + "` not found.");
                             eb.setColor(Pals.error);
@@ -282,6 +285,7 @@ public class ServerCommands {
                     role = apprenticeRole;
                     usage = "<playerid|ip|name|teamid> <message>";
                     category = "moderation";
+                    apprenticeCommand = true;
                 }
 
                 public void run(Context ctx) {
@@ -328,6 +332,7 @@ public class ServerCommands {
                     usage = "<player>";
                     role = apprenticeRole;
                     category = "moderation";
+                    apprenticeCommand = true;
                 }
 
                 public void run(Context ctx) {
@@ -557,6 +562,7 @@ public class ServerCommands {
                             if (player != null) {
                                 player.con.kick(Packets.KickReason.banned);
                             }
+                            logBanMessage(info, ctx, reason, "Banned");
                         } else {
                             eb.setTitle("Player `" + escapeEverything(target) + "` not found.");
                             eb.setColor(Pals.error);
@@ -586,6 +592,7 @@ public class ServerCommands {
                         setData(target, pd);
                         eb.setTitle("Blacklisted successfully.");
                         eb.setDescription("`" + escapeEverything(info.lastName) + "` was banned.");
+                        logBanMessage(info, ctx, null, "Blacklisted");
                     } else {
                         eb.setTitle("Command terminated");
                         eb.setColor(Pals.error);
@@ -634,6 +641,8 @@ public class ServerCommands {
                             ctx.channel.sendMessage(eb);
 
                             player.con.kick(Packets.KickReason.banned);
+                            Administration.PlayerInfo info = netServer.admins.getInfo(player.uuid());
+                            logBanMessage(info, ctx, reason, "Banned");
                         } else {
                             eb.setTitle("Player `" + escapeEverything(target) + "` not found.");
                             eb.setColor(Pals.error);
@@ -665,6 +674,8 @@ public class ServerCommands {
                         ctx.channel.sendMessage(eb);
 
                         player.con.kick(Packets.KickReason.kick);
+                        Administration.PlayerInfo info = netServer.admins.getInfo(player.uuid());
+                        logBanMessage(info, ctx, reason, "Kicked");
                     } else {
                         eb.setTitle("Player `" + escapeEverything(target) + "` not found.");
                         eb.setColor(Pals.error);

@@ -12,8 +12,12 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.maps.Maps;
+import mindustry.net.Administration;
+import mindustry.plugin.discordcommands.Context;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
+import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -25,6 +29,7 @@ import java.util.HashMap;
 import java.util.TimeZone;
 
 import static mindustry.Vars.maps;
+import static mindustry.plugin.ioMain.getTextChannel;
 //import java.sql.*;
 
 public class Utils {
@@ -74,7 +79,7 @@ public class Utils {
 //        rankNames.put(7, new Rank("[accent]<[white]\uE817[accent]>[]", "moderator"));
 //        rankNames.put(8, new Rank("[accent]<[white][accent]>[]", "admin"));
         rankNames.put(1, new Rank("[accent]<[white]\uE800[accent]>[] ", "newbie"));
-        rankNames.put(2, new Rank("[accent]<[white]\uE815[accent]>[] ", "active"));
+        rankNames.put(2, new Rank("[accent]<[white]\uE826[accent]>[] ", "active"));
         rankNames.put(3, new Rank("[accent]<[white]\uE813[accent]>[] ", "veteran"));
         rankNames.put(4, new Rank("[accent]<[white]\uE809[accent]>[] ", "map_creator:"));
         rankNames.put(5, new Rank("[accent]<[white]\uE88E[accent]>[] ", "moderator_jr:"));
@@ -289,6 +294,18 @@ public class Utils {
         }
         ;
         return message;
+    }
+
+
+    public static void logBanMessage(Administration.PlayerInfo info, Context ctx, String reason, String action) {
+        TextChannel log_channel = getTextChannel("882342315438526525");
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(action +" " + info.lastName);
+        eb.addField("UUID", info.id, true);
+        eb.addField("IP", info.lastIP, true);
+        eb.addField("Banned by", ctx.author.getDiscriminatedName(), true);
+        eb.addField("Reason", reason, true);
+        log_channel.sendMessage(eb);
     }
 
     public static String hsvToRgb(double hue, float saturation, float value) {

@@ -24,7 +24,8 @@ public class DiscordCommands implements MessageCreateListener {
     private final TextChannel admin_bot_channel = getTextChannel(admin_bot_channel_id);
     private final TextChannel staff_bot_channel = getTextChannel(staff_bot_channel_id);
     private final TextChannel bot_channel = getTextChannel(bot_channel_id);
-    private final TextChannel error_log_channel = getTextChannel("891677596117504020");
+    private final TextChannel apprentice_bot_channel = getTextChannel(ioMain.apprentice_bot_channel_id);
+    public static final TextChannel error_log_channel = getTextChannel("891677596117504020");
 
 
     public DiscordCommands() {
@@ -99,18 +100,21 @@ public class DiscordCommands implements MessageCreateListener {
         if (!Objects.equals(command.category, "public")) {
             if (event.getChannel().getId() != Long.parseLong(staff_bot_channel_id)
                     && event.getChannel().getId() != Long.parseLong(admin_bot_channel_id)) {
-                EmbedBuilder eb = new EmbedBuilder()
-                        .setTitle("Wrong Channel!")
-                        .setDescription("Please use <#" + staff_bot_channel.getIdAsString() + "> or <#" + admin_bot_channel.getIdAsString() + ">! ")
-                        .setColor(Utils.Pals.error);
-                event.getChannel().sendMessage(eb);
-                return;
+                if (event.getChannel().getId() == Long.parseLong(apprentice_bot_channel_id) && !command.apprenticeCommand) {
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("Wrong Channel!")
+                            .setDescription("Please use <#" + staff_bot_channel.getIdAsString() + "> or <#" + admin_bot_channel.getIdAsString() + ">! ")
+                            .setColor(Utils.Pals.error);
+                    event.getChannel().sendMessage(eb);
+                    return;
+                }
             }
         }
         // check if the command gets executed in the #bot channel
         if (event.getChannel().getId() != Long.parseLong(bot_channel_id)
                 && event.getChannel().getId() != Long.parseLong(staff_bot_channel_id)
-                && event.getChannel().getId() != Long.parseLong(admin_bot_channel_id)) {
+                && event.getChannel().getId() != Long.parseLong(admin_bot_channel_id)
+                && event.getChannel().getId() != Long.parseLong(apprentice_bot_channel_id)) {
             EmbedBuilder eb = new EmbedBuilder()
                     .setTitle("Wrong Channel!")
                     .setDescription("Please use <#" + bot_channel.getIdAsString() + ">! ")
@@ -118,6 +122,7 @@ public class DiscordCommands implements MessageCreateListener {
             event.getChannel().sendMessage(eb);
             return;
         }
+
 
         // run the command
         runCommand(name, new Context(event, args, newMessage));
