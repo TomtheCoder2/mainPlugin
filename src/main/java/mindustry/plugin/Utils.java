@@ -13,6 +13,7 @@ import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.maps.Maps;
 import mindustry.net.Administration;
+import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
@@ -149,7 +150,7 @@ public class Utils {
      * remove everything (rank symbol colors etc.)
      *
      * @param player the player
-     * */
+     */
     public static String escapeEverything(Player player) {
         return escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "");
     }
@@ -174,6 +175,14 @@ public class Utils {
             }
         }
         return found;
+    }
+
+    public static void tooFewArguments(Context ctx, Command command) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("Too few arguments!")
+                .setDescription("Usage: " + ioMain.prefix + command.name + " " + command.usage)
+                .setColor(Pals.error);
+        ctx.channel.sendMessage(eb);
     }
 
     /**
@@ -300,7 +309,7 @@ public class Utils {
     public static void logBanMessage(Administration.PlayerInfo info, Context ctx, String reason, String action) {
         TextChannel log_channel = getTextChannel("882342315438526525");
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(action +" " + info.lastName);
+        eb.setTitle(action + " " + info.lastName);
         eb.addField("UUID", info.id, true);
         eb.addField("IP", info.lastIP, true);
         eb.addField("Banned by", ctx.author.getDiscriminatedName(), true);
@@ -310,7 +319,7 @@ public class Utils {
 
     public static String hsvToRgb(double hue, float saturation, float value) {
 
-        int h = (int)(hue * 6);
+        int h = (int) (hue * 6);
         float f = (float) (hue * 6 - h);
         float p = value * (1 - saturation);
         float q = value * (1 - f * saturation);
@@ -328,9 +337,9 @@ public class Utils {
     }
 
     public static String rgbToString(float r, float g, float b) {
-        String rs = Integer.toHexString((int)(r * 256));
-        String gs = Integer.toHexString((int)(g * 256));
-        String bs = Integer.toHexString((int)(b * 256));
+        String rs = Integer.toHexString((int) (r * 256));
+        String gs = Integer.toHexString((int) (g * 256));
+        String bs = Integer.toHexString((int) (b * 256));
         return rs + gs + bs;
     }
 

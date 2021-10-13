@@ -821,9 +821,7 @@ public class ServerCommands {
                 public void run(Context ctx) {
                     EmbedBuilder eb = new EmbedBuilder();
                     if (ctx.args.length < 2) {
-                        eb.setTitle("Too few arguments!")
-                                .setDescription("Usage: " + ioMain.prefix + "lookup <uuid|name|code>");
-                        ctx.channel.sendMessage(eb);
+                        tooFewArguments(ctx, this);
                     }
                     String target = ctx.args[1];
 
