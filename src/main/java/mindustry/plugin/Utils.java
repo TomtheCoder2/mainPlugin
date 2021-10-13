@@ -5,12 +5,14 @@ import arc.Events;
 import arc.struct.Seq;
 import arc.util.Strings;
 import mindustry.content.Blocks;
+import mindustry.content.UnitTypes;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.maps.Maps;
+import mindustry.type.UnitType;
 import mindustry.world.Block;
 
 import java.awt.*;
@@ -75,7 +77,8 @@ public class Utils {
         rankNames.put(2, new Rank("[accent]<[white]\uE815[accent]>[] ", "active"));
         rankNames.put(3, new Rank("[accent]<[white]\uE813[accent]>[] ", "veteran"));
         rankNames.put(4, new Rank("[accent]<[white]\uE809[accent]>[] ", "map_creator:"));
-        rankNames.put(5, new Rank("[accent]<[white]\uE82C[accent]>[] ", "moderator"));
+        rankNames.put(5, new Rank("[accent]<[white]\uE88E[accent]>[] ", "moderator_jr:"));
+        rankNames.put(6, new Rank("[accent]<[white]\uE82C[accent]>[] ", "moderator"));
 
 
         rankRoles.put("627985513600516109", 1);
@@ -286,6 +289,32 @@ public class Utils {
         }
         ;
         return message;
+    }
+
+    public static String hsvToRgb(double hue, float saturation, float value) {
+
+        int h = (int)(hue * 6);
+        float f = (float) (hue * 6 - h);
+        float p = value * (1 - saturation);
+        float q = value * (1 - f * saturation);
+        float t = value * (1 - (1 - f) * saturation);
+
+        return switch (h) {
+            case 0 -> rgbToString(value, t, p);
+            case 1 -> rgbToString(q, value, p);
+            case 2 -> rgbToString(p, value, t);
+            case 3 -> rgbToString(p, q, value);
+            case 4 -> rgbToString(t, p, value);
+            case 5 -> rgbToString(value, p, q);
+            default -> throw new RuntimeException("Something went wrong when converting from HSV to RGB. Input was " + hue + ", " + saturation + ", " + value);
+        };
+    }
+
+    public static String rgbToString(float r, float g, float b) {
+        String rs = Integer.toHexString((int)(r * 256));
+        String gs = Integer.toHexString((int)(g * 256));
+        String bs = Integer.toHexString((int)(b * 256));
+        return rs + gs + bs;
     }
 
 //    public static PlayerData getData(String uuid) {

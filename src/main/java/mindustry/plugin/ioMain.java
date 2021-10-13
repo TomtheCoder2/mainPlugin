@@ -1,10 +1,13 @@
 package mindustry.plugin;
 
+import java.awt.*;
+
 import arc.Core;
 import arc.Events;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.util.*;
+import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.core.NetClient;
 import mindustry.game.EventType;
@@ -28,9 +31,9 @@ import org.json.JSONTokener;
 import java.awt.*;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.awt.Color;
+import java.util.List;
 
 import static arc.util.Log.info;
 import static mindustry.Vars.*;
@@ -52,6 +55,7 @@ public class ioMain extends Plugin {
     public static String serverName = "<untitled>";
     public static JSONObject data; //token, channel_id, role_id
     public static String apiKey = "";
+    public static List<Player> joinedPlayer = new ArrayList<>();
 //    static Gson gson = new Gson();
 
     public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
@@ -182,11 +186,14 @@ public class ioMain extends Plugin {
                 player.con.kick("[scarlet]Download the game from legitimate sources to join.\n[accent]https://anuke.itch.io/mindustry");
                 return;
             }
-            EmbedBuilder eb = new EmbedBuilder();
-            eb.setTitle("Player Join Log");
-            eb.setDescription(String.format("`%s` • `%d `:%s", player.uuid(), player.id, escapeColorCodes(player.name)));
-            assert log_channel != null;
-            log_channel.sendMessage(eb);
+//            EmbedBuilder eb = new EmbedBuilder();
+//            eb.setTitle("Player Join Log");
+//            eb.setDescription(String.format("`%s` • `%d `:%s", player.uuid(), player.id, escapeColorCodes(player.name)));
+//            assert log_channel != null;
+//            log_channel.sendMessage(eb);
+            if (!joinedPlayer.contains(player)) {
+                joinedPlayer.add(player);
+            }
             PlayerData pd = getData(player.uuid());
             System.out.println(pd);
 
@@ -213,30 +220,38 @@ public class ioMain extends Plugin {
                     case 0:
                         break;
                     case 1:
-                        Call.sendMessage("[#91f063]Active player [] " + player.name + "[accent] joined the server!");
+//                        Call.sendMessage("[#91f063]active player [] " + player.name + "[accent] joined the server!");
+                        Call.sendMessage("[#80FF80]Newbie player [] " + player.name + "[accent] joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
                         player.name = rankNames.get(1).tag + player.name;
                         break;
                     case 2:
-                        Call.sendMessage("[#dfd06e]Veteran player[] " + player.name + "[accent] joined the server!");
+//                        Call.sendMessage("[#dfd06e]Veteran player[] " + player.name + "[accent] joined the server!");
+                        Call.sendMessage("[#80FFBF]Active player [] " + player.name + "[accent] joined the server!");
 //                        player.name = "[white][\uE800][accent][] " + player.name;
                         player.name = rankNames.get(2).tag + player.name;
                         break;
                     case 3:
-                        Call.sendMessage("[#bf7134]Contributor [] " + player.name + "[accent] joined the server!");
+//                        Call.sendMessage("[#bf7134]Contributor [] " + player.name + "[accent] joined the server!");
+                        Call.sendMessage("[#80FFFF]Veteran player [] " + player.name + "[accent] joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
                         player.name = rankNames.get(3).tag + player.name;
                         break;
                     case 4:
-                        Call.sendMessage("[orange]<[][#9c59ce]Moderator[][orange]>[] " + player.name + "[accent] joined the server!");
+//                        Call.sendMessage("[orange]<[][#9c59ce]Moderator[][orange]>[] " + player.name + "[accent] joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
+                        Call.sendMessage("[#80BFFF]Map creator [] " + player.name + "[accent] joined the server!");
                         player.name = rankNames.get(4).tag + player.name;
                         break;
                     case 5:
-                        Call.sendMessage("[orange]<[][#00f8fd]Admin[][orange]>[] " + player.name + "[accent] joined the server!");
+//                        Call.sendMessage("[orange]<[][#00f8fd]Admin[][orange]>[] " + player.name + "[accent] joined the server!");
 //                        player.name = "[white][][accent][] " + player.name;
+                        Call.sendMessage("[#8080FF]Moderator Jr [] " + player.name + "[accent] joined the server!");
                         player.name = rankNames.get(5).tag + player.name;
                         break;
+                    case 6:
+                        Call.sendMessage("[#8000FF]Moderator [] " + player.name + "[accent] joined the server!");
+                        player.name = rankNames.get(6).tag + player.name;
                 }
             } else { // not in database
                 System.out.println("new player connected: " + escapeColorCodes(event.player.name));
@@ -385,7 +400,7 @@ public class ioMain extends Plugin {
         return true;
     }
 
-    public static TextChannel  getTextChannel(String id) {
+    public static TextChannel getTextChannel(String id) {
         Optional<Channel> dc = api.getChannelById(id);
         if (dc.isEmpty()) {
             Log.err("[ERR!] discordplugin: channel not found! " + id);
@@ -439,6 +454,31 @@ public class ioMain extends Plugin {
 //                    player.sendMessage("[scarlet]Successfully sent message to moderators.");
 //                }
 //            });
+
+            handler.<Player>register("bug", "[description]", "Send a bug report to the discord server. (Please do not spam, because this command pings developers)", (args, player) -> {
+                for (Long key : cooldowns.keys()) {
+                    if (key + CDT < System.currentTimeMillis() / 1000L) {
+                        cooldowns.remove(key);
+                    } else if (player.uuid().equals(cooldowns.get(key))) {
+                        player.sendMessage("[scarlet]This command is on a 5 minute cooldown!");
+                        return;
+                    }
+                }
+
+                if (args.length == 0) {
+                    player.sendMessage("[orange]Please describe exactly what the bug is or how you got it!\n");
+                } else {
+                    TextChannel bugReportChannel = getTextChannel("864957934513684480");
+                    EmbedBuilder eb = new EmbedBuilder();
+                    eb.setTitle("Player " + escapeEverything(player) + " reported a bug!");
+                    eb.setDescription("Description: " + String.join(" ", args));
+                    assert bugReportChannel != null;
+                    bugReportChannel.sendMessage(" <@770240444466069514> ");
+                    bugReportChannel.sendMessage(eb);
+                    Call.sendMessage("[sky]The bug is reported to discord.");
+                    cooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
+                }
+            });
 
             handler.<Player>register("players", "Display all players and their ids", (args, player) -> {
                 StringBuilder builder = new StringBuilder();
@@ -664,6 +704,44 @@ public class ioMain extends Plugin {
 //                }
 //            });
 
+
+            handler.<Player>register("rainbow", "[veteran+] Change your colors to rainbow colors", (args, player) -> {
+                if (!state.rules.pvp || player.admin) {
+                    PlayerData pd = getData(player.uuid());
+                    if (pd != null && pd.rank >= 3) {
+                        String originalName = escapeEverything(player);
+                        StringBuilder finalName = new StringBuilder();
+
+                        final int ARRAY_SIZE = originalName.length();
+                        double jump = 360.0 / (ARRAY_SIZE * 1.0);
+                        Color[] colors = new Color[ARRAY_SIZE];
+                        for (int i = 0; i < colors.length; i++) {
+                            System.out.println(jump * i);
+                            colors[i] = new Color(Color.HSBtoRGB((float) (jump * i) / 360, 1.0f, 1.0f));
+                        }
+
+                        for (int i = 0; i < originalName.length(); i++) {
+                            finalName.append("[#").append(Integer.toHexString(colors[i].getRGB()).substring(2)).append("]").append(originalName.charAt(i));
+                        }
+                        System.out.println(Arrays.toString(colors));
+                        System.out.println(finalName);
+
+                        // apply the name with the rank
+                        int rank = pd.rank;
+                        switch (rank) { // apply new tag
+                            case 3:
+                                player.name = rankNames.get(3).tag + finalName;
+                            case 4:
+                                player.name = rankNames.get(4).tag + finalName;
+                            case 5:
+                                player.name = rankNames.get(5).tag + finalName;
+                        }
+                    } else {
+                        player.sendMessage(noPermissionMessage);
+                    }
+                }
+            });
+
             handler.<Player>register("stats", "[player]", "Display stats of the specified player.", (args, player) -> {
                 if (args.length > 0) {
                     Player p = findPlayer(args[0]);
@@ -775,7 +853,7 @@ public class ioMain extends Plugin {
                 }
             });
 
-            handler.<Player>register("req","Show the requirements for all ranks", (args, player) -> { // self info
+            handler.<Player>register("req", "Show the requirements for all ranks", (args, player) -> { // self info
 //                for (Map.Entry<Integer, Rank> rank : rankNames.entrySet()) {
 ////                    if(rank.getValue().name.equals(args[1])) {
 ////                        player.sendMessage("");
@@ -785,7 +863,7 @@ public class ioMain extends Plugin {
 
             });
 
-            handler.<Player>register("ranks","Show for all ranks.", (args, player) -> { // self info
+            handler.<Player>register("ranks", "Show for all ranks.", (args, player) -> { // self info
 //                for (Map.Entry<Integer, Rank> rank : rankNames.entrySet()) {
 ////                    if(rank.getValue().name.equals(args[1])) {
 ////                        player.sendMessage("");

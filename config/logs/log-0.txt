@@ -4568,3 +4568,615 @@
 [10-11-2021 17:08:53] [I] Opened a server on port 6567.
 [10-11-2021 17:09:16] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
 [10-11-2021 17:11:43] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has skipped the wave.
+[10-11-2021 17:25:42] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-11-2021 22:30:16] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-11-2021 22:30:22] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: [orange]un[red]titled
+[10-11-2021 22:31:57] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: [#0020ff]u[#0040ff]n[#0060ff]t[#0080ff]i[#009fff]t[#00bfff]l[#00dfff]e[#00ffff]d
+[10-11-2021 22:32:51] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 10:04:13] [I] 1 mods loaded.
+[10-13-2021 10:04:13] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:04:39] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 10:04:39] [I] Loading map...
+[10-13-2021 10:04:39] [I] Map loaded.
+[10-13-2021 10:04:39] [I] Opened a server on port 6567.
+[10-13-2021 10:04:57] [I] name set to [#ff2400]P[#ff4900]H[#ff6d00]O[#ff9200]E[#ffb600]N[#ffdb00]I[#ffff00]X.
+[10-13-2021 10:05:01] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:05:06] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:05:06] [E] java.lang.RuntimeException: Something went wrong when converting from HSV to RGB. Input was 3.6, 1.0, 1.0
+	at mindustry.plugin.Utils.hsvToRgb(Utils.java:308)
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$16(ioMain.java:676)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:232)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-13-2021 10:13:34] [I] 1 mods loaded.
+[10-13-2021 10:13:34] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:13:34] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 10:13:34] [I] Loading map...
+[10-13-2021 10:13:35] [I] Map loaded.
+[10-13-2021 10:13:35] [I] Opened a server on port 6567.
+[10-13-2021 10:13:38] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:13:41] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:21:54] [I] 1 mods loaded.
+[10-13-2021 10:21:54] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:21:54] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 10:21:54] [I] Loading map...
+[10-13-2021 10:21:55] [I] Map loaded.
+[10-13-2021 10:21:55] [I] Opened a server on port 6567.
+[10-13-2021 10:21:59] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:22:02] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:24:30] [I] 1 mods loaded.
+[10-13-2021 10:24:30] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:24:30] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 10:24:30] [I] Loading map...
+[10-13-2021 10:24:30] [I] Map loaded.
+[10-13-2021 10:24:30] [I] Opened a server on port 6567.
+[10-13-2021 10:24:34] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:24:38] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:28:20] [I] 1 mods loaded.
+[10-13-2021 10:28:20] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:28:20] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 10:28:20] [I] Loading map...
+[10-13-2021 10:28:21] [I] Map loaded.
+[10-13-2021 10:28:21] [I] Opened a server on port 6567.
+[10-13-2021 10:28:25] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:28:28] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:28:28] [E] java.lang.IndexOutOfBoundsException: Index 6 out of bounds for length 6
+	at java.base/jdk.internal.util.Preconditions.outOfBounds(Preconditions.java:64)
+	at java.base/jdk.internal.util.Preconditions.outOfBoundsCheckIndex(Preconditions.java:70)
+	at java.base/jdk.internal.util.Preconditions.checkIndex(Preconditions.java:266)
+	at java.base/java.util.Objects.checkIndex(Objects.java:359)
+	at java.base/java.util.ArrayList.get(ArrayList.java:427)
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$16(ioMain.java:689)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:232)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-13-2021 10:33:07] [I] 1 mods loaded.
+[10-13-2021 10:33:07] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:33:07] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 10:33:07] [I] Loading map...
+[10-13-2021 10:33:07] [I] Map loaded.
+[10-13-2021 10:33:07] [I] Opened a server on port 6567.
+[10-13-2021 10:33:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:33:12] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:36:46] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 10:36:46] [I] Selected next map to be V130: Polluted river: Crux.
+[10-13-2021 10:38:20] [I] 1 mods loaded.
+[10-13-2021 10:38:20] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:38:20] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 10:38:20] [I] Loading map...
+[10-13-2021 10:38:20] [I] Map loaded.
+[10-13-2021 10:38:21] [I] Opened a server on port 6567.
+[10-13-2021 10:38:25] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:38:28] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:39:53] [I] 1 mods loaded.
+[10-13-2021 10:39:53] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:39:53] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 10:39:53] [I] Loading map...
+[10-13-2021 10:39:53] [I] Map loaded.
+[10-13-2021 10:39:53] [I] Opened a server on port 6567.
+[10-13-2021 10:39:57] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:40:01] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:41:20] [I] 1 mods loaded.
+[10-13-2021 10:41:20] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:41:22] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 10:41:22] [I] Loading map...
+[10-13-2021 10:41:22] [I] Map loaded.
+[10-13-2021 10:41:22] [I] Opened a server on port 6567.
+[10-13-2021 10:41:30] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:41:33] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:44:26] [I] 1 mods loaded.
+[10-13-2021 10:44:26] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:44:26] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 10:44:26] [I] Loading map...
+[10-13-2021 10:44:26] [I] Map loaded.
+[10-13-2021 10:44:26] [I] Opened a server on port 6567.
+[10-13-2021 10:44:27] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:44:29] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:45:07] [I] 1 mods loaded.
+[10-13-2021 10:45:07] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:45:11] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 10:45:11] [I] Loading map...
+[10-13-2021 10:45:11] [I] Map loaded.
+[10-13-2021 10:45:11] [I] Opened a server on port 6567.
+[10-13-2021 10:45:14] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:45:15] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 10:45:23] [I] [accent]<[white][accent]>[] [#ff0000]N[#ffbf00]a[#80ff00]u[#00ff40]t[#00ffff]i[#0040ff]l[#8000ff]u[#ff00bf]s: ok
+[10-13-2021 10:45:29] [I] [accent]<[white][accent]>[] [#ff0000]N[#ffbf00]a[#80ff00]u[#00ff40]t[#00ffff]i[#0040ff]l[#8000ff]u[#ff00bf]s: well thats a rainbow
+[10-13-2021 10:45:31] [I] [accent]<[white][accent]>[] [#ff0000]N[#ffbf00]a[#80ff00]u[#00ff40]t[#00ffff]i[#0040ff]l[#8000ff]u[#ff00bf]s: but uhh
+[10-13-2021 10:45:37] [I] [accent]<[white][accent]>[] [#ff0000]N[#ffbf00]a[#80ff00]u[#00ff40]t[#00ffff]i[#0040ff]l[#8000ff]u[#ff00bf]s: it looks ugly
+[10-13-2021 10:48:06] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 10:48:06] [I] Selected next map to be V130: Polluted river: Crux.
+[10-13-2021 10:58:45] [I] 1 mods loaded.
+[10-13-2021 10:58:45] [I] Server loaded. Type 'help' for help.
+[10-13-2021 10:58:45] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 10:58:45] [I] Loading map...
+[10-13-2021 10:58:46] [I] Map loaded.
+[10-13-2021 10:58:46] [I] Opened a server on port 6567.
+[10-13-2021 10:58:51] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 10:58:51] [E] java.lang.NullPointerException: Cannot invoke "java.util.List.add(Object)" because "mindustry.plugin.ioMain.joinedPlayer" is null
+	at mindustry.plugin.ioMain.lambda$new$2(ioMain.java:194)
+	at arc.Events.lambda$fire$2(Events.java:31)
+	at arc.struct.Seq.each(Seq.java:200)
+	at arc.Events.fire(Events.java:31)
+	at arc.Events.fire(Events.java:26)
+	at mindustry.core.NetServer.connectConfirm(NetServer.java:767)
+	at mindustry.gen.ConnectConfirmCallPacket.handleServer(ConnectConfirmCallPacket.java:34)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-13-2021 11:00:41] [I] 1 mods loaded.
+[10-13-2021 11:00:41] [I] Server loaded. Type 'help' for help.
+[10-13-2021 11:00:42] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 11:00:42] [I] Loading map...
+[10-13-2021 11:00:42] [I] Map loaded.
+[10-13-2021 11:00:42] [I] Opened a server on port 6567.
+[10-13-2021 11:00:44] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 11:01:11] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 11:05:37] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 11:05:37] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-13-2021 11:07:28] [I] 1 mods loaded.
+[10-13-2021 11:07:28] [I] Server loaded. Type 'help' for help.
+[10-13-2021 11:07:28] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 11:07:28] [I] Loading map...
+[10-13-2021 11:07:29] [I] Map loaded.
+[10-13-2021 11:07:29] [I] Opened a server on port 6567.
+[10-13-2021 11:07:33] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 11:14:02] [I] 1 mods loaded.
+[10-13-2021 11:14:02] [I] Server loaded. Type 'help' for help.
+[10-13-2021 11:14:49] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 11:14:49] [I] Loading map...
+[10-13-2021 11:14:49] [I] Map loaded.
+[10-13-2021 11:14:49] [I] Opened a server on port 6567.
+[10-13-2021 11:14:54] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 11:15:18] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 11:15:20] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 11:15:22] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 11:15:24] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 11:15:27] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 11:18:06] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 11:18:06] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-13-2021 11:22:51] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 11:26:17] [E] Command not found. Did you mean "maps"?
+[10-13-2021 11:26:19] [I] Commands:
+[10-13-2021 11:26:19] [I]    help [command] - Display the command list, or get help for a specific command.
+[10-13-2021 11:26:19] [I]    version - Displays server version info.
+[10-13-2021 11:26:19] [I]    exit - Exit the server application.
+[10-13-2021 11:26:19] [I]    stop - Stop hosting the server.
+[10-13-2021 11:26:19] [I]    host [mapname] [mode] - Open the server. Will default to survival and a random map if not specified.
+[10-13-2021 11:26:19] [I]    maps [all/custom/default] - Display available maps. Displays only custom maps by default.
+[10-13-2021 11:26:19] [I]    reloadmaps - Reload all maps from disk.
+[10-13-2021 11:26:19] [I]    status - Display server status.
+[10-13-2021 11:26:19] [I]    mods - Display all loaded mods.
+[10-13-2021 11:26:19] [I]    mod <name...> - Display information about a loaded plugin.
+[10-13-2021 11:26:19] [I]    js <script...> - Run arbitrary Javascript.
+[10-13-2021 11:26:19] [I]    say <message...> - Send a message to all players.
+[10-13-2021 11:26:19] [I]    pause <on/off> - Pause or unpause the game.
+[10-13-2021 11:26:19] [I]    rules [remove/add] [name] [value...] - List, remove or add global rules. These will apply regardless of map.
+[10-13-2021 11:26:19] [I]    fillitems [team] - Fill the core with items.
+[10-13-2021 11:26:19] [I]    playerlimit [off/somenumber] - Set the server player limit.
+[10-13-2021 11:26:19] [I]    config [name] [value...] - Configure server settings.
+[10-13-2021 11:26:19] [I]    subnet-ban [add/remove] [address] - Ban a subnet. This simply rejects all connections with IPs starting with some string.
+[10-13-2021 11:26:19] [I]    whitelist [add/remove] [ID] - Add/remove players from the whitelist using their ID.
+[10-13-2021 11:26:19] [I]    shuffle [none/all/custom/builtin] - Set map shuffling mode.
+[10-13-2021 11:26:19] [I]    nextmap <mapname...> - Set the next map to be played after a game-over. Overrides shuffling.
+[10-13-2021 11:26:19] [I]    kick <username...> - Kick a person by name.
+[10-13-2021 11:26:19] [I]    ban <type-id/name/ip> <username/IP/ID...> - Ban a person.
+[10-13-2021 11:26:19] [I]    bans - List all banned IPs and IDs.
+[10-13-2021 11:26:19] [I]    unban <ip/ID> - Completely unban a person by IP or ID.
+[10-13-2021 11:26:19] [I]    pardon <ID> - Pardons a votekicked player by ID and allows them to join again.
+[10-13-2021 11:26:19] [I]    admin <add/remove> <username/ID...> - Make an online user admin
+[10-13-2021 11:26:19] [I]    admins - List all admins.
+[10-13-2021 11:26:19] [I]    players - List all players currently in game.
+[10-13-2021 11:26:19] [I]    runwave - Trigger the next wave.
+[10-13-2021 11:26:19] [I]    load <slot> - Load a save from a slot.
+[10-13-2021 11:26:19] [I]    save <slot> - Save game state to a slot.
+[10-13-2021 11:26:19] [I]    saves - List all saves in the save directory.
+[10-13-2021 11:26:19] [I]    gameover - Force a game over.
+[10-13-2021 11:26:19] [I]    info <IP/UUID/name...> - Find player info(s). Can optionally check for all names or IPs a player has had.
+[10-13-2021 11:26:19] [I]    search <name...> - Search players who have used part of a name.
+[10-13-2021 11:26:19] [I]    gc - Trigger a garbage collection. Testing only.
+[10-13-2021 11:26:19] [I]    yes - Run the last suggested incorrect command.
+[10-13-2021 11:26:21] [I] Status:
+[10-13-2021 11:26:21] [I]   Playing on map Mision 12   Base pretrolera / Wave 4
+[10-13-2021 11:26:21] [I]   0 enemies.
+[10-13-2021 11:26:21] [I]   61 FPS, 33 MB used.
+[10-13-2021 11:26:21] [I]   Players: 1
+[10-13-2021 11:26:21] [I]     [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us / VA8X0BlqyTsAAAAAFkLMBg==
+[10-13-2021 11:26:36] [I] Commands:
+[10-13-2021 11:26:36] [I]    help [command] - Display the command list, or get help for a specific command.
+[10-13-2021 11:26:36] [I]    version - Displays server version info.
+[10-13-2021 11:26:36] [I]    exit - Exit the server application.
+[10-13-2021 11:26:36] [I]    stop - Stop hosting the server.
+[10-13-2021 11:26:36] [I]    host [mapname] [mode] - Open the server. Will default to survival and a random map if not specified.
+[10-13-2021 11:26:36] [I]    maps [all/custom/default] - Display available maps. Displays only custom maps by default.
+[10-13-2021 11:26:36] [I]    reloadmaps - Reload all maps from disk.
+[10-13-2021 11:26:36] [I]    status - Display server status.
+[10-13-2021 11:26:36] [I]    mods - Display all loaded mods.
+[10-13-2021 11:26:36] [I]    mod <name...> - Display information about a loaded plugin.
+[10-13-2021 11:26:36] [I]    js <script...> - Run arbitrary Javascript.
+[10-13-2021 11:26:36] [I]    say <message...> - Send a message to all players.
+[10-13-2021 11:26:36] [I]    pause <on/off> - Pause or unpause the game.
+[10-13-2021 11:26:36] [I]    rules [remove/add] [name] [value...] - List, remove or add global rules. These will apply regardless of map.
+[10-13-2021 11:26:36] [I]    fillitems [team] - Fill the core with items.
+[10-13-2021 11:26:36] [I]    playerlimit [off/somenumber] - Set the server player limit.
+[10-13-2021 11:26:36] [I]    config [name] [value...] - Configure server settings.
+[10-13-2021 11:26:36] [I]    subnet-ban [add/remove] [address] - Ban a subnet. This simply rejects all connections with IPs starting with some string.
+[10-13-2021 11:26:36] [I]    whitelist [add/remove] [ID] - Add/remove players from the whitelist using their ID.
+[10-13-2021 11:26:36] [I]    shuffle [none/all/custom/builtin] - Set map shuffling mode.
+[10-13-2021 11:26:36] [I]    nextmap <mapname...> - Set the next map to be played after a game-over. Overrides shuffling.
+[10-13-2021 11:26:36] [I]    kick <username...> - Kick a person by name.
+[10-13-2021 11:26:36] [I]    ban <type-id/name/ip> <username/IP/ID...> - Ban a person.
+[10-13-2021 11:26:36] [I]    bans - List all banned IPs and IDs.
+[10-13-2021 11:26:36] [I]    unban <ip/ID> - Completely unban a person by IP or ID.
+[10-13-2021 11:26:36] [I]    pardon <ID> - Pardons a votekicked player by ID and allows them to join again.
+[10-13-2021 11:26:36] [I]    admin <add/remove> <username/ID...> - Make an online user admin
+[10-13-2021 11:26:36] [I]    admins - List all admins.
+[10-13-2021 11:26:36] [I]    players - List all players currently in game.
+[10-13-2021 11:26:36] [I]    runwave - Trigger the next wave.
+[10-13-2021 11:26:36] [I]    load <slot> - Load a save from a slot.
+[10-13-2021 11:26:36] [I]    save <slot> - Save game state to a slot.
+[10-13-2021 11:26:36] [I]    saves - List all saves in the save directory.
+[10-13-2021 11:26:36] [I]    gameover - Force a game over.
+[10-13-2021 11:26:36] [I]    info <IP/UUID/name...> - Find player info(s). Can optionally check for all names or IPs a player has had.
+[10-13-2021 11:26:36] [I]    search <name...> - Search players who have used part of a name.
+[10-13-2021 11:26:36] [I]    gc - Trigger a garbage collection. Testing only.
+[10-13-2021 11:26:36] [I]    yes - Run the last suggested incorrect command.
+[10-13-2021 11:33:25] [I] 1 mods loaded.
+[10-13-2021 11:33:25] [I] Server loaded. Type 'help' for help.
+[10-13-2021 11:33:32] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 11:33:32] [I] Loading map...
+[10-13-2021 11:33:32] [I] Map loaded.
+[10-13-2021 11:33:32] [I] Opened a server on port 6567.
+[10-13-2021 11:33:36] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 11:33:49] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-13-2021 11:33:58] [I] [accent]<[white][accent]>[] [#ff0000]N[#ffbf00]a[#80ff00]u[#00ff40]t[#00ffff]i[#0040ff]l[#8000ff]u[#ff00bf]s has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 11:34:01] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 11:34:03] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 11:50:23] [I] 1 mods loaded.
+[10-13-2021 11:50:23] [I] Server loaded. Type 'help' for help.
+[10-13-2021 11:50:53] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 11:50:53] [I] Loading map...
+[10-13-2021 11:50:53] [I] Map loaded.
+[10-13-2021 11:50:53] [I] Opened a server on port 6567.
+[10-13-2021 11:50:56] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 11:50:59] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 12:05:35] [I] Game over! Reached wave 14 with 0 players online on map V130: Polluted river: Crux.
+[10-13-2021 12:05:35] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-13-2021 12:12:19] [I] 1 mods loaded.
+[10-13-2021 12:12:19] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:13:02] [I] 1 mods loaded.
+[10-13-2021 12:13:02] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:13:02] [E] Command not found. Did you mean "host"?
+[10-13-2021 12:13:04] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 12:13:04] [I] Loading map...
+[10-13-2021 12:13:05] [I] Map loaded.
+[10-13-2021 12:13:05] [I] Opened a server on port 6567.
+[10-13-2021 12:13:07] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 12:16:10] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /maps>
+[10-13-2021 12:17:52] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 12:42:42] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:42:56] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 12:42:59] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help>
+[10-13-2021 12:43:02] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /bug test>
+[10-13-2021 12:43:06] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 4>
+[10-13-2021 12:43:09] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 2>
+[10-13-2021 12:43:12] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 3>
+[10-13-2021 12:44:01] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /bug>
+[10-13-2021 12:44:19] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:44:24] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 12:44:24] [I] Loading map...
+[10-13-2021 12:44:25] [I] Map loaded.
+[10-13-2021 12:44:25] [E] Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.
+[10-13-2021 12:44:41] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 12:44:41] [I] Loading map...
+[10-13-2021 12:44:41] [I] Map loaded.
+[10-13-2021 12:44:41] [I] Opened a server on port 6567.
+[10-13-2021 12:44:46] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 12:44:49] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /bug test>
+[10-13-2021 12:44:51] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help>
+[10-13-2021 12:45:03] [I] <[#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /help 2>
+[10-13-2021 12:45:08] [I] No mods found.
+[10-13-2021 12:45:08] [I] Mod directory: C:\Users\janwi\mindustryServer\v7\mods\Plugin_with_database\config\mods
+[10-13-2021 12:45:40] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:47:35] [I] 1 mods loaded.
+[10-13-2021 12:47:35] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:47:35] [E] java.lang.RuntimeException: Error loading mod DiscordPlugin
+	at mindustry.mod.Mods.contextRun(Mods.java:707)
+	at mindustry.mod.Mods.lambda$eachClass$27(Mods.java:695)
+	at arc.struct.Seq.each(Seq.java:193)
+	at mindustry.mod.Mods.eachClass(Mods.java:695)
+	at mindustry.core.NetServer.init(NetServer.java:262)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:65)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.lang.IllegalArgumentException: Malformed param '[description'
+	at arc.util.CommandHandler$Command.<init>(CommandHandler.java:175)
+	at arc.util.CommandHandler.register(CommandHandler.java:117)
+	at mindustry.plugin.ioMain.registerClientCommands(ioMain.java:450)
+	at mindustry.core.NetServer.lambda$init$7(NetServer.java:262)
+	at mindustry.mod.Mods.lambda$eachClass$26(Mods.java:695)
+	at mindustry.mod.Mods.contextRun(Mods.java:705)
+	... 6 more
+
+[10-13-2021 12:48:24] [I] 1 mods loaded.
+[10-13-2021 12:48:24] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:48:25] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 12:48:25] [I] Loading map...
+[10-13-2021 12:48:25] [I] Map loaded.
+[10-13-2021 12:48:25] [I] Opened a server on port 6567.
+[10-13-2021 12:48:30] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 12:48:34] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /bug test>
+[10-13-2021 12:52:19] [I] 1 mods loaded.
+[10-13-2021 12:52:19] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:52:19] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 12:52:19] [I] Loading map...
+[10-13-2021 12:52:19] [I] Map loaded.
+[10-13-2021 12:52:19] [I] Opened a server on port 6567.
+[10-13-2021 12:52:26] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 12:52:28] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /bug test>
+[10-13-2021 12:54:22] [I] 1 mods loaded.
+[10-13-2021 12:54:22] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:54:22] [I] Randomized next map to be UwU.
+[10-13-2021 12:54:22] [I] Loading map...
+[10-13-2021 12:54:24] [I] Map loaded.
+[10-13-2021 12:54:24] [I] Opened a server on port 6567.
+[10-13-2021 12:54:27] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 12:54:30] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /bug test>
+[10-13-2021 12:55:38] [I] 1 mods loaded.
+[10-13-2021 12:55:38] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:55:38] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 12:55:38] [I] Loading map...
+[10-13-2021 12:55:38] [I] Map loaded.
+[10-13-2021 12:55:38] [I] Opened a server on port 6567.
+[10-13-2021 12:56:18] [I] 1 mods loaded.
+[10-13-2021 12:56:18] [I] Server loaded. Type 'help' for help.
+[10-13-2021 12:56:18] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 12:56:18] [I] Loading map...
+[10-13-2021 12:56:18] [I] Map loaded.
+[10-13-2021 12:56:18] [I] Opened a server on port 6567.
+[10-13-2021 12:56:21] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 12:56:25] [I] <[accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /bug test>
+[10-13-2021 13:07:32] [I] 1 mods loaded.
+[10-13-2021 13:07:32] [I] Server loaded. Type 'help' for help.
+[10-13-2021 13:07:38] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 13:07:38] [I] Loading map...
+[10-13-2021 13:07:39] [I] Map loaded.
+[10-13-2021 13:07:39] [I] Opened a server on port 6567.
+[10-13-2021 13:07:41] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 13:07:45] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 13:12:51] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 13:12:51] [I] Selected next map to be UwU.
+[10-13-2021 13:15:40] [I] 1 mods loaded.
+[10-13-2021 13:15:40] [I] Server loaded. Type 'help' for help.
+[10-13-2021 13:15:40] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 13:15:40] [I] Loading map...
+[10-13-2021 13:15:40] [I] Map loaded.
+[10-13-2021 13:15:40] [I] Opened a server on port 6567.
+[10-13-2021 13:15:43] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 13:15:46] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 13:16:02] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: banned
+[10-13-2021 13:16:14] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 13:16:18] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 13:17:11] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 13:17:21] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
+[10-13-2021 13:17:21] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 13:17:44] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 13:18:49] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 13:18:49] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-13-2021 13:54:46] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[10-13-2021 13:54:46] [I] Selected next map to be UwU.
+[10-13-2021 14:03:47] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 14:03:56] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: <@770240444466069514>
+[10-13-2021 14:31:42] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[10-13-2021 14:34:23] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[10-13-2021 14:34:34] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: sa
+[10-13-2021 14:34:39] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: asdf
+[10-13-2021 14:34:44] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: f
+[10-13-2021 14:34:45] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: t
+[10-13-2021 14:34:48] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: e
+[10-13-2021 14:34:55] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[10-13-2021 14:41:26] [I] 1 mods loaded.
+[10-13-2021 14:41:26] [I] Server loaded. Type 'help' for help.
+[10-13-2021 14:41:26] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 14:41:26] [I] Loading map...
+[10-13-2021 14:41:26] [I] Map loaded.
+[10-13-2021 14:41:26] [I] Opened a server on port 6567.
+[10-13-2021 14:41:29] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 14:43:53] [E] Command not found. Did you mean "config"?
+[10-13-2021 14:43:54] [I] All config values:
+[10-13-2021 14:43:54] [I] | name: [#ff2400]P[#ff4900]H[#ff6d00]O[#ff9200]E[#ffb600]N[#ffdb00]I[#ffff00]X
+[10-13-2021 14:43:54] [I] | | The server name as displayed on clients.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | desc: off
+[10-13-2021 14:43:54] [I] | | The server description, displayed under the name. Max 100 characters.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | port: 6567
+[10-13-2021 14:43:54] [I] | | The port to host on.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | autoUpdate: false
+[10-13-2021 14:43:54] [I] | | Whether to auto-update and exit when a new bleeding-edge update arrives.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | showConnectMessages: true
+[10-13-2021 14:43:54] [I] | | Whether to display connect/disconnect messages.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | enableVotekick: true
+[10-13-2021 14:43:54] [I] | | Whether votekick is enabled.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | startCommands: 
+[10-13-2021 14:43:54] [I] | | Commands run at startup. This should be a comma-separated list.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | crashReport: false
+[10-13-2021 14:43:54] [I] | | Whether to send crash reports.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | logging: true
+[10-13-2021 14:43:54] [I] | | Whether to log everything to files.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | strict: true
+[10-13-2021 14:43:54] [I] | | Whether strict mode is on - corrects positions and prevents duplicate UUIDs.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | antiSpam: true
+[10-13-2021 14:43:54] [I] | | Whether spammers are automatically kicked and rate-limited.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | interactRateWindow: 6
+[10-13-2021 14:43:54] [I] | | Block interaction rate limit window, in seconds.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | interactRateLimit: 25
+[10-13-2021 14:43:54] [I] | | Block interaction rate limit.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | interactRateKick: 60
+[10-13-2021 14:43:54] [I] | | How many times a player must interact inside the window to get kicked.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | messageRateLimit: 1
+[10-13-2021 14:43:54] [I] | | Message rate limit in seconds. 0 to disable.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | messageSpamKick: 3
+[10-13-2021 14:43:54] [I] | | How many times a player must send a message before the cooldown to get kicked. 0 to disable.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | socketInput: false
+[10-13-2021 14:43:54] [I] | | Allows a local application to control this server through a local TCP socket.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | socketInputPort: 6859
+[10-13-2021 14:43:54] [I] | | The port for socket input.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | socketInputAddress: localhost
+[10-13-2021 14:43:54] [I] | | The bind address for socket input.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | allowCustomClients: false
+[10-13-2021 14:43:54] [I] | | Whether custom clients are allowed to connect.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | whitelist: false
+[10-13-2021 14:43:54] [I] | | Whether the whitelist is used.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | motd:  
+[10-13-2021 14:43:54] [I] | | The message displayed to people on connection.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | autosave: false
+[10-13-2021 14:43:54] [I] | | Whether the periodically save the map when playing.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | autosaveAmount: 10
+[10-13-2021 14:43:54] [I] | | The maximum amount of autosaves. Older ones get replaced.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | autosaveSpacing: 300
+[10-13-2021 14:43:54] [I] | | Spacing between autosaves in seconds.
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:43:54] [I] | debug: false
+[10-13-2021 14:43:54] [I] | | Enable debug logging
+[10-13-2021 14:43:54] [I] |
+[10-13-2021 14:44:13] [I] crashReport set to true.
+[10-13-2021 14:45:06] [I] 1 mods loaded.
+[10-13-2021 14:45:06] [I] Server loaded. Type 'help' for help.
+[10-13-2021 14:45:06] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 14:45:06] [I] Loading map...
+[10-13-2021 14:45:06] [I] Map loaded.
+[10-13-2021 14:45:06] [I] Opened a server on port 6567.
+[10-13-2021 14:45:10] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 14:46:04] [I] [accent]<[white][accent]>[] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 14:46:06] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 14:47:20] [I] 1 mods loaded.
+[10-13-2021 14:47:20] [I] Server loaded. Type 'help' for help.
+[10-13-2021 14:47:20] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 14:47:20] [I] Loading map...
+[10-13-2021 14:47:20] [I] Map loaded.
+[10-13-2021 14:47:20] [I] Opened a server on port 6567.
+[10-13-2021 14:47:22] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 14:48:06] [I] 1 mods loaded.
+[10-13-2021 14:48:06] [I] Server loaded. Type 'help' for help.
+[10-13-2021 14:48:06] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 14:48:06] [I] Loading map...
+[10-13-2021 14:48:06] [I] Map loaded.
+[10-13-2021 14:48:06] [I] Opened a server on port 6567.
+[10-13-2021 14:48:07] [E] Already hosting. Type 'stop' to stop hosting first.
+[10-13-2021 14:48:10] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 14:49:12] [I] [accent]<[white][accent]>[] [accent][][accent][][accent][][accent][][accent][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 14:51:15] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 14:51:15] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-13-2021 15:26:42] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[10-13-2021 15:26:42] [I] Selected next map to be V130: Polluted river: Crux.
+[10-13-2021 15:32:42] [I] 1 mods loaded.
+[10-13-2021 15:32:42] [I] Server loaded. Type 'help' for help.
+[10-13-2021 15:32:42] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-13-2021 15:32:42] [I] Loading map...
+[10-13-2021 15:32:42] [I] Map loaded.
+[10-13-2021 15:32:42] [I] Opened a server on port 6567.
+[10-13-2021 15:33:15] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:41:58] [I] 1 mods loaded.
+[10-13-2021 15:41:58] [I] Server loaded. Type 'help' for help.
+[10-13-2021 15:41:58] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 15:41:58] [I] Loading map...
+[10-13-2021 15:41:59] [I] Map loaded.
+[10-13-2021 15:41:59] [I] Opened a server on port 6567.
+[10-13-2021 15:42:00] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:42:17] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
+[10-13-2021 15:42:17] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 15:43:11] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:43:19] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
+[10-13-2021 15:43:19] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 15:43:36] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 15:43:51] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:43:51] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 22:03:18 UTC [accent]Ban ID:[] VA8X
+[10-13-2021 15:43:51] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 15:46:30] [I] 1 mods loaded.
+[10-13-2021 15:46:30] [I] Server loaded. Type 'help' for help.
+[10-13-2021 15:46:30] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-13-2021 15:46:30] [I] Loading map...
+[10-13-2021 15:46:30] [I] Map loaded.
+[10-13-2021 15:46:30] [I] Opened a server on port 6567.
+[10-13-2021 15:46:32] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:46:32] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 22:03:18 UTC [accent]Ban ID:[] VA8X
+[10-13-2021 15:46:32] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 15:46:50] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 15:46:53] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 15:46:59] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 15:47:11] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:47:21] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
+[10-13-2021 15:47:21] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 15:47:44] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 15:48:10] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:48:10] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 22:07:21 UTC [accent]Ban ID:[] VA8X
+[10-13-2021 15:48:10] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 15:49:48] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:49:56] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
+[10-13-2021 15:49:56] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 15:50:21] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 15:50:37] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:50:45] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
+[10-13-2021 15:50:45] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 15:50:52] [I] Kicking connection 192.168.0.105 / AAAAAAAA; Reason: recentKick
+[10-13-2021 15:51:16] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:51:16] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 13:51:45 UTC [accent]Ban ID:[] VA8X
+[10-13-2021 15:51:16] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-13-2021 15:51:48] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:54:37] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 15:54:50] [I] 1 mods loaded.
+[10-13-2021 15:54:50] [I] Server loaded. Type 'help' for help.
+[10-13-2021 15:54:50] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 15:54:50] [I] Loading map...
+[10-13-2021 15:54:50] [I] Map loaded.
+[10-13-2021 15:54:50] [I] Opened a server on port 6567.
+[10-13-2021 15:54:55] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-13-2021 15:55:02] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
+[10-13-2021 15:55:02] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-13-2021 15:58:51] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 15:58:51] [I] Selected next map to be UwU.
+[10-13-2021 15:59:39] [I] 1 mods loaded.
+[10-13-2021 15:59:39] [I] Server loaded. Type 'help' for help.
+[10-13-2021 15:59:39] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-13-2021 15:59:39] [I] Loading map...
+[10-13-2021 15:59:39] [I] Map loaded.
+[10-13-2021 15:59:39] [I] Opened a server on port 6567.
+[10-13-2021 16:03:03] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-13-2021 16:03:03] [I] Selected next map to be Mision 12 - Base pretrolera.

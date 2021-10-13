@@ -6,9 +6,14 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import org.javacord.api.DiscordApi;
+import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
+import static mindustry.plugin.ioMain.*;
 
 import mindustry.plugin.discordcommands.DiscordCommands;
+
+import java.util.List;
 
 import static mindustry.Vars.netServer;
 //import static mindustry.Vars.playerGroup;
@@ -38,12 +43,27 @@ public class BotThread extends Thread {
     }
 
     public void run(){
+        TextChannel log_channel = getTextChannel("882342315438526525");
         while (this.mt.isAlive()){
             try {
                 Thread.sleep(60 * 1000);
 
+//                System.out.println(joinedPlayer);
+
                 for (Player p : Groups.player) {
 
+                    if (joinedPlayer.size() > 0) {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        eb.setTitle("Player Join Log");
+                        StringBuilder desc = new StringBuilder();
+                        for (Player player : joinedPlayer) {
+                            desc.append(String.format("`%s` : `%d `:%s\n", player.uuid(), player.id, escapeEverything(player.name)));
+                        }
+                        eb.setDescription(String.valueOf(desc));
+                        assert log_channel != null;
+                        log_channel.sendMessage(eb);
+                    }
+                    joinedPlayer.clear();
                     PlayerData pd = getData(p.uuid());
                     if (pd == null) return;
 //

@@ -27,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static mindustry.Vars.state;
 import static mindustry.plugin.Utils.*;
+import static mindustry.gen.StateSnapshotCallPacket.*;
 
 public class ComCommands {
 //    public static ContentHandler contentHandler = new ContentHandler();
@@ -138,7 +139,7 @@ public class ComCommands {
                         .send(ctx.channel);
             }
         });
-        handler.registerCommand(new Command("info") {
+        handler.registerCommand(new Command("status") {
             {
                 help = "Get basic server information.";
             }
@@ -150,6 +151,7 @@ public class ComCommands {
                             .addField("Players", String.valueOf(Groups.player.size()))
                             .addField("Map", Vars.state.map.name())
                             .addField("Wave", String.valueOf(state.wave))
+                            .addField("TPS", String.valueOf(state.serverTps))
                             .addField("Next wave in", Math.round(state.wavetime / 60) + " seconds.");
 
                     ctx.channel.sendMessage(eb);
