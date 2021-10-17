@@ -1,6 +1,7 @@
-[![Discord](https://img.shields.io/discord/391020510269669376.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48)](https://discord.gg/W3eYUjGbce)
+## This is the plugin for the Phoenix Network
+[comment]: <> ([![Discord]&#40;https://img.shields.io/discord/391020510269669376.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48&#41;]&#40;https://discord.gg/W3eYUjGbce&#41;)
 
-## This is the plugin for the Online Discord Community server
+[comment]: <> ([![Join our Discord server!]&#40;https://invidget.switchblade.xyz/qtjqCUbbdR&#41;]&#40;http://discord.gg/qtjqCUbbdR&#41;)
 
 ### Instructions:
 
@@ -25,9 +26,11 @@ Please suggest features on the discord server. I would appreciate feedback and s
 ### Contributing
 Everyone is welcome to contribute to this project, just send me a direct message on Discord (Nautilus#0100).
 
+![](https://dcbadge.vercel.app/api/shield/770240444466069514)
+
+
 
 PS: The original Plugin is [here](https://github.com/TranquillyUnpleasant/ioplugin). 
-Please give some credits to [TranquillyUnpleasant
-](https://github.com/TranquillyUnpleasant)!
+Please give some credits to [TranquillyUnpleasant](https://github.com/TranquillyUnpleasant)!
 
 ~~There are many bugs~~
