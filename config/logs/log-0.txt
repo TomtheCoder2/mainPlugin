@@ -5332,3 +5332,94 @@ Caused by: java.lang.IllegalArgumentException: Malformed param '[description'
 [10-13-2021 21:36:50] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
 [10-13-2021 21:37:23] [I] Kicking connection 192.168.0.105 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: banned
 [10-13-2021 21:37:23] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-16-2021 23:14:49] [I] 1 mods loaded.
+[10-16-2021 23:14:49] [I] Server loaded. Type 'help' for help.
+[10-16-2021 23:14:53] [I] Version: Mindustry 7-pre-alpha official / build 132
+[10-16-2021 23:14:53] [I] Java Version: 16.0.1
+[10-16-2021 23:15:15] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-16-2021 23:15:15] [I] Loading map...
+[10-16-2021 23:15:16] [I] Map loaded.
+[10-16-2021 23:15:16] [I] Opened a server on port 6567.
+[10-16-2021 23:17:37] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-16-2021 23:50:31] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[10-16-2021 23:50:31] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-16-2021 23:54:45] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-16-2021 23:54:45] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-17-2021 00:10:38] [E] Command not found. Did you mean "js"?
+[10-17-2021 00:10:38] [E] Already hosting. Type 'stop' to stop hosting first.
+[10-17-2021 23:40:40] [I] 1 mods loaded.
+[10-17-2021 23:40:40] [I] Server loaded. Type 'help' for help.
+[10-17-2021 23:40:40] [I] Randomized next map to be UwU.
+[10-17-2021 23:40:40] [I] Loading map...
+[10-17-2021 23:40:41] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 11 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-17-2021 23:40:41] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 10 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-17-2021 23:40:41] [I] Map loaded.
+[10-17-2021 23:40:41] [I] Opened a server on port 6567.
+[10-17-2021 23:40:53] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-17-2021 23:40:53] [I] Kicking connection 192.168.192.1 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 19:38:23 UTC [accent]Ban ID:[] VA8X [white] If you what to appeal join our discord server: [cyan]https://discord.gg/qtjqCUbbdR
+[10-17-2021 23:40:53] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-17-2021 23:43:41] [I] 1 mods loaded.
+[10-17-2021 23:43:41] [I] Server loaded. Type 'help' for help.
+[10-17-2021 23:43:45] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-17-2021 23:43:45] [I] Loading map...
+[10-17-2021 23:43:46] [I] Map loaded.
+[10-17-2021 23:43:46] [I] Opened a server on port 6567.
+[10-17-2021 23:43:50] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-17-2021 23:43:50] [I] Kicking connection 192.168.192.1 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 19:38:23 UTC [accent]Ban ID:[] VA8X [white] If you what to appeal join our discord server: [cyan]https://discord.gg/qtjqCUbbdR
+[10-17-2021 23:43:50] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)

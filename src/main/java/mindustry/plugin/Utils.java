@@ -54,17 +54,11 @@ public class Utils {
                     [#9342f5]You built a total of %buildings% buildings!
                     [sky]Thank you for participating and enjoy your time on [orange]<[white]io[orange]>[sky]!
                     [scarlet]Please rejoin for the change to take effect.""";
-    static String verificationMessage = """
-            [scarlet]Your IP was flagged as a VPN.
-
-            [sky]Please join our discord:
-            http://discord.mindustry.io
-            [#7a7a7a]verify your account in #verifications""";
     public static HashMap<Integer, Rank> rankNames = new HashMap<>();
     static HashMap<String, Integer> rankRoles = new HashMap<>();
     static Seq<String> bannedNames = new Seq<>();
     static Seq<String> onScreenMessages = new Seq<>();
-    static String eventIp = "mindustry.io";
+    static String eventIp = "";
     static int eventPort = 1001;
 
     public static void init() {

@@ -8,6 +8,7 @@ import arc.util.*;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.core.NetClient;
+import mindustry.core.NetServer;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -67,6 +68,8 @@ public class ioMain extends Plugin {
     int voteCooldown = 120 * 1;
     private ObjectMap<Long, String> cooldowns = new ObjectMap<>(); //uuid
     private JSONObject alldata;
+    public NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
+
 
     // register event handlers and create variables in the constructor
     public ioMain() {
@@ -463,7 +466,8 @@ public class ioMain extends Plugin {
             handler.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
                 String message = args[0];
                 if (!checkChatRatelimit(message, player)) return;
-                Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(message, player, "[#" + player.team().color.toString() + "]<T>" + NetClient.colorizeName(player.id, player.name)));
+                String raw = "[#" + player.team().color.toString() + "]<T> " + chatFormatter.format(player, message);
+                Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(raw, player, message));
             });
 
             handler.<Player>register("js", "<script...>", "Run arbitrary Javascript.", (arg, player) -> {
