@@ -5423,3 +5423,1209 @@ Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 canno
 [10-17-2021 23:43:50] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
 [10-17-2021 23:43:50] [I] Kicking connection 192.168.192.1 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 19:38:23 UTC [accent]Ban ID:[] VA8X [white] If you what to appeal join our discord server: [cyan]https://discord.gg/qtjqCUbbdR
 [10-17-2021 23:43:50] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-18-2021 10:48:24] [I] Game over! Reached wave 20 with 0 players online on map Mision 12   Base pretrolera.
+[10-18-2021 10:48:24] [I] Selected next map to be UwU.
+[10-18-2021 10:48:37] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$setup$4(ServerControl.java:189)
+	at mindustry.server.ServerControl.lambda$play$65(ServerControl.java:1010)
+	at mindustry.server.ServerControl$1.run(ServerControl.java:1024)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 8 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 10 more
+
+[10-18-2021 10:48:37] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$setup$4(ServerControl.java:189)
+	at mindustry.server.ServerControl.lambda$play$65(ServerControl.java:1010)
+	at mindustry.server.ServerControl$1.run(ServerControl.java:1024)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 7 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 10 more
+
+[10-18-2021 10:49:21] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-18-2021 10:49:21] [I] Kicking connection 192.168.192.1 / VA8X0BlqyTsAAAAAFkLMBg==; Reason: [scarlet]You are banned.[accent] Reason: test [accent]Until: 2021-10-13 19:38:23 UTC [accent]Ban ID:[] VA8X [white] If you what to appeal join our discord server: [cyan]https://discord.gg/qtjqCUbbdR
+[10-18-2021 10:49:21] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-18-2021 10:50:06] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-18-2021 10:50:22] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: :github:
+[10-18-2021 10:50:24] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: hmm
+[10-18-2021 10:50:26] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: wtf
+[10-18-2021 10:52:04] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: \uE802
+[10-18-2021 10:53:22] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: :wrench:
+[10-18-2021 10:53:38] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: hmmm why does it Not work
+[10-18-2021 11:01:52] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us:                                                     
+[10-18-2021 11:02:56] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-18-2021 11:03:27] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-18-2021 11:10:01] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[10-18-2021 11:40:17] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-19-2021 18:23:32] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-19-2021 18:23:39] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: tset
+[10-19-2021 18:23:42] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: test
+[10-19-2021 18:30:40] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[10-19-2021 18:30:45] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: reddit alien
+[10-19-2021 18:30:58] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[10-19-2021 18:31:08] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: ^ 2 swords\
+[10-19-2021 18:33:03] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[10-19-2021 18:33:06] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: add
+[10-19-2021 18:33:49] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: :typeicons:
+[10-19-2021 18:34:01] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: :typicons:
+[10-19-2021 18:34:05] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: hmm
+[10-19-2021 18:34:38] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[10-19-2021 18:34:43] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[10-19-2021 18:34:47] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: airplane ^
+[10-19-2021 18:35:45] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: 
+[10-19-2021 18:35:50] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: ^ sword
+[10-20-2021 01:03:31] [I] [accent]<[white][accent]>[] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-20-2021 15:45:49] [I] 1 mods loaded.
+[10-20-2021 15:45:49] [I] Server loaded. Type 'help' for help.
+[10-20-2021 15:45:49] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-20-2021 15:45:49] [I] Loading map...
+[10-20-2021 15:45:49] [I] Map loaded.
+[10-20-2021 15:45:49] [I] Opened a server on port 6567.
+[10-20-2021 15:45:59] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 15:46:08] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 15:46:11] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 15:46:58] [I] 1 mods loaded.
+[10-20-2021 15:46:58] [I] Server loaded. Type 'help' for help.
+[10-20-2021 15:46:58] [I] Randomized next map to be UwU.
+[10-20-2021 15:46:58] [I] Loading map...
+[10-20-2021 15:46:59] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 11 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 15:46:59] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 10 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 15:46:59] [I] Map loaded.
+[10-20-2021 15:46:59] [I] Opened a server on port 6567.
+[10-20-2021 15:47:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 15:47:11] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 15:47:35] [I] [accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: [[white]test
+[10-20-2021 15:47:39] [I] [accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: hmmm
+[10-20-2021 15:47:46] [I] [accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: [ [white]test
+[10-20-2021 15:47:54] [I] [accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: well thats bad
+[10-20-2021 15:50:30] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 15:50:35] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 15:50:35] [E] java.lang.NullPointerException: Cannot read field "playtime" because the return value of "java.util.HashMap.get(Object)" is null
+	at mindustry.plugin.Utils.listRequirements(Utils.java:195)
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$25(ioMain.java:877)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:240)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-20-2021 15:50:37] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 15:50:37] [E] java.lang.NullPointerException: Cannot read field "playtime" because the return value of "java.util.HashMap.get(Object)" is null
+	at mindustry.plugin.Utils.listRequirements(Utils.java:195)
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$25(ioMain.java:877)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:240)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-20-2021 15:56:33] [I] [accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (disappeared)
+[10-20-2021 15:57:00] [I] 1 mods loaded.
+[10-20-2021 15:57:00] [I] Server loaded. Type 'help' for help.
+[10-20-2021 15:57:00] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-20-2021 15:57:00] [I] Loading map...
+[10-20-2021 15:57:01] [I] Map loaded.
+[10-20-2021 15:57:01] [I] Opened a server on port 6567.
+[10-20-2021 15:57:15] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 15:57:18] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 15:57:20] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 15:57:20] [E] java.lang.NullPointerException: Cannot read field "playtime" because the return value of "java.util.HashMap.get(Object)" is null
+	at mindustry.plugin.Utils.listRequirements(Utils.java:196)
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$25(ioMain.java:877)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:240)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-20-2021 15:59:07] [I] 1 mods loaded.
+[10-20-2021 15:59:07] [I] Server loaded. Type 'help' for help.
+[10-20-2021 15:59:07] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 15:59:07] [I] Loading map...
+[10-20-2021 15:59:07] [I] Map loaded.
+[10-20-2021 15:59:07] [I] Opened a server on port 6567.
+[10-20-2021 15:59:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 15:59:11] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 15:59:29] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 16:00:13] [I] [accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: [[][white]test
+[10-20-2021 16:00:19] [I] [accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: [[[white]test
+[10-20-2021 16:04:24] [I] [accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: [[[white]test
+[10-20-2021 16:04:26] [I] <[accent][[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 16:05:24] [I] 1 mods loaded.
+[10-20-2021 16:05:24] [I] Server loaded. Type 'help' for help.
+[10-20-2021 16:05:24] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-20-2021 16:05:24] [I] Loading map...
+[10-20-2021 16:05:24] [I] Map loaded.
+[10-20-2021 16:05:24] [I] Opened a server on port 6567.
+[10-20-2021 16:05:28] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 16:05:30] [I] <[accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 16:07:22] [I] 1 mods loaded.
+[10-20-2021 16:07:22] [I] Server loaded. Type 'help' for help.
+[10-20-2021 16:07:26] [E] Invalid command. Type 'help' for help.
+[10-20-2021 16:07:28] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-20-2021 16:07:28] [I] Loading map...
+[10-20-2021 16:07:28] [I] Map loaded.
+[10-20-2021 16:07:28] [I] Opened a server on port 6567.
+[10-20-2021 16:07:32] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 16:07:35] [I] <[accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 16:08:25] [I] <[accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 16:08:44] [I] <[accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 16:13:01] [I] [accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-20-2021 16:13:17] [I] 1 mods loaded.
+[10-20-2021 16:13:17] [I] Server loaded. Type 'help' for help.
+[10-20-2021 16:13:17] [I] Randomized next map to be UwU.
+[10-20-2021 16:13:17] [I] Loading map...
+[10-20-2021 16:13:18] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 11 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 16:13:18] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 10 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 16:13:18] [I] Map loaded.
+[10-20-2021 16:13:18] [I] Opened a server on port 6567.
+[10-20-2021 16:13:35] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 16:13:40] [I] <[accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 16:21:11] [I] 1 mods loaded.
+[10-20-2021 16:21:11] [I] Server loaded. Type 'help' for help.
+[10-20-2021 16:21:11] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-20-2021 16:21:11] [I] Loading map...
+[10-20-2021 16:21:11] [I] Map loaded.
+[10-20-2021 16:21:11] [I] Opened a server on port 6567.
+[10-20-2021 16:21:13] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 16:21:17] [I] <[accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 16:21:36] [I] <[accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 16:21:51] [I] [accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-20-2021 16:21:56] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 16:27:27] [I] 1 mods loaded.
+[10-20-2021 16:27:27] [I] Server loaded. Type 'help' for help.
+[10-20-2021 16:27:27] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 16:27:27] [I] Loading map...
+[10-20-2021 16:27:27] [I] Map loaded.
+[10-20-2021 16:27:27] [I] Opened a server on port 6567.
+[10-20-2021 16:27:30] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 16:27:34] [I] <[accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 16:46:20] [I] [accent][[[white][accent]][][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (error)
+[10-20-2021 17:03:10] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[10-20-2021 17:03:10] [I] Selected next map to be UwU.
+[10-20-2021 17:03:23] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$setup$4(ServerControl.java:189)
+	at mindustry.server.ServerControl.lambda$play$65(ServerControl.java:1010)
+	at mindustry.server.ServerControl$1.run(ServerControl.java:1024)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 8 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 10 more
+
+[10-20-2021 17:03:23] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$setup$4(ServerControl.java:189)
+	at mindustry.server.ServerControl.lambda$play$65(ServerControl.java:1010)
+	at mindustry.server.ServerControl$1.run(ServerControl.java:1024)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 7 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 10 more
+
+[10-20-2021 17:14:56] [I] 1 mods loaded.
+[10-20-2021 17:14:56] [I] Server loaded. Type 'help' for help.
+[10-20-2021 17:14:56] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 17:14:56] [I] Loading map...
+[10-20-2021 17:14:57] [I] Map loaded.
+[10-20-2021 17:14:57] [I] Opened a server on port 6567.
+[10-20-2021 17:16:21] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 17:22:26] [I] 1 mods loaded.
+[10-20-2021 17:22:26] [I] Server loaded. Type 'help' for help.
+[10-20-2021 17:22:26] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-20-2021 17:22:26] [I] Loading map...
+[10-20-2021 17:22:26] [I] Map loaded.
+[10-20-2021 17:22:26] [I] Opened a server on port 6567.
+[10-20-2021 17:22:28] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 17:24:06] [I] 1 mods loaded.
+[10-20-2021 17:24:06] [I] Server loaded. Type 'help' for help.
+[10-20-2021 17:24:06] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-20-2021 17:24:06] [I] Loading map...
+[10-20-2021 17:24:06] [I] Map loaded.
+[10-20-2021 17:24:06] [I] Opened a server on port 6567.
+[10-20-2021 17:24:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 17:28:18] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (error)
+[10-20-2021 17:37:14] [I] 1 mods loaded.
+[10-20-2021 17:37:14] [I] Server loaded. Type 'help' for help.
+[10-20-2021 17:37:14] [I] Randomized next map to be UwU.
+[10-20-2021 17:37:14] [I] Loading map...
+[10-20-2021 17:37:14] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 11 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 17:37:14] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 10 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 17:37:14] [I] Map loaded.
+[10-20-2021 17:37:14] [I] Opened a server on port 6567.
+[10-20-2021 17:37:20] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 17:42:48] [I] 1 mods loaded.
+[10-20-2021 17:42:48] [I] Server loaded. Type 'help' for help.
+[10-20-2021 17:42:48] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 17:42:48] [I] Loading map...
+[10-20-2021 17:42:49] [I] Map loaded.
+[10-20-2021 17:42:49] [I] Opened a server on port 6567.
+[10-20-2021 17:42:58] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 17:44:43] [I] 1 mods loaded.
+[10-20-2021 17:44:43] [I] Server loaded. Type 'help' for help.
+[10-20-2021 17:44:43] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 17:44:43] [I] Loading map...
+[10-20-2021 17:44:43] [I] Map loaded.
+[10-20-2021 17:44:43] [I] Opened a server on port 6567.
+[10-20-2021 17:44:51] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 17:48:54] [I] 1 mods loaded.
+[10-20-2021 17:48:54] [I] Server loaded. Type 'help' for help.
+[10-20-2021 17:48:54] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-20-2021 17:48:54] [I] Loading map...
+[10-20-2021 17:48:55] [I] Map loaded.
+[10-20-2021 17:48:55] [I] Opened a server on port 6567.
+[10-20-2021 17:48:57] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 17:50:00] [I] 1 mods loaded.
+[10-20-2021 17:50:00] [I] Server loaded. Type 'help' for help.
+[10-20-2021 17:50:00] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 17:50:00] [I] Loading map...
+[10-20-2021 17:50:00] [I] Map loaded.
+[10-20-2021 17:50:00] [I] Opened a server on port 6567.
+[10-20-2021 17:50:07] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:14:01] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (error)
+[10-20-2021 19:20:58] [I] 1 mods loaded.
+[10-20-2021 19:20:58] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:20:58] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 19:20:58] [I] Loading map...
+[10-20-2021 19:20:58] [I] Map loaded.
+[10-20-2021 19:20:58] [E] Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.
+[10-20-2021 19:21:17] [I] Randomized next map to be UwU.
+[10-20-2021 19:21:17] [I] Loading map...
+[10-20-2021 19:21:17] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 11 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 19:21:17] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 10 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 19:21:17] [I] Map loaded.
+[10-20-2021 19:21:17] [I] Opened a server on port 6567.
+[10-20-2021 19:21:42] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:23:16] [I] 1 mods loaded.
+[10-20-2021 19:23:16] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:23:16] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-20-2021 19:23:16] [I] Loading map...
+[10-20-2021 19:23:16] [I] Map loaded.
+[10-20-2021 19:23:16] [I] Opened a server on port 6567.
+[10-20-2021 19:23:18] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:23:55] [I] 1 mods loaded.
+[10-20-2021 19:23:55] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:23:58] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-20-2021 19:23:58] [I] Loading map...
+[10-20-2021 19:23:58] [I] Map loaded.
+[10-20-2021 19:23:58] [I] Opened a server on port 6567.
+[10-20-2021 19:24:07] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:25:53] [I] 1 mods loaded.
+[10-20-2021 19:25:53] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:25:53] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 19:25:53] [I] Loading map...
+[10-20-2021 19:25:54] [I] Map loaded.
+[10-20-2021 19:25:54] [I] Opened a server on port 6567.
+[10-20-2021 19:25:55] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:27:16] [I] 1 mods loaded.
+[10-20-2021 19:27:16] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:27:23] [E] Command not found. Did you mean "js"?
+[10-20-2021 19:27:23] [I] Randomized next map to be UwU.
+[10-20-2021 19:27:23] [I] Loading map...
+[10-20-2021 19:27:23] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 11 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 19:27:23] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 10 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 19:27:23] [I] Map loaded.
+[10-20-2021 19:27:23] [I] Opened a server on port 6567.
+[10-20-2021 19:27:27] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:30:52] [I] 1 mods loaded.
+[10-20-2021 19:30:52] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:30:52] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 19:30:52] [I] Loading map...
+[10-20-2021 19:30:52] [I] Map loaded.
+[10-20-2021 19:30:53] [I] Opened a server on port 6567.
+[10-20-2021 19:30:56] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:33:18] [I] 1 mods loaded.
+[10-20-2021 19:33:18] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:33:18] [I] Randomized next map to be UwU.
+[10-20-2021 19:33:18] [I] Loading map...
+[10-20-2021 19:33:19] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 11 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 19:33:19] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 10 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 19:33:19] [I] Map loaded.
+[10-20-2021 19:33:19] [I] Opened a server on port 6567.
+[10-20-2021 19:33:19] [E] Already hosting. Type 'stop' to stop hosting first.
+[10-20-2021 19:33:22] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:35:16] [I] 1 mods loaded.
+[10-20-2021 19:35:16] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:35:16] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 19:35:16] [I] Loading map...
+[10-20-2021 19:35:17] [I] Map loaded.
+[10-20-2021 19:35:17] [I] Opened a server on port 6567.
+[10-20-2021 19:35:18] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:37:59] [I] 1 mods loaded.
+[10-20-2021 19:37:59] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:37:59] [E] Command not found. Did you mean "host"?
+[10-20-2021 19:38:06] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-20-2021 19:38:06] [I] Loading map...
+[10-20-2021 19:38:07] [I] Map loaded.
+[10-20-2021 19:38:07] [I] Opened a server on port 6567.
+[10-20-2021 19:38:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:39:37] [I] 1 mods loaded.
+[10-20-2021 19:39:37] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:39:37] [I] Randomized next map to be UwU.
+[10-20-2021 19:39:37] [I] Loading map...
+[10-20-2021 19:39:38] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 11 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 19:39:38] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 10 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 19:39:38] [I] Map loaded.
+[10-20-2021 19:39:38] [I] Opened a server on port 6567.
+[10-20-2021 19:39:49] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:48:18] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-20-2021 19:48:18] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-20-2021 19:48:18] [I] 1 mods loaded.
+[10-20-2021 19:48:18] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:48:45] [I] Randomized next map to be UwU.
+[10-20-2021 19:48:45] [I] Loading map...
+[10-20-2021 19:48:45] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:165)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	... 11 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 19:48:45] [E] mindustry.io.SaveIO$SaveException: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveIO.load(SaveIO.java:149)
+	at mindustry.core.World.loadMap(World.java:315)
+	at mindustry.server.ServerControl.lambda$registerCommands$19(ServerControl.java:338)
+	at arc.util.CommandHandler.lambda$register$2(CommandHandler.java:128)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:29)
+	at mindustry.server.ServerControl.handleCommandString(ServerControl.java:973)
+	at mindustry.server.ServerControl.lambda$readCommands$64(ServerControl.java:968)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+Caused by: java.io.IOException: Error reading region "map".
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:87)
+	at mindustry.io.SaveVersion.read(SaveVersion.java:63)
+	at mindustry.io.SaveIO.load(SaveIO.java:162)
+	at mindustry.io.SaveIO.load(SaveIO.java:142)
+	... 10 more
+Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 cannot be cast to class mindustry.world.blocks.environment.Floor (mindustry.content.Blocks$48 and mindustry.world.blocks.environment.Floor are in unnamed module of loader 'app')
+	at mindustry.world.Tile.setOverlay(Tile.java:376)
+	at mindustry.maps.filters.GenerateFilter.apply(GenerateFilter.java:40)
+	at mindustry.core.World$FilterContext.end(World.java:581)
+	at mindustry.io.SaveVersion.readMap(SaveVersion.java:290)
+	at mindustry.io.SaveVersion.lambda$read$0(SaveVersion.java:63)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:135)
+	at mindustry.io.SaveFileReader.readChunk(SaveFileReader.java:128)
+	at mindustry.io.SaveFileReader.region(SaveFileReader.java:85)
+	... 13 more
+
+[10-20-2021 19:48:45] [I] Map loaded.
+[10-20-2021 19:48:45] [I] Opened a server on port 6567.
+[10-20-2021 19:48:56] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 19:50:07] [I] Game over! Reached wave 1 with 1 players online on map Unknown.
+[10-20-2021 19:50:07] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-20-2021 19:55:36] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-20-2021 19:55:36] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-20-2021 19:55:36] [I] 1 mods loaded.
+[10-20-2021 19:55:36] [I] Server loaded. Type 'help' for help.
+[10-20-2021 19:55:36] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-20-2021 19:55:36] [I] Loading map...
+[10-20-2021 19:55:37] [I] Map loaded.
+[10-20-2021 19:55:37] [I] Opened a server on port 6567.
+[10-20-2021 19:55:41] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 20:13:09] [I] Game over! Reached wave 17 with 1 players online on map V130: Polluted river: Crux.
+[10-20-2021 20:13:09] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-20-2021 20:16:39] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-20-2021 20:16:39] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-20-2021 20:16:39] [I] 1 mods loaded.
+[10-20-2021 20:16:39] [I] Server loaded. Type 'help' for help.
+[10-20-2021 20:16:39] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-20-2021 20:16:39] [I] Loading map...
+[10-20-2021 20:16:40] [I] Map loaded.
+[10-20-2021 20:16:40] [I] Opened a server on port 6567.
+[10-20-2021 20:16:42] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 20:16:44] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 20:16:55] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 20:17:06] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 20:17:06] [E] java.lang.NullPointerException: Cannot read field "playtime" because the return value of "java.util.HashMap.get(Object)" is null
+	at mindustry.plugin.Utils.listRequirements(Utils.java:195)
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$25(ioMain.java:844)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:240)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-20-2021 20:20:34] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-20-2021 20:20:34] [I] Selected next map to be V130: Polluted river: Crux.
+[10-20-2021 20:36:57] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (timeout)
+[10-20-2021 20:40:59] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-20-2021 20:40:59] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-20-2021 20:40:59] [I] 1 mods loaded.
+[10-20-2021 20:40:59] [I] Server loaded. Type 'help' for help.
+[10-20-2021 20:41:39] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-20-2021 20:41:39] [I] Loading map...
+[10-20-2021 20:41:39] [I] Map loaded.
+[10-20-2021 20:41:39] [I] Opened a server on port 6567.
+[10-20-2021 20:41:44] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 20:41:49] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 20:41:49] [E] java.lang.NullPointerException: Cannot read field "playtime" because the return value of "java.util.HashMap.get(Object)" is null
+	at mindustry.plugin.Utils.listRequirements(Utils.java:194)
+	at mindustry.plugin.ioMain.lambda$registerClientCommands$25(ioMain.java:844)
+	at arc.util.CommandHandler.handleMessage(CommandHandler.java:85)
+	at mindustry.core.NetClient.sendChatMessage(NetClient.java:240)
+	at mindustry.gen.SendChatMessageCallPacket.handleServer(SendChatMessageCallPacket.java:39)
+	at mindustry.net.Net.handleServerReceived(Net.java:311)
+	at mindustry.net.ArcNetProvider$2.lambda$received$2(ArcNetProvider.java:128)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-20-2021 20:41:52] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /ranks>
+[10-20-2021 20:45:35] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-20-2021 20:45:35] [I] Selected next map to be V130: Polluted river: Crux.
+[10-20-2021 20:51:48] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-20-2021 20:51:48] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-20-2021 20:51:48] [I] 1 mods loaded.
+[10-20-2021 20:51:48] [I] Server loaded. Type 'help' for help.
+[10-20-2021 20:51:48] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-20-2021 20:51:48] [I] Loading map...
+[10-20-2021 20:51:48] [I] Map loaded.
+[10-20-2021 20:51:48] [I] Opened a server on port 6567.
+[10-20-2021 20:51:50] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 20:51:55] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /req>
+[10-20-2021 20:54:47] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (error)
+[10-20-2021 20:55:12] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-20-2021 20:55:12] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-20-2021 21:31:45] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-20-2021 21:31:45] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-20-2021 21:35:07] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-20-2021 21:35:07] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-20-2021 22:11:44] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-20-2021 22:11:44] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-20-2021 22:12:45] [I] Server loaded. Type 'help' for help.
+[10-20-2021 22:15:52] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-20-2021 22:15:52] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-20-2021 22:34:56] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-20-2021 22:34:56] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-20-2021 22:34:57] [I] 1 mods loaded.
+[10-20-2021 22:34:57] [I] Server loaded. Type 'help' for help.
+[10-20-2021 22:34:57] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-20-2021 22:34:57] [I] Loading map...
+[10-20-2021 22:34:57] [I] Map loaded.
+[10-20-2021 22:34:57] [E] Unable to host: Port already in use! Make sure no other servers are running on the same port in your network.
+[10-20-2021 22:35:11] [I] Stopped server.
+[10-20-2021 22:35:13] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-20-2021 22:35:13] [I] Loading map...
+[10-20-2021 22:35:13] [I] Map loaded.
+[10-20-2021 22:35:13] [I] Opened a server on port 6567.
+[10-20-2021 22:35:19] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-20-2021 22:35:21] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: test
+[10-20-2021 22:47:58] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-20-2021 23:13:32] [I] Game over! Reached wave 19 with 0 players online on map Mision 12   Base pretrolera.
+[10-20-2021 23:13:32] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-20-2021 23:16:55] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-20-2021 23:16:55] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-21-2021 15:12:53] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-21-2021 15:12:53] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-21-2021 15:12:53] [I] 1 mods loaded.
+[10-21-2021 15:12:53] [I] Server loaded. Type 'help' for help.
+[10-21-2021 15:12:56] [I] All config values:
+[10-21-2021 15:12:56] [I] | name: [#ff2400]P[#ff4900]H[#ff6d00]O[#ff9200]E[#ffb600]N[#ffdb00]I[#ffff00]X
+[10-21-2021 15:12:56] [I] | | The server name as displayed on clients.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | desc: off
+[10-21-2021 15:12:56] [I] | | The server description, displayed under the name. Max 100 characters.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | port: 6567
+[10-21-2021 15:12:56] [I] | | The port to host on.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | autoUpdate: false
+[10-21-2021 15:12:56] [I] | | Whether to auto-update and exit when a new bleeding-edge update arrives.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | showConnectMessages: true
+[10-21-2021 15:12:56] [I] | | Whether to display connect/disconnect messages.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | enableVotekick: true
+[10-21-2021 15:12:56] [I] | | Whether votekick is enabled.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | startCommands: 
+[10-21-2021 15:12:56] [I] | | Commands run at startup. This should be a comma-separated list.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | crashReport: true
+[10-21-2021 15:12:56] [I] | | Whether to send crash reports.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | logging: true
+[10-21-2021 15:12:56] [I] | | Whether to log everything to files.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | strict: true
+[10-21-2021 15:12:56] [I] | | Whether strict mode is on - corrects positions and prevents duplicate UUIDs.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | antiSpam: true
+[10-21-2021 15:12:56] [I] | | Whether spammers are automatically kicked and rate-limited.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | interactRateWindow: 6
+[10-21-2021 15:12:56] [I] | | Block interaction rate limit window, in seconds.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | interactRateLimit: 25
+[10-21-2021 15:12:56] [I] | | Block interaction rate limit.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | interactRateKick: 60
+[10-21-2021 15:12:56] [I] | | How many times a player must interact inside the window to get kicked.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | messageRateLimit: 1
+[10-21-2021 15:12:56] [I] | | Message rate limit in seconds. 0 to disable.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | messageSpamKick: 3
+[10-21-2021 15:12:56] [I] | | How many times a player must send a message before the cooldown to get kicked. 0 to disable.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | socketInput: false
+[10-21-2021 15:12:56] [I] | | Allows a local application to control this server through a local TCP socket.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | socketInputPort: 6859
+[10-21-2021 15:12:56] [I] | | The port for socket input.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | socketInputAddress: localhost
+[10-21-2021 15:12:56] [I] | | The bind address for socket input.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | allowCustomClients: false
+[10-21-2021 15:12:56] [I] | | Whether custom clients are allowed to connect.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | whitelist: false
+[10-21-2021 15:12:56] [I] | | Whether the whitelist is used.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | motd:  
+[10-21-2021 15:12:56] [I] | | The message displayed to people on connection.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | autosave: false
+[10-21-2021 15:12:56] [I] | | Whether the periodically save the map when playing.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | autosaveAmount: 10
+[10-21-2021 15:12:56] [I] | | The maximum amount of autosaves. Older ones get replaced.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | autosaveSpacing: 300
+[10-21-2021 15:12:56] [I] | | Spacing between autosaves in seconds.
+[10-21-2021 15:12:56] [I] |
+[10-21-2021 15:12:56] [I] | debug: false
+[10-21-2021 15:12:56] [I] | | Enable debug logging
+[10-21-2021 15:12:56] [I] |
+[10-22-2021 14:29:09] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 14:29:09] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 14:29:09] [I] 1 mods loaded.
+[10-22-2021 14:29:09] [I] Server loaded. Type 'help' for help.
+[10-22-2021 14:37:47] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 14:37:47] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 14:37:47] [I] 1 mods loaded.
+[10-22-2021 14:37:47] [I] Server loaded. Type 'help' for help.
+[10-22-2021 14:39:02] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 14:39:02] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 14:39:02] [I] 1 mods loaded.
+[10-22-2021 14:39:02] [I] Server loaded. Type 'help' for help.
+[10-22-2021 15:26:50] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 15:26:50] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 15:26:50] [I] 1 mods loaded.
+[10-22-2021 15:26:50] [I] Server loaded. Type 'help' for help.
+[10-22-2021 15:28:10] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 15:28:10] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 15:28:10] [I] 1 mods loaded.
+[10-22-2021 15:28:10] [I] Server loaded. Type 'help' for help.
+[10-22-2021 15:34:08] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 15:34:08] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 15:34:08] [I] 1 mods loaded.
+[10-22-2021 15:34:08] [I] Server loaded. Type 'help' for help.
+[10-22-2021 15:37:55] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 15:37:55] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 15:37:55] [I] 1 mods loaded.
+[10-22-2021 15:37:55] [I] Server loaded. Type 'help' for help.
+[10-22-2021 15:43:22] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 15:43:22] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 15:43:22] [I] 1 mods loaded.
+[10-22-2021 15:43:22] [I] Server loaded. Type 'help' for help.
+[10-22-2021 15:46:30] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 15:46:30] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 15:46:30] [I] 1 mods loaded.
+[10-22-2021 15:46:30] [I] Server loaded. Type 'help' for help.
+[10-22-2021 15:49:42] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 15:49:42] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 15:49:42] [I] 1 mods loaded.
+[10-22-2021 15:49:42] [I] Server loaded. Type 'help' for help.
+[10-22-2021 15:56:20] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 15:56:20] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 15:56:20] [I] 1 mods loaded.
+[10-22-2021 15:56:20] [I] Server loaded. Type 'help' for help.
+[10-22-2021 15:57:10] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 15:57:10] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 15:57:10] [I] 1 mods loaded.
+[10-22-2021 15:57:10] [I] Server loaded. Type 'help' for help.
+[10-22-2021 16:04:02] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 16:04:02] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 16:04:02] [I] 1 mods loaded.
+[10-22-2021 16:04:02] [I] Server loaded. Type 'help' for help.
+[10-22-2021 16:04:02] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-22-2021 16:04:02] [I] Loading map...
+[10-22-2021 16:04:02] [I] Map loaded.
+[10-22-2021 16:04:02] [I] Opened a server on port 6567.
+[10-22-2021 16:04:09] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-22-2021 16:10:51] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 16:10:51] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 16:10:51] [I] 1 mods loaded.
+[10-22-2021 16:10:51] [I] Server loaded. Type 'help' for help.
+[10-22-2021 16:10:51] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-22-2021 16:10:51] [I] Loading map...
+[10-22-2021 16:10:52] [I] Map loaded.
+[10-22-2021 16:10:52] [I] Opened a server on port 6567.
+[10-22-2021 16:10:53] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-22-2021 16:11:54] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 16:11:54] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 16:11:54] [I] 1 mods loaded.
+[10-22-2021 16:11:54] [I] Server loaded. Type 'help' for help.
+[10-22-2021 16:11:54] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-22-2021 16:11:54] [I] Loading map...
+[10-22-2021 16:11:54] [I] Map loaded.
+[10-22-2021 16:11:54] [I] Opened a server on port 6567.
+[10-22-2021 16:11:57] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-22-2021 16:17:08] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-22-2021 16:17:08] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-22-2021 16:17:08] [I] 1 mods loaded.
+[10-22-2021 16:17:08] [I] Server loaded. Type 'help' for help.
+[10-22-2021 16:17:08] [E] Command not found. Did you mean "host"?
+[10-22-2021 16:17:13] [E] Command not found. Did you mean "js"?
+[10-22-2021 16:17:15] [E] Too few command arguments. Usage: js <script...>
+[10-22-2021 16:17:17] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-22-2021 16:17:17] [I] Loading map...
+[10-22-2021 16:17:17] [I] Map loaded.
+[10-22-2021 16:17:17] [I] Opened a server on port 6567.
+[10-22-2021 16:17:19] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-22-2021 16:34:02] [I] Game over! Reached wave 16 with 1 players online on map V130: Polluted river: Crux.
+[10-22-2021 16:34:02] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-22-2021 17:10:41] [I] Game over! Reached wave 18 with 1 players online on map Mision 12   Base pretrolera.
+[10-22-2021 17:10:41] [I] Selected next map to be V130: Polluted river: Crux.
+[10-22-2021 17:30:14] [I] Game over! Reached wave 19 with 1 players online on map V130: Polluted river: Crux.
+[10-22-2021 17:30:14] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-22-2021 17:34:29] [I] Game over! Reached wave 2 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-22-2021 17:34:29] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-22-2021 18:11:04] [I] Game over! Reached wave 18 with 1 players online on map Mision 12   Base pretrolera.
+[10-22-2021 18:11:04] [I] Selected next map to be V130: Polluted river: Crux.
+[10-22-2021 18:27:38] [I] Game over! Reached wave 16 with 1 players online on map V130: Polluted river: Crux.
+[10-22-2021 18:27:38] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-22-2021 18:33:34] [I] Game over! Reached wave 2 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-22-2021 18:33:34] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-22-2021 19:10:14] [I] Game over! Reached wave 18 with 1 players online on map Mision 12   Base pretrolera.
+[10-22-2021 19:10:14] [I] Selected next map to be V130: Polluted river: Crux.
+[10-22-2021 19:18:31] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-22-2021 19:28:32] [I] Game over! Reached wave 18 with 0 players online on map V130: Polluted river: Crux.
+[10-22-2021 19:28:32] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-22-2021 20:04:23] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[10-22-2021 20:04:23] [I] Selected next map to be V130: Polluted river: Crux.
+[10-22-2021 20:20:32] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[10-22-2021 20:20:32] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-22-2021 20:56:02] [I] Game over! Reached wave 17 with 0 players online on map Mision 12   Base pretrolera.
+[10-22-2021 20:56:02] [I] Selected next map to be V130: Polluted river: Crux.
+[10-22-2021 21:15:32] [I] Game over! Reached wave 19 with 0 players online on map V130: Polluted river: Crux.
+[10-22-2021 21:15:32] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-22-2021 21:21:26] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-22-2021 21:21:26] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-22-2021 21:58:07] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-22-2021 21:58:07] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-22-2021 22:01:45] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-22-2021 22:01:45] [I] Selected next map to be V130: Polluted river: Crux.
+[10-22-2021 22:18:45] [I] Game over! Reached wave 16 with 0 players online on map V130: Polluted river: Crux.
+[10-22-2021 22:18:45] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-22-2021 22:55:02] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-22-2021 22:55:02] [I] Selected next map to be V130: Polluted river: Crux.
+[10-22-2021 23:11:32] [I] Game over! Reached wave 16 with 0 players online on map V130: Polluted river: Crux.
+[10-22-2021 23:11:32] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-22-2021 23:48:01] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-22-2021 23:48:01] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-22-2021 23:52:10] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-22-2021 23:52:10] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-23-2021 09:01:27] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-23-2021 09:01:27] [I] Selected next map to be V130: Polluted river: Crux.
+[10-23-2021 09:17:21] [I] Game over! Reached wave 15 with 0 players online on map V130: Polluted river: Crux.
+[10-23-2021 09:17:21] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-23-2021 09:21:29] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-23-2021 09:21:29] [I] Selected next map to be Mision 12 - Base pretrolera.

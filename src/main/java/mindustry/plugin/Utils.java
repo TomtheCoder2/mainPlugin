@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
 import arc.util.Strings;
+import com.google.gson.JsonArray;
 import mindustry.content.Blocks;
 import mindustry.content.UnitTypes;
 import mindustry.game.EventType;
@@ -17,6 +18,8 @@ import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
+import mindustry.world.Tile;
+import mindustry.world.blocks.storage.CoreBlock;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
@@ -27,9 +30,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import static mindustry.Vars.maps;
+import static mindustry.Vars.netServer;
 import static mindustry.plugin.ioMain.getTextChannel;
 //import java.sql.*;
 
@@ -44,27 +49,29 @@ public class Utils {
     static String rankMessage = "";
     static String ruleMessage = "";
     static String noPermissionMessage = "You don't have the required rank for this command. Learn more about ranks [pink]/info[]";
-    // wheter ip verification is in place (detect vpns, disallow their build rights)
+    // whether ip verification is in place (detect vpns, disallow their build rights)
     static Boolean verification = false;
     static String promotionMessage =
             """
-                    [sky]%player%, you have been promoted to [sky]<active>[]!
-                    [#4287f5]You reached a playtime of - %playtime% minutes! That's 10+ hours!
+                    [sky]%player%, you have been promoted to [sky]<%rank%>[]!
+                    [#4287f5]You reached a playtime of - %playtime% minutes!
                     [#f54263]You played a total of %games% games!
                     [#9342f5]You built a total of %buildings% buildings!
-                    [sky]Thank you for participating and enjoy your time on [orange]<[white]io[orange]>[sky]!
-                    [scarlet]Please rejoin for the change to take effect.""";
+                    [sky]Enjoy your time on the [white][#ff2400]P[#ff4900]H[#ff6d00]O[#ff9200]E[#ffb600]N[#ffdb00]I[#ffff00]X [white]Servers[sky]!""";
     public static HashMap<Integer, Rank> rankNames = new HashMap<>();
+    public static HashMap<Integer, Requirement> rankRequirements = new HashMap<>();
     static HashMap<String, Integer> rankRoles = new HashMap<>();
     static Seq<String> bannedNames = new Seq<>();
     static Seq<String> onScreenMessages = new Seq<>();
+    static Seq<Block> bannedBlocks = new Seq<>();
     static String eventIp = "";
     static int eventPort = 1001;
 
     public static void init() {
 //        "\uE816";
         // set all ranks
-        rankNames.put(0, new Rank("[#7d7d7d][]", "none"));
+        rankNames.put(0, new Rank("[#7d7d7d][]", "Civilian", "The new combatants at the front", new Color(0xffffff)));
+        // first try:
 //        rankNames.put(1, new Rank("[accent]<[white]\uE802[accent]>[]", "private"));
 //        rankNames.put(2, new Rank("[accent]<[white]\uE813[accent]>[]", "general"));
 //        rankNames.put(3, new Rank("[accent]<[white]\uE824[accent]>[]", "sargent"));
@@ -73,12 +80,54 @@ public class Utils {
 //        rankNames.put(6, new Rank("[accent]<[white]\uE809[accent]>[]", "contributor"));
 //        rankNames.put(7, new Rank("[accent]<[white]\uE817[accent]>[]", "moderator"));
 //        rankNames.put(8, new Rank("[accent]<[white][accent]>[]", "admin"));
-        rankNames.put(1, new Rank("[accent]<[white]\uE800[accent]>[] ", "newbie"));
-        rankNames.put(2, new Rank("[accent]<[white]\uE826[accent]>[] ", "active"));
-        rankNames.put(3, new Rank("[accent]<[white]\uE813[accent]>[] ", "veteran"));
-        rankNames.put(4, new Rank("[accent]<[white]\uE809[accent]>[] ", "map_creator:"));
-        rankNames.put(5, new Rank("[accent]<[white]\uE88E[accent]>[] ", "moderator_jr:"));
-        rankNames.put(6, new Rank("[accent]<[white]\uE82C[accent]>[] ", "moderator"));
+        // second try:
+//        rankNames.put(1, new Rank("[accent]<[white]\uE800[accent]>[] ", "newbie"));
+//        rankNames.put(2, new Rank("[accent]<[white]\uE826[accent]>[] ", "active"));
+//        rankNames.put(3, new Rank("[accent]<[white]\uE813[accent]>[] ", "veteran"));
+//        rankNames.put(4, new Rank("[accent]<[white]\uE809[accent]>[] ", "map_creator:"));
+//        rankNames.put(5, new Rank("[accent]<[white]\uE88E[accent]>[] ", "moderator_jr:"));
+//        rankNames.put(6, new Rank("[accent]<[white]\uE82C[accent]>[] ", "moderator"));
+        // third try:
+        // ranks in normal form:
+        /**
+         * Private => Soldier
+         * General => Corporal
+         * Corporal => Sargeant
+         * Sargeant => Major
+         * Pro player => Lieutenant
+         * Contributor => Captain
+         * Mod Jr => Colonel
+         * Mod => General
+         * Admin => Marshal
+         * */
+        // icons:
+        /**
+         * -Soldier  (uE865)
+         * -Corporal (uE861)
+         * -Sargeant  (uE806)
+         * -Major ()
+         * -Lieutenant ()
+         * -Captain (uE811)
+         * -Colonel (uE864)
+         * -General (uE817)
+         * -Marshall (uE814)
+         * */
+
+        rankNames.put(1, new Rank("[accent]|[white]\uE865[accent]|[]", "Soldier", new Color(0xC0C3C4))); // private
+        rankNames.put(2, new Rank("[accent]|[white]\uE861[accent]|[]", "Corporal", new Color(0x969A9D))); // general
+        rankNames.put(3, new Rank("[accent]|[white]\uE826[accent]|[]", "Sargeant", new Color(0x717578))); // corporal
+        rankNames.put(4, new Rank("[accent]|[white]\uE806[accent]|[]", "Major", new Color(0x515456))); // sargeant
+        rankNames.put(5, new Rank("[accent]|[white]\uE810[accent]|[]", "Lieutenant", "Be decorated by General/Marshal", new Color(0x708374))); // pro player
+        rankNames.put(6, new Rank("[accent]|[white]\uE811[accent]|[]", "Captain", "Create maps or code for the server", new Color(0x456F43))); // contributer
+        rankNames.put(7, new Rank("[accent]|[white]\uE864[accent]|[]", "Colonel", "Apply at our discord server (Junior Mod)", new Color(0x405B32))); // mod jr
+        rankNames.put(8, new Rank("[accent]|[white]\uE817[accent]|[]", "General", "Be decorated from Colonel", new Color(0x0A6216))); // mod
+        rankNames.put(9, new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", "Be admin", new Color(0xffcc00))); // admin
+
+
+        rankRequirements.put(1, new Requirement(1000, 3000, 5));
+        rankRequirements.put(2, new Requirement(2500, 5000, 15));
+        rankRequirements.put(3, new Requirement(10000, 15000, 25));
+        rankRequirements.put(4, new Requirement(20000, 35000, 50));
 
 
         rankRoles.put("627985513600516109", 1);
@@ -94,16 +143,63 @@ public class Utils {
         bannedNames.add("IgruhaOrg");
         bannedNames.add("андрей");
 
-        activeRequirements.bannedBlocks.add(Blocks.conveyor);
-        activeRequirements.bannedBlocks.add(Blocks.titaniumConveyor);
-        activeRequirements.bannedBlocks.add(Blocks.junction);
-        activeRequirements.bannedBlocks.add(Blocks.router);
+        bannedBlocks.add(Blocks.conveyor);
+        bannedBlocks.add(Blocks.titaniumConveyor);
+        bannedBlocks.add(Blocks.junction);
+        bannedBlocks.add(Blocks.router);
 
         statMessage = Core.settings.getString("statMessage");
         reqMessage = Core.settings.getString("reqMessage");
         rankMessage = Core.settings.getString("rankMessage");
         welcomeMessage = Core.settings.getString("welcomeMessage");
         ruleMessage = Core.settings.getString("ruleMessage");
+    }
+
+    /**
+     * Get a list of all ranks for the help page
+     */
+    public static String listRanks() {
+        StringBuilder list = new StringBuilder();
+        list.append("```java\n");
+        for (var entry : rankNames.entrySet()) {
+            list.append(entry.getKey()).append(": ").append(entry.getValue().name).append("\n");
+        }
+        list.append("```");
+        return list.toString();
+    }
+
+    /**
+     * list all ranks for the /ranks command
+     */
+    public static String inGameListRanks() {
+        StringBuilder list = new StringBuilder("[accent]List of all ranks:\n");
+        for (var entry : rankNames.entrySet()) {
+            list.append(entry.getValue().tag).append(" [#").append(Integer.toHexString(rankNames.get(entry.getKey()).color.getRGB()).substring(2)).append("]").append(entry.getValue().name).append("\n");
+        }
+        list.append("\n[green]Type [sky]/req [green]to see the requirements for the ranks");
+        return list.toString();
+    }
+
+    /**
+     * show the requirements for the ranks
+     */
+    public static String listRequirements() {
+        StringBuilder list = new StringBuilder("[accent]List of all requirements:\n");
+        for (var entry : rankNames.entrySet()) {
+            list.append("[#").append(Integer.toHexString(rankNames.get(entry.getKey()).color.getRGB()).substring(2)).append("]").append(entry.getValue().name).append(" ");
+            if (entry.getValue().description != null) {
+                list.append(" : [orange]").append(entry.getValue().description).append("\n");
+            } else {
+                list
+                        .append(": [red]")
+                        .append(rankRequirements.get(entry.getKey()).playtime / 1000)
+                        .append("k mins[white]/ [orange]")
+                        .append(rankRequirements.get(entry.getKey()).gamesPlayed)
+                        .append(" games[white]/ [yellow]")
+                        .append(rankRequirements.get(entry.getKey()).buildingsBuilt / 1000).append(" built\n");
+            }
+        }
+        return list.toString();
     }
 
     /**
@@ -137,7 +233,11 @@ public class Utils {
      * @param string the player name (in most cases)
      */
     public static String escapeEverything(String string) {
-        return escapeColorCodes(string.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "");
+        return escapeColorCodes(string
+                .replaceAll(" ", "")
+                .replaceAll("<.*?>", "")
+                .replaceAll("\\|(.*)\\|", "")
+                .replaceAll("\\[accent\\]", ""));
     }
 
     /**
@@ -146,7 +246,7 @@ public class Utils {
      * @param player the player
      */
     public static String escapeEverything(Player player) {
-        return escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "");
+        return escapeEverything(player.name);
     }
 
     /**
@@ -171,14 +271,6 @@ public class Utils {
         return found;
     }
 
-    public static void tooFewArguments(Context ctx, Command command) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("Too few arguments!")
-                .setDescription("Usage: " + ioMain.prefix + command.name + " " + command.usage)
-                .setColor(Pals.error);
-        ctx.channel.sendMessage(eb);
-    }
-
     /**
      * Find a player by name
      *
@@ -195,7 +287,7 @@ public class Utils {
             if (player.con.address.equals(identifier.replaceAll(" ", "")) ||
                     String.valueOf(player.id).equals(identifier.replaceAll(" ", "")) ||
                     player.uuid().equals(identifier.replaceAll(" ", "")) ||
-                    escapeColorCodes(player.name.toLowerCase().replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "").startsWith(identifier.toLowerCase().replaceAll(" ", ""))) {
+                    escapeEverything(player).toLowerCase().replaceAll(" ", "").startsWith(identifier.toLowerCase().replaceAll(" ", ""))) {
                 found = player;
             }
         }
@@ -492,11 +584,77 @@ public class Utils {
     }
 
     /**
+     * get a ranking from the database
+     */
+    public static String ranking(int limit, String column) {
+//        String SQL = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason "
+//                + "FROM playerdata "
+//                + "WHERE uuid = ?";
+        String SQL = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason " +
+                "FROM playerdata " +
+                "ORDER BY " + column + " DESC LIMIT ?";
+        try {
+            StringBuilder rankingList = new StringBuilder("```");
+            // connect to the database
+            connect();
+            Connection conn = connect();
+            PreparedStatement pstmt = conn.prepareStatement(SQL);
+
+            // replace ? with the uuid
+//            pstmt.setString(1, column);
+            pstmt.setInt(1, limit);
+            System.out.println(pstmt);
+            // get the result
+            ResultSet rs = pstmt.executeQuery();
+            int c = 0; // count
+            while (rs.next()) {
+                c++;
+                // create a new Player to return
+                PlayerData pd = new PlayerData(rs.getInt("rank"));
+
+                // set all stats
+                pd.uuid = rs.getString("uuid");
+                pd.playTime = rs.getInt("playTime");
+                pd.buildingsBuilt = rs.getInt("buildingsBuilt");
+                pd.gamesPlayed = rs.getInt("gamesPlayed");
+                rankingList.append(String.format("%-3d", c));
+                Administration.PlayerInfo info = netServer.admins.getInfoOptional(pd.uuid);
+                switch (column) {
+                    case "playTime" -> {
+                        rankingList.append(String.format("%-10d", pd.playTime));
+                    }
+                    case "buildingsBuilt" -> {
+                        rankingList.append(String.format("%-10d", pd.buildingsBuilt));
+                    }
+                    case "gamesPlayed" -> {
+                        rankingList.append(String.format("%-10d", pd.gamesPlayed));
+                    }
+                    default -> {
+                        return "Please select a valid stat";
+                    }
+                }
+                rankingList.append(" ").append(String.format("%-24s: ", pd.uuid));
+                if (info != null) {
+                    rankingList.append(escapeEverything(info.names.get(0)));
+                }
+                rankingList.append("\n");
+            }
+            rankingList.append("```");
+            return rankingList.toString();
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return "Didnt find anything idk";
+    }
+
+    /**
      * create and save Ranks
      */
     public static class Rank {
         public String tag = "";
         public String name = "";
+        public String description = null;
+        public Color color = null;
 
         /**
          * Create a new rank
@@ -504,13 +662,34 @@ public class Utils {
          * @param t name tag (gets displayed before the player names starts, for example: <*>Nautilus
          * @param n name of the rank (for example: Moderator)
          */
-        Rank(String t, String n) {
+        Rank(String t, String n, String desc, Color col) {
             this.tag = t;
             this.name = n;
+            this.description = desc;
+            this.color = col;
+        }
+
+        Rank(String t, String n, Color col) {
+            this.tag = t;
+            this.name = n;
+            this.color = col;
+        }
+
+    }
+
+    public static class Requirement {
+        public int buildingsBuilt;
+        public int gamesPlayed;
+        public int playtime;
+
+        public Requirement(int inputPlaytime, int inputBuildingsBuilt, int inputGamesPlayed) {
+            this.playtime = inputPlaytime;
+            this.buildingsBuilt = inputBuildingsBuilt;
+            this.gamesPlayed = inputGamesPlayed;
         }
     }
 
-    //    public static CoreBlock.CoreEntity getCore(Team team){
+//        public static getCore(Team team){
 //        Tile[][] tiles = world.getTiles();
 //        for (int x = 0; x < tiles.length; ++x) {
 //            for(int y = 0; y < tiles[0].length; ++y) {
@@ -526,6 +705,7 @@ public class Utils {
 //        }
 //        return null;
 //    }
+
     // colors for errors, info, warning etc messages
     public static class Pals {
         public static Color warning = (Color.getHSBColor(5, 85, 95));
@@ -533,66 +713,4 @@ public class Utils {
         public static Color error = (Color.getHSBColor(3, 78, 91));
         public static Color success = (Color.getHSBColor(108, 80, 100));
     }
-
-    // Requirements for the different ranks
-    public static class newbieRequirements {
-        public static Seq<Block> bannedBlocks = new Seq<>();
-        public static int playtime = 500;
-        public static int buildingsBuilt = 1000;
-        public static int gamesPlayed = 5;
-        public static String promotionMessage = """
-                [sky]%player%, you have been promoted to [sky]<newbie>[]!
-                [#4287f5]You reached a playtime of - %playtime% minutes! That's 500+ minutes!
-                [#f54263]You played a total of %games% games!
-                [#9342f5]You built a total of %buildings% buildings!
-                [scarlet]Please rejoin for the change to take effect.""";
-    }
-
-    public static class activeRequirements {
-        public static Seq<Block> bannedBlocks = new Seq<>();
-        public static int playtime = 2500;
-        public static int buildingsBuilt = 5 * 1000;
-        public static int gamesPlayed = 15;
-        public static String promotionMessage = """
-                [sky]%player%, you have been promoted to [sky]<active>[]!
-                [#4287f5]You reached a playtime of - %playtime% minutes! That's 2500+ minutes!
-                [#f54263]You played a total of %games% games!
-                [#9342f5]You built a total of %buildings% buildings!
-                [scarlet]Please rejoin for the change to take effect.""";
-    }
-
-    public static class veteranRequirements {
-        public static Seq<Block> bannedBlocks = new Seq<>();
-        public static int playtime = 20 * 1000;
-        public static int buildingsBuilt = 35 * 1000;
-        public static int gamesPlayed = 50;
-        public static String promotionMessage = """
-                [sky]%player%, you have been promoted to [sky]<veteran>[]!
-                [#4287f5]You reached a playtime of - %playtime% minutes! That's 20000+ minutes!
-                [#f54263]You played a total of %games% games!
-                [#9342f5]You built a total of %buildings% buildings!
-                [scarlet]Please rejoin for the change to take effect.""";
-    }
-
-
-//    public static class generalRequirements {
-//        public static Seq<Block> bannedBlocks = new Seq<>();
-//        public static int playtime = 2500;
-//        public static int buildingsBuilt = 5 * 1000;
-//        public static int gamesPlayed = 15;
-//    }
-//
-//    public static class corporalRequirements {
-//        public static Seq<Block> bannedBlocks = new Seq<>();
-//        public static int playtime = 10 * 1000;
-//        public static int buildingsBuilt = 15 * 1000;
-//        public static int gamesPlayed = 25;
-//    }
-//
-//    public static class sargentRequirements {
-//        public static Seq<Block> bannedBlocks = new Seq<>();
-//        public static int playtime = 20 * 1000;
-//        public static int buildingsBuilt = 35 * 1000;
-//        public static int gamesPlayed = 50;
-//    }
 }

@@ -26,7 +26,7 @@ Please suggest features on the discord server. I would appreciate feedback and s
 ### Contributing
 Everyone is welcome to contribute to this project, just send me a direct message on Discord (Nautilus#0100).
 
-![](https://dcbadge.vercel.app/api/shield/770240444466069514)
+[comment]: <> (![]&#40;https://dcbadge.vercel.app/api/shield/770240444466069514&#41;)
 
 
 

@@ -23,6 +23,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
@@ -40,6 +41,7 @@ public class ComCommands {
             {
                 help = "Sends a message to in-game chat.";
                 usage = "<message>";
+                minArguments = 1;
             }
 
             public void run(Context ctx) {
@@ -61,6 +63,7 @@ public class ComCommands {
             {
                 help = "Preview and download a server map in a .msav file format.";
                 usage = "<mapname/mapid>";
+                minArguments = 1;
             }
 
             public void run(Context ctx) {
@@ -105,7 +108,7 @@ public class ComCommands {
             public void run(Context ctx) {
                 StringBuilder msg = new StringBuilder("**Players online: " + Groups.player.size() + "**\n```\n");
                 for (Player player : Groups.player) {
-                    msg.append("· ").append(escapeColorCodes(player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "")).append(" : ").append(player.id).append("\n");
+                    msg.append("· ").append(escapeEverything(player)).append(" : ").append(player.id).append("\n");
                 }
                 msg.append("```");
 //                ctx.channel.sendMessage(msg.toString());
@@ -121,12 +124,14 @@ public class ComCommands {
                 if (Groups.player.size() == 0) {
                     lijst.append("No players are currently in the server.");// + Vars.playerGroup.all().count(p->p.isAdmin)+"\n");
                 }
-                for (Player p : Groups.player) {
-                    if (p.admin()) {
-                        lijst.append("`").append(escapeColorCodes(p.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "")).append(" : ").append("admin").append("`\n");
+                for (Player player : Groups.player) {
+                    lijst.append("`* ");
+                    if (player.admin()) {
+                        lijst.append(String.format("%-9s :` ", "admin"));
                     } else {
-                        lijst.append("`").append(escapeColorCodes(p.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "")).append(" : ").append(String.format("%-5d", p.id)).append("`\n");
+                        lijst.append(String.format("%-9s :` ", player.id));
                     }
+                    lijst.append(escapeEverything(player.name)).append("\n");
                 }
 
                 new MessageBuilder()
@@ -166,6 +171,7 @@ public class ComCommands {
         handler.registerCommand(new Command("resinfo") {
             {
                 help = "Check the amount of resources in the core.";
+                usage =  "[team]";
             }
 
             public void run(Context ctx) {
@@ -175,6 +181,13 @@ public class ComCommands {
                 }
                 // the normal player team is "sharded"
                 TeamData data = state.teams.get(Team.sharded);
+                if (ctx.args.length == 2) {
+                    try {
+                        Field field = Team.class.getDeclaredField(ctx.args[1]);
+                        data = state.teams.get((Team) field.get(null));
+                    } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                    }
+                }
                 //-- Items are shared between cores
 //                CoreEntity core = data.cores.first();
                 ItemModule core = Groups.player.first().core().items;

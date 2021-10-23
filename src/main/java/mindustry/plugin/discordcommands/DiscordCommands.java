@@ -10,6 +10,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
+import mindustry.plugin.Utils.*;
 
 import mindustry.plugin.ioMain.*;
 
@@ -146,6 +147,10 @@ public class DiscordCommands implements MessageCreateListener {
             ctx.channel.sendMessage(eb);
             return;
         }
+        if (command.minArguments > ctx.args.length - 1) {
+            tooFewArguments(ctx, command);
+            return;
+        }
         try {
             command.run(ctx);
         } catch (Exception error) {
@@ -163,6 +168,14 @@ public class DiscordCommands implements MessageCreateListener {
                 System.out.println(error2.toString());
             }
         }
+    }
+
+    public static void tooFewArguments(Context ctx, Command command) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("Too few arguments!")
+                .setDescription("Usage: " + ioMain.prefix + command.name + " " + command.usage)
+                .setColor(Pals.error);
+        ctx.channel.sendMessage(eb);
     }
 
     /**

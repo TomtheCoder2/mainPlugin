@@ -5,13 +5,10 @@ import arc.Events;
 import arc.files.Fi;
 import arc.struct.Seq;
 import arc.util.Log;
-import arc.util.Strings;
 import arc.util.Structs;
 import mindustry.content.Blocks;
-import mindustry.content.Bullets;
 import mindustry.content.UnitTypes;
 import mindustry.core.GameState;
-import mindustry.entities.bullet.BulletType;
 import mindustry.game.EventType.GameOverEvent;
 import mindustry.game.Gamemode;
 import mindustry.game.Team;
@@ -19,7 +16,6 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
-import mindustry.graphics.Pal;
 import mindustry.io.SaveIO;
 import mindustry.maps.Map;
 import mindustry.maps.MapException;
@@ -38,7 +34,6 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.user.User;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -46,8 +41,6 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
-import java.time.Period;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
@@ -57,8 +50,6 @@ import static arc.util.Log.err;
 import static arc.util.Log.info;
 import static mindustry.Vars.*;
 import static mindustry.plugin.Utils.*;
-
-import mindustry.mod.Scripts.*;
 
 public class ServerCommands {
     public GetMap map = new GetMap();
@@ -237,6 +228,7 @@ public class ServerCommands {
                     usage = "<player> <duration (minutes)> [reason...]";
                     category = "moderation";
                     apprenticeCommand = true;
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -286,6 +278,7 @@ public class ServerCommands {
                     usage = "<playerid|ip|name|teamid> <message>";
                     category = "moderation";
                     apprenticeCommand = true;
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -333,6 +326,7 @@ public class ServerCommands {
                     role = apprenticeRole;
                     category = "moderation";
                     apprenticeCommand = true;
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -364,12 +358,43 @@ public class ServerCommands {
         if (data.has("moderator_roleid")) {
             String banRole = data.getString("moderator_roleid");
 
+            handler.registerCommand(new RoleRestrictedCommand("ranking") {
+                {
+                    help = "Get a ranking list.";
+                    role = banRole;
+                    usage = "<playtime|games|buildings> [offset]";
+                    category = "management";
+                    minArguments = 1;
+                }
+                public void run(Context ctx) {
+                    // get a list from the database
+                    EmbedBuilder eb = new EmbedBuilder();
+                    eb.setTitle("Ranking list:");
+                    switch (ctx.args[1].toLowerCase()) {
+                        case "playtime", "p" -> {
+                            eb.setDescription(ranking(10, "playTime"));
+                        }
+                        case "games", "gamesplayed", "g" -> {
+                            eb.setDescription(ranking(10, "gamesPlayed"));
+                        }
+                        case "buildings", "buildingsbuilt", "b" -> {
+                            eb.setDescription(ranking(10, "buildingsBuilt"));
+                        }
+                        default -> {
+                            eb.setDescription("Please select a valid stat");
+                        }
+                    }
+                    ctx.channel.sendMessage(eb);
+                }
+            });
+
             handler.registerCommand(new RoleRestrictedCommand("changemap") {
                 {
                     help = "Change the current map to the one provided.";
                     role = banRole;
                     usage = "<mapname/mapid>";
                     category = "management";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -407,6 +432,7 @@ public class ServerCommands {
                     role = banRole;
                     usage = "<message>";
                     category = "moderation";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -437,6 +463,7 @@ public class ServerCommands {
                     role = banRole;
                     usage = "<ip/none>";
                     category = "admin";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -474,11 +501,11 @@ public class ServerCommands {
                     role = banRole;
                     usage = "<playerid|ip|name|teamid>";
                     category = "moderation";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
                     EmbedBuilder eb = new EmbedBuilder();
-                    if (ctx.args.length < 2) tooFewArguments(ctx, this);
                     String target = ctx.args[1].toLowerCase();
 
                     Player p = findPlayer(target);
@@ -530,6 +557,7 @@ public class ServerCommands {
                     usage = "<player> [reason..]";
                     role = banRole;
                     category = "moderation";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -582,6 +610,7 @@ public class ServerCommands {
                     usage = "<uuid>";
                     role = banRole;
                     category = "moderation";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -613,6 +642,7 @@ public class ServerCommands {
                     usage = "<player> <duration (minutes)> [reason..]";
                     role = banRole;
                     category = "moderation";
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -662,6 +692,7 @@ public class ServerCommands {
                     usage = "<player> [reason..]";
                     role = banRole;
                     category = "moderation";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -694,6 +725,7 @@ public class ServerCommands {
                     usage = "<uuid>";
                     role = banRole;
                     category = "moderation";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -723,6 +755,7 @@ public class ServerCommands {
                     usage = "<uuid>";
                     role = banRole;
                     category = "moderation";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -747,6 +780,7 @@ public class ServerCommands {
                     usage = "<uuid>";
                     role = banRole;
                     category = "moderation";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -792,12 +826,13 @@ public class ServerCommands {
                         lijst.append("No players are currently in the server.");// + Vars.playerGroup.all().count(p->p.isAdmin)+"\n");
                     }
                     for (Player player : Groups.player) {
-                        lijst.append("`* ").append(escapeEverything(player.name));
+                        lijst.append("`* ");
                         if (player.admin()) {
-                            lijst.append("`\n");
+                            lijst.append(String.format("%-43s:` ", "admin"));
                         } else {
-                            lijst.append(" : ").append(player.con.address).append(" : ").append(player.uuid()).append("`\n");
+                            lijst.append(String.format("%-24s : %-16s :` ", player.uuid(), player.con.address));
                         }
+                        lijst.append(escapeEverything(player.name)).append("\n");
                     }
 
                     new MessageBuilder()
@@ -820,19 +855,18 @@ public class ServerCommands {
                     usage = "<player>";
                     role = banRole;
                     category = "moderation";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
                     EmbedBuilder eb = new EmbedBuilder();
-                    if (ctx.args.length < 2) {
-                        tooFewArguments(ctx, this);
-                    }
                     String target = ctx.args[1];
 
                     Administration.PlayerInfo info = null;
                     Player player = findPlayer(target);
                     if (player != null) {
                         info = netServer.admins.getInfo(player.uuid());
+                        System.out.println("Found " + player.name);
                     } else {
                         info = netServer.admins.getInfoOptional(target);
                     }
@@ -847,8 +881,12 @@ public class ServerCommands {
                             s.append(escapeEverything(ip)).append(" / ");
                         }
                         eb.setDescription(s.toString());
-                        ctx.channel.sendMessage(eb);
+                    } else {
+                        eb.setTitle("Command terminated");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("Player could not be found or is offline.");
                     }
+                    ctx.channel.sendMessage(eb);
                 }
             });
 
@@ -877,6 +915,7 @@ public class ServerCommands {
                     role = banRole;
                     usage = "<playerid|ip|all|name|teamid> <unit> [team]";
                     category = "management";
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -935,6 +974,7 @@ public class ServerCommands {
                     role = banRole;
                     usage = "<playerid|ip|all|name|teamid> <team>";
                     category = "management";
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -990,6 +1030,7 @@ public class ServerCommands {
                     role = banRole;
                     usage = "<playerid|ip|all|name> <team>";
                     category = "management";
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -1036,6 +1077,7 @@ public class ServerCommands {
                     role = banRole;
                     usage = "<playerid|ip|name> <name>";
                     category = "management";
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -1064,6 +1106,7 @@ public class ServerCommands {
                     role = banRole;
                     usage = "<newmessage>";
                     category = "management";
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -1090,6 +1133,7 @@ public class ServerCommands {
                     role = banRole;
                     usage = "<list/remove/add> <message>";
                     category = "moderation";
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -1141,12 +1185,14 @@ public class ServerCommands {
                     }
                 }
             });
+
             handler.registerCommand(new RoleRestrictedCommand("edit") {
                 {
                     help = "Change / set a message";
                     role = banRole;
-                    usage = "<stats|rank|req|rule> <newmessage>";
+                    usage = "<stats|rule> <newmessage>";
                     category = "management";
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -1169,36 +1215,36 @@ public class ServerCommands {
                             }
                             ctx.channel.sendMessage(eb);
                         }
-                        case "req" -> {
-                            EmbedBuilder eb = new EmbedBuilder();
-                            eb.setTitle("Command executed successfully");
-                            String message = ctx.message.split(" ", 2)[1];
-                            if (message.length() > 0) {
-                                reqMessage = message;
-                                Core.settings.put("reqMessage", message);
-                                Core.settings.autosave();
-                                eb.setDescription("Changed reqMessage.");
-                            } else {
-                                eb.setTitle("Command terminated");
-                                eb.setDescription("No message provided.");
-                            }
-                            ctx.channel.sendMessage(eb);
-                        }
-                        case "rank" -> {
-                            EmbedBuilder eb = new EmbedBuilder();
-                            eb.setTitle("Command executed successfully");
-                            String message = ctx.message.split(" ", 2)[1];
-                            if (message.length() > 0) {
-                                rankMessage = message;
-                                Core.settings.put("rankMessage", message);
-                                Core.settings.autosave();
-                                eb.setDescription("Changed rankMessage.");
-                            } else {
-                                eb.setTitle("Command terminated");
-                                eb.setDescription("No message provided.");
-                            }
-                            ctx.channel.sendMessage(eb);
-                        }
+//                        case "req" -> {
+//                            EmbedBuilder eb = new EmbedBuilder();
+//                            eb.setTitle("Command executed successfully");
+//                            String message = ctx.message.split(" ", 2)[1];
+//                            if (message.length() > 0) {
+//                                reqMessage = message;
+//                                Core.settings.put("reqMessage", message);
+//                                Core.settings.autosave();
+//                                eb.setDescription("Changed reqMessage.");
+//                            } else {
+//                                eb.setTitle("Command terminated");
+//                                eb.setDescription("No message provided.");
+//                            }
+//                            ctx.channel.sendMessage(eb);
+//                        }
+//                        case "rank" -> {
+//                            EmbedBuilder eb = new EmbedBuilder();
+//                            eb.setTitle("Command executed successfully");
+//                            String message = ctx.message.split(" ", 2)[1];
+//                            if (message.length() > 0) {
+//                                rankMessage = message;
+//                                Core.settings.put("rankMessage", message);
+//                                Core.settings.autosave();
+//                                eb.setDescription("Changed rankMessage.");
+//                            } else {
+//                                eb.setTitle("Command terminated");
+//                                eb.setDescription("No message provided.");
+//                            }
+//                            ctx.channel.sendMessage(eb);
+//                        }
                         case "rule" -> {
                             EmbedBuilder eb = new EmbedBuilder();
                             eb.setTitle("Command executed successfully");
@@ -1225,6 +1271,8 @@ public class ServerCommands {
                     }
                 }
             });
+
+            // idk why these commands are still here
 
 //            handler.registerCommand(new RoleRestrictedCommand("statmessage") {
 //                {
@@ -1338,6 +1386,7 @@ public class ServerCommands {
                     role = banRole;
                     category = "management";
                     usage = "<playerid|ip|name> <unit> <amount>";
+                    minArguments = 3;
                 }
 
                 public void run(Context ctx) {
@@ -1380,6 +1429,7 @@ public class ServerCommands {
                     role = banRole;
                     category = "management";
                     usage = "<playerid|ip|name> <unit>";
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -1424,6 +1474,7 @@ public class ServerCommands {
                     role = banRole;
                     usage = "<playerid|ip|name> <block> [rotation]";
                     category = "management";
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -1546,6 +1597,7 @@ public class ServerCommands {
                     role = banRole;
                     category = "management";
                     hidden = true;
+                    minArguments = 1;
                 }
 
                 public void run(Context ctx) {
@@ -1560,10 +1612,11 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("setrank") {
                 {
-                    help = "Change the player's rank to the provided one.";
+                    help = "Change the player's rank to the provided one.\nList of all ranks" + listRanks();
                     usage = "<playerid|ip|name> <rank>";
                     role = banRole;
                     category = "management";
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -1593,31 +1646,9 @@ public class ServerCommands {
                                 eb.setTitle("Command executed successfully");
                                 eb.setDescription("Promoted " + escapeEverything(info.names.get(0)) + " to " + rankNames.get(targetRank).name);
                                 ctx.channel.sendMessage(eb);
-//                                player.con.kick("Your rank was modified, please rejoin.", 0);
                                 int rank = pd.rank;
                                 if (player != null) {
-                                    switch (rank) { // apply new tag
-                                        case 0:
-                                            break;
-                                        case 1:
-                                            player.name = rankNames.get(1).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                            break;
-                                        case 2:
-                                            player.name = rankNames.get(2).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                            break;
-                                        case 3:
-                                            player.name = rankNames.get(3).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                            break;
-                                        case 4:
-                                            player.name = rankNames.get(4).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                            break;
-                                        case 5:
-                                            player.name = rankNames.get(5).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                            break;
-                                        case 6:
-                                            player.name = rankNames.get(6).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "");
-                                            break;
-                                    }
+                                    player.name = rankNames.get(rank).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "").replaceAll("\\|(.*)\\|", "");
                                 }
                             } else {
                                 eb.setTitle("Command terminated");
@@ -1627,7 +1658,7 @@ public class ServerCommands {
                                 return;
                             }
 
-                            if (targetRank == 6) {
+                            if (targetRank == rankNames.size() - 1) {
                                 assert player != null;
                                 netServer.admins.adminPlayer(player.uuid(), player.usid());
                             }
@@ -1642,6 +1673,7 @@ public class ServerCommands {
                     usage = "<playerid|ip|name> <rank> <playTime> <buildingsBuilt> <gamesPlayed>";
                     role = banRole;
                     category = "management";
+                    minArguments = 5;
                 }
 
                 public void run(Context ctx) {
@@ -1784,6 +1816,7 @@ public class ServerCommands {
                     role = reviewerRole;
                     usage = "<mapname/mapid>";
                     category = "mapReviewer";
+                    minArguments = 1;
                 }
 
                 @Override
@@ -1880,15 +1913,17 @@ public class ServerCommands {
                         System.out.println(mapData.get(0));
 
                         EmbedBuilder embed = new EmbedBuilder()
-                                .setTitle(escapeCharacters(mapData.get(6)))
-                                .setDescription(escapeCharacters(mapData.get(5)))
+                                .setTitle(escapeEverything(mapData.get(6)))
+                                .setDescription(escapeCharacters(mapData.get(5)) + "\nSize: " + mapData.get(7))
                                 .setAuthor(ctx.author.getName(), ctx.author.getAvatar().getUrl().toString(), ctx.author.getAvatar().getUrl().toString())
 //                                .setImage("attachment://" + mapData.get(6) + ".png");
-                                .setImage("attachment://output.png");
+                                .setImage("attachment://output.png")
+                                .setColor(new Color(0xF8D452))
+                                .setFooter("Date: " + mapData.get(4));
                         MessageBuilder mb = new MessageBuilder();
                         mb.addEmbed(embed);
                         InputStream PNG = new FileInputStream(mapData.get(0));
-                        mb.addFile(PNG, mapData.get(6) + ".png");
+                        mb.addFile(new File(mapData.get(0))); // mapData.get(6) + ".png"
                         InputStream initialStream = new FileInputStream(
                                 new File("./temp/upload.msav"));
                         mb.addAttachment(initialStream, mapData.get(6) + ".msav");
@@ -1940,6 +1975,8 @@ public class ServerCommands {
 //            user.thenAccept(user1 -> {
 //                eb.addField("Discord Link", user1.getDiscriminatedName());
 //            });
+
+
         }
         s.append("**All used names: **\n");
         for (String name : info.names) {

@@ -131,7 +131,7 @@ public class ioMain extends Plugin {
             TextChannel finalTc = tc;
             Events.on(EventType.PlayerChatEvent.class, event -> {
                 if (event.message.charAt(0) != '/') {
-                    finalTc.sendMessage("**" + escapeColorCodes(event.player.name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "") + "**: " + event.message);
+                    finalTc.sendMessage("**" + escapeEverything(event.player.name) + "**: " + event.message);
                 }
             });
         }
@@ -179,36 +179,36 @@ public class ioMain extends Plugin {
         }, 0, 10);
 
         /** for now removed
-        // generate 100 colors for /rainbow
-        int ARRAY_SIZE = 100;
-        double jump = 360.0 / (ARRAY_SIZE * 1.0);
-        Color[] colors = new Color[ARRAY_SIZE];
-        for (int i = 0; i < colors.length; i++) {
-            System.out.println(jump * i);
-            colors[i] = new Color(Color.HSBtoRGB((float) (jump * i) / 360, 1.0f, 1.0f));
-        }
-        AtomicInteger iterator = new AtomicInteger();
+         // generate 100 colors for /rainbow
+         int ARRAY_SIZE = 100;
+         double jump = 360.0 / (ARRAY_SIZE * 1.0);
+         Color[] colors = new Color[ARRAY_SIZE];
+         for (int i = 0; i < colors.length; i++) {
+         System.out.println(jump * i);
+         colors[i] = new Color(Color.HSBtoRGB((float) (jump * i) / 360, 1.0f, 1.0f));
+         }
+         AtomicInteger iterator = new AtomicInteger();
 
-        Timer.schedule(() -> {
-            iterator.addAndGet(1);
-            if (ARRAY_SIZE <= iterator.get()) {
-                iterator.set(0);
-            }
-//            System.out.println(iterator);
-            for (Player player : Groups.player) {
-                PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
-                if (tdata.rainbowColor) {
-//                    System.out.println(Integer.toHexString(colors[iterator.get()].getRGB()));
-                    PlayerData pd = getData(player.uuid());
-                    String rankSymbol;
-                    if (pd != null) {
-                        int rank = pd.rank;
-                        player.name = "[#" + Integer.toHexString(colors[iterator.get()].getRGB()) + "]" + escapeEverything(rankNames.get(pd.rank).tag) + escapeEverything(player.name);
-//                    System.out.println(player.name);
-                    }
-                }
-            }
-        }, 0, (float) 0.1);
+         Timer.schedule(() -> {
+         iterator.addAndGet(1);
+         if (ARRAY_SIZE <= iterator.get()) {
+         iterator.set(0);
+         }
+         //            System.out.println(iterator);
+         for (Player player : Groups.player) {
+         PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
+         if (tdata.rainbowColor) {
+         //                    System.out.println(Integer.toHexString(colors[iterator.get()].getRGB()));
+         PlayerData pd = getData(player.uuid());
+         String rankSymbol;
+         if (pd != null) {
+         int rank = pd.rank;
+         player.name = "[#" + Integer.toHexString(colors[iterator.get()].getRGB()) + "]" + escapeEverything(rankNames.get(pd.rank).tag) + escapeEverything(player.name);
+         //                    System.out.println(player.name);
+         }
+         }
+         }
+         }, 0, (float) 0.1);
          */
 
         // update every tick
@@ -252,47 +252,13 @@ public class ioMain extends Plugin {
                     player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason + "\n[white] If you what to appeal join our discord server: [cyan]" + "https://discord.gg/qtjqCUbbdR");
                 }
                 int rank = pd.rank;
-                switch (rank) { // apply new tag
-                    case 0:
-                        break;
-                    case 1:
-//                        Call.sendMessage("[#91f063]active player [] " + player.name + "[accent] joined the server!");
-                        Call.sendMessage("[#80FF80]Newbie player [] " + player.name + "[accent] joined the server!");
-//                        player.name = "[white][][accent][] " + player.name;
-                        player.name = rankNames.get(1).tag + player.name;
-                        break;
-                    case 2:
-//                        Call.sendMessage("[#dfd06e]Veteran player[] " + player.name + "[accent] joined the server!");
-                        Call.sendMessage("[#80FFBF]Active player [] " + player.name + "[accent] joined the server!");
-//                        player.name = "[white][\uE800][accent][] " + player.name;
-                        player.name = rankNames.get(2).tag + player.name;
-                        break;
-                    case 3:
-//                        Call.sendMessage("[#bf7134]Contributor [] " + player.name + "[accent] joined the server!");
-                        Call.sendMessage("[#80FFFF]Veteran player [] " + player.name + "[accent] joined the server!");
-//                        player.name = "[white][][accent][] " + player.name;
-                        player.name = rankNames.get(3).tag + player.name;
-                        break;
-                    case 4:
-//                        Call.sendMessage("[orange]<[][#9c59ce]Moderator[][orange]>[] " + player.name + "[accent] joined the server!");
-//                        player.name = "[white][][accent][] " + player.name;
-                        Call.sendMessage("[#80BFFF]Map creator [] " + player.name + "[accent] joined the server!");
-                        player.name = rankNames.get(4).tag + player.name;
-                        break;
-                    case 5:
-//                        Call.sendMessage("[orange]<[][#00f8fd]Admin[][orange]>[] " + player.name + "[accent] joined the server!");
-//                        player.name = "[white][][accent][] " + player.name;
-                        Call.sendMessage("[#8080FF]Moderator Jr [] " + player.name + "[accent] joined the server!");
-                        player.name = rankNames.get(5).tag + player.name;
-                        break;
-                    case 6:
-                        Call.sendMessage("[#8000FF]Moderator [] " + player.name + "[accent] joined the server!");
-                        player.name = rankNames.get(6).tag + player.name;
-                }
+                Call.sendMessage("[#" + Integer.toHexString(rankNames.get(rank).color.getRGB()).substring(2) + "]" + rankNames.get(rank).name + " [] " + player.name + "[accent] joined the front!");
+                player.name = rankNames.get(rank).tag + player.name;
             } else { // not in database
                 System.out.println("new player connected: " + escapeColorCodes(event.player.name));
                 setData(player.uuid(), new PlayerData(0));
-                Call.infoMessage(player.con, formatMessage(player, welcomeMessage));
+//                Call.infoMessage(player.con, formatMessage(player, welcomeMessage));
+                Call.sendMessage("[#" + Integer.toHexString(rankNames.get(0).color.getRGB()).substring(2) + "]" + rankNames.get(0).name + " [] " + player.name + "[accent] joined the front!");
             }
 //
 //            CompletableFuture.runAsync(() -> {
@@ -323,6 +289,8 @@ public class ioMain extends Plugin {
             Call.infoMessage(player.con, welcomeMessage);
         });
 
+//        Events.on(EventType.d)
+
         // player built building
         Events.on(EventType.BlockBuildEndEvent.class, event -> {
             if (event.unit.getPlayer() == null) return;
@@ -331,7 +299,7 @@ public class ioMain extends Plugin {
             PersistentPlayerData td = (playerDataGroup.getOrDefault(event.unit.getPlayer().uuid(), null));
             if (pd == null || td == null) return;
             if (event.tile.block() != null) {
-                if (!activeRequirements.bannedBlocks.contains(event.tile.block())) {
+                if (!bannedBlocks.contains(event.tile.block())) {
                     td.bbIncrementor++;
 //                    System.out.println(escapeColorCodes(event.unit.getPlayer().name) + " built a block");
 //                    pd.buildingsBuilt++;
@@ -339,7 +307,6 @@ public class ioMain extends Plugin {
                 }
             }
         });
-
 
 
         Events.on(EventType.ServerLoadEvent.class, event -> {
@@ -744,17 +711,17 @@ public class ioMain extends Plugin {
 //            });
 
             /**
-            handler.<Player>register("rainbow", "[veteran+] Change your colors to rainbow colors", (args, player) -> {
-                if (!state.rules.pvp || player.admin) {
-                    PlayerData pd = getData(player.uuid());
-                    if (pd != null && pd.rank >= 3) {
-                        PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
-                        tdata.rainbowColor = !tdata.rainbowColor;
-                    } else {
-                        player.sendMessage(noPermissionMessage);
-                    }
-                }
-            });*/
+             handler.<Player>register("rainbow", "[veteran+] Change your colors to rainbow colors", (args, player) -> {
+             if (!state.rules.pvp || player.admin) {
+             PlayerData pd = getData(player.uuid());
+             if (pd != null && pd.rank >= 3) {
+             PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
+             tdata.rainbowColor = !tdata.rainbowColor;
+             } else {
+             player.sendMessage(noPermissionMessage);
+             }
+             }
+             });*/
 
             handler.<Player>register("stats", "[player]", "Display stats of the specified player.", (args, player) -> {
                 if (args.length > 0) {
@@ -811,7 +778,7 @@ public class ioMain extends Plugin {
                 }
 
                 StringBuilder result = new StringBuilder();
-                result.append(Strings.format("[orange]-- Maps Page[lightgray] {0}[gray]/[lightgray]{1}[orange] --\n\n", (page + 1), pages));
+                result.append("[orange]-- Maps Page[lightgray] ").append(page + 1).append("[gray]/[lightgray]").append(pages).append("[orange] --\n\n");
 
                 for (int i = commandsPerPage * page; i < Math.min(commandsPerPage * (page + 1), Vars.maps.customMaps().size); i++) {
                     mindustry.maps.Map map = Vars.maps.customMaps().get(i);
@@ -873,8 +840,8 @@ public class ioMain extends Plugin {
 ////                        player.sendMessage("");
 ////                    }
 //                }
-                Call.infoMessage(player.con, formatMessage(player, reqMessage));
-
+//                Call.infoMessage(player.con, formatMessage(player, reqMessage));
+                Call.infoMessage(player.con, formatMessage(player, listRequirements()));
             });
 
             handler.<Player>register("ranks", "Show for all ranks.", (args, player) -> { // self info
@@ -883,7 +850,8 @@ public class ioMain extends Plugin {
 ////                        player.sendMessage("");
 ////                    }
 //                }
-                Call.infoMessage(player.con, formatMessage(player, rankMessage));
+//                Call.infoMessage(player.con, formatMessage(player, rankMessage));
+                Call.infoMessage(player.con, formatMessage(player, inGameListRanks()));
             });
 
             handler.<Player>register("label", "<duration> <text...>", "[admin only] Create an in-world label at the current position.", (args, player) -> {

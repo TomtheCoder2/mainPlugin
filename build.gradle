@@ -21,7 +21,7 @@ ext {
 }
 
 dependencies {
-    implementation 'org.jsoup:jsoup:1.14.2'
+    implementation 'org.jsoup:jsoup:1.14.3'
     compileOnly("com.github.Anuken.Arc:arc-core:$arcVersion")
     compileOnly("com.github.Anuken.Mindustry:core:$arcVersion")
 //    compileOnly("com.github.fuzzbuck.Mindustry:core:$mindustryVersion")
@@ -29,7 +29,7 @@ dependencies {
     implementation group: 'org.json', name: 'json', version: '20210307'
     compileOnly 'org.springframework.data:spring-data-redis:2.5.4'
     compileOnly 'redis.clients:jedis:3.6.3'
-    compileOnly('org.glassfish.jersey.core:jersey-client:3.0.2')
+    compileOnly('org.glassfish.jersey.core:jersey-client:3.0.3')
 //    compileOnly("redis.clients:jedis:3.2.0")
     compileOnly('org.apache.commons:commons-pool2:2.10.0')
     compileOnly('redis.clients:jedis:3.6.3')
@@ -38,7 +38,7 @@ dependencies {
     compileOnly('javax.ws.rs:javax.ws.rs-api:2.1.1')
     implementation 'com.google.code.gson:gson:2.8.8'
     implementation("net.dv8tion:JDA:4.3.0_277")
-    implementation 'org.postgresql:postgresql:42.2.23.jre7'
+    implementation 'org.postgresql:postgresql:42.2.24.jre7'
 
 }
 

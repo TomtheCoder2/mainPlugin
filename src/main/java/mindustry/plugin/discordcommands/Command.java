@@ -9,6 +9,7 @@ public abstract class Command {
     public String category = "public";
     public boolean hidden = false;
     public boolean apprenticeCommand = false;
+    public int minArguments = 0;
 
     public Command(String name) {
         // ALWAYS -> always lowercase command names
