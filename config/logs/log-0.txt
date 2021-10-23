@@ -6629,3 +6629,85 @@ Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 canno
 [10-23-2021 09:17:21] [I] Selected next map to be Mision 14 - Atacar y zarpar.
 [10-23-2021 09:21:29] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
 [10-23-2021 09:21:29] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-23-2021 23:02:26] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-23-2021 23:02:26] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-23-2021 23:02:26] [I] 1 mods loaded.
+[10-23-2021 23:02:26] [I] Server loaded. Type 'help' for help.
+[10-23-2021 23:02:26] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-23-2021 23:02:26] [I] Loading map...
+[10-23-2021 23:02:26] [I] Map loaded.
+[10-23-2021 23:02:26] [I] Opened a server on port 6567.
+[10-23-2021 23:02:32] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-23-2021 23:02:37] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-23-2021 23:02:45] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: hmmm doesnt work
+[10-23-2021 23:11:33] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-23-2021 23:11:33] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-23-2021 23:11:33] [I] 1 mods loaded.
+[10-23-2021 23:11:33] [I] Server loaded. Type 'help' for help.
+[10-23-2021 23:11:33] [E] Command not found. Did you mean "host"?
+[10-23-2021 23:11:38] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-23-2021 23:11:38] [I] Loading map...
+[10-23-2021 23:11:39] [I] Map loaded.
+[10-23-2021 23:11:39] [I] Opened a server on port 6567.
+[10-23-2021 23:11:57] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-23-2021 23:12:05] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbox>
+[10-23-2021 23:12:06] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-23-2021 23:12:53] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-23-2021 23:12:53] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-23-2021 23:12:53] [I] 1 mods loaded.
+[10-23-2021 23:12:53] [I] Server loaded. Type 'help' for help.
+[10-23-2021 23:12:54] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-23-2021 23:12:54] [I] Loading map...
+[10-23-2021 23:12:54] [I] Map loaded.
+[10-23-2021 23:12:54] [I] Opened a server on port 6567.
+[10-23-2021 23:12:56] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-23-2021 23:12:58] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-23-2021 23:14:57] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-23-2021 23:14:57] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-23-2021 23:14:57] [I] 1 mods loaded.
+[10-23-2021 23:14:57] [I] Server loaded. Type 'help' for help.
+[10-23-2021 23:14:57] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-23-2021 23:14:57] [I] Loading map...
+[10-23-2021 23:14:57] [I] Map loaded.
+[10-23-2021 23:14:57] [I] Opened a server on port 6567.
+[10-23-2021 23:15:02] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-23-2021 23:15:04] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-23-2021 23:16:55] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-23-2021 23:16:55] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-23-2021 23:16:55] [I] 1 mods loaded.
+[10-23-2021 23:16:55] [I] Server loaded. Type 'help' for help.
+[10-23-2021 23:16:55] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-23-2021 23:16:55] [I] Loading map...
+[10-23-2021 23:16:55] [I] Map loaded.
+[10-23-2021 23:16:55] [I] Opened a server on port 6567.
+[10-23-2021 23:17:14] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-23-2021 23:17:14] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-23-2021 23:17:14] [I] 1 mods loaded.
+[10-23-2021 23:17:14] [I] Server loaded. Type 'help' for help.
+[10-23-2021 23:17:15] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-23-2021 23:17:15] [I] Loading map...
+[10-23-2021 23:17:15] [I] Map loaded.
+[10-23-2021 23:17:15] [I] Opened a server on port 6567.
+[10-23-2021 23:17:18] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-23-2021 23:17:20] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-23-2021 23:17:35] [I] <[##00fffb][##00fff7][##00fff2][##00ffee][##00ffea][##00ffe5][##00ffe1][##00ffdd][##00ffd9][##00ffd4][##00ffd0][##00ffcc][##00ffc8][##00ffc4][##00ffbf][##00ffbb][##00ffb7][##00ffb2][##00ffae][##00ffaa][##00ffa6][##00ffa1][##00ff9d][##00ff99][##00ff95][##00ff90][##00ff8c][##00ff88][##00ff84][##00ff80][##00ff7b][##00ff77][##00ff73][##00ff6f][##00ff6a][##00ff66][##00ff62][##00ff5d][##00ff59][##00ff55][##00ff51][##00ff4c][##00ff48][##00ff44][##00ff40][##00ff3c][##00ff37][##00ff33][##00ff2f][##00ff2a][##00ff26][##00ff22][##00ff1e][##00ff19][##00ff15][##00ff11][##00ff0d][##00ff08][##00ff04][##00ff00][##04ff00][##08ff00][##0dff00][##11ff00][##15ff00][##1aff00][##1eff00][##22ff00][##26ff00][##2bff00][##2fff00][##33ff00][##37ff00][##3cff00][##40ff00][##44ff00][##48ff00][##4cff00][##51ff00][##55ff00][##59ff00][##5eff00][##62ff00][##66ff00][##6aff00][##6fff00][##73ff00][##77ff00][##7bff00][##80ff00][##84ff00][##88ff00][##8cff00][##90ff00][##95ff00][##99ff00][##9dff00][##a2ff00][##a6ff00][##aaff00][##aeff00][##b3ff00][##b7ff00][##bbff00][##bfff00][##c4ff00][##c8ff00][##ccff00][##d0ff00][##d4ff00][##d9ff00][##ddff00][##e1ff00][##e6ff00][##eaff00][##eeff00][##f2ff00][##f7ff00][##fbff00][##ffff00][##fffb00][##fff700][##fff200][##ffee00][##ffea00][##ffe600][##ffe100][##ffdd00][##ffd900][##ffd500][##ffd000][##ffcc00][##ffc800][##ffc400][##ffbf00][##ffbb00][##ffb700][##ffb300][##ffae00][##ffaa00][##ffa600][##ffa200][##ff9d00][##ff9900][##ff9500][##ff9100][##ff8c00][##ff8800][##ff8400][##ff8000][##ff7b00][##ff7700][##ff7300][##ff6f00][##ff6a00][##ff6600][##ff6200][##ff5e00][##ff5900][##ff5500][##ff5100][##ff4d00][##ff4800][##ff4400][##ff4000][##ff3c00][##ff3700][##ff3300][##ff2f00][##ff2b00][##ff2600][##ff2200][##ff1e00][##ff1a00][##ff1500][##ff1100][##ff0d00][##ff0900][##ff0400]Nautilus: /rainbow>
+[10-23-2021 23:18:50] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-23-2021 23:18:50] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-23-2021 23:18:50] [I] 1 mods loaded.
+[10-23-2021 23:18:50] [I] Server loaded. Type 'help' for help.
+[10-23-2021 23:18:50] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-23-2021 23:18:50] [I] Loading map...
+[10-23-2021 23:18:50] [I] Map loaded.
+[10-23-2021 23:18:50] [I] Opened a server on port 6567.
+[10-23-2021 23:18:54] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-23-2021 23:18:55] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-23-2021 23:21:17] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-23-2021 23:21:17] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-23-2021 23:21:17] [I] 1 mods loaded.
+[10-23-2021 23:21:17] [I] Server loaded. Type 'help' for help.
+[10-23-2021 23:21:17] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-23-2021 23:21:17] [I] Loading map...
+[10-23-2021 23:21:17] [I] Map loaded.
+[10-23-2021 23:21:17] [I] Opened a server on port 6567.
+[10-23-2021 23:21:27] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-23-2021 23:21:29] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>

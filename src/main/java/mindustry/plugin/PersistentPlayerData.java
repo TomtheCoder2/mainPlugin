@@ -13,6 +13,8 @@ public class PersistentPlayerData implements Serializable {
 //    public boolean spawnedLichPet;
 //    public boolean spawnedPowerGen;
     public boolean rainbowColor = false;
+    public int hue;
+    public boolean doRainbow;
 
     // 50 configures per 1000 ms
     public Ratelimit configureRatelimit = new Ratelimit(50, 1000);
@@ -20,4 +22,8 @@ public class PersistentPlayerData implements Serializable {
     public Ratelimit rotateRatelimit = new Ratelimit(10, 1000);
 
     public PersistentPlayerData() {}
+
+    public void setHue(int i) {
+        this.hue = i;
+    }
 }

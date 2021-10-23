@@ -372,8 +372,38 @@ public class ioMain extends Plugin {
                 return true;
             });
         });
+        Core.app.post(this::loop);
     }
 
+    public void loop() {
+        for (Player player : Groups.player) {
+            PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+
+            if (tdata.doRainbow) {
+                int rank = Objects.requireNonNull(getData(player.uuid())).rank;
+                // update rainbows
+                String playerNameUnmodified = tdata.origName;
+                int hue = tdata.hue;
+                if (hue < 360) {
+                    hue = hue + 1;
+                } else {
+                    hue = 0;
+                }
+
+                String hex = "#" + Integer.toHexString(Color.getHSBColor(hue / 360f, 1f, 1f).getRGB()).substring(2);
+//                String[] c = playerNameUnmodified.split(" ", 2);
+//                if (c.length > 1) player.name = c[0] + " [" + hex + "]" + escapeEverything(c[1]);
+//                else player.name = "[" + hex + "]" + escapeEverything(c[0]);
+                player.name = "[" + hex + "]" + escapeColorCodes(rankNames.get(rank).tag) + "[" + hex + "]" + escapeEverything(player.name);
+                tdata.setHue(hue);
+            }
+
+        }
+
+        Core.app.post(this::loop);
+    }
+
+    //    Core.app.post(this::loop);
     public static boolean checkChatRatelimit(String message, Player player) {
         // copied almost exactly from mindustry core, will probably need updating
         // will also update the user's global chat ratelimits
@@ -710,18 +740,22 @@ public class ioMain extends Plugin {
 //                }
 //            });
 
-            /**
-             handler.<Player>register("rainbow", "[veteran+] Change your colors to rainbow colors", (args, player) -> {
-             if (!state.rules.pvp || player.admin) {
-             PlayerData pd = getData(player.uuid());
-             if (pd != null && pd.rank >= 3) {
-             PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
-             tdata.rainbowColor = !tdata.rainbowColor;
-             } else {
-             player.sendMessage(noPermissionMessage);
-             }
-             }
-             });*/
+            handler.<Player>register("rainbow", "[sargeaNt+] Give your username a rainbow animation", (args, player) -> {
+                PlayerData pd = getData(player.uuid());
+                if (pd.rank >= 3) {
+                    PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                    if (tdata == null) return; // shouldn't happen, ever
+                    if (tdata.doRainbow) {
+                        player.sendMessage("[sky]Rainbow effect toggled off.");
+                        tdata.doRainbow = false;
+                    } else {
+                        player.sendMessage("[sky]Rainbow effect toggled on.");
+                        tdata.doRainbow = true;
+                    }
+                } else {
+                    player.sendMessage(noPermissionMessage);
+                }
+            });
 
             handler.<Player>register("stats", "[player]", "Display stats of the specified player.", (args, player) -> {
                 if (args.length > 0) {
