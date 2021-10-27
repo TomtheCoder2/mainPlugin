@@ -7,7 +7,6 @@ import arc.struct.ObjectMap;
 import arc.util.*;
 import arc.util.Timer;
 import mindustry.Vars;
-import mindustry.core.NetClient;
 import mindustry.core.NetServer;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
@@ -32,7 +31,6 @@ import java.time.Instant;
 import java.util.*;
 import java.awt.Color;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static arc.util.Log.info;
 import static mindustry.Vars.*;
@@ -121,6 +119,10 @@ public class ioMain extends Plugin {
         bt.setDaemon(false);
         bt.start();
 
+        Rainbow rainbowThread = new Rainbow(Thread.currentThread());
+        rainbowThread.setDaemon(false);
+        rainbowThread.start();
+
         TextChannel tc = getTextChannel("881300954845179914");
         if (!Objects.equals(live_chat_channel_id, "")) {
             tc = getTextChannel(live_chat_channel_id);
@@ -188,28 +190,8 @@ public class ioMain extends Plugin {
          colors[i] = new Color(Color.HSBtoRGB((float) (jump * i) / 360, 1.0f, 1.0f));
          }
          AtomicInteger iterator = new AtomicInteger();
+*/
 
-         Timer.schedule(() -> {
-         iterator.addAndGet(1);
-         if (ARRAY_SIZE <= iterator.get()) {
-         iterator.set(0);
-         }
-         //            System.out.println(iterator);
-         for (Player player : Groups.player) {
-         PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
-         if (tdata.rainbowColor) {
-         //                    System.out.println(Integer.toHexString(colors[iterator.get()].getRGB()));
-         PlayerData pd = getData(player.uuid());
-         String rankSymbol;
-         if (pd != null) {
-         int rank = pd.rank;
-         player.name = "[#" + Integer.toHexString(colors[iterator.get()].getRGB()) + "]" + escapeEverything(rankNames.get(pd.rank).tag) + escapeEverything(player.name);
-         //                    System.out.println(player.name);
-         }
-         }
-         }
-         }, 0, (float) 0.1);
-         */
 
         // update every tick
 
@@ -372,10 +354,10 @@ public class ioMain extends Plugin {
                 return true;
             });
         });
-        Core.app.post(this::loop);
+//        Core.app.post(this::loop);
     }
 
-    public void loop() {
+    public static Timer.Task loop() {
         for (Player player : Groups.player) {
             PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
             if (tdata == null) {
@@ -387,19 +369,22 @@ public class ioMain extends Plugin {
                 String playerNameUnmodified = tdata.origName;
                 int hue = tdata.hue;
                 if (hue < 360) {
-                    hue = hue + 1;
+                    hue = hue + 5;
                 } else {
                     hue = 0;
                 }
 
                 String hex = "#" + Integer.toHexString(Color.getHSBColor(hue / 360f, 1f, 1f).getRGB()).substring(2);
-                player.name = "[" + hex + "]" + escapeColorCodes(rankNames.get(rank).tag) + "[" + hex + "]" + escapeEverything(player.name);
+                if (rank < rankNames.size() && rank > -1) {
+                    player.name = "[" + hex + "]" + escapeColorCodes(rankNames.get(rank).tag) + "[" + hex + "]" + escapeEverything(player.name);
+                }
                 tdata.setHue(hue);
             }
 
         }
 
-        Core.app.post(this::loop);
+//        Core.app.post(this::loop);
+        return null;
     }
 
     //    Core.app.post(this::loop);

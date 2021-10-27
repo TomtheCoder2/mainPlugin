@@ -6861,3 +6861,112 @@ Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 canno
 [10-27-2021 19:12:59] [I] Map loaded.
 [10-27-2021 19:12:59] [I] Opened a server on port 6567.
 [10-27-2021 19:13:04] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 19:16:55] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-27-2021 19:16:55] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-27-2021 19:53:09] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-27-2021 19:53:39] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-27-2021 19:53:39] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-27-2021 19:57:54] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-27-2021 19:57:54] [I] Selected next map to be V130: Polluted river: Crux.
+[10-27-2021 20:03:43] [I] 1 mods loaded.
+[10-27-2021 20:03:43] [I] Server loaded. Type 'help' for help.
+[10-27-2021 20:03:43] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-27-2021 20:03:43] [I] Loading map...
+[10-27-2021 20:03:44] [I] Map loaded.
+[10-27-2021 20:03:44] [I] Opened a server on port 6567.
+[10-27-2021 20:03:48] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 20:10:39] [I] 1 mods loaded.
+[10-27-2021 20:10:39] [I] Server loaded. Type 'help' for help.
+[10-27-2021 20:10:39] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-27-2021 20:10:39] [I] Loading map...
+[10-27-2021 20:10:39] [I] Map loaded.
+[10-27-2021 20:10:39] [I] Opened a server on port 6567.
+[10-27-2021 20:10:42] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 20:19:00] [I] 1 mods loaded.
+[10-27-2021 20:19:00] [I] Server loaded. Type 'help' for help.
+[10-27-2021 20:19:00] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-27-2021 20:19:00] [I] Loading map...
+[10-27-2021 20:19:01] [I] Map loaded.
+[10-27-2021 20:19:01] [I] Opened a server on port 6567.
+[10-27-2021 20:19:06] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 20:25:24] [I] 1 mods loaded.
+[10-27-2021 20:25:24] [I] Server loaded. Type 'help' for help.
+[10-27-2021 20:25:24] [E] Command not found. Did you mean "js"?
+[10-27-2021 20:25:25] [E] Invalid command. Type 'help' for help.
+[10-27-2021 20:25:26] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-27-2021 20:25:26] [I] Loading map...
+[10-27-2021 20:25:26] [I] Map loaded.
+[10-27-2021 20:25:26] [I] Opened a server on port 6567.
+[10-27-2021 20:25:31] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 20:25:36] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-27-2021 20:32:38] [I] 1 mods loaded.
+[10-27-2021 20:32:38] [I] Server loaded. Type 'help' for help.
+[10-27-2021 20:32:38] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-27-2021 20:32:38] [I] Loading map...
+[10-27-2021 20:32:38] [I] Map loaded.
+[10-27-2021 20:32:38] [I] Opened a server on port 6567.
+[10-27-2021 20:35:54] [I] 1 mods loaded.
+[10-27-2021 20:35:54] [I] Server loaded. Type 'help' for help.
+[10-27-2021 20:35:56] [E] Command not found. Did you mean "js"?
+[10-27-2021 20:35:56] [I] Commands:
+[10-27-2021 20:35:56] [I]    help [command] - Display the command list, or get help for a specific command.
+[10-27-2021 20:35:56] [I]    version - Displays server version info.
+[10-27-2021 20:35:56] [I]    exit - Exit the server application.
+[10-27-2021 20:35:56] [I]    stop - Stop hosting the server.
+[10-27-2021 20:35:56] [I]    host [mapname] [mode] - Open the server. Will default to survival and a random map if not specified.
+[10-27-2021 20:35:56] [I]    maps [all/custom/default] - Display available maps. Displays only custom maps by default.
+[10-27-2021 20:35:56] [I]    reloadmaps - Reload all maps from disk.
+[10-27-2021 20:35:56] [I]    status - Display server status.
+[10-27-2021 20:35:56] [I]    mods - Display all loaded mods.
+[10-27-2021 20:35:56] [I]    mod <name...> - Display information about a loaded plugin.
+[10-27-2021 20:35:56] [I]    js <script...> - Run arbitrary Javascript.
+[10-27-2021 20:35:56] [I]    say <message...> - Send a message to all players.
+[10-27-2021 20:35:56] [I]    pause <on/off> - Pause or unpause the game.
+[10-27-2021 20:35:56] [I]    rules [remove/add] [name] [value...] - List, remove or add global rules. These will apply regardless of map.
+[10-27-2021 20:35:56] [I]    fillitems [team] - Fill the core with items.
+[10-27-2021 20:35:56] [I]    playerlimit [off/somenumber] - Set the server player limit.
+[10-27-2021 20:35:56] [I]    config [name] [value...] - Configure server settings.
+[10-27-2021 20:35:56] [I]    subnet-ban [add/remove] [address] - Ban a subnet. This simply rejects all connections with IPs starting with some string.
+[10-27-2021 20:35:56] [I]    whitelist [add/remove] [ID] - Add/remove players from the whitelist using their ID.
+[10-27-2021 20:35:56] [I]    shuffle [none/all/custom/builtin] - Set map shuffling mode.
+[10-27-2021 20:35:56] [I]    nextmap <mapname...> - Set the next map to be played after a game-over. Overrides shuffling.
+[10-27-2021 20:35:56] [I]    kick <username...> - Kick a person by name.
+[10-27-2021 20:35:56] [I]    ban <type-id/name/ip> <username/IP/ID...> - Ban a person.
+[10-27-2021 20:35:56] [I]    bans - List all banned IPs and IDs.
+[10-27-2021 20:35:56] [I]    unban <ip/ID> - Completely unban a person by IP or ID.
+[10-27-2021 20:35:56] [I]    pardon <ID> - Pardons a votekicked player by ID and allows them to join again.
+[10-27-2021 20:35:56] [I]    admin <add/remove> <username/ID...> - Make an online user admin
+[10-27-2021 20:35:56] [I]    admins - List all admins.
+[10-27-2021 20:35:56] [I]    players - List all players currently in game.
+[10-27-2021 20:35:56] [I]    runwave - Trigger the next wave.
+[10-27-2021 20:35:56] [I]    load <slot> - Load a save from a slot.
+[10-27-2021 20:35:56] [I]    save <slot> - Save game state to a slot.
+[10-27-2021 20:35:56] [I]    saves - List all saves in the save directory.
+[10-27-2021 20:35:56] [I]    gameover - Force a game over.
+[10-27-2021 20:35:56] [I]    info <IP/UUID/name...> - Find player info(s). Can optionally check for all names or IPs a player has had.
+[10-27-2021 20:35:56] [I]    search <name...> - Search players who have used part of a name.
+[10-27-2021 20:35:56] [I]    gc - Trigger a garbage collection. Testing only.
+[10-27-2021 20:35:56] [I]    yes - Run the last suggested incorrect command.
+[10-27-2021 20:35:58] [E] Command not found. Did you mean "host"?
+[10-27-2021 20:36:00] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-27-2021 20:36:00] [I] Loading map...
+[10-27-2021 20:36:01] [I] Map loaded.
+[10-27-2021 20:36:01] [I] Opened a server on port 6567.
+[10-27-2021 20:36:05] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 20:36:08] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-27-2021 20:37:46] [I] 1 mods loaded.
+[10-27-2021 20:37:46] [I] Server loaded. Type 'help' for help.
+[10-27-2021 20:37:46] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-27-2021 20:37:46] [I] Loading map...
+[10-27-2021 20:37:46] [I] Map loaded.
+[10-27-2021 20:37:46] [I] Opened a server on port 6567.
+[10-27-2021 20:37:51] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 20:37:52] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-27-2021 20:38:36] [I] 1 mods loaded.
+[10-27-2021 20:38:36] [I] Server loaded. Type 'help' for help.
+[10-27-2021 20:38:36] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-27-2021 20:38:36] [I] Loading map...
+[10-27-2021 20:38:36] [I] Map loaded.
+[10-27-2021 20:38:36] [I] Opened a server on port 6567.
+[10-27-2021 20:38:39] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 20:38:41] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>

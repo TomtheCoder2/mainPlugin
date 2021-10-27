@@ -3,6 +3,7 @@ package mindustry.plugin;
 import arc.Core;
 import arc.math.Mathf;
 //import mindustry.entities.type.Player;
+import arc.util.Timer;
 import mindustry.core.GameState;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -48,6 +49,7 @@ public class BotThread extends Thread {
     }
 
     public void run(){
+//        Timer.schedule(ioMain.loop(), 0.5F);
         TextChannel log_channel = getTextChannel("882342315438526525");
         while (this.mt.isAlive()){
             try {

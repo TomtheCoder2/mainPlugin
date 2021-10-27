@@ -3,12 +3,15 @@ package mindustry.plugin;
 import arc.Core;
 import arc.Events;
 import arc.files.Fi;
+import arc.func.Boolf;
 import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Structs;
+import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.UnitTypes;
 import mindustry.core.GameState;
+import mindustry.core.NetServer;
 import mindustry.game.EventType.GameOverEvent;
 import mindustry.game.Gamemode;
 import mindustry.game.Team;
@@ -366,6 +369,7 @@ public class ServerCommands {
                     category = "management";
                     minArguments = 1;
                 }
+
                 public void run(Context ctx) {
                     // get a list from the database
                     EmbedBuilder eb = new EmbedBuilder();
@@ -508,16 +512,18 @@ public class ServerCommands {
                     EmbedBuilder eb = new EmbedBuilder();
                     String target = ctx.args[1].toLowerCase();
 
+
                     Player p = findPlayer(target);
                     if (p != null) {
+                        Administration.PlayerInfo targetInfo = p.getInfo();
 //                        Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
+//                        if (Vars.netServer.admins.getAdmins().contains(targetInfo)) {
                         if (!p.admin) {
-                            netServer.admins.adminPlayer(p.uuid(), p.usid());
+//                            netServer.admins.adminPlayer(targetInfo.id, targetInfo.adminUsid);
                             p.admin = true;
                             eb.setDescription("Promoted " + escapeEverything(p.name) + " to admin");
-                        }
-                        if (p.admin) {
-                            netServer.admins.unAdminPlayer(p.uuid());
+                        } else {
+//                            netServer.admins.unAdminPlayer(targetInfo.id);
                             p.admin = false;
                             eb.setDescription("Demoted " + escapeEverything(p.name) + " from admin");
                         }
@@ -829,7 +835,7 @@ public class ServerCommands {
                     for (Player player : Groups.player) {
                         lijst.append("`* ");
                         if (player.admin()) {
-                            lijst.append(String.format("%-43s:` ", "admin"));
+                            lijst.append(String.format("%-44s:` ", "admin"));
                         } else {
                             lijst.append(String.format("%-24s : %-16s :` ", player.uuid(), player.con.address));
                         }
