@@ -8,12 +8,14 @@ import mindustry.plugin.Utils;
 import mindustry.plugin.ioMain;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 import mindustry.plugin.Utils.*;
 
 import mindustry.plugin.ioMain.*;
 
+import static arc.util.Log.debug;
 import static mindustry.plugin.ioMain.*;
 
 /**
@@ -73,8 +75,13 @@ public class DiscordCommands implements MessageCreateListener {
             tc = getTextChannel(live_chat_channel_id);
         }
         assert tc != null;
+        // check if it's a live chat message
         if (event.getChannel().getId() == tc.getId() && !event.getMessageAuthor().isBotUser()) {
             System.out.println(event.getMessageContent());
+            String message = event.getMessage().getContent().toString();
+//            message = message.replaceAll("<@![0-9]+>", message.substring(message.indexOf("<@!") + 2, (message.indexOf("<@!") + 18)));
+//            message = message.replaceAll("/<@![0-9]+>/gm", "Nautilus");
+//            debug(message);
             Call.sendMessage("[sky]" + event.getMessageAuthor().getName() + " @discord >[] " + event.getMessage().getContent());
             return;
         }

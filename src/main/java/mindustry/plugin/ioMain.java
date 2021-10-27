@@ -378,7 +378,9 @@ public class ioMain extends Plugin {
     public void loop() {
         for (Player player : Groups.player) {
             PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-
+            if (tdata == null) {
+                continue;
+            }
             if (tdata.doRainbow) {
                 int rank = Objects.requireNonNull(getData(player.uuid())).rank;
                 // update rainbows
@@ -391,9 +393,6 @@ public class ioMain extends Plugin {
                 }
 
                 String hex = "#" + Integer.toHexString(Color.getHSBColor(hue / 360f, 1f, 1f).getRGB()).substring(2);
-//                String[] c = playerNameUnmodified.split(" ", 2);
-//                if (c.length > 1) player.name = c[0] + " [" + hex + "]" + escapeEverything(c[1]);
-//                else player.name = "[" + hex + "]" + escapeEverything(c[0]);
                 player.name = "[" + hex + "]" + escapeColorCodes(rankNames.get(rank).tag) + "[" + hex + "]" + escapeEverything(player.name);
                 tdata.setHue(hue);
             }
@@ -468,7 +467,8 @@ public class ioMain extends Plugin {
             });
 
             handler.<Player>register("js", "<script...>", "Run arbitrary Javascript.", (arg, player) -> {
-                if (player.admin) {
+                PlayerData pd = getData(player.uuid());
+                if (player.admin && Objects.requireNonNull(pd).rank == 9) {
                     player.sendMessage(mods.getScripts().runConsole(arg[0]));
                 } else {
                     player.sendMessage("[scarlet]This command is restricted to admins!");
@@ -748,6 +748,7 @@ public class ioMain extends Plugin {
                     if (tdata.doRainbow) {
                         player.sendMessage("[sky]Rainbow effect toggled off.");
                         tdata.doRainbow = false;
+                        player.name = rankNames.get(pd.rank).tag + netServer.admins.getInfo(player.uuid()).names.get(0);
                     } else {
                         player.sendMessage("[sky]Rainbow effect toggled on.");
                         tdata.doRainbow = true;

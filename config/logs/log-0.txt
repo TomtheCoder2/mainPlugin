@@ -6711,3 +6711,153 @@ Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 canno
 [10-23-2021 23:21:17] [I] Opened a server on port 6567.
 [10-23-2021 23:21:27] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
 [10-23-2021 23:21:29] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-23-2021 23:23:29] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-23-2021 23:23:30] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-23-2021 23:25:32] [E] java.lang.NullPointerException
+	at java.base/java.util.Objects.requireNonNull(Objects.java:208)
+	at mindustry.plugin.ioMain.loop(ioMain.java:383)
+	at arc.util.TaskQueue.run(TaskQueue.java:17)
+	at arc.backend.headless.HeadlessApplication.mainLoop(HeadlessApplication.java:82)
+	at arc.backend.headless.HeadlessApplication$1.run(HeadlessApplication.java:53)
+
+[10-27-2021 17:44:32] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 17:44:32] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 17:44:32] [I] 1 mods loaded.
+[10-27-2021 17:44:32] [I] Server loaded. Type 'help' for help.
+[10-27-2021 17:44:32] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-27-2021 17:44:32] [I] Loading map...
+[10-27-2021 17:44:32] [I] Map loaded.
+[10-27-2021 17:44:32] [I] Opened a server on port 6567.
+[10-27-2021 17:44:39] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 17:44:43] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /stats>
+[10-27-2021 17:45:37] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /stats>
+[10-27-2021 17:52:15] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-27-2021 17:52:18] [I] <[#ff8800][accent]|[accent]|[#ff8800]Nautilus: /rainbow>
+[10-27-2021 17:59:43] [I] Game over! Reached wave 15 with 1 players online on map V130: Polluted river: Crux.
+[10-27-2021 17:59:43] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-27-2021 18:03:52] [I] Game over! Reached wave 1 with 1 players online on map Mision 14   Atacar y zarpar.
+[10-27-2021 18:03:52] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-27-2021 18:27:32] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:27:32] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:27:32] [I] 1 mods loaded.
+[10-27-2021 18:27:32] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:27:32] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-27-2021 18:27:32] [I] Loading map...
+[10-27-2021 18:27:32] [I] Map loaded.
+[10-27-2021 18:27:32] [I] Opened a server on port 6567.
+[10-27-2021 18:27:37] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 18:28:31] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:28:31] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:28:31] [I] 1 mods loaded.
+[10-27-2021 18:28:31] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:28:56] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:28:56] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:28:56] [I] 1 mods loaded.
+[10-27-2021 18:28:56] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:30:47] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:30:47] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:30:47] [I] 1 mods loaded.
+[10-27-2021 18:30:47] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:32:22] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:32:22] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:32:22] [I] 1 mods loaded.
+[10-27-2021 18:32:22] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:32:51] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:32:51] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:32:51] [I] 1 mods loaded.
+[10-27-2021 18:32:51] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:35:35] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:35:35] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:35:35] [I] 1 mods loaded.
+[10-27-2021 18:35:35] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:36:52] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:36:52] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:36:53] [I] 1 mods loaded.
+[10-27-2021 18:36:53] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:37:55] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:37:55] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:37:55] [I] 1 mods loaded.
+[10-27-2021 18:37:55] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:44:09] [I] Randomized next map to be V130: Polluted river: Crux.
+[10-27-2021 18:44:09] [I] Loading map...
+[10-27-2021 18:44:10] [I] Map loaded.
+[10-27-2021 18:44:10] [I] Opened a server on port 6567.
+[10-27-2021 18:44:14] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 18:44:31] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-27-2021 18:44:33] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 18:46:37] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:46:37] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:46:37] [I] 1 mods loaded.
+[10-27-2021 18:46:37] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:46:37] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-27-2021 18:46:37] [I] Loading map...
+[10-27-2021 18:46:37] [I] Map loaded.
+[10-27-2021 18:46:37] [I] Opened a server on port 6567.
+[10-27-2021 18:46:38] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 18:48:11] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:48:11] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:48:11] [I] 1 mods loaded.
+[10-27-2021 18:48:11] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:48:11] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-27-2021 18:48:11] [I] Loading map...
+[10-27-2021 18:48:12] [I] Map loaded.
+[10-27-2021 18:48:12] [I] Opened a server on port 6567.
+[10-27-2021 18:48:15] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 18:48:29] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-27-2021 18:48:31] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 18:48:37] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /hs>
+[10-27-2021 18:48:41] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js>
+[10-27-2021 18:48:44] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /js asdf>
+[10-27-2021 18:52:09] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 18:52:09] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 18:52:09] [I] 1 mods loaded.
+[10-27-2021 18:52:09] [I] Server loaded. Type 'help' for help.
+[10-27-2021 18:52:09] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-27-2021 18:52:09] [I] Loading map...
+[10-27-2021 18:52:09] [I] Map loaded.
+[10-27-2021 18:52:09] [I] Opened a server on port 6567.
+[10-27-2021 18:52:11] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 18:52:22] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-27-2021 18:52:24] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 19:06:41] [W] Your server is running a custom build, which means that client checking is disabled.
+[10-27-2021 19:06:41] [W] It is highly advised to specify which version you're using by building with gradle args -Pbuildversion=<build>
+[10-27-2021 19:06:41] [I] 1 mods loaded.
+[10-27-2021 19:06:41] [I] Server loaded. Type 'help' for help.
+[10-27-2021 19:06:41] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-27-2021 19:06:41] [I] Loading map...
+[10-27-2021 19:06:41] [I] Map loaded.
+[10-27-2021 19:06:41] [I] Opened a server on port 6567.
+[10-27-2021 19:06:49] [I] Version: Mindustry 7-pre-alpha official / build -1
+[10-27-2021 19:06:49] [I] Java Version: 16.0.1
+[10-27-2021 19:08:58] [I] 1 mods loaded.
+[10-27-2021 19:08:58] [I] Server loaded. Type 'help' for help.
+[10-27-2021 19:08:58] [E] Command not found. Did you mean "js"?
+[10-27-2021 19:08:58] [I] Version: Mindustry 7-pre-alpha official / build 134
+[10-27-2021 19:08:58] [I] Java Version: 16.0.1
+[10-27-2021 19:09:15] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-27-2021 19:09:15] [I] Loading map...
+[10-27-2021 19:09:15] [I] Map loaded.
+[10-27-2021 19:09:15] [I] Opened a server on port 6567.
+[10-27-2021 19:09:19] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 19:09:24] [I] Version: Mindustry 7-pre-alpha official / build 134
+[10-27-2021 19:09:24] [I] Java Version: 16.0.1
+[10-27-2021 19:09:52] [I] Version: Mindustry 7-pre-alpha official / build 134
+[10-27-2021 19:09:52] [I] Java Version: 16.0.1
+[10-27-2021 19:12:01] [I] 1 mods loaded.
+[10-27-2021 19:12:01] [I] Server loaded. Type 'help' for help.
+[10-27-2021 19:12:01] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-27-2021 19:12:01] [I] Loading map...
+[10-27-2021 19:12:01] [I] Map loaded.
+[10-27-2021 19:12:01] [I] Opened a server on port 6567.
+[10-27-2021 19:12:10] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 19:12:28] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-27-2021 19:12:30] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
+[10-27-2021 19:12:33] [I] [accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-27-2021 19:12:49] [I] 1 mods loaded.
+[10-27-2021 19:12:49] [I] Server loaded. Type 'help' for help.
+[10-27-2021 19:12:49] [E] Command not found. Did you mean "js"?
+[10-27-2021 19:12:59] [I] Randomized next map to be Mision 14 - Atacar y zarpar.
+[10-27-2021 19:12:59] [I] Loading map...
+[10-27-2021 19:12:59] [I] Map loaded.
+[10-27-2021 19:12:59] [I] Opened a server on port 6567.
+[10-27-2021 19:13:04] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]

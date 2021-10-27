@@ -1,7 +1,9 @@
 package mindustry.plugin;
 
+import arc.Core;
 import arc.math.Mathf;
 //import mindustry.entities.type.Player;
+import mindustry.core.GameState;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
@@ -9,11 +11,14 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
+
+import static mindustry.Vars.state;
 import static mindustry.plugin.ioMain.*;
 
 import mindustry.plugin.discordcommands.DiscordCommands;
 
 import java.util.List;
+import static arc.util.Log.debug;
 
 import static mindustry.Vars.netServer;
 //import static mindustry.Vars.playerGroup;
@@ -92,11 +97,16 @@ public class BotThread extends Thread {
                     setData(p.uuid(), pd);
                     ioMain.playerDataGroup.put(p.uuid(), tdata); // update tdata with the new stuff
                 }
-                if(Mathf.chance(0.01f)){
-                    api.updateActivity("( ͡° ͜ʖ ͡°)");
-                    System.out.println("( ͡° ͜ʖ ͡°)");
+                debug("Updated database!");
+                if (state.is(GameState.State.playing)) {
+                    if (Mathf.chance(0.01f)) {
+                        api.updateActivity("( ͡° ͜ʖ ͡°)");
+                        System.out.println("( ͡° ͜ʖ ͡°)");
+                    } else {
+                        api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
+                    }
                 } else {
-                    api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
+                    api.updateActivity("Not hosting. Please Host a game. Ping an admin");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

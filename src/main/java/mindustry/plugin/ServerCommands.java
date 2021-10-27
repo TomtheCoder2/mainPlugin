@@ -511,16 +511,17 @@ public class ServerCommands {
                     Player p = findPlayer(target);
                     if (p != null) {
 //                        Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
-                        p.admin = !p.admin;
-                        if (p.admin) {
+                        if (!p.admin) {
                             netServer.admins.adminPlayer(p.uuid(), p.usid());
+                            p.admin = true;
+                            eb.setDescription("Promoted " + escapeEverything(p.name) + " to admin");
+                        }
+                        if (p.admin) {
+                            netServer.admins.unAdminPlayer(p.uuid());
+                            p.admin = false;
+                            eb.setDescription("Demoted " + escapeEverything(p.name) + " from admin");
                         }
                         eb.setTitle("Command executed!");
-                        if (p.admin) {
-                            eb.setDescription("Promoted " + escapeEverything(p.name) + " to admin");
-                        } else {
-                            eb.setDescription("Demoted " + escapeEverything(p.name) + " to admin");
-                        }
                     } else {
                         eb.setTitle("Command terminated!");
                         eb.setColor(Pals.error);
@@ -1806,7 +1807,7 @@ public class ServerCommands {
                     eb.setTitle("Map upload completed.");
                     eb.setDescription(ml.get(0).getFileName() + " was added succesfully into the playlist!");
                     ctx.channel.sendMessage(eb);
-                    //Utils.LogAction("uploadmap", "Uploaded a new map", ctx.author, null);
+//                    Utils.LogAction("uploadmap", "Uploaded a new map", ctx.author, null);
                 }
             });
 

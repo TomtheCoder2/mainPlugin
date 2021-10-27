@@ -154,11 +154,11 @@ public class ComCommands {
                 try {
                     EmbedBuilder eb = new EmbedBuilder()
                             .setTitle(ioMain.serverName)
-                            .addField("Players", String.valueOf(Groups.player.size()))
-                            .addField("Map", Vars.state.map.name())
-                            .addField("Wave", String.valueOf(state.wave))
-                            .addField("TPS", String.valueOf(Core.graphics.getFramesPerSecond()))
-                            .addField("Next wave in", Math.round(state.wavetime / 60) + " seconds.");
+                            .addField("Players", String.valueOf(Groups.player.size()), true)
+                            .addField("Map", Vars.state.map.name(), true)
+                            .addField("Wave", String.valueOf(state.wave), true)
+                            .addField("TPS", String.valueOf(Core.graphics.getFramesPerSecond()), true)
+                            .addField("Next wave in", Math.round(state.wavetime / 60) + " seconds.", true);
 
                     ctx.channel.sendMessage(eb);
                 } catch (Exception e) {
