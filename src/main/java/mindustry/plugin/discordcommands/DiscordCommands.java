@@ -82,7 +82,7 @@ public class DiscordCommands implements MessageCreateListener {
 //            message = message.replaceAll("<@![0-9]+>", message.substring(message.indexOf("<@!") + 2, (message.indexOf("<@!") + 18)));
 //            message = message.replaceAll("/<@![0-9]+>/gm", "Nautilus");
 //            debug(message);
-            Call.sendMessage("[sky]" + event.getMessageAuthor().getName() + " @discord >[] " + event.getMessage().getContent());
+            Call.sendMessage("[sky]" + event.getMessageAuthor().getName() + "@discord >[] " + event.getMessage().getContent());
             return;
         }
         for (MessageCreatedListener listener : messageCreatedListenerRegistry) listener.run(event);
@@ -109,6 +109,15 @@ public class DiscordCommands implements MessageCreateListener {
             if (event.getChannel().getId() != Long.parseLong(staff_bot_channel_id)
                     && event.getChannel().getId() != Long.parseLong(admin_bot_channel_id)) {
                 if (event.getChannel().getId() == Long.parseLong(apprentice_bot_channel_id) && !command.apprenticeCommand) {
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("Wrong Channel!")
+                            .setDescription("Please use <#" + staff_bot_channel.getIdAsString() + "> or <#" + admin_bot_channel.getIdAsString() + ">! ")
+                            .setColor(Utils.Pals.error);
+                    event.getChannel().sendMessage(eb);
+                    return;
+                } else if (event.getChannel().getId() != Long.parseLong(apprentice_bot_channel_id)) {
+                    assert staff_bot_channel != null;
+                    assert admin_bot_channel != null;
                     EmbedBuilder eb = new EmbedBuilder()
                             .setTitle("Wrong Channel!")
                             .setDescription("Please use <#" + staff_bot_channel.getIdAsString() + "> or <#" + admin_bot_channel.getIdAsString() + ">! ")

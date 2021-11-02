@@ -32,6 +32,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static mindustry.Vars.maps;
 import static mindustry.Vars.netServer;
@@ -40,6 +42,8 @@ import static mindustry.plugin.ioMain.getTextChannel;
 
 public class Utils {
     static String url = null;
+    public static String maps_url = null;
+    public static String apapi_key = null;
     static String user = null;
     static String password = null;
     public static int chatMessageMaxSize = 256;
@@ -124,9 +128,9 @@ public class Utils {
         rankNames.put(9, new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", "Be admin", new Color(0xffcc00))); // admin
 
 
-        rankRequirements.put(1, new Requirement(1000, 3000, 5));
-        rankRequirements.put(2, new Requirement(2500, 5000, 15));
-        rankRequirements.put(3, new Requirement(10000, 15000, 25));
+        rankRequirements.put(1, new Requirement(300, 3000, 5));
+        rankRequirements.put(2, new Requirement(1000, 5000, 12));
+        rankRequirements.put(3, new Requirement(5000, 15000, 20));
         rankRequirements.put(4, new Requirement(20000, 35000, 50));
 
 
@@ -192,11 +196,11 @@ public class Utils {
             } else {
                 list
                         .append(": [red]")
-                        .append(rankRequirements.get(entry.getKey()).playtime / 1000)
-                        .append("k mins[white]/ [orange]")
+                        .append((rankRequirements.get(entry.getKey()).playtime >= 1000 ? rankRequirements.get(entry.getKey()).playtime / 1000 + "k" : rankRequirements.get(entry.getKey()).playtime))
+                        .append(" mins[white]/ [orange]")
                         .append(rankRequirements.get(entry.getKey()).gamesPlayed)
                         .append(" games[white]/ [yellow]")
-                        .append(rankRequirements.get(entry.getKey()).buildingsBuilt / 1000).append(" built\n");
+                        .append(rankRequirements.get(entry.getKey()).buildingsBuilt / 1000).append("k built\n");
             }
         }
         return list.toString();
@@ -235,10 +239,53 @@ public class Utils {
     public static String escapeEverything(String string) {
         return escapeColorCodes(string
                 .replaceAll(" ", "")
-                .replaceAll("<.*?>", "")
-                .replaceAll("\\|(.*)\\|", "")
-                .replaceAll("\\[accent\\]", ""));
+                .replaceAll("\\|(.)\\|", "")
+                .replaceAll("\\[accent\\]", "")
+                .replaceAll("\\|(.)\\|", "")
+        ).replaceAll("\\|(.)\\|", "");
     }
+
+    /**
+     * check if a string is an ip
+     *
+     * @note ik there are functions for that, but I like to do it with regex
+     */
+
+    public static boolean isValidIPAddress(String ip) {
+
+        // Regex for digit from 0 to 255.
+        String zeroTo255
+                = "(\\d{1,2}|(0|1)\\"
+                + "d{2}|2[0-4]\\d|25[0-5])";
+
+        // Regex for a digit from 0 to 255 and
+        // followed by a dot, repeat 4 times.
+        // this is the regex to validate an IP address.
+        String regex
+                = zeroTo255 + "\\."
+                + zeroTo255 + "\\."
+                + zeroTo255 + "\\."
+                + zeroTo255;
+
+        // Compile the ReGex
+        Pattern p = Pattern.compile(regex);
+
+        // If the IP address is empty
+        // return false
+        if (ip == null) {
+            return false;
+        }
+
+        // Pattern class contains matcher() method
+        // to find matching between given IP address
+        // and regular expression.
+        Matcher m = p.matcher(ip);
+
+        // Return if the IP address
+        // matched the ReGex
+        return m.matches();
+    }
+
 
     /**
      * remove everything (rank symbol colors etc.)
@@ -292,6 +339,32 @@ public class Utils {
             }
         }
         return found;
+    }
+
+    /**
+     * get player info by uuid or name
+     */
+    public static Administration.PlayerInfo getPlayerInfo(String target) {
+        Administration.PlayerInfo info;
+        Player player = findPlayer(target);
+        if (player != null) {
+            info = netServer.admins.getInfo(player.uuid());
+            System.out.println("Found " + player.name);
+        } else {
+            info = netServer.admins.getInfoOptional(target);
+        }
+        return info;
+    }
+
+    public static boolean isInt(String str) {
+        try {
+            @SuppressWarnings("unused")
+            int x = Integer.parseInt(str);
+            return true; //String is an Integer
+        } catch (NumberFormatException e) {
+            return false; //String is not an Integer
+        }
+
     }
 
     /**
@@ -401,6 +474,13 @@ public class Utils {
         eb.addField("Banned by", ctx.author.getDiscriminatedName(), true);
         eb.addField("Reason", reason, true);
         log_channel.sendMessage(eb);
+    }
+
+    public static void playerNotFound(String name, EmbedBuilder eb, Context ctx) {
+        eb.setTitle("Command terminated");
+        eb.setDescription("Player `" + escapeEverything(name) + "` not found.");
+        eb.setColor(Pals.error);
+        ctx.channel.sendMessage(eb);
     }
 
     public static String hsvToRgb(double hue, float saturation, float value) {
@@ -586,13 +666,13 @@ public class Utils {
     /**
      * get a ranking from the database
      */
-    public static String ranking(int limit, String column) {
+    public static String ranking(int limit, String column, int offset, boolean showUUID) {
 //        String SQL = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason "
 //                + "FROM playerdata "
 //                + "WHERE uuid = ?";
         String SQL = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason " +
                 "FROM playerdata " +
-                "ORDER BY " + column + " DESC LIMIT ?";
+                "ORDER BY " + column + " DESC LIMIT ? OFFSET ?";
         try {
             StringBuilder rankingList = new StringBuilder("```");
             // connect to the database
@@ -603,10 +683,15 @@ public class Utils {
             // replace ? with the uuid
 //            pstmt.setString(1, column);
             pstmt.setInt(1, limit);
+            pstmt.setInt(2, offset);
             System.out.println(pstmt);
             // get the result
             ResultSet rs = pstmt.executeQuery();
             int c = 0; // count
+            rankingList.append(String.format("%-3s", ""));
+            rankingList.append(String.format("%-10s", column));
+            if (showUUID) rankingList.append(String.format(" %-24sName:\n", "UUID"));
+            else rankingList.append("Name:\n");
             while (rs.next()) {
                 c++;
                 // create a new Player to return
@@ -617,7 +702,7 @@ public class Utils {
                 pd.playTime = rs.getInt("playTime");
                 pd.buildingsBuilt = rs.getInt("buildingsBuilt");
                 pd.gamesPlayed = rs.getInt("gamesPlayed");
-                rankingList.append(String.format("%-3d", c));
+                rankingList.append(String.format("%-3d", c + offset));
                 Administration.PlayerInfo info = netServer.admins.getInfoOptional(pd.uuid);
                 switch (column) {
                     case "playTime" -> {
@@ -633,7 +718,7 @@ public class Utils {
                         return "Please select a valid stat";
                     }
                 }
-                rankingList.append(" ").append(String.format("%-24s: ", pd.uuid));
+                if (showUUID) rankingList.append(String.format(" %-24s: ", pd.uuid));
                 if (info != null) {
                     rankingList.append(escapeEverything(info.names.get(0)));
                 }

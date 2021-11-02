@@ -6970,3 +6970,21 @@ Caused by: java.lang.ClassCastException: class mindustry.content.Blocks$48 canno
 [10-27-2021 20:38:36] [I] Opened a server on port 6567.
 [10-27-2021 20:38:39] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]
 [10-27-2021 20:38:41] [I] <[accent]|[white][accent]|[][#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us: /rainbow>
+[10-27-2021 20:48:52] [I] [#ff0095][accent]|[accent]|[#ff0095]Nautilus has disconnected. [VA8X0BlqyTsAAAAAFkLMBg==] (closed)
+[10-27-2021 21:15:57] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-27-2021 21:15:57] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-27-2021 21:20:08] [I] Game over! Reached wave 1 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-27-2021 21:20:08] [I] Selected next map to be V130: Polluted river: Crux.
+[10-27-2021 21:34:15] [I] Game over! Reached wave 13 with 0 players online on map V130: Polluted river: Crux.
+[10-27-2021 21:34:15] [I] Selected next map to be Mision 12 - Base pretrolera.
+[10-27-2021 22:12:08] [I] Game over! Reached wave 18 with 0 players online on map Mision 12   Base pretrolera.
+[10-27-2021 22:12:08] [I] Selected next map to be Mision 14 - Atacar y zarpar.
+[10-27-2021 22:16:24] [I] Game over! Reached wave 2 with 0 players online on map Mision 14   Atacar y zarpar.
+[10-27-2021 22:16:24] [I] Selected next map to be V130: Polluted river: Crux.
+[10-27-2021 22:28:03] [I] 1 mods loaded.
+[10-27-2021 22:28:03] [I] Server loaded. Type 'help' for help.
+[10-27-2021 22:28:03] [I] Randomized next map to be Mision 12 - Base pretrolera.
+[10-27-2021 22:28:03] [I] Loading map...
+[10-27-2021 22:28:03] [I] Map loaded.
+[10-27-2021 22:28:03] [I] Opened a server on port 6567.
+[10-27-2021 22:28:05] [I] [#00FFF]Na[#007DF]ut[#1000F]il[#0200B]us has connected. [VA8X0BlqyTsAAAAAFkLMBg==]

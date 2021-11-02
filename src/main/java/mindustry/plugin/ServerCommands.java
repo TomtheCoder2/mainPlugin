@@ -42,8 +42,10 @@ import org.json.JSONObject;
 import java.awt.*;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
@@ -53,6 +55,8 @@ import static arc.util.Log.err;
 import static arc.util.Log.info;
 import static mindustry.Vars.*;
 import static mindustry.plugin.Utils.*;
+import static mindustry.plugin.ioMain.*;
+import static mindustry.plugin.requests.IPLookup.readJsonFromUrl;
 
 public class ServerCommands {
     public GetMap map = new GetMap();
@@ -81,9 +85,36 @@ public class ServerCommands {
                 ctx.channel.sendMessage(eb);
             }
         });
+
+        if (data.has("appeal_roleid") && data.has("appeal_channel_id")) {
+            String appealRole = data.getString("appeal_roleid");
+            TextChannel appeal_channel = getTextChannel(data.getString("appeal_channel_id"));
+
+            handler.registerCommand(new Command("appeal") {
+                {
+                    help = "Request an appeal";
+                }
+
+                public void run(Context ctx) {
+                    ctx.author.asUser().get().addRole(api.getRoleById(appealRole).get());
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("Successfully requested an appeal")
+                            .setDescription("Please head over to <#" + appeal_channel.getIdAsString() + ">!");
+                    ctx.channel.sendMessage(eb);
+                    EmbedBuilder appealMessage = new EmbedBuilder()
+                            .setTitle("Please use this format to appeal:")
+                            .addField("1.Names", "All names used in game.")
+                            .addField("2.Screenshot", "Send a screenshot of your ban screen")
+                            .addField("3.Reason", "Explain what you did and why you want to get unbanned");
+                    appeal_channel.sendMessage("<@" + ctx.author.getIdAsString() + ">");
+                    appeal_channel.sendMessage(appealMessage);
+                }
+            });
+        }
         if (data.has("administrator_roleid")) {
             String adminRole = data.getString("administrator_roleid");
             // TODO: make an update command to update the EI mod
+
 
             handler.registerCommand(new RoleRestrictedCommand("start") {
                 {
@@ -224,6 +255,69 @@ public class ServerCommands {
         if (data.has("apprentice_roleid")) {
             String apprenticeRole = data.getString("apprentice_roleid");
 
+            handler.registerCommand(new RoleRestrictedCommand("mute") {
+                {
+                    help = "Mute a player. To unmute just use this command again.";
+                    usage = "<playerid|ip|name> [reason...]";
+                    minArguments = 1;
+                    category = "moderation";
+                    role = apprenticeRole;
+                    apprenticeCommand = true;
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    String target = ctx.args[1];
+                    Player player = findPlayer(target);
+                    EmbedBuilder eb = new EmbedBuilder();
+                    if (player != null) {
+                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                        assert tdata != null;
+                        tdata.muted = !tdata.muted;
+                        eb.setTitle("Successfully " + (tdata.muted ? "muted" : "unmuted") + " " + escapeEverything(target));
+                        if (ctx.args.length > 2) {
+                            eb.addField("Reason", ctx.args[2]);
+                        }
+                        ctx.channel.sendMessage(eb);
+                        Call.infoMessage(player.con, "[cyan]You got " + (tdata.muted ? "muted" : "unmuted") + " by a moderator. " + (ctx.args.length > 2 ? "Reason: " + ctx.message.split(" ", 2)[1] : ""));
+                    } else {
+                        playerNotFound(target, eb, ctx);
+                    }
+                }
+            });
+
+
+            handler.registerCommand(new RoleRestrictedCommand("freeze") {
+                {
+                    help = "Freeze a player. To unfreeze just use this command again.";
+                    usage = "<playerid|ip|name> [reason...]";
+                    minArguments = 1;
+                    category = "moderation";
+                    role = apprenticeRole;
+                    apprenticeCommand = true;
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    String target = ctx.args[1];
+                    Player player = findPlayer(target);
+                    EmbedBuilder eb = new EmbedBuilder();
+                    if (player != null) {
+                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                        assert tdata != null;
+                        tdata.frozen = !tdata.frozen;
+                        eb.setTitle("Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(target));
+                        if (ctx.args.length > 2) {
+                            eb.addField("Reason", ctx.args[2]);
+                        }
+                        ctx.channel.sendMessage(eb);
+                        Call.infoMessage(player.con, "[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " by a moderator. " + (ctx.args.length > 2 ? "Reason: " + ctx.message.split(" ", 2)[1] : ""));
+                    } else {
+                        playerNotFound(target, eb, ctx);
+                    }
+                }
+            });
+
             handler.registerCommand(new RoleRestrictedCommand("banish") {
                 {
                     help = "Ban the provided player for a specific duration with a specific reason.";
@@ -242,33 +336,34 @@ public class ServerCommands {
                         String reason = ctx.message.substring(target.length() + targetDuration.length() + 2);
                         long now = Instant.now().getEpochSecond();
 
-                        Player player = findPlayer(target);
-                        if (player != null) {
-                            String uuid = player.uuid();
+                        Administration.PlayerInfo info = getPlayerInfo(target);
+                        if (info != null) {
+                            String uuid = info.id;
                             String banId = uuid.substring(0, 4);
                             PlayerData pd = getData(uuid);
                             long until = now + Integer.parseInt(targetDuration) * 60L;
                             if (pd != null) {
-                                pd.banned = true;
+//                                pd.banned = true;
                                 pd.bannedUntil = until;
                                 pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
                                 setData(uuid, pd);
                             }
 
-                            eb.setTitle("Banned " + escapeEverything(player.name) + " for " + targetDuration + " minutes. ");
+                            eb.setTitle("Banned " + escapeEverything(info.lastName) + " for " + targetDuration + " minutes. ");
                             eb.addField("Ban ID", banId);
                             eb.addField("For", targetDuration + " minutes.");
                             eb.addField("Until", epochToString(until));
                             eb.addInlineField("Reason", reason);
                             ctx.channel.sendMessage(eb);
 
-                            player.con.kick(Packets.KickReason.banned);
-                            Administration.PlayerInfo info = netServer.admins.getInfo(player.uuid());
-                            logBanMessage(info, ctx, reason, "Banned");
+                            Player player = findPlayer(uuid);
+                            if (player != null) {
+                                player.con.kick(Packets.KickReason.banned);
+                                logBanMessage(info, ctx, reason, "Banned");
+                            }
                         } else {
-                            eb.setTitle("Player `" + escapeEverything(target) + "` not found.");
-                            eb.setColor(Pals.error);
-                            ctx.channel.sendMessage(eb);
+                            playerNotFound(target, eb, ctx);
+                            return;
                         }
                     });
                 }
@@ -361,12 +456,10 @@ public class ServerCommands {
         if (data.has("moderator_roleid")) {
             String banRole = data.getString("moderator_roleid");
 
-            handler.registerCommand(new RoleRestrictedCommand("ranking") {
+            handler.registerCommand(new Command("ranking") {
                 {
                     help = "Get a ranking list.";
-                    role = banRole;
                     usage = "<playtime|games|buildings> [offset]";
-                    category = "management";
                     minArguments = 1;
                 }
 
@@ -374,15 +467,22 @@ public class ServerCommands {
                     // get a list from the database
                     EmbedBuilder eb = new EmbedBuilder();
                     eb.setTitle("Ranking list:");
+                    int offset = 0;
+                    if (ctx.args.length > 2) {
+                        if (isInt(ctx.args[2])) {
+                            offset = Integer.parseInt(ctx.args[2]);
+                        }
+                    }
+                    boolean showUUID = ctx.channel.getId() != Long.parseLong(bot_channel_id);
                     switch (ctx.args[1].toLowerCase()) {
                         case "playtime", "p" -> {
-                            eb.setDescription(ranking(10, "playTime"));
+                            eb.setDescription(ranking(10, "playTime", offset, showUUID));
                         }
                         case "games", "gamesplayed", "g" -> {
-                            eb.setDescription(ranking(10, "gamesPlayed"));
+                            eb.setDescription(ranking(10, "gamesPlayed", offset, showUUID));
                         }
                         case "buildings", "buildingsbuilt", "b" -> {
-                            eb.setDescription(ranking(10, "buildingsBuilt"));
+                            eb.setDescription(ranking(10, "buildingsBuilt", offset, showUUID));
                         }
                         default -> {
                             eb.setDescription("Please select a valid stat");
@@ -426,6 +526,64 @@ public class ServerCommands {
                     ctx.channel.sendMessage(eb);
 
                     maps.reload();
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("iplookup") {
+                {
+                    help = "Make an ip lookup of an ip";
+                    role = banRole;
+                    usage = "ip";
+                    category = "moderation";
+                    minArguments = 1;
+                    hidden = true;
+                }
+
+                public void run(Context ctx) {
+                    String target = ctx.args[1];
+                    String ip;
+                    EmbedBuilder eb = new EmbedBuilder();
+                    if (isValidIPAddress(target) || true) {
+                        ip = ctx.args[1];
+                    } else {
+                        Administration.PlayerInfo info = null;
+                        Player player = findPlayer(target);
+                        if (player != null) {
+                            info = netServer.admins.getInfo(player.uuid());
+                            ip = info.lastIP;
+                            ip = info.ips.get(0);
+                            System.out.println(ip);
+                        } else {
+                            playerNotFound(target, eb, ctx);
+                            return;
+                        }
+                    }
+                    try {
+                        String url = "http://api.ipapi.com/" + ip + "?access_key=" + apapi_key;
+//                        System.out.println(url);
+                        JSONObject json = readJsonFromUrl(url);
+//                        System.out.println(json);
+                        eb.setTitle(ip + "'s Lookup:");
+                        eb.addField("continent", json.getString("continent_name"), true);
+                        try {
+                            eb.addField("Zip Code", json.getString("zip"), true);
+                        } catch (Exception e) {
+                            eb.addField("Zip Code", "null", true);
+                        }
+                        eb.addField("City", json.getString("city"), true);
+                        eb.addField("Country", json.getString("country_name"), true);
+                        eb.addField("Region", json.getString("region_name"), true);
+                        eb.addField("Latitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("latitude")).floatValue())), true);
+                        eb.addField("Longitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("longitude")).floatValue())), true);
+                        ctx.channel.sendMessage(eb);
+                        System.out.println(eb);
+                    } catch (Exception e) {
+                        System.out.println(Arrays.toString(e.getStackTrace()));
+                        eb.setTitle("There was an error executing this command: " + name + "!")
+                                .setDescription(e.getStackTrace()[0].toString())
+                                .setColor(Color.decode("#ff0000"));
+                        ctx.channel.sendMessage(eb);
+                    }
                 }
             });
 
@@ -603,9 +761,7 @@ public class ServerCommands {
                             }
                             logBanMessage(info, ctx, reason, "Banned");
                         } else {
-                            eb.setTitle("Player `" + escapeEverything(target) + "` not found.");
-                            eb.setColor(Pals.error);
-                            ctx.channel.sendMessage(eb);
+                            playerNotFound(target, eb, ctx);
                         }
                     });
                 }
@@ -667,7 +823,7 @@ public class ServerCommands {
                             PlayerData pd = getData(uuid);
                             long until = now + Integer.parseInt(targetDuration) * 60L;
                             if (pd != null) {
-                                pd.banned = true;
+//                                pd.banned = true;
                                 pd.bannedUntil = until;
                                 pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
                                 setData(uuid, pd);
@@ -685,9 +841,7 @@ public class ServerCommands {
                             Administration.PlayerInfo info = netServer.admins.getInfo(player.uuid());
                             logBanMessage(info, ctx, reason, "Banned");
                         } else {
-                            eb.setTitle("Player `" + escapeEverything(target) + "` not found.");
-                            eb.setColor(Pals.error);
-                            ctx.channel.sendMessage(eb);
+                            playerNotFound(target, eb, ctx);
                         }
                     });
                 }
@@ -719,9 +873,8 @@ public class ServerCommands {
                         Administration.PlayerInfo info = netServer.admins.getInfo(player.uuid());
                         logBanMessage(info, ctx, reason, "Kicked");
                     } else {
-                        eb.setTitle("Player `" + escapeEverything(target) + "` not found.");
-                        eb.setColor(Pals.error);
-                        ctx.channel.sendMessage(eb);
+                        playerNotFound(target, eb, ctx);
+                        return;
                     }
                 }
             });
@@ -869,14 +1022,7 @@ public class ServerCommands {
                     EmbedBuilder eb = new EmbedBuilder();
                     String target = ctx.args[1];
 
-                    Administration.PlayerInfo info = null;
-                    Player player = findPlayer(target);
-                    if (player != null) {
-                        info = netServer.admins.getInfo(player.uuid());
-                        System.out.println("Found " + player.name);
-                    } else {
-                        info = netServer.admins.getInfoOptional(target);
-                    }
+                    Administration.PlayerInfo info = getPlayerInfo(target);
 
                     if (info != null) {
                         eb.setTitle(escapeEverything(info.lastName) + "'s lookup");
@@ -899,7 +1045,7 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("syncserver") {
                 {
-                    help = "Tell everyone to resync.";
+                    help = "Tell everyone to resync.\nMay kick everyone you never know!";
                     role = banRole;
                     category = "management";
                 }
@@ -975,7 +1121,7 @@ public class ServerCommands {
                 }
             });
 
-            handler.registerCommand(new RoleRestrictedCommand("changeteam") {
+            handler.registerCommand(new RoleRestrictedCommand("team") {
                 {
                     help = "Change the provided player's team into the provided one.";
                     role = banRole;
@@ -988,16 +1134,24 @@ public class ServerCommands {
                     String target = ctx.args[1];
                     String targetTeam = ctx.args[2];
                     Team desiredTeam = Team.crux;
-
+                    EmbedBuilder eb = new EmbedBuilder();
 
                     if (target.length() > 0 && targetTeam.length() > 0) {
                         try {
                             Field field = Team.class.getDeclaredField(targetTeam);
                             desiredTeam = (Team) field.get(null);
                         } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                            if (isInt(targetTeam)) {
+                                desiredTeam = Team.get(Integer.parseInt(ctx.args[2]));
+                            } else {
+                                eb.setTitle("Command terminated");
+                                eb.setColor(Pals.error);
+                                eb.setDescription("Please select a valid team");
+                                ctx.channel.sendMessage(eb);
+                                return;
+                            }
                         }
 
-                        EmbedBuilder eb = new EmbedBuilder();
                         if (target.equals("all")) {
                             for (Player p : Groups.player) {
                                 p.team(desiredTeam);
@@ -1026,57 +1180,62 @@ public class ServerCommands {
                             eb.setTitle("Command executed successfully.");
                             eb.setDescription("Changed " + escapeEverything(player.name) + "s team to " + desiredTeam.name);
                             ctx.channel.sendMessage(eb);
-                        }
-                    }
-                }
-            });
-
-            handler.registerCommand(new RoleRestrictedCommand("changeteamid") {
-                {
-                    help = "Change the provided player's team into a generated int.";
-                    role = banRole;
-                    usage = "<playerid|ip|all|name> <team>";
-                    category = "management";
-                    minArguments = 2;
-                }
-
-                public void run(Context ctx) {
-                    String target = ctx.args[1];
-                    int targetTeam = Integer.parseInt(ctx.args[2]);
-                    if (target.length() > 0 && targetTeam > 0) {
-                        EmbedBuilder eb = new EmbedBuilder();
-
-                        if (target.equals("all")) {
-                            for (Player p : Groups.player) {
-                                p.team(Team.get(targetTeam));
-//                                p.spawner = getCore(p.getTeam());
-                            }
-                            eb.setTitle("Command executed successfully.");
-                            eb.setDescription("Changed everyone's team to " + targetTeam);
-                            ctx.channel.sendMessage(eb);
-                            return;
-                        } else if (target.matches("[0-9]+") && target.length() == 1) {
-                            for (Player p : Groups.player) {
-                                if (p.team().id == Byte.parseByte(target)) {
-                                    p.team(Team.get(targetTeam));
-//                                    p.spawner = getCore(p.getTeam());
-                                }
-                            }
-                            eb.setTitle("Command executed successfully.");
-                            eb.setDescription("Changed everyone's team to " + targetTeam);
-                            ctx.channel.sendMessage(eb);
-                            return;
-                        }
-                        Player player = findPlayer(target);
-                        if (player != null) {
-                            player.team(Team.get(targetTeam));
-                            eb.setTitle("Command executed successfully.");
-                            eb.setDescription("Changed " + escapeEverything(player.name) + "s team to " + targetTeam);
+                        } else {
+                            eb.setTitle("Command terminated");
+                            eb.setColor(Pals.error);
+                            eb.setDescription("Player " + escapeEverything(target) + " could not be found or is offline.");
                             ctx.channel.sendMessage(eb);
                         }
                     }
                 }
             });
+
+//            handler.registerCommand(new RoleRestrictedCommand("changeteamid") {
+//                {
+//                    help = "Change the provided player's team into a generated int.";
+//                    role = banRole;
+//                    usage = "<playerid|ip|all|name> <team>";
+//                    category = "management";
+//                    minArguments = 2;
+//                }
+//
+//                public void run(Context ctx) {
+//                    String target = ctx.args[1];
+//                    int targetTeam = Integer.parseInt(ctx.args[2]);
+//                    if (target.length() > 0 && targetTeam > 0) {
+//                        EmbedBuilder eb = new EmbedBuilder();
+//
+//                        if (target.equals("all")) {
+//                            for (Player p : Groups.player) {
+//                                p.team(Team.get(targetTeam));
+////                                p.spawner = getCore(p.getTeam());
+//                            }
+//                            eb.setTitle("Command executed successfully.");
+//                            eb.setDescription("Changed everyone's team to " + targetTeam);
+//                            ctx.channel.sendMessage(eb);
+//                            return;
+//                        } else if (target.matches("[0-9]+") && target.length() == 1) {
+//                            for (Player p : Groups.player) {
+//                                if (p.team().id == Byte.parseByte(target)) {
+//                                    p.team(Team.get(targetTeam));
+////                                    p.spawner = getCore(p.getTeam());
+//                                }
+//                            }
+//                            eb.setTitle("Command executed successfully.");
+//                            eb.setDescription("Changed everyone's team to " + targetTeam);
+//                            ctx.channel.sendMessage(eb);
+//                            return;
+//                        }
+//                        Player player = findPlayer(target);
+//                        if (player != null) {
+//                            player.team(Team.get(targetTeam));
+//                            eb.setTitle("Command executed successfully.");
+//                            eb.setDescription("Changed " + escapeEverything(player.name) + "s team to " + targetTeam);
+//                            ctx.channel.sendMessage(eb);
+//                        }
+//                    }
+//                }
+//            });
 
             handler.registerCommand(new RoleRestrictedCommand("rename") {
                 {
@@ -1658,10 +1817,7 @@ public class ServerCommands {
                                     player.name = rankNames.get(rank).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "").replaceAll("\\|(.*)\\|", "");
                                 }
                             } else {
-                                eb.setTitle("Command terminated");
-                                eb.setDescription("Player not found.");
-                                eb.setColor(Pals.error);
-                                ctx.channel.sendMessage(eb);
+                                playerNotFound(target, eb, ctx);
                                 return;
                             }
 
@@ -1709,10 +1865,7 @@ public class ServerCommands {
                                 info = netServer.admins.getInfoOptional(target);
                             }
                             if (info == null) {
-                                eb.setTitle("Command terminated");
-                                eb.setDescription("Player not found.");
-                                eb.setColor(Pals.error);
-                                ctx.channel.sendMessage(eb);
+                                playerNotFound(target, eb, ctx);
                                 return;
                             }
                             PlayerData pd = getData(info.id);
@@ -1728,10 +1881,7 @@ public class ServerCommands {
                                 ctx.channel.sendMessage(eb);
 //                                player.con.kick("Your rank was modified, please rejoin.", 0);
                             } else {
-                                eb.setTitle("Command terminated");
-                                eb.setDescription("Player not found.");
-                                eb.setColor(Pals.error);
-                                ctx.channel.sendMessage(eb);
+                                playerNotFound(target, eb, ctx);
                                 return;
                             }
 
@@ -1990,7 +2140,7 @@ public class ServerCommands {
             s.append(escapeEverything(name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "")).append(" / ");
         }
         s.append("**\n\nCurrent Name with color codes: **\n");
-        s.append(info.names.get(0));
+        s.append(info.lastName);
         return s;
     }
 }

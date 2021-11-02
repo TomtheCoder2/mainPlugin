@@ -18,15 +18,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static mindustry.plugin.Utils.*;
+
 public class GetMap {
     /**
      * Generate an image for a map (.msav)
-     * @implNote this sends a http request to the MindServer from Traqun. */
+     *
+     * @implNote this sends a http request to the MindServer from Traqun.
+     */
     public List<String> getMap(Fi file) {
         try {
             var client = HttpClient.newBuilder().build();
             var request = HttpRequest.newBuilder()
-                    .uri(URI.create("http://localhost:6969/map"))
+                    .uri(URI.create(maps_url + "/map"))
                     .POST(HttpRequest.BodyPublishers.ofFile(Paths.get(file.absolutePath())))
 //                    .GET()
                     .build();
@@ -59,9 +63,12 @@ public class GetMap {
 
         return null;
     }
+
     /**
      * just converts a byte[] to a png
-     * @param data the byte stream of the picture*/
+     *
+     * @param data the byte stream of the picture
+     */
     private static void convertToPNG(byte[] data) throws IOException {
         ByteArrayInputStream bis = new ByteArrayInputStream(data);
         BufferedImage bImage2 = ImageIO.read(bis);

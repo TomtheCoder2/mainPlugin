@@ -5,11 +5,13 @@ import arc.files.Fi;
 import arc.util.Strings;
 import mindustry.Vars;
 import mindustry.content.Items;
+import mindustry.core.GameState;
 import mindustry.game.Team;
 import mindustry.game.Teams.TeamData;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.io.SaveIO;
 import mindustry.maps.Map;
 import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
@@ -25,11 +27,15 @@ import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-import static mindustry.Vars.state;
+import static arc.util.Log.err;
+import static arc.util.Log.info;
+import static mindustry.Vars.*;
 import static mindustry.plugin.Utils.*;
 import static mindustry.gen.StateSnapshotCallPacket.*;
+import static mindustry.plugin.ioMain.*;
 
 public class ComCommands {
 //    public static ContentHandler contentHandler = new ContentHandler();
@@ -151,6 +157,13 @@ public class ComCommands {
             }
 
             public void run(Context ctx) {
+                if (!state.is(GameState.State.playing)) {
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("Not hosting, please ping an admin!")
+                            .setColor(Pals.error);
+                    ctx.channel.sendMessage(eb);
+                    return;
+                }
                 try {
                     EmbedBuilder eb = new EmbedBuilder()
                             .setTitle(ioMain.serverName)
@@ -159,8 +172,41 @@ public class ComCommands {
                             .addField("Wave", String.valueOf(state.wave), true)
                             .addField("TPS", String.valueOf(Core.graphics.getFramesPerSecond()), true)
                             .addField("Next wave in", Math.round(state.wavetime / 60) + " seconds.", true);
+                    if (ctx.args.length > 1) {
+                        if (state.is(GameState.State.playing) && Objects.equals(ctx.args[1], "preview")) {
+                            try {
+                                Fi file = Core.settings.getDataDirectory().child("../temp/map." + saveExtension);
 
-                    ctx.channel.sendMessage(eb);
+                                Core.app.post(() -> {
+                                    SaveIO.save(file);
+                                    info("Saved to @.", file);
+                                });
+                                Fi mapfile = file;
+                                try {
+                                    String absolute = map.getMap(mapfile).get(0);
+                                    System.out.println(absolute);
+
+                                    eb.setImage("attachment://output.png");
+                                    MessageBuilder mb = new MessageBuilder();
+                                    mb.addEmbed(eb);
+                                    mb.addFile(new File(absolute));
+//                                mb.addAttachment(mapfile.file());
+                                    mb.send(ctx.channel);
+                                } catch (Exception e) {
+                                    String err = Strings.neatError(e, true);
+                                    int max = 900;
+//                    errDelete(msg, "Error parsing map.", err.length() < max ? err : err.substring(0, max));
+                                }
+                            } catch (Exception e) {
+                                System.out.println(e.getMessage());
+                                e.printStackTrace();
+                                ctx.reply("An error has occurred.");
+                                ctx.channel.sendMessage(eb);
+                            }
+                        }
+                    } else {
+                        ctx.channel.sendMessage(eb);
+                    }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                     e.printStackTrace();
@@ -171,7 +217,7 @@ public class ComCommands {
         handler.registerCommand(new Command("resinfo") {
             {
                 help = "Check the amount of resources in the core.";
-                usage =  "[team]";
+                usage = "[team]";
             }
 
             public void run(Context ctx) {
@@ -229,6 +275,16 @@ public class ComCommands {
                     for (Command command : handler.getAllCommands()) {
                         if (command.hidden) continue;
                         if (!command.hasPermission(ctx)) continue;
+                        if (!Objects.equals(command.category, "public")) {
+                            if (ctx.channel.getId() != Long.parseLong(staff_bot_channel_id)
+                                    && ctx.channel.getId() != Long.parseLong(admin_bot_channel_id)) {
+                                if (ctx.channel.getId() == Long.parseLong(apprentice_bot_channel_id) && !command.apprenticeCommand) {
+                                    continue;
+                                } else if (ctx.channel.getId() != Long.parseLong(apprentice_bot_channel_id)) {
+                                    continue;
+                                }
+                            }
+                        }
                         switch (command.category) {
                             case "moderation" -> {
                                 moderation.append("**").append(command.name).append("** ");

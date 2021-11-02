@@ -15,6 +15,8 @@ public class PersistentPlayerData implements Serializable {
     public boolean rainbowColor = false;
     public int hue;
     public boolean doRainbow;
+    public boolean muted = false;
+    public boolean frozen = false;
 
     // 50 configures per 1000 ms
     public Ratelimit configureRatelimit = new Ratelimit(50, 1000);

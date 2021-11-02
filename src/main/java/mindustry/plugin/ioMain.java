@@ -4,8 +4,8 @@ import arc.Core;
 import arc.Events;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
-import arc.util.*;
 import arc.util.Timer;
+import arc.util.*;
 import mindustry.Vars;
 import mindustry.core.NetServer;
 import mindustry.game.EventType;
@@ -26,14 +26,14 @@ import org.javacord.api.entity.permission.Role;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.awt.*;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.util.*;
-import java.awt.Color;
 import java.util.List;
+import java.util.*;
 
-import static arc.util.Log.info;
 import static mindustry.Vars.*;
+import static mindustry.Vars.player;
 import static mindustry.plugin.Utils.*;
 
 public class ioMain extends Plugin {
@@ -58,12 +58,12 @@ public class ioMain extends Plugin {
 
     public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
     private final long CDT = 300L;
-    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
+    //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public ObjectMap<String, Role> discRoles = new ObjectMap<>();
-    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
-    protected Interval timer = new Interval(1);
+    //    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
+//    protected Interval timer = new Interval(1);
     //cooldown between votes
-    int voteCooldown = 120 * 1;
+    int voteCooldown = 120;
     private ObjectMap<Long, String> cooldowns = new ObjectMap<>(); //uuid
     private JSONObject alldata;
     public NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
@@ -80,8 +80,12 @@ public class ioMain extends Plugin {
             url = alldata.getString("url");
             user = alldata.getString("user");
             password = alldata.getString("password");
+            // url to connect to the MindServ
+            maps_url = alldata.getString("maps_url");
             // for the live chat between the discord server and the mindustry server
             live_chat_channel_id = alldata.getString("live_chat_channel_id");
+            // iplookup api key
+            apapi_key = alldata.getString("apapi_key");
             // bot channels
             bot_channel_id = alldata.getString("bot_channel_id");
             apprentice_bot_channel_id = alldata.getString("apprentice_bot_channel");
@@ -133,10 +137,19 @@ public class ioMain extends Plugin {
             TextChannel finalTc = tc;
             Events.on(EventType.PlayerChatEvent.class, event -> {
                 if (event.message.charAt(0) != '/') {
-                    finalTc.sendMessage("**" + escapeEverything(event.player.name) + "**: " + event.message);
+                    Player player = event.player;
+                    assert player != null;
+                    PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                    assert tdata != null;
+                    if (!tdata.muted) {
+                        finalTc.sendMessage("**" + escapeEverything(event.player.name) + "**: " + event.message);
+                    } else {
+                        player.sendMessage("[cyan]You are muted!");
+                    }
                 }
             });
         }
+
 
         // database
         try {
@@ -180,21 +193,7 @@ public class ioMain extends Plugin {
             }
         }, 0, 10);
 
-        /** for now removed
-         // generate 100 colors for /rainbow
-         int ARRAY_SIZE = 100;
-         double jump = 360.0 / (ARRAY_SIZE * 1.0);
-         Color[] colors = new Color[ARRAY_SIZE];
-         for (int i = 0; i < colors.length; i++) {
-         System.out.println(jump * i);
-         colors[i] = new Color(Color.HSBtoRGB((float) (jump * i) / 360, 1.0f, 1.0f));
-         }
-         AtomicInteger iterator = new AtomicInteger();
-*/
-
-
         // update every tick
-
 
         // player joined
         TextChannel log_channel = getTextChannel("882342315438526525");
@@ -308,7 +307,6 @@ public class ioMain extends Plugin {
                 PlayerData pd = getData(p.uuid());
                 if (pd != null) {
                     pd.gamesPlayed++;
-                    setData(p.uuid(), pd);
                     Call.infoMessage(p.con, "[accent]+1 games played");
                 }
             }
@@ -355,32 +353,35 @@ public class ioMain extends Plugin {
             });
         });
 //        Core.app.post(this::loop);
+
     }
 
     public static Timer.Task loop() {
         for (Player player : Groups.player) {
-            PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-            if (tdata == null) {
-                continue;
-            }
-            if (tdata.doRainbow) {
-                int rank = Objects.requireNonNull(getData(player.uuid())).rank;
-                // update rainbows
-                String playerNameUnmodified = tdata.origName;
-                int hue = tdata.hue;
-                if (hue < 360) {
-                    hue = hue + 5;
-                } else {
-                    hue = 0;
+            try {
+                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                if (tdata == null) {
+                    continue;
                 }
+                if (tdata.doRainbow) {
+                    int rank = Objects.requireNonNull(getData(player.uuid())).rank;
+                    // update rainbows
+                    String playerNameUnmodified = tdata.origName;
+                    int hue = tdata.hue;
+                    if (hue < 360) {
+                        hue = hue + 5;
+                    } else {
+                        hue = 0;
+                    }
 
-                String hex = "#" + Integer.toHexString(Color.getHSBColor(hue / 360f, 1f, 1f).getRGB()).substring(2);
-                if (rank < rankNames.size() && rank > -1) {
-                    player.name = "[" + hex + "]" + escapeColorCodes(rankNames.get(rank).tag) + "[" + hex + "]" + escapeEverything(player.name);
+                    String hex = "#" + Integer.toHexString(Color.getHSBColor(hue / 360f, 1f, 1f).getRGB()).substring(2);
+                    if (rank < rankNames.size() && rank > -1) {
+                        player.name = "[" + hex + "]" + escapeColorCodes(rankNames.get(rank).tag) + "[" + hex + "]" + escapeEverything(player.name);
+                    }
+                    tdata.setHue(hue);
                 }
-                tdata.setHue(hue);
+            } catch (Exception ignored) {
             }
-
         }
 
 //        Core.app.post(this::loop);
@@ -433,15 +434,36 @@ public class ioMain extends Plugin {
         return dtc.get();
     }
 
+
     //register commands that run on the server
     @Override
     public void registerServerCommands(CommandHandler handler) {
 
     }
 
+
     //register commands that player can invoke in-game
     @Override
     public void registerClientCommands(CommandHandler handler) {
+        netServer.admins.addChatFilter((player, message) -> {
+            assert player != null;
+            PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+            assert tdata != null;
+            if (tdata.muted) {
+                return null;
+            }
+            return message;
+        });
+        netServer.admins.addActionFilter(action -> {
+            assert action.player != null;
+            Player player = action.player;
+            PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+            assert tdata != null;
+            if (tdata.frozen) {
+                player.sendMessage("[cyan]You are frozen!");
+            }
+            return !tdata.frozen;
+        });
         if (api != null) {
             handler.removeCommand("t");
             handler.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
@@ -476,7 +498,29 @@ public class ioMain extends Plugin {
 //                }
 //            });
 
-            handler.<Player>register("bug", "[description]", "Send a bug report to the discord server. (Please do not spam, because this command pings developers)", (args, player) -> {
+            handler.<Player>register("freeze", "<player> [reason...]", "Freeze a player. To unfreeze just use this command again.", (args, player) -> {
+                Player target = findPlayer(args[0]);
+                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                assert tdata != null;
+                tdata.frozen = !tdata.frozen;
+                assert target != null;
+                player.sendMessage("[cyan]Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(target));
+                Call.infoMessage(target.con, "[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " by a moderator. " + (args.length > 1 ? "Reason: " + args[1] : ""));
+            });
+
+            handler.<Player>register("mute", "<player> [reason...]", "Mute a player. To unmute just use this command again.", (args, player) -> {
+                Player target = findPlayer(args[0]);
+                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                assert tdata != null;
+                tdata.muted = !tdata.muted;
+                assert target != null;
+                player.sendMessage("[cyan]Successfully " + (tdata.muted ? "muted" : "unmuted") + " " + escapeEverything(target));
+                Call.infoMessage(target.con, "[cyan]You got " + (tdata.muted ? "muted" : "unmuted") + " by a moderator. " + (args.length > 1 ? "Reason: " + args[1] : ""));
+            });
+
+
+
+            handler.<Player>register("bug", "[description...]", "Send a bug report to the discord server. (Please do not spam, because this command pings developers)", (args, player) -> {
                 for (Long key : cooldowns.keys()) {
                     if (key + CDT < System.currentTimeMillis() / 1000L) {
                         cooldowns.remove(key);
@@ -564,12 +608,7 @@ public class ioMain extends Plugin {
                             }
                         }
                     } else {
-                        for (Player p : Groups.player) {
-                            if (p.name.equalsIgnoreCase(args[0])) {
-                                found = p;
-                                break;
-                            }
-                        }
+                        found = findPlayer(args[0]);
                     }
                     if (found != null) {
                         if (found.admin()) {
@@ -727,7 +766,11 @@ public class ioMain extends Plugin {
 
             handler.<Player>register("rainbow", "[sargeaNt+] Give your username a rainbow animation", (args, player) -> {
                 PlayerData pd = getData(player.uuid());
-                if (pd.rank >= 3) {
+                if (pd == null) {
+                    player.sendMessage("There was an error!");
+                    return;
+                }
+                if (pd.rank >= 0) {
                     PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
                     if (tdata == null) return; // shouldn't happen, ever
                     if (tdata.doRainbow) {
@@ -811,7 +854,7 @@ public class ioMain extends Plugin {
 
             VoteSession[] currentlyKicking = {null};
 
-            handler.<Player>register("nominate", "[map...]", " Vote to change to a specific map.", (args, player) -> {
+            handler.<Player>register("changemap", "<map...>", " Vote to change to a specific map.", (args, player) -> {
                 if (!state.rules.pvp || player.admin) {
 //                    PlayerData pd = getData(player.uuid());
 //                    if (pd != null && pd.rank >= 2) {
@@ -862,6 +905,22 @@ public class ioMain extends Plugin {
 //                }
 //                Call.infoMessage(player.con, formatMessage(player, reqMessage));
                 Call.infoMessage(player.con, formatMessage(player, listRequirements()));
+            });
+
+            handler.<Player>register("reset", "Set everyone's name back to the original name.", (args, player) -> {
+                if (player.admin) {
+                    for (Player p : Groups.player) {
+                        PlayerData pd = getData(p.uuid());
+                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                        if (tdata == null) continue; // shouldn't happen, ever
+                        tdata.doRainbow = false;
+                        assert pd != null;
+                        player.name = rankNames.get(pd.rank).tag + netServer.admins.getInfo(player.uuid()).names.get(0);
+                    }
+                    player.sendMessage("[cyan]Reset names!");
+                } else {
+                    player.sendMessage(noPermissionMessage);
+                }
             });
 
             handler.<Player>register("ranks", "Show for all ranks.", (args, player) -> { // self info
