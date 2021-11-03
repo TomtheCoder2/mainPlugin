@@ -38,7 +38,9 @@ dependencies {
     compileOnly('javax.ws.rs:javax.ws.rs-api:2.1.1')
     implementation 'com.google.code.gson:gson:2.8.8'
     implementation("net.dv8tion:JDA:4.3.0_277")
-    implementation 'org.postgresql:postgresql:42.2.24.jre7'
+//    implementation 'org.postgresql:postgresql:42.2.24.jre7'
+    // http://mvnrepository.com/artifact/postgresql/postgresql
+    compileOnly group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4'
 
 }
 

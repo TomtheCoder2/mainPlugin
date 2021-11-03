@@ -7,6 +7,7 @@ import arc.struct.ObjectMap;
 import arc.util.Timer;
 import arc.util.*;
 import mindustry.Vars;
+import mindustry.core.GameState;
 import mindustry.core.NetServer;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
@@ -32,6 +33,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.*;
 
+import static arc.util.Log.debug;
 import static mindustry.Vars.*;
 import static mindustry.Vars.player;
 import static mindustry.plugin.Utils.*;
@@ -303,13 +305,16 @@ public class ioMain extends Plugin {
         });
 
         Events.on(EventType.GameOverEvent.class, event -> {
+            debug("Game over!");
             for (Player p : Groups.player) {
                 PlayerData pd = getData(p.uuid());
                 if (pd != null) {
                     pd.gamesPlayed++;
                     Call.infoMessage(p.con, "[accent]+1 games played");
+                    setData(pd.uuid, pd);
                 }
             }
+            update(log_channel, api);
         });
 
 //        Events.on(EventType.WorldLoadEvent.class, event -> {
@@ -438,7 +443,66 @@ public class ioMain extends Plugin {
     //register commands that run on the server
     @Override
     public void registerServerCommands(CommandHandler handler) {
+        handler.register("update", "Update the database with the new current data", arg -> {
+            TextChannel log_channel = getTextChannel("882342315438526525");
+            update(log_channel, api);
+        });
+    }
 
+    public static void update(TextChannel log_channel, DiscordApi api) {
+        for (Player p : Groups.player) {
+
+            if (joinedPlayer.size() > 0) {
+                EmbedBuilder eb = new EmbedBuilder();
+                eb.setTitle("Player Join Log");
+                StringBuilder desc = new StringBuilder();
+                for (Player player : joinedPlayer) {
+                    desc.append(String.format("`%s` : `%d `:%s\n", player.uuid(), player.id, escapeEverything(player.name)));
+                }
+                eb.setDescription(desc.toString());
+                assert log_channel != null;
+                log_channel.sendMessage(eb);
+            }
+            joinedPlayer.clear();
+            PlayerData pd = getData(p.uuid());
+            if (pd == null) return;
+//
+            // update buildings built
+            PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(p.uuid(), null));
+            if (tdata != null) {
+                if (tdata.bbIncrementor > 0) {
+                    pd.buildingsBuilt = pd.buildingsBuilt + tdata.bbIncrementor;
+                    tdata.bbIncrementor = 0;
+                }
+            }
+//
+//
+            pd.playTime++;
+            // check if someone gets promoted
+            for (var entry : rankRequirements.entrySet()) {
+                if (pd.rank <= entry.getKey() - 1 && pd.playTime >= entry.getValue().playtime &&
+                        pd.buildingsBuilt >= entry.getValue().buildingsBuilt &&
+                        pd.gamesPlayed >= entry.getValue().gamesPlayed) {
+                    Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+                    if (pd.rank < entry.getKey()) pd.rank = entry.getKey();
+                    System.out.println(escapeEverything(p) + " got promoted to " + rankNames.get(pd.rank).name + "!");
+                }
+            }
+
+            setData(p.uuid(), pd);
+            ioMain.playerDataGroup.put(p.uuid(), tdata); // update tdata with the new stuff
+        }
+        debug("Updated database!");
+        if (state.is(GameState.State.playing)) {
+            if (Mathf.chance(0.01f)) {
+                api.updateActivity("( ͡° ͜ʖ ͡°)");
+                System.out.println("( ͡° ͜ʖ ͡°)");
+            } else {
+                api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
+            }
+        } else {
+            api.updateActivity("Not hosting. Please Host a game. Ping an admin");
+        }
     }
 
 
@@ -499,25 +563,38 @@ public class ioMain extends Plugin {
 //            });
 
             handler.<Player>register("freeze", "<player> [reason...]", "Freeze a player. To unfreeze just use this command again.", (args, player) -> {
-                Player target = findPlayer(args[0]);
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-                assert tdata != null;
-                tdata.frozen = !tdata.frozen;
-                assert target != null;
-                player.sendMessage("[cyan]Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(target));
-                Call.infoMessage(target.con, "[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " by a moderator. " + (args.length > 1 ? "Reason: " + args[1] : ""));
+                if (player.admin()) {
+                    Player target = findPlayer(args[0]);
+                    if (target != null) {
+                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(target.uuid(), null));
+                        assert tdata != null;
+                        tdata.frozen = !tdata.frozen;
+                        player.sendMessage("[cyan]Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(target));
+                        Call.infoMessage(target.con, "[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " by a moderator. " + (args.length > 1 ? "Reason: " + args[1] : ""));
+                    } else {
+                        player.sendMessage("Player not found!");
+                    }
+                } else {
+                    player.sendMessage(noPermissionMessage);
+                }
             });
 
             handler.<Player>register("mute", "<player> [reason...]", "Mute a player. To unmute just use this command again.", (args, player) -> {
-                Player target = findPlayer(args[0]);
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-                assert tdata != null;
-                tdata.muted = !tdata.muted;
-                assert target != null;
-                player.sendMessage("[cyan]Successfully " + (tdata.muted ? "muted" : "unmuted") + " " + escapeEverything(target));
-                Call.infoMessage(target.con, "[cyan]You got " + (tdata.muted ? "muted" : "unmuted") + " by a moderator. " + (args.length > 1 ? "Reason: " + args[1] : ""));
+                if (player.admin()) {
+                    Player target = findPlayer(args[0]);
+                    if (target != null) {
+                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(target.uuid(), null));
+                        assert tdata != null;
+                        tdata.muted = !tdata.muted;
+                        player.sendMessage("[cyan]Successfully " + (tdata.muted ? "muted" : "unmuted") + " " + escapeEverything(target));
+                        Call.infoMessage(target.con, "[cyan]You got " + (tdata.muted ? "muted" : "unmuted") + " by a moderator. " + (args.length > 1 ? "Reason: " + args[1] : ""));
+                    } else {
+                        player.sendMessage("Player not found!");
+                    }
+                } else {
+                    player.sendMessage(noPermissionMessage);
+                }
             });
-
 
 
             handler.<Player>register("bug", "[description...]", "Send a bug report to the discord server. (Please do not spam, because this command pings developers)", (args, player) -> {
@@ -911,11 +988,11 @@ public class ioMain extends Plugin {
                 if (player.admin) {
                     for (Player p : Groups.player) {
                         PlayerData pd = getData(p.uuid());
-                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(p.uuid(), null));
                         if (tdata == null) continue; // shouldn't happen, ever
                         tdata.doRainbow = false;
-                        assert pd != null;
-                        player.name = rankNames.get(pd.rank).tag + netServer.admins.getInfo(player.uuid()).names.get(0);
+                        if (pd == null) continue;
+                        p.name = rankNames.get(pd.rank).tag + netServer.admins.getInfo(p.uuid()).names.get(0);
                     }
                     player.sendMessage("[cyan]Reset names!");
                 } else {
