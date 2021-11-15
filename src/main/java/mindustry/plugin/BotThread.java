@@ -50,7 +50,7 @@ public class BotThread extends Thread {
 
     public void run(){
 //        Timer.schedule(ioMain.loop(), 0.5F);
-        TextChannel log_channel = getTextChannel("882342315438526525");
+        TextChannel log_channel = getTextChannel(log_channel_id);
         while (this.mt.isAlive()){
             try {
                 Thread.sleep(60 * 1000);

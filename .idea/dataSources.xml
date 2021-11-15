@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost/mindustrydata</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="official database" uuid="b0d30ab0-7148-44d8-bbb2-53955262f12e">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://172.104.253.198:5432/mindustrydata</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

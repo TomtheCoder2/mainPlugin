@@ -4,9 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
 import arc.util.Strings;
-import com.google.gson.JsonArray;
 import mindustry.content.Blocks;
-import mindustry.content.UnitTypes;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Groups;
@@ -14,12 +12,10 @@ import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.maps.Maps;
 import mindustry.net.Administration;
-import mindustry.plugin.discordcommands.Command;
+import mindustry.plugin.database.MapData;
+import mindustry.plugin.database.PlayerData;
 import mindustry.plugin.discordcommands.Context;
-import mindustry.type.UnitType;
 import mindustry.world.Block;
-import mindustry.world.Tile;
-import mindustry.world.blocks.storage.CoreBlock;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
@@ -30,7 +26,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,14 +33,16 @@ import java.util.regex.Pattern;
 import static mindustry.Vars.maps;
 import static mindustry.Vars.netServer;
 import static mindustry.plugin.ioMain.getTextChannel;
+import static mindustry.plugin.ioMain.log_channel_id;
+import static mindustry.plugin.database.Utils.*;
 //import java.sql.*;
 
 public class Utils {
-    static String url = null;
+    public static String url = null;
     public static String maps_url = null;
     public static String apapi_key = null;
-    static String user = null;
-    static String password = null;
+    public static String user = null;
+    public static String password = null;
     public static int chatMessageMaxSize = 256;
     static String welcomeMessage = "";
     static String statMessage = "";
@@ -116,22 +113,23 @@ public class Utils {
          * -General (uE817)
          * -Marshall (uE814)
          * */
+        rankNames.put(1, new Rank("[accent]|[white]\uE865[accent]|[]", "Soldier", new Color(0xC0C3C4)));
+        rankNames.put(2, new Rank("[accent]|[white]\uE861[accent]|[]", "Corporal", new Color(0x969A9D)));
+        rankNames.put(3, new Rank("[accent]|[white]\uE861[accent]|[]", "Brigadier", new Color(0x84888B)));
+        rankNames.put(4, new Rank("[accent]|[white]\uE826[accent]|[]", "Sargeant", new Color(0x717578)));
+        rankNames.put(5, new Rank("[accent]|[white]\uE806[accent]|[]", "Major", new Color(0x515456)));
+        rankNames.put(6, new Rank("[accent]|[white]\uE810[accent]|[]", "Lieutenant", "Be decorated by General/Marshal", new Color(0x708374)));
+        rankNames.put(7, new Rank("[accent]|[white]\uE811[accent]|[]", "Captain", "Create maps or code for the server", new Color(0x456F43)));
+        rankNames.put(8, new Rank("[accent]|[white]\uE864[accent]|[]", "Colonel", "Apply at our discord server (Junior Mod)", new Color(0x405B32)));
+        rankNames.put(9, new Rank("[accent]|[white]\uE817[accent]|[]", "General", "Be decorated from Colonel", new Color(0x0A6216))); // mod
+        rankNames.put(10, new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", "Be admin", new Color(0xffcc00))); // admin
 
-        rankNames.put(1, new Rank("[accent]|[white]\uE865[accent]|[]", "Soldier", new Color(0xC0C3C4))); // private
-        rankNames.put(2, new Rank("[accent]|[white]\uE861[accent]|[]", "Corporal", new Color(0x969A9D))); // general
-        rankNames.put(3, new Rank("[accent]|[white]\uE826[accent]|[]", "Sargeant", new Color(0x717578))); // corporal
-        rankNames.put(4, new Rank("[accent]|[white]\uE806[accent]|[]", "Major", new Color(0x515456))); // sargeant
-        rankNames.put(5, new Rank("[accent]|[white]\uE810[accent]|[]", "Lieutenant", "Be decorated by General/Marshal", new Color(0x708374))); // pro player
-        rankNames.put(6, new Rank("[accent]|[white]\uE811[accent]|[]", "Captain", "Create maps or code for the server", new Color(0x456F43))); // contributer
-        rankNames.put(7, new Rank("[accent]|[white]\uE864[accent]|[]", "Colonel", "Apply at our discord server (Junior Mod)", new Color(0x405B32))); // mod jr
-        rankNames.put(8, new Rank("[accent]|[white]\uE817[accent]|[]", "General", "Be decorated from Colonel", new Color(0x0A6216))); // mod
-        rankNames.put(9, new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", "Be admin", new Color(0xffcc00))); // admin
 
-
-        rankRequirements.put(1, new Requirement(300, 3000, 5));
-        rankRequirements.put(2, new Requirement(1000, 5000, 12));
-        rankRequirements.put(3, new Requirement(5000, 15000, 20));
-        rankRequirements.put(4, new Requirement(20000, 35000, 50));
+        rankRequirements.put(1, new Requirement(300, 3000 * 2, 5));
+        rankRequirements.put(2, new Requirement(600, 6000 * 2, 10));
+        rankRequirements.put(3, new Requirement(1200, 12000 * 2, 20));
+        rankRequirements.put(4, new Requirement(2400, 24000 * 2, 40));
+        rankRequirements.put(5, new Requirement(4800, 48000 * 2, 80));
 
 
         rankRoles.put("627985513600516109", 1);
@@ -206,12 +204,6 @@ public class Utils {
         return list.toString();
     }
 
-    /**
-     * Connect to the PostgreSQL Server
-     */
-    public static Connection connect() throws SQLException {
-        return DriverManager.getConnection(url, user, password);
-    }
 
     /**
      * replace all color codes, ` and @
@@ -238,10 +230,10 @@ public class Utils {
      */
     public static String escapeEverything(String string) {
         return escapeColorCodes(string
-                .replaceAll(" ", "")
-                .replaceAll("\\|(.)\\|", "")
-                .replaceAll("\\[accent\\]", "")
-                .replaceAll("\\|(.)\\|", "")
+//                .replaceAll(" ", "")
+                        .replaceAll("\\|(.)\\|", "")
+                        .replaceAll("\\[accent\\]", "")
+                        .replaceAll("\\|(.)\\|", "")
         ).replaceAll("\\|(.)\\|", "");
     }
 
@@ -466,7 +458,7 @@ public class Utils {
 
 
     public static void logBanMessage(Administration.PlayerInfo info, Context ctx, String reason, String action) {
-        TextChannel log_channel = getTextChannel("882342315438526525");
+        TextChannel log_channel = getTextChannel(log_channel_id);
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(action + " " + info.lastName);
         eb.addField("UUID", info.id, true);
@@ -533,204 +525,6 @@ public class Utils {
 //            }
 //        }
 //    }
-
-    /**
-     * Get Data from a specific player
-     *
-     * @param uuid the uuid of the player
-     */
-    public static PlayerData getData(String uuid) {
-//        System.out.println(uuid);
-        // search for the uuid
-        String SQL = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason "
-                + "FROM playerdata "
-                + "WHERE uuid = ?";
-        try {
-            // connect to the database
-            connect();
-            Connection conn = connect();
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
-
-            // replace ? with the uuid
-            pstmt.setString(1, uuid);
-            // get the result
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                // create a new Player to return
-                PlayerData pd = new PlayerData(rs.getInt("rank"));
-
-                // set all stats
-                pd.uuid = rs.getString("uuid");
-                pd.playTime = rs.getInt("playTime");
-                pd.buildingsBuilt = rs.getInt("buildingsBuilt");
-                pd.gamesPlayed = rs.getInt("gamesPlayed");
-                pd.verified = rs.getBoolean("verified");
-                pd.banned = rs.getBoolean("banned");
-                pd.bannedUntil = rs.getLong("bannedUntil");
-                pd.banReason = rs.getString("banReason");
-                // finally return it
-                return pd;
-            } else {
-                System.out.println(rs.next());
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-        // if theres no player return null
-        return null;
-    }
-
-    /**
-     * Set Data for a specific player
-     *
-     * @param uuid uuid of the player
-     * @param pd   player Data
-     */
-    public static void setData(String uuid, PlayerData pd) {
-        if (getData(uuid) == null) {
-            // define all variables
-            String SQL = "INSERT INTO playerdata(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason) "
-                    + "VALUES(?, ?,?, ?, ?, ?, ?, ?, ?)";
-
-            long id = 0;
-
-            try (Connection conn = connect();
-                 PreparedStatement pstmt = conn.prepareStatement(SQL,
-                         Statement.RETURN_GENERATED_KEYS)) {
-
-                // set all variables
-                pstmt.setString(1, uuid);
-                pstmt.setInt(2, pd.rank);
-                pstmt.setInt(3, pd.playTime);
-                pstmt.setInt(4, pd.buildingsBuilt);
-                pstmt.setInt(5, pd.gamesPlayed);
-                pstmt.setBoolean(6, pd.verified);
-                pstmt.setBoolean(7, pd.banned);
-                pstmt.setLong(8, pd.bannedUntil);
-                pstmt.setString(9, pd.banReason);
-
-                // send the data
-                int affectedRows = pstmt.executeUpdate();
-                // check the affected rows
-                if (affectedRows > 0) {
-                    // get the ID back
-                    try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                        if (rs.next()) {
-                            id = rs.getLong(1);
-                        }
-                    } catch (SQLException ex) {
-                        System.out.println(ex.getMessage());
-                    }
-                }
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        } else {
-            String SQL = "UPDATE playerdata "
-                    + "SET rank = ?, "
-                    + "playTime = ?, "
-                    + "buildingsBuilt = ?, "
-                    + "gamesPlayed = ?, "
-                    + "verified = ?, "
-                    + "banned = ?, "
-                    + "bannedUntil = ?, "
-                    + "banReason = ? "
-                    + "WHERE uuid = ?";
-
-            int affectedrows = 0;
-
-            try (Connection conn = connect();
-                 PreparedStatement pstmt = conn.prepareStatement(SQL)) {
-
-                // set all variables
-                pstmt.setString(9, uuid);
-                pstmt.setInt(1, pd.rank);
-                pstmt.setInt(2, pd.playTime);
-                pstmt.setInt(3, pd.buildingsBuilt);
-                pstmt.setInt(4, pd.gamesPlayed);
-                pstmt.setBoolean(5, pd.verified);
-                pstmt.setBoolean(6, pd.banned);
-                pstmt.setLong(7, pd.bannedUntil);
-                pstmt.setString(8, pd.banReason);
-//                System.out.println(pstmt);
-
-                affectedrows = pstmt.executeUpdate();
-//                System.out.println("affctected rows: " + affectedrows);
-
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
-        }
-    }
-
-    /**
-     * get a ranking from the database
-     */
-    public static String ranking(int limit, String column, int offset, boolean showUUID) {
-//        String SQL = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason "
-//                + "FROM playerdata "
-//                + "WHERE uuid = ?";
-        String SQL = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason " +
-                "FROM playerdata " +
-                "ORDER BY " + column + " DESC LIMIT ? OFFSET ?";
-        try {
-            StringBuilder rankingList = new StringBuilder("```");
-            // connect to the database
-            connect();
-            Connection conn = connect();
-            PreparedStatement pstmt = conn.prepareStatement(SQL);
-
-            // replace ? with the uuid
-//            pstmt.setString(1, column);
-            pstmt.setInt(1, limit);
-            pstmt.setInt(2, offset);
-            System.out.println(pstmt);
-            // get the result
-            ResultSet rs = pstmt.executeQuery();
-            int c = 0; // count
-            rankingList.append(String.format("%-3s", ""));
-            rankingList.append(String.format("%-10s", column));
-            if (showUUID) rankingList.append(String.format(" %-24sName:\n", "UUID"));
-            else rankingList.append("Name:\n");
-            while (rs.next()) {
-                c++;
-                // create a new Player to return
-                PlayerData pd = new PlayerData(rs.getInt("rank"));
-
-                // set all stats
-                pd.uuid = rs.getString("uuid");
-                pd.playTime = rs.getInt("playTime");
-                pd.buildingsBuilt = rs.getInt("buildingsBuilt");
-                pd.gamesPlayed = rs.getInt("gamesPlayed");
-                rankingList.append(String.format("%-3d", c + offset));
-                Administration.PlayerInfo info = netServer.admins.getInfoOptional(pd.uuid);
-                switch (column) {
-                    case "playTime" -> {
-                        rankingList.append(String.format("%-10d", pd.playTime));
-                    }
-                    case "buildingsBuilt" -> {
-                        rankingList.append(String.format("%-10d", pd.buildingsBuilt));
-                    }
-                    case "gamesPlayed" -> {
-                        rankingList.append(String.format("%-10d", pd.gamesPlayed));
-                    }
-                    default -> {
-                        return "Please select a valid stat";
-                    }
-                }
-                if (showUUID) rankingList.append(String.format(" %-24s: ", pd.uuid));
-                if (info != null) {
-                    rankingList.append(escapeEverything(info.names.get(0)));
-                }
-                rankingList.append("\n");
-            }
-            rankingList.append("```");
-            return rankingList.toString();
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-        return "Didnt find anything idk";
-    }
 
     /**
      * create and save Ranks

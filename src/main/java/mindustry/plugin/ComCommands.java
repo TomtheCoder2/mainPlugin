@@ -13,28 +13,27 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.io.SaveIO;
 import mindustry.maps.Map;
+import mindustry.plugin.database.MapData;
 import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
-import mindustry.plugin.discordcommands.RoleRestrictedCommand;
 import mindustry.plugin.requests.GetMap;
 import mindustry.world.modules.ItemModule;
-import net.dv8tion.jda.api.entities.Role;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-import static arc.util.Log.err;
+import static arc.util.Log.debug;
 import static arc.util.Log.info;
-import static mindustry.Vars.*;
+import static mindustry.Vars.saveExtension;
+import static mindustry.Vars.state;
 import static mindustry.plugin.Utils.*;
-import static mindustry.gen.StateSnapshotCallPacket.*;
+import static mindustry.plugin.database.Utils.getMapData;
 import static mindustry.plugin.ioMain.*;
 
 public class ComCommands {
@@ -84,26 +83,41 @@ public class ComCommands {
                     return;
                 }
 
-                Fi mapfile = found.file;
-                try {
-                    String absolute = map.getMap(mapfile).get(0);
-                    System.out.println(absolute);
-
+                Fi mapFile = found.file;
+                CompletableFuture.runAsync(() -> {
                     EmbedBuilder embed = new EmbedBuilder()
                             .setTitle(escapeCharacters(found.name()))
-                            .setDescription(escapeCharacters(found.description()))
-                            .setAuthor(escapeCharacters(found.author()))
-                            .setImage("attachment://output.png");
-                    MessageBuilder mb = new MessageBuilder();
-                    mb.addEmbed(embed);
-                    mb.addFile(new File(absolute));
-                    mb.addAttachment(mapfile.file());
-                    mb.send(ctx.channel);
-                } catch (Exception e) {
-                    String err = Strings.neatError(e, true);
-                    int max = 900;
+                            .setAuthor(escapeCharacters(found.author()));
+                    MapData mapData = getMapData(escapeCharacters(found.name()));
+                    if (mapData != null) {
+                        embed.setDescription(
+                                escapeCharacters(found.description()) + "\n\n" +
+                                        "**Positive Rating: **" + mapData.positiveRating + "\n" +
+                                        "**Negative Rating: **" + mapData.negativeRating + "\n" +
+                                        "**Highscore Time: **" + mapData.highscoreTime + "\n" +
+                                        "**Highscore Wave: **" + mapData.highscoreWaves + "\n" +
+                                        "**Shortest Game: **" + mapData.shortestGame + "\n" +
+                                        "**Play Time: **" + mapData.playtime + "\n"
+                        );
+                    } else {
+                        embed.setDescription(escapeCharacters(found.description()));
+                    }
+                    try {
+                        String absolute = map.getMap(mapFile).get(0);
+                        debug(absolute);
+
+                        embed.setImage("attachment://output.png");
+                        MessageBuilder mb = new MessageBuilder();
+                        mb.addEmbed(embed);
+                        mb.addFile(new File(absolute));
+                        mb.addAttachment(mapFile.file());
+                        mb.send(ctx.channel);
+                    } catch (Exception e) {
+                        String err = Strings.neatError(e, true);
+                        int max = 900;
 //                    errDelete(msg, "Error parsing map.", err.length() < max ? err : err.substring(0, max));
-                }
+                    }
+                });
             }
         });
         handler.registerCommand(new Command("players") {
@@ -174,41 +188,43 @@ public class ComCommands {
                             .addField("Next wave in", Math.round(state.wavetime / 60) + " seconds.", true);
                     if (ctx.args.length > 1) {
                         if (state.is(GameState.State.playing) && Objects.equals(ctx.args[1], "preview")) {
-                            try {
-                                Fi file = Core.settings.getDataDirectory().child("../temp/map." + saveExtension);
-
-                                Core.app.post(() -> {
-                                    SaveIO.save(file);
-                                    info("Saved to @.", file);
-                                });
-                                Fi mapfile = file;
+                            CompletableFuture.runAsync(() -> {
                                 try {
-                                    String absolute = map.getMap(mapfile).get(0);
-                                    System.out.println(absolute);
+                                    Fi file = Core.settings.getDataDirectory().child("../temp/map." + saveExtension);
 
-                                    eb.setImage("attachment://output.png");
-                                    MessageBuilder mb = new MessageBuilder();
-                                    mb.addEmbed(eb);
-                                    mb.addFile(new File(absolute));
+                                    Core.app.post(() -> {
+                                        SaveIO.save(file);
+                                        info("Saved to @.", file);
+                                    });
+
+                                    try {
+                                        String absolute = map.getMap(file).get(0);
+                                        debug(absolute);
+
+                                        eb.setImage("attachment://output.png");
+                                        MessageBuilder mb = new MessageBuilder();
+                                        mb.addEmbed(eb);
+                                        mb.addFile(new File(absolute));
 //                                mb.addAttachment(mapfile.file());
-                                    mb.send(ctx.channel);
-                                } catch (Exception e) {
-                                    String err = Strings.neatError(e, true);
-                                    int max = 900;
+                                        mb.send(ctx.channel);
+                                    } catch (Exception e) {
+                                        String err = Strings.neatError(e, true);
+                                        int max = 900;
 //                    errDelete(msg, "Error parsing map.", err.length() < max ? err : err.substring(0, max));
+                                    }
+                                } catch (Exception e) {
+                                    debug(e.getMessage());
+                                    e.printStackTrace();
+                                    ctx.reply("An error has occurred.");
+                                    ctx.channel.sendMessage(eb);
                                 }
-                            } catch (Exception e) {
-                                System.out.println(e.getMessage());
-                                e.printStackTrace();
-                                ctx.reply("An error has occurred.");
-                                ctx.channel.sendMessage(eb);
-                            }
+                            });
                         }
                     } else {
                         ctx.channel.sendMessage(eb);
                     }
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
+                    debug(e.getMessage());
                     e.printStackTrace();
                     ctx.reply("An error has occurred.");
                 }

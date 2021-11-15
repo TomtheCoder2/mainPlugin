@@ -3,15 +3,12 @@ package mindustry.plugin;
 import arc.Core;
 import arc.Events;
 import arc.files.Fi;
-import arc.func.Boolf;
 import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Structs;
-import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.content.UnitTypes;
 import mindustry.core.GameState;
-import mindustry.core.NetServer;
 import mindustry.game.EventType.GameOverEvent;
 import mindustry.game.Gamemode;
 import mindustry.game.Team;
@@ -24,6 +21,7 @@ import mindustry.maps.Map;
 import mindustry.maps.MapException;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
+import mindustry.plugin.database.PlayerData;
 import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
@@ -57,6 +55,7 @@ import static mindustry.Vars.*;
 import static mindustry.plugin.Utils.*;
 import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.requests.IPLookup.readJsonFromUrl;
+import static mindustry.plugin.database.Utils.*;
 
 public class ServerCommands {
     public GetMap map = new GetMap();
@@ -473,7 +472,7 @@ public class ServerCommands {
                             offset = Integer.parseInt(ctx.args[2]);
                         }
                     }
-                    boolean showUUID = ctx.channel.getId() != Long.parseLong(bot_channel_id);
+                    boolean showUUID = ctx.channel.getId() != Long.parseLong(bot_channel_id) && ctx.channel.getId() != Long.parseLong(apprentice_bot_channel_id);
                     switch (ctx.args[1].toLowerCase()) {
                         case "playtime", "p" -> {
                             eb.setDescription(ranking(10, "playTime", offset, showUUID));
@@ -483,6 +482,12 @@ public class ServerCommands {
                         }
                         case "buildings", "buildingsbuilt", "b" -> {
                             eb.setDescription(ranking(10, "buildingsBuilt", offset, showUUID));
+                        }
+                        case "negative", "n" -> {
+                            eb.setDescription(ranking(10, "negativeRating", offset));
+                        }
+                        case "positive" -> {
+                            eb.setDescription(ranking(10, "positiveRating", offset));
                         }
                         default -> {
                             eb.setDescription("Please select a valid stat");
@@ -664,6 +669,7 @@ public class ServerCommands {
                     usage = "<playerid|ip|name|teamid>";
                     category = "moderation";
                     minArguments = 1;
+                    hidden = true;
                 }
 
                 public void run(Context ctx) {
@@ -677,15 +683,16 @@ public class ServerCommands {
 //                        Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
 //                        if (Vars.netServer.admins.getAdmins().contains(targetInfo)) {
                         if (!p.admin) {
-//                            netServer.admins.adminPlayer(targetInfo.id, targetInfo.adminUsid);
-                            p.admin = true;
+                            netServer.admins.adminPlayer(targetInfo.id, targetInfo.adminUsid);
+//                            p.admin = true;
                             eb.setDescription("Promoted " + escapeEverything(p.name) + " to admin");
                         } else {
-//                            netServer.admins.unAdminPlayer(targetInfo.id);
+                            netServer.admins.unAdminPlayer(targetInfo.id);
                             p.admin = false;
                             eb.setDescription("Demoted " + escapeEverything(p.name) + " from admin");
                         }
                         eb.setTitle("Command executed!");
+                        netServer.admins.save();
                     } else {
                         eb.setTitle("Command terminated!");
                         eb.setColor(Pals.error);
@@ -695,6 +702,55 @@ public class ServerCommands {
                     ctx.channel.sendMessage(eb);
                 }
             });
+
+            // command with admin remove|add
+//            handler.registerCommand(new RoleRestrictedCommand("admin") {
+//                {
+//                    help = "Toggle the admin status on a player.";
+//                    role = banRole;
+//                    usage = "<add|remove> <playerid|ip|name|teamid>";
+//                    category = "moderation";
+//                    minArguments = 1;
+//                }
+//
+//                public void run(Context ctx) {
+//                    EmbedBuilder eb = new EmbedBuilder();
+//
+//
+//                    if(!(ctx.args[1].equals("add") || ctx.args[1].equals("remove"))){
+//                        err("Second parameter must be either 'add' or 'remove'.");
+//                        return;
+//                    }
+//
+//                    boolean add = ctx.args[1].equals("add");
+//
+//                    Administration.PlayerInfo target;
+//                    Player playert = findPlayer(ctx.args[2]);
+//                    if(playert != null){
+//                        target = playert.getInfo();
+//                    }else{
+//                        target = netServer.admins.getInfoOptional(ctx.args[2]);
+//                        playert = Groups.player.find(p -> p.getInfo() == target);
+//                    }
+//
+//                    if(target != null){
+//                        if(add){
+//                            netServer.admins.adminPlayer(target.id, target.adminUsid);
+//                        }else{
+//                            netServer.admins.unAdminPlayer(target.id);
+//                        }
+//                        if(playert != null) playert.admin = add;
+//                        eb.setTitle("Changed admin status of player: "+ escapeEverything(target.lastName));
+//                        eb.setColor(Pals.success);
+//                        info("Changed admin status of player: @", target.lastName);
+//                    }else{
+//                        eb.setTitle("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");
+//                        eb.setColor(Pals.error);
+//                        err("Nobody with that name or ID could be found. If adding an admin by name, make sure they're online; otherwise, use their UUID.");
+//                    }
+//                    ctx.channel.sendMessage(eb);
+//                }
+//            });
 
             handler.registerCommand(new RoleRestrictedCommand("gameover") {
                 {

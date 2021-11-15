@@ -15,8 +15,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import static arc.util.Log.debug;
 
 import static mindustry.plugin.Utils.*;
 
@@ -32,12 +34,11 @@ public class GetMap {
             var request = HttpRequest.newBuilder()
                     .uri(URI.create(maps_url + "/map"))
                     .POST(HttpRequest.BodyPublishers.ofFile(Paths.get(file.absolutePath())))
-//                    .GET()
                     .build();
             HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
             if (200 == response.statusCode()) {
                 byte[] bytes = response.body();
-//                System.out.println(Arrays.toString(bytes));
+                debug(Arrays.toString(bytes));
                 convertToPNG(bytes);
                 HttpHeaders data = response.headers();
                 Map<String, List<String>> mappeddata = data.map();

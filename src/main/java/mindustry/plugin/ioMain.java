@@ -10,12 +10,16 @@ import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.core.NetServer;
 import mindustry.game.EventType;
+import mindustry.game.Gamemode;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.maps.Map;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration;
 import mindustry.net.Administration.Config;
+import mindustry.plugin.database.MapData;
+import mindustry.plugin.database.PlayerData;
 import mindustry.world.Tile;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
@@ -34,9 +38,11 @@ import java.util.List;
 import java.util.*;
 
 import static arc.util.Log.debug;
+import static arc.util.Log.info;
 import static mindustry.Vars.*;
-import static mindustry.Vars.player;
 import static mindustry.plugin.Utils.*;
+import static mindustry.plugin.database.Utils.*;
+import static mindustry.plugin.discordcommands.DiscordCommands.error_log_channel;
 
 public class ioMain extends Plugin {
 //    public static final File prefsFile = new File("prefs.properties");
@@ -48,6 +54,8 @@ public class ioMain extends Plugin {
     public static DiscordApi api = null;
     public static String prefix = ".";
     public static String live_chat_channel_id = "";
+    public static String map_rating_channel_id = "";
+    public static String log_channel_id = "";
     public static String bot_channel_id = null;
     public static String apprentice_bot_channel_id = null;
     public static String staff_bot_channel_id = null;
@@ -56,6 +64,7 @@ public class ioMain extends Plugin {
     public static JSONObject data; //token, channel_id, role_id
     public static String apiKey = "";
     public static List<Player> joinedPlayer = new ArrayList<>();
+    public static long passedMapTime = 0;
 //    static Gson gson = new Gson();
 
     public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
@@ -86,6 +95,10 @@ public class ioMain extends Plugin {
             maps_url = alldata.getString("maps_url");
             // for the live chat between the discord server and the mindustry server
             live_chat_channel_id = alldata.getString("live_chat_channel_id");
+            // log joins bans etc
+            log_channel_id = alldata.getString("log_channel_id");
+            // channel to give feedback for maps
+            map_rating_channel_id = alldata.getString("map_rating_channel_id");
             // iplookup api key
             apapi_key = alldata.getString("apapi_key");
             // bot channels
@@ -237,6 +250,10 @@ public class ioMain extends Plugin {
                 int rank = pd.rank;
                 Call.sendMessage("[#" + Integer.toHexString(rankNames.get(rank).color.getRGB()).substring(2) + "]" + rankNames.get(rank).name + " [] " + player.name + "[accent] joined the front!");
                 player.name = rankNames.get(rank).tag + player.name;
+                // just give marshals admin when they join
+                if (rank == 9) {
+                    player.admin = true;
+                }
             } else { // not in database
                 System.out.println("new player connected: " + escapeColorCodes(event.player.name));
                 setData(player.uuid(), new PlayerData(0));
@@ -313,8 +330,28 @@ public class ioMain extends Plugin {
                     Call.infoMessage(p.con, "[accent]+1 games played");
                     setData(pd.uuid, pd);
                 }
+                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(p.uuid(), null));
+                if (tdata != null) {
+                    tdata.votedMap = false;
+                }
+
             }
             update(log_channel, api);
+
+            // maybe update the highscore
+            String mapName = state.map.name();
+            MapData mapData = getMapData(mapName);
+            assert mapData != null;
+            mapData.highscoreWaves = Math.max(mapData.highscoreWaves, state.stats.wavesLasted);
+            mapData.highscoreTime = Math.max(mapData.highscoreTime, passedMapTime);
+            if (mapData.shortestGame != 0) {
+                mapData.shortestGame = Math.min(mapData.shortestGame, passedMapTime);
+            } else {
+                mapData.shortestGame = passedMapTime;
+            }
+            rateMap(mapName, mapData);
+
+            passedMapTime = 0;
         });
 
 //        Events.on(EventType.WorldLoadEvent.class, event -> {
@@ -355,6 +392,25 @@ public class ioMain extends Plugin {
                 }
 
                 return true;
+            });
+            netServer.admins.addChatFilter((player, message) -> {
+                assert player != null;
+                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                assert tdata != null;
+                if (tdata.muted) {
+                    return null;
+                }
+                return message;
+            });
+            netServer.admins.addActionFilter(action -> {
+                assert action.player != null;
+                Player player = action.player;
+                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                assert tdata != null;
+                if (tdata.frozen) {
+                    player.sendMessage("[cyan]You are frozen!");
+                }
+                return !tdata.frozen;
             });
         });
 //        Core.app.post(this::loop);
@@ -492,6 +548,18 @@ public class ioMain extends Plugin {
             setData(p.uuid(), pd);
             ioMain.playerDataGroup.put(p.uuid(), tdata); // update tdata with the new stuff
         }
+        // update the playtime of the current map
+        String mapName = state.map.name();
+        MapData mapData = getMapData(mapName);
+        if (mapData != null) {
+            mapData.playtime++;
+        } else {
+            mapData = new MapData(mapName);
+            mapData.playtime = 1;
+        }
+        rateMap(mapName, mapData);
+        passedMapTime++;
+
         debug("Updated database!");
         if (state.is(GameState.State.playing)) {
             if (Mathf.chance(0.01f)) {
@@ -502,6 +570,17 @@ public class ioMain extends Plugin {
             }
         } else {
             api.updateActivity("Not hosting. Please Host a game. Ping an admin");
+            // restart the server:
+            Map result;
+            Gamemode preset = Gamemode.survival;
+            result = maps.getShuffleMode().next(preset, state.map);
+            info("Randomized next map to be @.", result.name());
+            world.loadMap(result, result.applyRules(preset));
+            state.rules = result.applyRules(preset);
+            logic.play();
+            assert error_log_channel != null;
+            error_log_channel.sendMessage(" <@770240444466069514> ");
+            error_log_channel.sendMessage(new EmbedBuilder().setColor(new Color(0xff0000)).setTitle("Server crashed. Restarted!"));
         }
     }
 
@@ -509,25 +588,6 @@ public class ioMain extends Plugin {
     //register commands that player can invoke in-game
     @Override
     public void registerClientCommands(CommandHandler handler) {
-        netServer.admins.addChatFilter((player, message) -> {
-            assert player != null;
-            PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-            assert tdata != null;
-            if (tdata.muted) {
-                return null;
-            }
-            return message;
-        });
-        netServer.admins.addActionFilter(action -> {
-            assert action.player != null;
-            Player player = action.player;
-            PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-            assert tdata != null;
-            if (tdata.frozen) {
-                player.sendMessage("[cyan]You are frozen!");
-            }
-            return !tdata.frozen;
-        });
         if (api != null) {
             handler.removeCommand("t");
             handler.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
@@ -541,6 +601,7 @@ public class ioMain extends Plugin {
                 PlayerData pd = getData(player.uuid());
                 if (player.admin && Objects.requireNonNull(pd).rank == 9) {
                     player.sendMessage(mods.getScripts().runConsole(arg[0]));
+
                 } else {
                     player.sendMessage("[scarlet]This command is restricted to admins!");
                 }
@@ -561,6 +622,66 @@ public class ioMain extends Plugin {
 //                    player.sendMessage("[scarlet]Successfully sent message to moderators.");
 //                }
 //            });
+
+            handler.<Player>register("rate", "<positive|negative|advice> [advice...]", "Rate the current map.", (args, player) -> {
+                String mapName = Vars.state.map.name();
+                TextChannel map_rating_channel = getTextChannel(map_rating_channel_id);
+                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                switch (args[0]) {
+                    case "positive" -> {
+                        if (!tdata.votedMap) {
+                            if (!state.gameOver) {
+                                MapData mapData = getMapData(mapName);
+                                if (mapData != null) {
+                                    mapData.positiveRating++;
+                                } else {
+                                    mapData = new MapData(mapName);
+                                    mapData.positiveRating = 1;
+                                }
+                                rateMap(mapName, mapData);
+                                player.sendMessage("Successfully gave a [green]positive [white]feedback for " + mapName + "[white]!");
+                                tdata.votedMap = true;
+                            } else {
+                                player.sendMessage("[scarlet]The game is already over!");
+                            }
+                        } else {
+                            player.sendMessage("[scarlet]You already voted in this game!");
+                        }
+                    }
+                    case "negative" -> {
+                        if (!tdata.votedMap) {
+                            if (!state.gameOver) {
+                                MapData mapData = getMapData(mapName);
+                                if (mapData != null) {
+                                    mapData.negativeRating++;
+                                } else {
+                                    mapData = new MapData(mapName);
+                                    mapData.negativeRating = 1;
+                                }
+                                rateMap(mapName, mapData);
+                                player.sendMessage("Successfully gave a [red]negative [white]feedback for " + mapName + "[white]!");
+                                tdata.votedMap = true;
+                            } else {
+                                player.sendMessage("[scarlet]The game is already over!");
+                            }
+                        } else {
+                            player.sendMessage("[scarlet]You already voted in this game!");
+                        }
+                    }
+                    case "advice" -> {
+                        EmbedBuilder eb = new EmbedBuilder()
+                                .setTitle("Feedback for map " + escapeEverything(mapName) + "!")
+                                .addField("Advice", args[1])
+                                .addField("By", escapeEverything(player.name));
+                        assert map_rating_channel != null;
+                        map_rating_channel.sendMessage(eb);
+                        player.sendMessage("Successfully gave an [cyan]advice [white]for " + mapName + "[white]!");
+                    }
+                    default -> {
+                        player.sendMessage("[white]Select [cyan]/rate [green]positive[white], [scarlet]negative [white]or [white]advice[white]!");
+                    }
+                }
+            });
 
             handler.<Player>register("freeze", "<player> [reason...]", "Freeze a player. To unfreeze just use this command again.", (args, player) -> {
                 if (player.admin()) {
@@ -841,7 +962,7 @@ public class ioMain extends Plugin {
 //                }
 //            });
 
-            handler.<Player>register("rainbow", "[sargeaNt+] Give your username a rainbow animation", (args, player) -> {
+            handler.<Player>register("rainbow", "Give your username a rainbow animation", (args, player) -> {
                 PlayerData pd = getData(player.uuid());
                 if (pd == null) {
                     player.sendMessage("There was an error!");
@@ -992,7 +1113,7 @@ public class ioMain extends Plugin {
                         if (tdata == null) continue; // shouldn't happen, ever
                         tdata.doRainbow = false;
                         if (pd == null) continue;
-                        p.name = rankNames.get(pd.rank).tag + netServer.admins.getInfo(p.uuid()).names.get(0);
+                        p.name = rankNames.get(pd.rank).tag + netServer.admins.getInfo(p.uuid()).lastName;
                     }
                     player.sendMessage("[cyan]Reset names!");
                 } else {
