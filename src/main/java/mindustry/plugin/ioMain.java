@@ -20,7 +20,9 @@ import mindustry.net.Administration;
 import mindustry.net.Administration.Config;
 import mindustry.plugin.database.MapData;
 import mindustry.plugin.database.PlayerData;
+import mindustry.plugin.requests.Translate;
 import mindustry.world.Tile;
+import net.dv8tion.jda.api.entities.Activity;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.channel.Channel;
@@ -30,6 +32,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import mindustry.plugin.requests.Translate;
 
 import java.awt.*;
 import java.sql.SQLException;
@@ -352,7 +355,14 @@ public class ioMain extends Plugin {
             rateMap(mapName, mapData);
 
             passedMapTime = 0;
+
+            // log the game over
+            assert log_channel != null;
+            log_channel.sendMessage(new EmbedBuilder().setTitle("Game over!").setDescription("Game ended with @ waves").setColor(new Color(0x33FFEC)));
         });
+
+
+        // TODO: log dangerous actions from players
 
 //        Events.on(EventType.WorldLoadEvent.class, event -> {
 //            Timer.schedule(MapRules::run, 5); // idk
@@ -604,6 +614,25 @@ public class ioMain extends Plugin {
 
                 } else {
                     player.sendMessage("[scarlet]This command is restricted to admins!");
+                }
+            });
+
+            handler.<Player>register("translate", "<language> <text...>", "Translate your message", (arg, player) -> {
+                try {
+                    JSONObject res = new JSONObject(Translate.translate(escapeEverything(arg[1]), arg[0]));
+                    if (res.has("translated") && res.getJSONObject("translated").has("text")) {
+                        String translated = res.getJSONObject("translated").getString("text");
+                        debug(translated);
+                        Call.sendMessage("<translated>[orange][[[accent]" + player.name + "[orange]][white]: " + translated);
+                        TextChannel tc = getTextChannel(live_chat_channel_id);
+                        assert tc != null;
+                        tc.sendMessage("<translated>**" + escapeEverything(player.name) + "**: " + translated);
+                    } else {
+                        debug(res);
+                        player.sendMessage("[scarlet]There was an error: " + (res.has("error") ? res.getString("error") : "No more information, ask Nautilus on discord!"));
+                    }
+                } catch (Exception e) {
+                    player.sendMessage("[scarlet]There was an error: " + e.getMessage());
                 }
             });
 

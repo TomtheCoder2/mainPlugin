@@ -3,6 +3,7 @@ package mindustry.plugin;
 import arc.Core;
 import arc.files.Fi;
 import arc.util.Strings;
+import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.Items;
 import mindustry.core.GameState;
@@ -84,24 +85,24 @@ public class ComCommands {
                 }
 
                 Fi mapFile = found.file;
+                EmbedBuilder embed = new EmbedBuilder()
+                        .setTitle(escapeCharacters(found.name()))
+                        .setAuthor(escapeCharacters(found.author()));
+                MapData mapData = getMapData(escapeCharacters(found.name()));
+                if (mapData != null) {
+                    embed.setDescription(
+                            escapeCharacters(found.description()) + "\n\n" +
+                                    "**Positive Rating: **" + mapData.positiveRating + "\n" +
+                                    "**Negative Rating: **" + mapData.negativeRating + "\n" +
+                                    "**Highscore Time: **" + mapData.highscoreTime + "\n" +
+                                    "**Highscore Wave: **" + mapData.highscoreWaves + "\n" +
+                                    "**Shortest Game: **" + mapData.shortestGame + "\n" +
+                                    "**Play Time: **" + mapData.playtime + "\n"
+                    );
+                } else {
+                    embed.setDescription(escapeCharacters(found.description()));
+                }
                 CompletableFuture.runAsync(() -> {
-                    EmbedBuilder embed = new EmbedBuilder()
-                            .setTitle(escapeCharacters(found.name()))
-                            .setAuthor(escapeCharacters(found.author()));
-                    MapData mapData = getMapData(escapeCharacters(found.name()));
-                    if (mapData != null) {
-                        embed.setDescription(
-                                escapeCharacters(found.description()) + "\n\n" +
-                                        "**Positive Rating: **" + mapData.positiveRating + "\n" +
-                                        "**Negative Rating: **" + mapData.negativeRating + "\n" +
-                                        "**Highscore Time: **" + mapData.highscoreTime + "\n" +
-                                        "**Highscore Wave: **" + mapData.highscoreWaves + "\n" +
-                                        "**Shortest Game: **" + mapData.shortestGame + "\n" +
-                                        "**Play Time: **" + mapData.playtime + "\n"
-                        );
-                    } else {
-                        embed.setDescription(escapeCharacters(found.description()));
-                    }
                     try {
                         String absolute = map.getMap(mapFile).get(0);
                         debug(absolute);
@@ -117,7 +118,11 @@ public class ComCommands {
                         int max = 900;
 //                    errDelete(msg, "Error parsing map.", err.length() < max ? err : err.substring(0, max));
                     }
+                    return;
                 });
+                Timer.schedule(() -> {
+                    ctx.channel.sendMessage(embed);
+                }, 10);
             }
         });
         handler.registerCommand(new Command("players") {
@@ -165,6 +170,38 @@ public class ComCommands {
                         .send(ctx.channel);
             }
         });
+
+        handler.registerCommand(new Command("translate") {
+            {
+                help = "Translate text and send it in the in game chat";
+                usage = "<language> <text...>";
+            }
+
+            @Override
+            public void run(Context ctx) {
+                ctx.channel.sendMessage(new EmbedBuilder()
+                        .setTitle("Wrong channel!")
+                        .setDescription("Please use the <#" + live_chat_channel_id + "> channel!")
+                        .setColor(new Color(0xff0000)));
+            }
+        });
+
+        handler.registerCommand(new Command("t") {
+            {
+                help = "Translate text and send it in the in game chat";
+                usage = "<language> <text...>";
+                hidden = true;
+            }
+
+            @Override
+            public void run(Context ctx) {
+                ctx.channel.sendMessage(new EmbedBuilder()
+                        .setTitle("Wrong channel!")
+                        .setDescription("Please use the <#" + live_chat_channel_id + "> channel!")
+                        .setColor(new Color(0xff0000)));
+            }
+        });
+
         handler.registerCommand(new Command("status") {
             {
                 help = "Get basic server information.";
@@ -361,6 +398,7 @@ public class ComCommands {
                 }
             }
         });
+
 
 //        handler.registerCommand(new Command("redeem") {
 //            {
