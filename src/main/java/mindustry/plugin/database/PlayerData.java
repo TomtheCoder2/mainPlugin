@@ -1,5 +1,7 @@
 package mindustry.plugin.database;
 
+import mindustry.entities.bullet.BulletType;
+
 public class PlayerData implements Cloneable{
     public String uuid;
     public int rank;

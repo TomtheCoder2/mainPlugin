@@ -20,6 +20,7 @@ import mindustry.net.Administration;
 import mindustry.net.Administration.Config;
 import mindustry.plugin.database.MapData;
 import mindustry.plugin.database.PlayerData;
+import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.requests.Translate;
 import mindustry.world.Tile;
 import net.dv8tion.jda.api.entities.Activity;
@@ -35,6 +36,11 @@ import org.json.JSONTokener;
 import mindustry.plugin.requests.Translate;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
@@ -63,6 +69,7 @@ public class ioMain extends Plugin {
     public static String apprentice_bot_channel_id = null;
     public static String staff_bot_channel_id = null;
     public static String admin_bot_channel_id = null;
+    public static String discordInviteLink = null;
     public static String serverName = "<untitled>";
     public static JSONObject data; //token, channel_id, role_id
     public static String apiKey = "";
@@ -109,6 +116,8 @@ public class ioMain extends Plugin {
             apprentice_bot_channel_id = alldata.getString("apprentice_bot_channel");
             staff_bot_channel_id = alldata.getString("staff_bot_channel_id");
             admin_bot_channel_id = alldata.getString("admin_bot_channel_id");
+            // link to join our discord server
+            discordInviteLink = alldata.getString("discordInviteLink");
             System.out.printf("url: %s, user: %s, password: %s%n", url, user, password);
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
@@ -213,6 +222,14 @@ public class ioMain extends Plugin {
 
         // update every tick
 
+        // player disconnected
+        Events.on(EventType.PlayerLeave.class, event -> {
+            String uuid = event.player.uuid();
+            //free ram
+            playerDataGroup.remove(uuid);
+        });
+
+
         // player joined
         TextChannel log_channel = getTextChannel("882342315438526525");
         Events.on(EventType.PlayerJoin.class, event -> {
@@ -248,7 +265,7 @@ public class ioMain extends Plugin {
 //                    setData(player.uuid(), pd);
 //                }
                 if (pd.banned || pd.bannedUntil > Instant.now().getEpochSecond()) {
-                    player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason + "\n[white] If you what to appeal join our discord server: [cyan]" + "https://discord.gg/qtjqCUbbdR");
+                    player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason + "\n[white] If you what to appeal join our discord server: [cyan]" + discordInviteLink);
                 }
                 int rank = pd.rank;
                 Call.sendMessage("[#" + Integer.toHexString(rankNames.get(rank).color.getRGB()).substring(2) + "]" + rankNames.get(rank).name + " [] " + player.name + "[accent] joined the front!");
@@ -324,6 +341,15 @@ public class ioMain extends Plugin {
             });
         });
 
+        Events.on(EventType.Trigger.update.getClass(), event -> {
+            for(Player p : Groups.player){
+                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(p.uuid(), null));
+                if (tdata != null && tdata.bt != null && p.shooting()) {
+                    Call.createBullet(tdata.bt, p.team(), p.getX(), p.getY(), p.unit().rotation, tdata.sclDamage, tdata.sclVelocity, tdata.sclLifetime);
+                }
+            }
+        });
+
         Events.on(EventType.GameOverEvent.class, event -> {
             debug("Game over!");
             for (Player p : Groups.player) {
@@ -344,7 +370,10 @@ public class ioMain extends Plugin {
             // maybe update the highscore
             String mapName = state.map.name();
             MapData mapData = getMapData(mapName);
-            assert mapData != null;
+            if (mapData == null) {
+                mapData = new MapData(mapName);
+                mapData.playtime = 1;
+            }
             mapData.highscoreWaves = Math.max(mapData.highscoreWaves, state.stats.wavesLasted);
             mapData.highscoreTime = Math.max(mapData.highscoreTime, passedMapTime);
             if (mapData.shortestGame != 0) {
@@ -358,7 +387,7 @@ public class ioMain extends Plugin {
 
             // log the game over
             assert log_channel != null;
-            log_channel.sendMessage(new EmbedBuilder().setTitle("Game over!").setDescription("Game ended with @ waves").setColor(new Color(0x33FFEC)));
+            log_channel.sendMessage(new EmbedBuilder().setTitle("Game over!").setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves").setColor(new Color(0x33FFEC)));
         });
 
 
@@ -523,7 +552,8 @@ public class ioMain extends Plugin {
                 eb.setTitle("Player Join Log");
                 StringBuilder desc = new StringBuilder();
                 for (Player player : joinedPlayer) {
-                    desc.append(String.format("`%s` : `%d `:%s\n", player.uuid(), player.id, escapeEverything(player.name)));
+                    Administration.PlayerInfo info = netServer.admins.getInfoOptional(player.uuid());
+                    desc.append(String.format("`%s` : `%s `:%s\n", player.uuid(), info.lastIP, escapeEverything(player.name)));
                 }
                 eb.setDescription(desc.toString());
                 assert log_channel != null;
@@ -590,8 +620,72 @@ public class ioMain extends Plugin {
             logic.play();
             assert error_log_channel != null;
             error_log_channel.sendMessage(" <@770240444466069514> ");
-            error_log_channel.sendMessage(new EmbedBuilder().setColor(new Color(0xff0000)).setTitle("Server crashed. Restarted!"));
+            error_log_channel.sendMessage(new EmbedBuilder().setColor(new Color(0xff0000)).setTitle("Server crashed. Restarting!"));
+            String command = "sh shellScripts/restart.sh";
+//            try {
+////                execute(command);
+//                ProcessBuilder processBuilder = new ProcessBuilder("nohup", "sh", "./shellScripts/restart.sh");
+//                try {
+//                    System.out.println(processBuilder.command());
+//                    processBuilder.directory(new File(System.getProperty("user.dir")));
+//                    processBuilder.redirectErrorStream(false);
+////                    processBuilder.start();
+////                    net.dispose();
+////                    Core.app.exit();
+////                    System.exit(1);
+//                    restartApplication();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            } catch (Exception e) {
+//                error_log_channel.sendMessage(new EmbedBuilder()
+//                        .setColor(new Color(0xff0000))
+//                        .setTitle("Failed to restart server!")
+//                        .setDescription(e.getMessage()));
+//            }
         }
+    }
+
+    private static void execute(String command) throws IOException {
+        Process process = Runtime.getRuntime().exec(command);
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//        String line = "";
+////        StringBuilder output = new StringBuilder();
+//        while ((line = reader.readLine()) != null) {
+//            System.out.println(line);
+////            output.append(line);
+//        }
+    }
+
+    public static void restartApplication() throws IOException, URISyntaxException {
+        final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+        final File currentJar = new File(Core.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+        /* is it a jar file? */
+        if (!currentJar.getName().endsWith(".jar"))
+            return;
+
+        /* Build command: java -jar application.jar */
+        final ArrayList<String> command = new ArrayList<String>();
+//        command.add("screen -d -r v7 -X stuff $'");
+//        command.add("sleep");
+//        command.add("0\n");
+//        command.add("screen");
+//        command.add("-d");
+//        command.add("-r");
+//        command.add("v7");
+//        command.add("-X");
+//        command.add("stuff");
+//        command.add("java -jar server-release.jar\n");
+        command.add(javaBin);
+        command.add("-jar");
+        command.add(currentJar.getPath());
+//        command.add("'");
+
+        final ProcessBuilder builder = new ProcessBuilder(command);
+        System.out.println(builder.command());
+        builder.start();
+        System.exit(0);
     }
 
 
@@ -609,7 +703,7 @@ public class ioMain extends Plugin {
 
             handler.<Player>register("js", "<script...>", "Run arbitrary Javascript.", (arg, player) -> {
                 PlayerData pd = getData(player.uuid());
-                if (player.admin && Objects.requireNonNull(pd).rank == 9) {
+                if (player.admin && Objects.requireNonNull(pd).rank >= 9) {
                     player.sendMessage(mods.getScripts().runConsole(arg[0]));
 
                 } else {

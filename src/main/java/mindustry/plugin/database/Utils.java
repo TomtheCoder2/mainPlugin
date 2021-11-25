@@ -56,6 +56,7 @@ public class Utils {
             } else {
                 debug(rs.next());
             }
+            conn.close();
         } catch (SQLException ex) {
             debug(ex.getMessage());
         }
@@ -105,6 +106,7 @@ public class Utils {
                         debug(ex.getMessage());
                     }
                 }
+                conn.close();
             } catch (SQLException ex) {
                 debug(ex.getMessage());
             }
@@ -139,7 +141,7 @@ public class Utils {
 
                 affectedrows = pstmt.executeUpdate();
 //                debug("affctected rows: " + affectedrows);
-
+                conn.close();
             } catch (SQLException ex) {
                 debug(ex.getMessage());
             }
@@ -208,6 +210,7 @@ public class Utils {
                 rankingList.append("\n");
             }
             rankingList.append("```");
+            conn.close();
             return rankingList.toString();
         } catch (SQLException ex) {
             debug(ex.getMessage());
@@ -270,6 +273,7 @@ public class Utils {
                 rankingList.append("\n");
             }
             rankingList.append("```");
+            conn.close();
             return rankingList.toString();
         } catch (SQLException ex) {
             debug(ex.getMessage());
@@ -311,6 +315,7 @@ public class Utils {
             } else {
                 debug(rs.next());
             }
+            conn.close();
         } catch (SQLException ex) {
             debug(ex.getMessage());
         }
@@ -359,6 +364,7 @@ public class Utils {
 //                        debug(ex.getMessage());
 //                    }
 //                }
+                conn.close();
             } catch (SQLException ex) {
                 debug(ex.getMessage());
             }
@@ -388,7 +394,7 @@ public class Utils {
                 debug(pstmt);
                 pstmt.executeUpdate();
                 //                debug("affctected rows: " + affectedrows);
-
+                conn.close();
             } catch (SQLException ex) {
                 debug(ex.getMessage());
             }

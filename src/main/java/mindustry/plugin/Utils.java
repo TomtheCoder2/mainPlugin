@@ -18,6 +18,7 @@ import mindustry.plugin.discordcommands.Context;
 import mindustry.world.Block;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.user.User;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -501,6 +502,18 @@ public class Utils {
         return rs + gs + bs;
     }
 
+    /** Send message without response handling
+     * @param user User to dm
+     * @param content message
+     * */
+    public void sendMessage(User user, String content) {
+        user.openPrivateChannel().join().sendMessage(content);
+    }
+
+
+
+
+
 //    public static PlayerData getData(String uuid) {
 //        try(Jedis jedis = ioMain.pool.getResource()) {
 //            String json = jedis.get(uuid);
@@ -591,5 +604,11 @@ public class Utils {
         public static Color info = (Color.getHSBColor(45, 85, 95));
         public static Color error = (Color.getHSBColor(3, 78, 91));
         public static Color success = (Color.getHSBColor(108, 80, 100));
+    }
+
+    public static class Categries {
+        public static String moderation = "moderation";
+        public static String management = "management";
+        public static String mapReviewer = "mapReviewer";
     }
 }

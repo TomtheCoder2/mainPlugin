@@ -1,9 +1,15 @@
 package mindustry.plugin.discordcommands;
 
+import mindustry.plugin.Utils;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
+
+import static mindustry.plugin.Utils.*;
+
+import java.util.HashMap;
 
 /** Represents the context in which a command was called */
 public class Context {
@@ -43,6 +49,90 @@ public class Context {
         MessageBuilder mb = new MessageBuilder();
         mb.append(message);
         mb.send(channel);
+    }
+
+
+
+    public void sendEmbed(EmbedBuilder eb){
+        channel.sendMessage(eb);
+    }
+
+    public void sendEmbed(String title){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(title);
+        channel.sendMessage(eb);
+    }
+
+    public void sendEmbed(boolean success, String title){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(title);
+        if(success){
+            eb.setColor(Pals.success);
+        } else{
+            eb.setColor(Pals.error);
+        }
+        channel.sendMessage(eb);
+    }
+
+    public void sendEmbed(String title, String description){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(title);
+        eb.setDescription(description);
+        channel.sendMessage(eb);
+    }
+
+    public void sendEmbed(boolean success, String title, String description){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(title);
+        eb.setDescription(description);
+        if(success){
+            eb.setColor(Utils.Pals.success);
+        } else{
+            eb.setColor(Pals.error);
+        }
+        channel.sendMessage(eb);;
+    }
+
+    public void sendEmbed(boolean success, String title, String description, HashMap<String, String> fields, boolean inline){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(title);
+        eb.setDescription(description);
+        if(success){
+            eb.setColor(Pals.success);
+        } else{
+            eb.setColor(Pals.error);
+        }
+        for(String name : fields.keySet()){
+            String desc = fields.get(name);
+            eb.addField(name, desc, inline);
+        }
+        channel.sendMessage(eb);
+    }
+
+    public void sendEmbed(boolean success, String title, HashMap<String, String> fields, boolean inline){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(title);
+        if(success){
+            eb.setColor(Pals.success);
+        } else{
+            eb.setColor(Pals.error);
+        }
+        for(String name : fields.keySet()){
+            String desc = fields.get(name);
+            eb.addField(name, desc, inline);
+        }
+        channel.sendMessage(eb);
+    }
+
+    public void sendEmbed(String title, String description, HashMap<String, String> fields){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(title);
+        eb.setDescription(description);
+        for(String name : fields.keySet()){
+            String desc = fields.get(name);
+            eb.addField(name, desc, false);
+        }
+        channel.sendMessage(eb);
     }
 
 }
