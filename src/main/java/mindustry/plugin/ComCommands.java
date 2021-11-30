@@ -15,6 +15,7 @@ import mindustry.gen.Player;
 import mindustry.io.SaveIO;
 import mindustry.maps.Map;
 import mindustry.plugin.database.MapData;
+import mindustry.plugin.database.PlayerData;
 import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
@@ -22,10 +23,12 @@ import mindustry.plugin.requests.GetMap;
 import mindustry.world.modules.ItemModule;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.permission.Role;
 
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,7 +37,7 @@ import static arc.util.Log.info;
 import static mindustry.Vars.saveExtension;
 import static mindustry.Vars.state;
 import static mindustry.plugin.Utils.*;
-import static mindustry.plugin.database.Utils.getMapData;
+import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.ioMain.*;
 
 public class ComCommands {
@@ -400,60 +403,84 @@ public class ComCommands {
         });
 
 
-//        handler.registerCommand(new Command("redeem") {
-//            {
-//                help = "<name|id> Promote your in-game rank. [NOTE: Abusing this power and giving it to other players will result in a ban.]";
-//            }
-//
-//            public void run(Context ctx) {
-//                CompletableFuture.runAsync(() -> {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = "";
-//                    if (ctx.args.length > 1) {
-//                        target = ctx.args[1];
-//                    }
-//                    List<Role> authorRoles = ctx.author.asUser().get().getRoles(ctx.event.getServer().get()); // javacord gay
-//                    List<String> roles = new ArrayList<>();
-//                    for (Role r : authorRoles) {
-//                        if (r != null) {
-//                            roles.add(r.getIdAsString());
-//                        }
-//                    }
-//                    if (target.length() > 0) {
-//                        int rank = 0;
-//                        for (String role : roles) {
-//                            if (rankRoles.containsKey(role)) {
-//                                if (rankRoles.get(role) > rank) {
-//                                    rank = rankRoles.get(role);
-//                                }
-//                            }
-//                        }
-//                        Player player = findPlayer(target);
-//                        if (player != null && rank > 0) {
-//                            PlayerData pd = getData(player.uuid());
-//                            if (pd != null) {
-//                                pd.rank = rank;
-//                                setData(player.uuid(), pd);
-//                            }
-//                            eb.setTitle("Command executed successfully");
-//                            eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + escapeColorCodes(rankNames.get(rank).name) + ".");
-//                            ctx.channel.sendMessage(eb);
+        handler.registerCommand(new Command("redeem") {
+            {
+                help = "Sync in-game and Discord rank. [NOTE: Abusing this power and giving it to other players will result in a ban.]";
+                usage = "<name|id>";
+                minArguments = 1;
+            }
+
+            public void run(Context ctx) {
+                CompletableFuture.runAsync(() -> {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = "";
+                    if (ctx.args.length > 1) {
+                        target = ctx.args[1];
+                    }
+                    List roles = new List();
+                    for (Role r : ctx.author.asUser().get().getRoles(ctx.event.getServer().get())) {
+                        if (r != null) {
+                            roles.add(r.getIdAsString());
+                        }
+                    }
+                    debug(target);
+                    if (target.length() > 0) {
+                        int rank = 0;
+                        for (Role role : ctx.author.asUser().get().getRoles(ctx.event.getServer().get())) {
+                            if (rankRoles.containsKey(role.getIdAsString())) {
+                                if (rankRoles.get(role.getIdAsString()) > rank) {
+                                    rank = rankRoles.get(role.getIdAsString());
+                                }
+                            }
+                        }
+                        Player player = findPlayer(target);
+                        if (player != null) {
+                            PlayerData pd = getData(player.uuid());
+                            if (pd != null) {
+                                if (pd.rank < rank) {
+                                    pd.rank = rank;
+                                } else {
+                                    // verify the action
+                                    PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                                    EmbedBuilder eb2 = new EmbedBuilder()
+                                            .setTitle("Please head over to Mindustry to complete the process!");
+                                    ctx.channel.sendMessage(eb2);
+                                    tdata.task = Timer.schedule(() -> {
+                                        eb.setTitle("Command terminated");
+                                        eb.setDescription("Player did not accept the action!");
+                                        eb.setColor(new Color(0xff0000));
+                                        ctx.channel.sendMessage(eb);
+                                        tdata.redeemKey = -1;
+                                    }, 120);
+                                    tdata.redeem = ctx.author.getIdAsString();
+                                    int key = (int) (Math.random() * 100);
+                                    key += Math.random() * 1000;
+                                    debug(key);
+                                    tdata.redeemKey = key;
+                                    player.sendMessage("Please enter this code: [cyan]/redeem " + key + " [white]to complete the redeem process.");
+                                    return;
+                                }
+                                setData(player.uuid(), pd);
+                            }
+                            eb.setTitle("Command executed successfully");
+                            eb.setDescription("Promoted " + escapeEverything(player.name) + " to " + escapeEverything(rankNames.get(rank).name) + ".");
+                            ctx.channel.sendMessage(eb);
 //                            player.con.kick("Your rank was modified, please rejoin.", 0);
-//                        } else {
-//                            eb.setTitle("Command terminated");
-//                            eb.setDescription("Player not online or not found.");
-//                            ctx.channel.sendMessage(eb);
-//                        }
-//
-//                    } else {
-//                        eb.setTitle("Command terminated");
-//                        eb.setDescription("Invalid arguments provided or no roles to redeem.");
-//                        ctx.channel.sendMessage(eb);
-//                    }
-//                });
-//            }
-//
-//        });
+                        } else {
+                            eb.setTitle("Command terminated");
+                            eb.setDescription("Player not online or not found.");
+                            ctx.channel.sendMessage(eb);
+                        }
+
+                    } else {
+                        eb.setTitle("Command terminated");
+                        eb.setDescription("Invalid arguments provided or no roles to redeem.");
+                        ctx.channel.sendMessage(eb);
+                    }
+                });
+            }
+
+        });
 
 //        TextChannel warningsChannel = null;
 //        if (ioMain.data.has("warnings_chat_channel_id")) {

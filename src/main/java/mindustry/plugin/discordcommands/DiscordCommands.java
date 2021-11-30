@@ -75,7 +75,7 @@ public class DiscordCommands implements MessageCreateListener {
     public void onMessageCreate(MessageCreateEvent event) {
         String message = event.getMessageContent();
         TextChannel tc = getTextChannel("881300954845179914");
-        if (!Objects.equals(live_chat_channel_id, "")) {
+        if (!Objects.equals(live_chat_channel_id, "") && message.startsWith(ioMain.prefix)) {
             tc = getTextChannel(live_chat_channel_id);
         }
         assert tc != null;

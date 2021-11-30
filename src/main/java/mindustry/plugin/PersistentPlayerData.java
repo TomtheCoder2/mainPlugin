@@ -2,6 +2,7 @@ package mindustry.plugin;
 //import arc.struct.Array;
 //import mindustry.entities.type.BaseUnit;
 //import mindustry.entities.type.Player;
+import arc.util.Timer;
 import mindustry.entities.bullet.BulletType;
 
 import java.io.Serializable;
@@ -18,6 +19,9 @@ public class PersistentPlayerData implements Serializable {
     public boolean muted = false;
     public boolean frozen = false;
     public boolean votedMap = false;
+    public String redeem = null;
+    public int redeemKey = -1;
+    public Timer.Task task;
 
     public BulletType bt;
     public float sclVelocity;

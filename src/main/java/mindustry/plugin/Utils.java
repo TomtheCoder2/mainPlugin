@@ -133,10 +133,12 @@ public class Utils {
         rankRequirements.put(5, new Requirement(4800, 48000 * 2, 80));
 
 
-        rankRoles.put("627985513600516109", 1);
-        rankRoles.put("636968410441318430", 2);
-        rankRoles.put("674778262857187347", 3);
-        rankRoles.put("624959361789329410", 4);
+        rankRoles.put("897568732749115403", 1);
+        rankRoles.put("881618465117581352", 2);
+        rankRoles.put("906958402100535296", 3);
+        rankRoles.put("897565215670042645", 4);
+        rankRoles.put("900369018110738442", 5);
+        rankRoles.put("900369102978310206", 6);
 
         bannedNames.add("IGGGAMES");
         bannedNames.add("CODEX");

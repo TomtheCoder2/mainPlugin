@@ -31,6 +31,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.user.User;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import mindustry.plugin.requests.Translate;
@@ -45,6 +46,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import static arc.util.Log.debug;
 import static arc.util.Log.info;
@@ -342,7 +344,7 @@ public class ioMain extends Plugin {
         });
 
         Events.on(EventType.Trigger.update.getClass(), event -> {
-            for(Player p : Groups.player){
+            for (Player p : Groups.player) {
                 PersistentPlayerData tdata = (playerDataGroup.getOrDefault(p.uuid(), null));
                 if (tdata != null && tdata.bt != null && p.shooting()) {
                     Call.createBullet(tdata.bt, p.team(), p.getX(), p.getY(), p.unit().rotation, tdata.sclDamage, tdata.sclVelocity, tdata.sclLifetime);
@@ -708,6 +710,45 @@ public class ioMain extends Plugin {
 
                 } else {
                     player.sendMessage("[scarlet]This command is restricted to admins!");
+                }
+            });
+
+            handler.<Player>register("redeem", "<key>", "Verify the redeem command (Discord)", (arg, player) -> {
+                try {
+                    PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                    if (tdata.redeemKey != -1) {
+                        if (Integer.parseInt(arg[0]) == tdata.redeemKey) {
+                            StringBuilder roleList = new StringBuilder();
+                            for (java.util.Map.Entry<String, Integer> entry : rankRoles.entrySet()) {
+                                PlayerData pd = getData(player.uuid());
+                                assert pd != null;
+                                if (entry.getValue() <= pd.rank) {
+                                    System.out.println("add role: " + api.getRoleById(entry.getKey()).get());
+                                    roleList.append("<@").append(api.getRoleById(entry.getKey()).get().getIdAsString()).append(">\n");
+                                    ioMain.api.getUserById(tdata.redeem).get().addRole(api.getRoleById(entry.getKey()).get());
+                                }
+                            }
+                            System.out.println(roleList);
+                            getTextChannel(log_channel_id).sendMessage(new EmbedBuilder()
+                                    .setTitle("Updated roles!")
+                                    .addField("Discord Name", ioMain.api.getUserById(tdata.redeem).get().getName(), true)
+                                    .addField("In Game Name", tdata.origName, true)
+                                    .addField("In Game UUID", player.uuid(), true)
+                                    .addField("Added roles", roleList.toString(), true)
+                            );
+                            player.sendMessage("Successfully redeem to account: [green]" + ioMain.api.getUserById(tdata.redeem).get().getName());
+                            tdata.task.cancel();
+                        } else {
+                            player.sendMessage("[scarlet]Wrong code!");
+                        }
+
+                        tdata.redeemKey = -1;
+                    } else {
+                        player.sendMessage("Please use the redeem command on the discord server first");
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                    player.sendMessage("[scarlet]There was an error: " + e.getMessage());
                 }
             });
 
