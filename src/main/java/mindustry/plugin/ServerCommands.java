@@ -1029,7 +1029,8 @@ public class ServerCommands {
                     }
                 }
             });
-//
+
+
             handler.registerCommand(new RoleRestrictedCommand("unban") {
                 {
                     help = "Unban the player by the provided uuid.";
@@ -1101,11 +1102,11 @@ public class ServerCommands {
                     if (info != null) {
                         info.lastKicked = 0;
                         eb.setTitle("Command executed.");
-                        eb.setDescription("Unvotekickbanned `" + target + "` succeessfully.");
+                        eb.setDescription("Pardoned `" + target + "` successfully.");
                     } else {
                         eb.setTitle("Command terminated.");
                         eb.setColor(Pals.error);
-                        eb.setDescription("That ID isn't votekickbanned!");
+                        eb.setDescription("That ID isn't votekicked!");
                     }
                     ctx.channel.sendMessage(eb);
                 }

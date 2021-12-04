@@ -1,13 +1,25 @@
 package mindustry.plugin.discordcommands;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.InputStreamReader;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.zip.InflaterInputStream;
 
+import arc.struct.Seq;
+import mindustry.game.Schematic;
+import mindustry.game.Schematics;
 import mindustry.gen.Call;
+import mindustry.plugin.ContentHandler;
 import mindustry.plugin.Utils;
 import mindustry.plugin.ioMain;
 import mindustry.plugin.requests.Translate;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -18,7 +30,7 @@ import mindustry.plugin.ioMain.*;
 import org.json.JSONObject;
 
 import static arc.util.Log.debug;
-import static mindustry.plugin.Utils.escapeEverything;
+import static mindustry.plugin.Utils.*;
 import static mindustry.plugin.ioMain.*;
 
 /**
@@ -74,6 +86,12 @@ public class DiscordCommands implements MessageCreateListener {
      */
     public void onMessageCreate(MessageCreateEvent event) {
         String message = event.getMessageContent();
+
+        if (previewSchem) {
+            if (checkIfSchem(event)) return;
+        }
+
+
         TextChannel tc = getTextChannel("881300954845179914");
         if (!Objects.equals(live_chat_channel_id, "") && message.startsWith(ioMain.prefix)) {
             tc = getTextChannel(live_chat_channel_id);

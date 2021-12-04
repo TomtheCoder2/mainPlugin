@@ -21,10 +21,12 @@ import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
 import mindustry.plugin.requests.GetMap;
 import mindustry.world.modules.ItemModule;
+import mindustry.plugin.ContentHandler;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.lang.reflect.Field;
@@ -87,7 +89,6 @@ public class ComCommands {
                     return;
                 }
 
-                Fi mapFile = found.file;
                 EmbedBuilder embed = new EmbedBuilder()
                         .setTitle(escapeCharacters(found.name()))
                         .setAuthor(escapeCharacters(found.author()));
@@ -105,27 +106,50 @@ public class ComCommands {
                 } else {
                     embed.setDescription(escapeCharacters(found.description()));
                 }
-                CompletableFuture.runAsync(() -> {
-                    try {
-                        String absolute = map.getMap(mapFile).get(0);
-                        debug(absolute);
+                embed.setFooter(found.width + "x" + found.height);
+                try {
+                    Fi mapFile = found.file;
 
-                        embed.setImage("attachment://output.png");
-                        MessageBuilder mb = new MessageBuilder();
-                        mb.addEmbed(embed);
-                        mb.addFile(new File(absolute));
-                        mb.addAttachment(mapFile.file());
-                        mb.send(ctx.channel);
-                    } catch (Exception e) {
-                        String err = Strings.neatError(e, true);
-                        int max = 900;
-//                    errDelete(msg, "Error parsing map.", err.length() < max ? err : err.substring(0, max));
-                    }
-                    return;
-                });
-                Timer.schedule(() -> {
-                    ctx.channel.sendMessage(embed);
-                }, 10);
+                    ContentHandler.Map visualMap = contentHandler.readMap(found.file.read());
+                    File imageFile = new File("temp/" + "image_" + mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png"));
+                    ImageIO.write(visualMap.image, "png", imageFile);
+
+
+//                    EmbedBuilder eb = new EmbedBuilder().setColor(Pals.success).setTitle(":map: " + escapeCharacters(found.name())).setFooter(found.width + "x" + found.height).setDescription(escapeCharacters(found.description())).setAuthor(escapeCharacters(found.author()));
+                    embed.setImage("attachment://" + imageFile.getName());
+//                    ctx.channel.sendFile(mapFile.file()).addFile(imageFile).embed(embed.build()).queue();
+//                    embed.setImage("attachment://output.png");
+                    MessageBuilder mb = new MessageBuilder();
+                    mb.addEmbed(embed);
+                    mb.addFile(imageFile);
+                    mb.addAttachment(mapFile.file());
+                    mb.send(ctx.channel);
+//                    ctx.channel.sendFile(mapFile.file()).embed(eb.build()).queue();
+                } catch (Exception e) {
+                    ctx.sendEmbed(false, ":eyes: **internal server error**");
+                    e.printStackTrace();
+                }
+//                Timer.Task task = Timer.schedule(() -> {
+//                    ctx.channel.sendMessage(embed);
+//                }, 10);
+//                CompletableFuture.runAsync(() -> {
+//                    try {
+//                        String absolute = map.getMap(mapFile).get(0);
+//                        debug(absolute);
+//
+//                        embed.setImage("attachment://output.png");
+//                        MessageBuilder mb = new MessageBuilder();
+//                        mb.addEmbed(embed);
+//                        mb.addFile(new File(absolute));
+//                        mb.addAttachment(mapFile.file());
+//                        mb.send(ctx.channel);
+//                        task.cancel();
+//                    } catch (Exception e) {
+//                        String err = Strings.neatError(e, true);
+//                        int max = 900;
+////                    errDelete(msg, "Error parsing map.", err.length() < max ? err : err.substring(0, max));
+//                    }
+//                });
             }
         });
         handler.registerCommand(new Command("players") {

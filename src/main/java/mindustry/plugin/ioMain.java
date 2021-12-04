@@ -20,10 +20,9 @@ import mindustry.net.Administration;
 import mindustry.net.Administration.Config;
 import mindustry.plugin.database.MapData;
 import mindustry.plugin.database.PlayerData;
-import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.requests.Translate;
+import mindustry.ui.Menus;
 import mindustry.world.Tile;
-import net.dv8tion.jda.api.entities.Activity;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.channel.Channel;
@@ -31,16 +30,12 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
-import org.javacord.api.entity.user.User;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import mindustry.plugin.requests.Translate;
 
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -75,8 +70,12 @@ public class ioMain extends Plugin {
     public static String serverName = "<untitled>";
     public static JSONObject data; //token, channel_id, role_id
     public static String apiKey = "";
-    public static List<Player> joinedPlayer = new ArrayList<>();
+    public static List<String> joinedPlayers = new ArrayList<>();
+    public static List<String> leftPlayers = new ArrayList<>();
     public static long passedMapTime = 0;
+    public Timer.Task rateMapTask; // popup to force map rating
+    public static ContentHandler contentHandler; // map and schem handler
+    public static boolean previewSchem = false; // preview schem or not
 //    static Gson gson = new Gson();
 
     public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
@@ -120,6 +119,7 @@ public class ioMain extends Plugin {
             admin_bot_channel_id = alldata.getString("admin_bot_channel_id");
             // link to join our discord server
             discordInviteLink = alldata.getString("discordInviteLink");
+            previewSchem = alldata.getBoolean("previewSchem");
             System.out.printf("url: %s, user: %s, password: %s%n", url, user, password);
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
@@ -222,6 +222,10 @@ public class ioMain extends Plugin {
             }
         }, 0, 10);
 
+        Events.on(EventType.ServerLoadEvent.class, event -> {
+            contentHandler = new ContentHandler();
+            Log.info("Everything's loaded !");
+        });
         // update every tick
 
         // player disconnected
@@ -229,6 +233,10 @@ public class ioMain extends Plugin {
             String uuid = event.player.uuid();
             //free ram
             playerDataGroup.remove(uuid);
+
+            if (!leftPlayers.contains(uuid)) {
+                leftPlayers.add(uuid);
+            }
         });
 
 
@@ -245,8 +253,8 @@ public class ioMain extends Plugin {
 //            eb.setDescription(String.format("`%s` • `%d `:%s", player.uuid(), player.id, escapeColorCodes(player.name)));
 //            assert log_channel != null;
 //            log_channel.sendMessage(eb);
-            if (!joinedPlayer.contains(player)) {
-                joinedPlayer.add(player);
+            if (!joinedPlayers.contains(player)) {
+                joinedPlayers.add(player.uuid());
             }
             PlayerData pd = getData(player.uuid());
             System.out.println(pd);
@@ -351,7 +359,7 @@ public class ioMain extends Plugin {
                 }
             }
         });
-
+        rateMapTask = Timer.schedule(this::rateMenu, 120); // for the rateMenu to appear after 2 minutes after start
         Events.on(EventType.GameOverEvent.class, event -> {
             debug("Game over!");
             for (Player p : Groups.player) {
@@ -390,6 +398,10 @@ public class ioMain extends Plugin {
             // log the game over
             assert log_channel != null;
             log_channel.sendMessage(new EmbedBuilder().setTitle("Game over!").setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves").setColor(new Color(0x33FFEC)));
+
+            // force map vote
+            rateMapTask.cancel(); // cancel the task if gameover before 5 min
+            rateMapTask = Timer.schedule(this::rateMenu, 120);
         });
 
 
@@ -457,6 +469,52 @@ public class ioMain extends Plugin {
 //        Core.app.post(this::loop);
 
     }
+
+    private void rateMenu() {
+        String mapName = state.map.name();
+        int id = Menus.registerMenu((player, selection) -> {
+            if (selection == 0) {
+                ratePositive(mapName, player);
+            } else if (selection == 1) {
+                rateNegative(mapName, player);
+            }
+        });
+        Call.menu(id,
+                "Rate this map! [pink]" + mapName,
+                "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
+                new String[][]{
+                        new String[]{"[green]Yes", "[scarlet]No"},
+                        new String[]{"Close"}
+                }
+        );
+    }
+
+    private void rateNegative(String mapName, Player player) {
+        MapData voteMapData = getMapData(mapName);
+        if (voteMapData != null) {
+            voteMapData.negativeRating++;
+        } else {
+            voteMapData = new MapData(mapName);
+            voteMapData.negativeRating = 1;
+        }
+        rateMap(mapName, voteMapData);
+        player.sendMessage("Successfully gave a [red]negative [white]feedback for " + mapName + "[white]!");
+    }
+
+    private void ratePositive(String mapName, Player player) {
+        MapData voteMapData = getMapData(mapName);
+        if (voteMapData != null) {
+            voteMapData.positiveRating++;
+        } else {
+            voteMapData = new MapData(mapName);
+            voteMapData.positiveRating = 1;
+        }
+        rateMap(mapName, voteMapData);
+        player.sendMessage("Successfully gave a [green]positive [white]feedback for " + mapName + "[white]!");
+    }
+
+    ;
+
 
     public static Timer.Task loop() {
         for (Player player : Groups.player) {
@@ -544,24 +602,18 @@ public class ioMain extends Plugin {
             TextChannel log_channel = getTextChannel("882342315438526525");
             update(log_channel, api);
         });
+        handler.register("rate", "Force everyone to vote on the current map.", arg -> {
+            rateMapTask.cancel();
+            rateMenu();
+        });
     }
 
     public static void update(TextChannel log_channel, DiscordApi api) {
-        for (Player p : Groups.player) {
+        // log player joins
+        logConnections(log_channel, joinedPlayers, "join");
 
-            if (joinedPlayer.size() > 0) {
-                EmbedBuilder eb = new EmbedBuilder();
-                eb.setTitle("Player Join Log");
-                StringBuilder desc = new StringBuilder();
-                for (Player player : joinedPlayer) {
-                    Administration.PlayerInfo info = netServer.admins.getInfoOptional(player.uuid());
-                    desc.append(String.format("`%s` : `%s `:%s\n", player.uuid(), info.lastIP, escapeEverything(player.name)));
-                }
-                eb.setDescription(desc.toString());
-                assert log_channel != null;
-                log_channel.sendMessage(eb);
-            }
-            joinedPlayer.clear();
+        logConnections(log_channel, leftPlayers, "leave");
+        for (Player p : Groups.player) {
             PlayerData pd = getData(p.uuid());
             if (pd == null) return;
 //
@@ -590,19 +642,7 @@ public class ioMain extends Plugin {
             setData(p.uuid(), pd);
             ioMain.playerDataGroup.put(p.uuid(), tdata); // update tdata with the new stuff
         }
-        // update the playtime of the current map
-        String mapName = state.map.name();
-        MapData mapData = getMapData(mapName);
-        if (mapData != null) {
-            mapData.playtime++;
-        } else {
-            mapData = new MapData(mapName);
-            mapData.playtime = 1;
-        }
-        rateMap(mapName, mapData);
-        passedMapTime++;
 
-        debug("Updated database!");
         if (state.is(GameState.State.playing)) {
             if (Mathf.chance(0.01f)) {
                 api.updateActivity("( ͡° ͜ʖ ͡°)");
@@ -624,6 +664,7 @@ public class ioMain extends Plugin {
             error_log_channel.sendMessage(" <@770240444466069514> ");
             error_log_channel.sendMessage(new EmbedBuilder().setColor(new Color(0xff0000)).setTitle("Server crashed. Restarting!"));
             String command = "sh shellScripts/restart.sh";
+            return;
 //            try {
 ////                execute(command);
 //                ProcessBuilder processBuilder = new ProcessBuilder("nohup", "sh", "./shellScripts/restart.sh");
@@ -646,6 +687,45 @@ public class ioMain extends Plugin {
 //                        .setDescription(e.getMessage()));
 //            }
         }
+        // update the playtime of the current map
+        String mapName = state.map.name();
+        MapData mapData = getMapData(mapName);
+        if (mapData != null) {
+            mapData.playtime++;
+        } else {
+            mapData = new MapData(mapName);
+            mapData.playtime = 1;
+        }
+        rateMap(mapName, mapData);
+        passedMapTime++;
+
+        debug("Updated database!");
+    }
+
+    public static void logConnections(TextChannel log_channel, List<String> leftPlayers, String connection) {
+        if (leftPlayers.size() > 0) {
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setTitle("Player " + connection + " Log");
+            StringBuilder desc = new StringBuilder();
+            for (String uuid : leftPlayers) {
+//                if (player == null) continue;
+                try {
+                    Administration.PlayerInfo info = getPlayerInfo(uuid);
+                    desc.append(String.format("`%s` : `%s `:%s\n", uuid, info.lastIP, escapeEverything(info.lastName)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (Objects.equals(connection, "leave")) {
+                eb.setColor(new Color(0xff0000));
+            } else {
+                eb.setColor(new Color(0x00ff00));
+            }
+            eb.setDescription(desc.toString());
+            assert log_channel != null;
+            log_channel.sendMessage(eb);
+        }
+        leftPlayers.clear();
     }
 
     private static void execute(String command) throws IOException {
@@ -795,15 +875,7 @@ public class ioMain extends Plugin {
                     case "positive" -> {
                         if (!tdata.votedMap) {
                             if (!state.gameOver) {
-                                MapData mapData = getMapData(mapName);
-                                if (mapData != null) {
-                                    mapData.positiveRating++;
-                                } else {
-                                    mapData = new MapData(mapName);
-                                    mapData.positiveRating = 1;
-                                }
-                                rateMap(mapName, mapData);
-                                player.sendMessage("Successfully gave a [green]positive [white]feedback for " + mapName + "[white]!");
+                                ratePositive(mapName, player);
                                 tdata.votedMap = true;
                             } else {
                                 player.sendMessage("[scarlet]The game is already over!");
@@ -815,15 +887,7 @@ public class ioMain extends Plugin {
                     case "negative" -> {
                         if (!tdata.votedMap) {
                             if (!state.gameOver) {
-                                MapData mapData = getMapData(mapName);
-                                if (mapData != null) {
-                                    mapData.negativeRating++;
-                                } else {
-                                    mapData = new MapData(mapName);
-                                    mapData.negativeRating = 1;
-                                }
-                                rateMap(mapName, mapData);
-                                player.sendMessage("Successfully gave a [red]negative [white]feedback for " + mapName + "[white]!");
+                                rateNegative(mapName, player);
                                 tdata.votedMap = true;
                             } else {
                                 player.sendMessage("[scarlet]The game is already over!");
