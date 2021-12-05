@@ -48,7 +48,7 @@ public class ContentHandler {
 
     public ContentHandler() {
 //        //clear cache
-//        new Fi("cache").deleteDirectory();
+        new Fi("cache").deleteDirectory();
 
         Version.enabled = false;
         Vars.content = new ContentLoader();
@@ -152,8 +152,8 @@ public class ContentHandler {
         for (ContentType type : ContentType.values()) {
             for (Content content : Vars.content.getBy(type)) {
                 try {
-                    content.load();
-                    content.loadIcon();
+//                    content.load();
+//                    content.loadIcon();
                 } catch (Throwable ignored) {
                 }
             }
@@ -174,11 +174,11 @@ public class ContentHandler {
         }
 
 
-        world = new World() {
-            public Tile tile(int x, int y) {
-                return new Tile(x, y);
-            }
-        };
+//        world = new World() {
+//            public Tile tile(int x, int y) {
+//                return new Tile(x, y);
+//            }
+//        };
     }
 
     private BufferedImage getImage(String name) {
@@ -279,7 +279,7 @@ public class ContentHandler {
 
                 @Override
                 public void begin() {
-                    world.setGenerating(true);
+//                    world.setGenerating(true);
                 }
 
                 @Override
@@ -321,6 +321,7 @@ public class ContentHandler {
                     return tile;
                 }
             }));
+//            if (true) return null;
 
             fgraphics.drawImage(walls, 0, 0, null);
             fgraphics.dispose();
