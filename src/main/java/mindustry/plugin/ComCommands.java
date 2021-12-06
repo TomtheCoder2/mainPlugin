@@ -2,6 +2,9 @@ package mindustry.plugin;
 
 import arc.Core;
 import arc.files.Fi;
+import arc.graphics.Pixmap;
+import arc.graphics.PixmapIO;
+import arc.util.Http;
 import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
@@ -21,18 +24,20 @@ import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
 import mindustry.plugin.requests.GetMap;
 import mindustry.world.modules.ItemModule;
-import mindustry.plugin.ContentHandler;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static arc.util.Log.debug;
 import static arc.util.Log.info;
@@ -109,14 +114,21 @@ public class ComCommands {
                 embed.setFooter(found.width + "x" + found.height);
                 try {
                     Fi mapFile = found.file;
-
-                    ContentHandler.Map visualMap = contentHandler.readMap(found.file.read());
+//
+//                    ContentHandler.Map visualMap = contentHandler.readMap(found.file.read());
+//                    BufferedImage image = map.getMap2(mapFile);
+                    InputStream stream = mapFile.readByteStream();
+                    Http.post(maps_url + "/map").content(stream, stream.available()).timeout(30000).submit(res -> {
+                        var pix = new Pixmap(res.getResultAsStream().readAllBytes());
+                        PixmapIO.writePng(new Fi("temp/" + "image_" + mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png")), pix); // Write to a file
+                    });
                     File imageFile = new File("temp/" + "image_" + mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png"));
-                    ImageIO.write(visualMap.image, "png", imageFile);
+//                    assert Objects.requireNonNull(image).get() != null;
+//                    ImageIO.write(image.get(), "png", imageFile);
 
 
 //                    EmbedBuilder eb = new EmbedBuilder().setColor(Pals.success).setTitle(":map: " + escapeCharacters(found.name())).setFooter(found.width + "x" + found.height).setDescription(escapeCharacters(found.description())).setAuthor(escapeCharacters(found.author()));
-                    embed.setImage("attachment://" + imageFile.getName());
+                    embed.setImage("attachment://" + "image_" + mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png"));
 //                    ctx.channel.sendFile(mapFile.file()).addFile(imageFile).embed(embed.build()).queue();
 //                    embed.setImage("attachment://output.png");
                     MessageBuilder mb = new MessageBuilder();
@@ -129,12 +141,13 @@ public class ComCommands {
                     ctx.sendEmbed(false, ":eyes: **internal server error**");
                     e.printStackTrace();
                 }
+
+
 //                Timer.Task task = Timer.schedule(() -> {
 //                    ctx.channel.sendMessage(embed);
 //                }, 10);
 //                CompletableFuture.runAsync(() -> {
 //                    try {
-//                        String absolute = map.getMap(mapFile).get(0);
 //                        debug(absolute);
 //
 //                        embed.setImage("attachment://output.png");

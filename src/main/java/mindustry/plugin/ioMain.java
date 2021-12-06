@@ -223,7 +223,7 @@ public class ioMain extends Plugin {
         }, 0, 10);
 
         Events.on(EventType.ServerLoadEvent.class, event -> {
-            contentHandler = new ContentHandler();
+//            contentHandler = new ContentHandler();
             Log.info("Everything's loaded !");
         });
         // update every tick

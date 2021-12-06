@@ -229,111 +229,111 @@ public class ContentHandler {
         return image;
     }
 
-    public Map readMap(InputStream is) throws IOException {
-        try (InputStream ifs = new InflaterInputStream(is); CounterInputStream counter = new CounterInputStream(ifs); DataInputStream stream = new DataInputStream(counter)) {
-            Map out = new Map();
-
-            SaveIO.readHeader(stream);
-            int version = stream.readInt();
-            SaveVersion ver = SaveIO.getSaveWriter(version);
-            StringMap[] metaOut = {null};
-            ver.region("meta", stream, counter, in -> metaOut[0] = ver.readStringMap(in));
-
-            StringMap meta = metaOut[0];
-
-            out.name = meta.get("name", "Unknown");
-            out.author = meta.get("author");
-            out.description = meta.get("description");
-            out.tags = meta;
-
-            int width = meta.getInt("width"), height = meta.getInt("height");
-
-            var floors = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            var walls = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            var fgraphics = floors.createGraphics();
-            var jcolor = new java.awt.Color(0, 0, 0, 64);
-            int black = 255;
-            CachedTile tile = new CachedTile() {
-                @Override
-                public void setBlock(Block type) {
-                    super.setBlock(type);
-
-                    int c = MapIO.colorFor(block(), Blocks.air, Blocks.air, team());
-                    if (c != black && c != 0) {
-                        walls.setRGB(x, floors.getHeight() - 1 - y, conv(c));
-                        fgraphics.setColor(jcolor);
-                    }
-                }
-            };
-
-            ver.region("content", stream, counter, ver::readContentHeader);
-            ver.region("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext() {
-                @Override
-                public void resize(int width, int height) {
-                }
-
-                @Override
-                public boolean isGenerating() {
-                    return false;
-                }
-
-                @Override
-                public void begin() {
-//                    world.setGenerating(true);
-                }
-
-                @Override
-                public void end() {
-                    world.setGenerating(false);
-                }
-
-                @Override
-                public void onReadBuilding() {
-                    //read team colors
-                    if (tile.build != null) {
-                        int c = tile.build.team.color.argb8888();
-                        int size = tile.block().size;
-                        int offsetx = -(size - 1) / 2;
-                        int offsety = -(size - 1) / 2;
-                        for (int dx = 0; dx < size; dx++) {
-                            for (int dy = 0; dy < size; dy++) {
-                                int drawx = tile.x + dx + offsetx, drawy = tile.y + dy + offsety;
-                                walls.setRGB(drawx, floors.getHeight() - 1 - drawy, c);
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public Tile tile(int index) {
-                    tile.x = (short) (index % width);
-                    tile.y = (short) (index / width);
-                    return tile;
-                }
-
-                @Override
-                public Tile create(int x, int y, int floorID, int overlayID, int wallID) {
-                    if (overlayID != 0) {
-                        floors.setRGB(x, floors.getHeight() - 1 - y, conv(MapIO.colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.derelict)));
-                    } else {
-                        floors.setRGB(x, floors.getHeight() - 1 - y, conv(MapIO.colorFor(Blocks.air, content.block(floorID), Blocks.air, Team.derelict)));
-                    }
-                    return tile;
-                }
-            }));
-//            if (true) return null;
-
-            fgraphics.drawImage(walls, 0, 0, null);
-            fgraphics.dispose();
-
-            out.image = floors;
-
-            return out;
-
-        } finally {
-            // content.setTemporaryMapper(null);
-        }
-    }
+//    public Map readMap(InputStream is) throws IOException {
+//        try (InputStream ifs = new InflaterInputStream(is); CounterInputStream counter = new CounterInputStream(ifs); DataInputStream stream = new DataInputStream(counter)) {
+//            Map out = new Map();
+//
+//            SaveIO.readHeader(stream);
+//            int version = stream.readInt();
+//            SaveVersion ver = SaveIO.getSaveWriter(version);
+//            StringMap[] metaOut = {null};
+//            ver.region("meta", stream, counter, in -> metaOut[0] = ver.readStringMap(in));
+//
+//            StringMap meta = metaOut[0];
+//
+//            out.name = meta.get("name", "Unknown");
+//            out.author = meta.get("author");
+//            out.description = meta.get("description");
+//            out.tags = meta;
+//
+//            int width = meta.getInt("width"), height = meta.getInt("height");
+//
+//            var floors = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+//            var walls = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+//            var fgraphics = floors.createGraphics();
+//            var jcolor = new java.awt.Color(0, 0, 0, 64);
+//            int black = 255;
+//            CachedTile tile = new CachedTile() {
+//                @Override
+//                public void setBlock(Block type) {
+//                    super.setBlock(type);
+//
+//                    int c = MapIO.colorFor(block(), Blocks.air, Blocks.air, team());
+//                    if (c != black && c != 0) {
+//                        walls.setRGB(x, floors.getHeight() - 1 - y, conv(c));
+//                        fgraphics.setColor(jcolor);
+//                    }
+//                }
+//            };
+//
+//            ver.region("content", stream, counter, ver::readContentHeader);
+//            ver.region("preview_map", stream, counter, in -> ver.readMap(in, new WorldContext() {
+//                @Override
+//                public void resize(int width, int height) {
+//                }
+//
+//                @Override
+//                public boolean isGenerating() {
+//                    return false;
+//                }
+//
+//                @Override
+//                public void begin() {
+////                    world.setGenerating(true);
+//                }
+//
+//                @Override
+//                public void end() {
+//                    world.setGenerating(false);
+//                }
+//
+//                @Override
+//                public void onReadBuilding() {
+//                    //read team colors
+//                    if (tile.build != null) {
+//                        int c = tile.build.team.color.argb8888();
+//                        int size = tile.block().size;
+//                        int offsetx = -(size - 1) / 2;
+//                        int offsety = -(size - 1) / 2;
+//                        for (int dx = 0; dx < size; dx++) {
+//                            for (int dy = 0; dy < size; dy++) {
+//                                int drawx = tile.x + dx + offsetx, drawy = tile.y + dy + offsety;
+//                                walls.setRGB(drawx, floors.getHeight() - 1 - drawy, c);
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public Tile tile(int index) {
+//                    tile.x = (short) (index % width);
+//                    tile.y = (short) (index / width);
+//                    return tile;
+//                }
+//
+//                @Override
+//                public Tile create(int x, int y, int floorID, int overlayID, int wallID) {
+//                    if (overlayID != 0) {
+//                        floors.setRGB(x, floors.getHeight() - 1 - y, conv(MapIO.colorFor(Blocks.air, Blocks.air, content.block(overlayID), Team.derelict)));
+//                    } else {
+//                        floors.setRGB(x, floors.getHeight() - 1 - y, conv(MapIO.colorFor(Blocks.air, content.block(floorID), Blocks.air, Team.derelict)));
+//                    }
+//                    return tile;
+//                }
+//            }));
+////            if (true) return null;
+//
+//            fgraphics.drawImage(walls, 0, 0, null);
+//            fgraphics.dispose();
+//
+//            out.image = floors;
+//
+//            return out;
+//
+//        } finally {
+//            // content.setTemporaryMapper(null);
+//        }
+//    }
 
     int conv(int rgba) {
         return co.set(rgba).argb8888();
