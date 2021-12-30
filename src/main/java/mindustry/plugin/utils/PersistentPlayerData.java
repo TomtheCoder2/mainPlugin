@@ -1,4 +1,4 @@
-package mindustry.plugin;
+package mindustry.plugin.utils;
 //import arc.struct.Array;
 //import mindustry.entities.type.BaseUnit;
 //import mindustry.entities.type.Player;
@@ -27,6 +27,8 @@ public class PersistentPlayerData implements Serializable {
     public float sclVelocity;
     public float sclLifetime;
     public float sclDamage;
+
+    public boolean snowBall = false;
 
 
     // 50 configures per 1000 ms

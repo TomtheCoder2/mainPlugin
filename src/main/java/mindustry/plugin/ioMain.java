@@ -2,13 +2,14 @@ package mindustry.plugin;
 
 import arc.Core;
 import arc.Events;
+import arc.files.Fi;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
-import arc.util.Timer;
 import arc.util.*;
 import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.core.NetServer;
+import mindustry.entities.Effect;
 import mindustry.game.EventType;
 import mindustry.game.Gamemode;
 import mindustry.gen.Call;
@@ -20,12 +21,13 @@ import mindustry.net.Administration;
 import mindustry.net.Administration.Config;
 import mindustry.plugin.database.MapData;
 import mindustry.plugin.database.PlayerData;
+import mindustry.plugin.effect.EffectHelper;
+import mindustry.plugin.effect.EffectObject;
 import mindustry.plugin.requests.Translate;
-import mindustry.ui.Menus;
+import mindustry.plugin.utils.*;
 import mindustry.world.Tile;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
-import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -34,28 +36,28 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.sql.SQLException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
-import static arc.util.Log.debug;
-import static arc.util.Log.info;
+import static arc.util.Log.*;
 import static mindustry.Vars.*;
-import static mindustry.plugin.Utils.*;
 import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.discordcommands.DiscordCommands.error_log_channel;
+import static mindustry.plugin.effect.EffectHelper.getEffect;
+import static mindustry.plugin.utils.Utils.*;
+import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setDebug;
+import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setTrace;
 
 public class ioMain extends Plugin {
-//    public static final File prefsFile = new File("prefs.properties");
+    //    public static final File prefsFile = new File("prefs.properties");
 //    public static Net net = new Net();
 //    public static Prefs prefs = new Prefs(prefsFile);
 //    public GetMap map = new GetMap();
-
+    public static final Fi pluginDir = new Fi("./config/mods/");
     //    public static JedisPool pool;
     public static DiscordApi api = null;
     public static String prefix = ".";
@@ -70,10 +72,11 @@ public class ioMain extends Plugin {
     public static String serverName = "<untitled>";
     public static JSONObject data; //token, channel_id, role_id
     public static String apiKey = "";
+    public static int effectId = 0; // effect id for the snowball
     public static List<String> joinedPlayers = new ArrayList<>();
     public static List<String> leftPlayers = new ArrayList<>();
     public static long passedMapTime = 0;
-    public Timer.Task rateMapTask; // popup to force map rating
+    //    public Timer.Task rateMapTask; // popup to force map rating
     public static ContentHandler contentHandler; // map and schem handler
     public static boolean previewSchem = false; // preview schem or not
 //    static Gson gson = new Gson();
@@ -82,18 +85,23 @@ public class ioMain extends Plugin {
     private final long CDT = 300L;
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public ObjectMap<String, Role> discRoles = new ObjectMap<>();
+    public NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
     //    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
 //    protected Interval timer = new Interval(1);
     //cooldown between votes
-    int voteCooldown = 120;
-    private ObjectMap<Long, String> cooldowns = new ObjectMap<>(); //uuid
+    float voteCooldown = 0;
+    //register commands that run on the server
+    // cooldowns per player
+    ObjectMap<String, Timekeeper> cooldowns = new ObjectMap<>();
+    // current kick sessions
+    VoteSession[] currentlyKicking = {null};
+    private ObjectMap<Long, String> CommandCooldowns = new ObjectMap<>(); //uuid
     private JSONObject alldata;
-    public NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
-
 
     // register event handlers and create variables in the constructor
     public ioMain() {
-        try {
+        setDebug(false); // disable debug logs from javacord
+        try { // read settings
             String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
             JSONObject alldata;
             JSONObject data;
@@ -124,17 +132,18 @@ public class ioMain extends Plugin {
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
         }
-        try {
-            // doesn't work on the first couple tries but after that it works, IDK why
-            connect();
-            connect();
-            connect();
-            connect();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            System.out.println(throwables);
-        }
+//        try {
+//            // doesn't work on the first couple tries but after that it works, IDK why
+//            connect();
+//            connect();
+//            connect();
+//            connect();
+//        } catch (SQLException throwables) {
+//            throwables.printStackTrace();
+//            System.out.println(throwables);
+//        }
         Utils.init();
+        EffectHelper.init();
 
         try {
             String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
@@ -221,6 +230,19 @@ public class ioMain extends Plugin {
                 currentInc = currentInc + increment;
             }
         }, 0, 10);
+
+        // force map votes with popup
+        Timer.schedule(() -> {
+            for (Player player : Groups.player) {
+                assert player != null; // ...idk how even
+                PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
+                assert tdata != null;
+                if (!tdata.votedMap) {
+                    rateMenu(player);
+                    tdata.votedMap = true;
+                }
+            }
+        }, 0, 120);
 
         Events.on(EventType.ServerLoadEvent.class, event -> {
 //            contentHandler = new ContentHandler();
@@ -325,9 +347,9 @@ public class ioMain extends Plugin {
         Events.on(EventType.BlockBuildEndEvent.class, event -> {
             if (event.unit.getPlayer() == null) return;
             if (event.breaking) return;
-            PlayerData pd = getData(event.unit.getPlayer().uuid());
+//            PlayerData pd = getData(event.unit.getPlayer().uuid());
             PersistentPlayerData td = (playerDataGroup.getOrDefault(event.unit.getPlayer().uuid(), null));
-            if (pd == null || td == null) return;
+            if (td == null) return;
             if (event.tile.block() != null) {
                 if (!bannedBlocks.contains(event.tile.block())) {
                     td.bbIncrementor++;
@@ -357,9 +379,32 @@ public class ioMain extends Plugin {
                 if (tdata != null && tdata.bt != null && p.shooting()) {
                     Call.createBullet(tdata.bt, p.team(), p.getX(), p.getY(), p.unit().rotation, tdata.sclDamage, tdata.sclVelocity, tdata.sclLifetime);
                 }
+                if (tdata != null && tdata.snowBall && p.shooting()) {
+//                    Effect.create(new Effect(), p.getX(), p.getY(), p.unit().rotation, new arc.graphics.Color(0xffffff), null);
+//                    EffectHelper.onMove(p);
+
+                    String key = "snowball";
+
+                    final String name = EffectHelper.properties.get(key + ".name", "none");
+                    if (name.equals("none")) {
+                        debug("cant find effect " + key);
+                        return;
+                    }
+
+                    final String color = EffectHelper.properties.get(key + ".color", "#ffffff");
+                    final int rotation = Integer.parseInt(
+                            EffectHelper.properties.get(key + ".rotation", "0")
+                    );
+
+                    final Effect eff = getEffect(name);
+                    final EffectObject place = new EffectObject(eff, p.getX(), p.getY(), rotation, arc.graphics.Color.valueOf(color));
+
+                    EffectHelper.on(key, player, (p.x / 8) + "," + (p.y / 8));
+                }
             }
         });
-        rateMapTask = Timer.schedule(this::rateMenu, 120); // for the rateMenu to appear after 2 minutes after start
+
+//        rateMapTask = Timer.schedule(this::rateMenu, 120); // for the rateMenu to appear after 2 minutes after start
         Events.on(EventType.GameOverEvent.class, event -> {
             debug("Game over!");
             for (Player p : Groups.player) {
@@ -399,9 +444,9 @@ public class ioMain extends Plugin {
             assert log_channel != null;
             log_channel.sendMessage(new EmbedBuilder().setTitle("Game over!").setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves").setColor(new Color(0x33FFEC)));
 
-            // force map vote
-            rateMapTask.cancel(); // cancel the task if gameover before 5 min
-            rateMapTask = Timer.schedule(this::rateMenu, 120);
+//            // force map vote
+//            rateMapTask.cancel(); // cancel the task if gameover before 5 min
+//            rateMapTask = Timer.schedule(this::rateMenu, 120);
         });
 
 
@@ -470,52 +515,7 @@ public class ioMain extends Plugin {
 
     }
 
-    private void rateMenu() {
-        String mapName = state.map.name();
-        int id = Menus.registerMenu((player, selection) -> {
-            if (selection == 0) {
-                ratePositive(mapName, player);
-            } else if (selection == 1) {
-                rateNegative(mapName, player);
-            }
-        });
-        Call.menu(id,
-                "Rate this map! [pink]" + mapName,
-                "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
-                new String[][]{
-                        new String[]{"[green]Yes", "[scarlet]No"},
-                        new String[]{"Close"}
-                }
-        );
-    }
-
-    private void rateNegative(String mapName, Player player) {
-        MapData voteMapData = getMapData(mapName);
-        if (voteMapData != null) {
-            voteMapData.negativeRating++;
-        } else {
-            voteMapData = new MapData(mapName);
-            voteMapData.negativeRating = 1;
-        }
-        rateMap(mapName, voteMapData);
-        player.sendMessage("Successfully gave a [red]negative [white]feedback for " + mapName + "[white]!");
-    }
-
-    private void ratePositive(String mapName, Player player) {
-        MapData voteMapData = getMapData(mapName);
-        if (voteMapData != null) {
-            voteMapData.positiveRating++;
-        } else {
-            voteMapData = new MapData(mapName);
-            voteMapData.positiveRating = 1;
-        }
-        rateMap(mapName, voteMapData);
-        player.sendMessage("Successfully gave a [green]positive [white]feedback for " + mapName + "[white]!");
-    }
-
-    ;
-
-
+    // rainbow
     public static Timer.Task loop() {
         for (Player player : Groups.player) {
             try {
@@ -548,6 +548,7 @@ public class ioMain extends Plugin {
         return null;
     }
 
+
     //    Core.app.post(this::loop);
     public static boolean checkChatRatelimit(String message, Player player) {
         // copied almost exactly from mindustry core, will probably need updating
@@ -578,34 +579,6 @@ public class ioMain extends Plugin {
             player.getInfo().lastMessageTime = Time.millis();
         }
         return true;
-    }
-
-    public static TextChannel getTextChannel(String id) {
-        Optional<Channel> dc = api.getChannelById(id);
-        if (dc.isEmpty()) {
-            Log.err("[ERR!] discordplugin: channel not found! " + id);
-            return null;
-        }
-        Optional<TextChannel> dtc = dc.get().asTextChannel();
-        if (dtc.isEmpty()) {
-            Log.err("[ERR!] discordplugin: textchannel not found! " + id);
-            return null;
-        }
-        return dtc.get();
-    }
-
-
-    //register commands that run on the server
-    @Override
-    public void registerServerCommands(CommandHandler handler) {
-        handler.register("update", "Update the database with the new current data", arg -> {
-            TextChannel log_channel = getTextChannel("882342315438526525");
-            update(log_channel, api);
-        });
-        handler.register("rate", "Force everyone to vote on the current map.", arg -> {
-            rateMapTask.cancel();
-            rateMenu();
-        });
     }
 
     public static void update(TextChannel log_channel, DiscordApi api) {
@@ -702,74 +675,55 @@ public class ioMain extends Plugin {
         debug("Updated database!");
     }
 
-    public static void logConnections(TextChannel log_channel, List<String> leftPlayers, String connection) {
-        if (leftPlayers.size() > 0) {
-            EmbedBuilder eb = new EmbedBuilder();
-            eb.setTitle("Player " + connection + " Log");
-            StringBuilder desc = new StringBuilder();
-            for (String uuid : leftPlayers) {
-//                if (player == null) continue;
-                try {
-                    Administration.PlayerInfo info = getPlayerInfo(uuid);
-                    desc.append(String.format("`%s` : `%s `:%s\n", uuid, info.lastIP, escapeEverything(info.lastName)));
-                } catch (Exception e) {
-                    e.printStackTrace();
+
+    @Override
+    public void registerServerCommands(CommandHandler handler) {
+        handler.register("update", "Update the database with the new current data", arg -> {
+            TextChannel log_channel = getTextChannel("882342315438526525");
+            update(log_channel, api);
+        });
+        handler.register("rate", "Force everyone to vote on the current map.", arg -> {
+//            rateMapTask.cancel();
+            rateMenu();
+        });
+        handler.register("vote", "<y/n>", "Vote for current votekick", arg -> {
+            if (currentlyKicking[0] == null) {
+                info("[scarlet]Nobody is being voted on.");
+            } else {
+                int sign = switch (arg[0].toLowerCase()) {
+                    case "y", "yes" -> 1;
+                    case "n", "no" -> -1;
+                    default -> 0;
+                };
+
+                if (sign == 0) {
+                    info("[scarlet]Vote either 'y' (yes) or 'n' (no).");
+                    return;
+                }
+
+                currentlyKicking[0].vote(sign);
+            }
+        });
+
+        handler.register("logging", "<trace/debug> <true/false>", "Enable or disable logging for javacord.", args -> {
+            if (!Objects.equals(args[1], "false") && !Objects.equals(args[1], "true")) {
+                err("Second argument has to be true or false!");
+            }
+            switch (args[0]) {
+                case "trace", "t" -> {
+                    setTrace(Objects.equals(args[1], "true"));
+                    info("Set trace logging to " + args[1]);
+                }
+                case "debug", "d" -> {
+                    setDebug(Objects.equals(args[1], "true"));
+                    info("Set debug to " + args[1]);
+                }
+                default -> {
+                    err("Please select either trace or debug!");
                 }
             }
-            if (Objects.equals(connection, "leave")) {
-                eb.setColor(new Color(0xff0000));
-            } else {
-                eb.setColor(new Color(0x00ff00));
-            }
-            eb.setDescription(desc.toString());
-            assert log_channel != null;
-            log_channel.sendMessage(eb);
-        }
-        leftPlayers.clear();
+        });
     }
-
-    private static void execute(String command) throws IOException {
-        Process process = Runtime.getRuntime().exec(command);
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//        String line = "";
-////        StringBuilder output = new StringBuilder();
-//        while ((line = reader.readLine()) != null) {
-//            System.out.println(line);
-////            output.append(line);
-//        }
-    }
-
-    public static void restartApplication() throws IOException, URISyntaxException {
-        final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
-        final File currentJar = new File(Core.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-
-        /* is it a jar file? */
-        if (!currentJar.getName().endsWith(".jar"))
-            return;
-
-        /* Build command: java -jar application.jar */
-        final ArrayList<String> command = new ArrayList<String>();
-//        command.add("screen -d -r v7 -X stuff $'");
-//        command.add("sleep");
-//        command.add("0\n");
-//        command.add("screen");
-//        command.add("-d");
-//        command.add("-r");
-//        command.add("v7");
-//        command.add("-X");
-//        command.add("stuff");
-//        command.add("java -jar server-release.jar\n");
-        command.add(javaBin);
-        command.add("-jar");
-        command.add(currentJar.getPath());
-//        command.add("'");
-
-        final ProcessBuilder builder = new ProcessBuilder(command);
-        System.out.println(builder.command());
-        builder.start();
-        System.exit(0);
-    }
-
 
     //register commands that player can invoke in-game
     @Override
@@ -790,6 +744,115 @@ public class ioMain extends Plugin {
 
                 } else {
                     player.sendMessage("[scarlet]This command is restricted to admins!");
+                }
+            });
+
+            handler.<Player>register("votekick", "[player]", "votekick a player.", (args, player) -> {
+//               Log.debug("vk @.", args[0]);
+                if (!Config.enableVotekick.bool()) {
+                    player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
+                    return;
+                }
+
+                if (Groups.player.size() < 3) {
+                    player.sendMessage("[scarlet]At least 3 players are needed to start a votekick.");
+                    return;
+                }
+
+                if (player.isLocal()) {
+                    player.sendMessage("[scarlet]Just kick them yourself if you're the host.");
+                    return;
+                }
+
+                if (currentlyKicking[0] != null) {
+                    player.sendMessage("[scarlet]A vote is already in progress.");
+                    return;
+                }
+
+                if (args.length == 0) {
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("[orange]Players to kick: \n");
+
+                    Groups.player.each(p -> !p.admin && p.con != null && p != player, p -> {
+                        builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id()).append(")\n");
+                    });
+                    player.sendMessage(builder.toString());
+                } else {
+                    Player found = findPlayer(args[0]);
+
+                    if (found != null) {
+                        if (found == player) {
+                            player.sendMessage("[scarlet]You can't vote to kick yourself.");
+                        } else if (found.admin) {
+                            player.sendMessage("[scarlet]Did you really expect to be able to kick an admin?");
+                        } else if (found.isLocal()) {
+                            player.sendMessage("[scarlet]Local players cannot be kicked.");
+                        } else if (found.team() != player.team()) {
+                            player.sendMessage("[scarlet]Only players on your team can be kicked.");
+                        } else {
+                            Timekeeper vtime = cooldowns.get(player.uuid(), () -> new Timekeeper(voteCooldown));
+
+                            if (!vtime.get()) {
+                                player.sendMessage("[scarlet]You must wait " + voteCooldown / 60 + " minutes between votekicks.");
+                                return;
+                            }
+
+                            VoteSession session = new VoteSession(currentlyKicking, found);
+                            session.vote(player, 1);
+
+                            // freeze the player
+                            PersistentPlayerData tdata = (playerDataGroup.getOrDefault(found.uuid(), null));
+                            assert tdata != null;
+                            tdata.frozen = !tdata.frozen;
+                            player.sendMessage("[cyan]Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(found));
+                            found.sendMessage("[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " for during the votekick!");
+
+                            vtime.reset();
+                            currentlyKicking[0] = session;
+                        }
+                    } else {
+                        player.sendMessage("[scarlet]No player [orange]'" + args[0] + "'[scarlet] found.");
+                    }
+                }
+            });
+
+            handler.<Player>register("vote", "<y/n>", "Vote to kick the current player.", (arg, player) -> {
+                if (currentlyKicking[0] == null) {
+                    player.sendMessage("[scarlet]Nobody is being voted on.");
+                } else {
+                    if (player.isLocal()) {
+                        player.sendMessage("[scarlet]Local players can't vote. Kick the player yourself instead.");
+                        return;
+                    }
+
+                    //hosts can vote all they want
+                    if ((currentlyKicking[0].voted.contains(player.uuid()) || currentlyKicking[0].voted.contains(netServer.admins.getInfo(player.uuid()).lastIP))) {
+                        player.sendMessage("[scarlet]You've already voted. Sit down.");
+                        return;
+                    }
+
+                    if (currentlyKicking[0].target == player) {
+                        player.sendMessage("[scarlet]You can't vote on your own trial.");
+                        return;
+                    }
+
+                    if (currentlyKicking[0].target.team() != player.team()) {
+                        player.sendMessage("[scarlet]You can't vote for other teams.");
+                        return;
+                    }
+
+                    int sign = switch (arg[0].toLowerCase()) {
+                        case "y", "yes" -> 1;
+                        case "n", "no" -> -1;
+                        default -> 0;
+                    };
+
+                    if (sign == 0) {
+                        player.sendMessage("[scarlet]Vote either 'y' (yes) or 'n' (no).");
+                        return;
+                    }
+
+                    currentlyKicking[0].vote(player, sign);
                 }
             });
 
@@ -829,6 +892,14 @@ public class ioMain extends Plugin {
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                     player.sendMessage("[scarlet]There was an error: " + e.getMessage());
+                }
+            });
+
+            handler.<Player>register("snowball", "<id>", "Shoot snowballs!", (arg, player) -> {
+                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                if (tdata != null) {
+                    tdata.snowBall = !tdata.snowBall;
+                    effectId = Integer.parseInt(arg[0]);
                 }
             });
 
@@ -947,10 +1018,10 @@ public class ioMain extends Plugin {
 
 
             handler.<Player>register("bug", "[description...]", "Send a bug report to the discord server. (Please do not spam, because this command pings developers)", (args, player) -> {
-                for (Long key : cooldowns.keys()) {
+                for (Long key : CommandCooldowns.keys()) {
                     if (key + CDT < System.currentTimeMillis() / 1000L) {
-                        cooldowns.remove(key);
-                    } else if (player.uuid().equals(cooldowns.get(key))) {
+                        CommandCooldowns.remove(key);
+                    } else if (player.uuid().equals(CommandCooldowns.get(key))) {
                         player.sendMessage("[scarlet]This command is on a 5 minute cooldown!");
                         return;
                     }
@@ -967,7 +1038,7 @@ public class ioMain extends Plugin {
                     bugReportChannel.sendMessage(" <@770240444466069514> ");
                     bugReportChannel.sendMessage(eb);
                     Call.sendMessage("[sky]The bug is reported to discord.");
-                    cooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
+                    CommandCooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
                 }
             });
 
@@ -1005,10 +1076,10 @@ public class ioMain extends Plugin {
             TextChannel tc_c = getTextChannel("881300595875643452");
             handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/gr' to get a list of ids)", (args, player) -> {
                 //https://github.com/Anuken/Mindustry/blob/master/core/src/io/anuke/mindustry/core/NetServer.java#L300-L351
-                for (Long key : cooldowns.keys()) {
+                for (Long key : CommandCooldowns.keys()) {
                     if (key + CDT < System.currentTimeMillis() / 1000L) {
-                        cooldowns.remove(key);
-                    } else if (player.uuid().equals(cooldowns.get(key))) {
+                        CommandCooldowns.remove(key);
+                    } else if (player.uuid().equals(CommandCooldowns.get(key))) {
                         player.sendMessage("[scarlet]This command is on a 5 minute cooldown!");
                         return;
                     }
@@ -1071,7 +1142,7 @@ public class ioMain extends Plugin {
                                 tc_c.sendMessage("<@&882340213551140935>");
                             }
                             Call.sendMessage(found.name + "[sky] is reported to discord.");
-                            cooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
+                            CommandCooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
                         }
                     } else {
                         player.sendMessage("[scarlet]No player[orange] '" + args[0] + "'[scarlet] found.");
@@ -1278,7 +1349,7 @@ public class ioMain extends Plugin {
 
             Timekeeper vtime = new Timekeeper(voteCooldown);
 
-            VoteSession[] currentlyKicking = {null};
+            MapVoteSession[] currentMapVoting = {null};
 
             handler.<Player>register("changemap", "<map...>", " Vote to change to a specific map.", (args, player) -> {
                 if (!state.rules.pvp || player.admin) {
@@ -1293,11 +1364,11 @@ public class ioMain extends Plugin {
                             return;
                         }
 
-                        VoteSession session = new VoteSession(currentlyKicking, found);
+                        MapVoteSession session = new MapVoteSession(currentMapVoting, found);
 
                         session.vote(player, 1);
                         vtime.reset();
-                        currentlyKicking[0] = session;
+                        currentMapVoting[0] = session;
                     } else {
                         player.sendMessage("[scarlet]No map[orange]'" + args[0] + "'[scarlet] found.");
                     }
@@ -1376,5 +1447,4 @@ public class ioMain extends Plugin {
         }
 
     }
-
 }

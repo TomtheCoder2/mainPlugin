@@ -1,11 +1,8 @@
-package mindustry.plugin;
+package mindustry.plugin.commands;
 
 import arc.Core;
 import arc.files.Fi;
-import arc.graphics.Pixmap;
-import arc.graphics.PixmapIO;
-import arc.util.Http;
-import arc.util.Strings;
+import arc.util.Log;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.Items;
@@ -17,33 +14,33 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.io.SaveIO;
 import mindustry.maps.Map;
+import mindustry.mod.Mods;
+import mindustry.plugin.utils.PersistentPlayerData;
 import mindustry.plugin.database.MapData;
 import mindustry.plugin.database.PlayerData;
 import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
+import mindustry.plugin.ioMain;
 import mindustry.plugin.requests.GetMap;
 import mindustry.world.modules.ItemModule;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static arc.util.Log.debug;
 import static arc.util.Log.info;
 import static mindustry.Vars.saveExtension;
 import static mindustry.Vars.state;
-import static mindustry.plugin.Utils.*;
+import static mindustry.plugin.utils.Utils.*;
 import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.ioMain.*;
 
@@ -75,6 +72,31 @@ public class ComCommands {
                 }
             }
         });
+
+        handler.registerCommand(new Command("version") {
+            {
+                help = "Get Versions of the mods";
+                minArguments = 0;
+            }
+
+            public void run(Context ctx) {
+                EmbedBuilder eb = new EmbedBuilder()
+                        .setTitle("Mods")
+                        .setColor(new Color(0x00ff00));
+                if (!Vars.mods.list().isEmpty()) {
+                    info("Mods:");
+                    for (Mods.LoadedMod mod : Vars.mods.list()) {
+                        info("  @ &fi@", mod.meta.displayName(), mod.meta.version);
+                        eb.addField(mod.meta.displayName(), mod.meta.version, true);
+                    }
+                } else {
+                    info("No mods found.");
+                    eb.setDescription("No mods found.");
+                }
+                ctx.channel.sendMessage(eb);
+            }
+        });
+
         handler.registerCommand(new Command("map") {
             {
                 help = "Preview and download a server map in a .msav file format.";
@@ -114,23 +136,12 @@ public class ComCommands {
                 embed.setFooter(found.width + "x" + found.height);
                 try {
                     Fi mapFile = found.file;
-//
-//                    ContentHandler.Map visualMap = contentHandler.readMap(found.file.read());
-//                    BufferedImage image = map.getMap2(mapFile);
                     InputStream stream = mapFile.readByteStream();
-                    Http.post(maps_url + "/map").content(stream, stream.available()).timeout(30000).submit(res -> {
-                        var pix = new Pixmap(res.getResultAsStream().readAllBytes());
-                        PixmapIO.writePng(new Fi("temp/" + "image_" + mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png")), pix); // Write to a file
-                    });
-                    File imageFile = new File("temp/" + "image_" + mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png"));
-//                    assert Objects.requireNonNull(image).get() != null;
-//                    ImageIO.write(image.get(), "png", imageFile);
-
-
-//                    EmbedBuilder eb = new EmbedBuilder().setColor(Pals.success).setTitle(":map: " + escapeCharacters(found.name())).setFooter(found.width + "x" + found.height).setDescription(escapeCharacters(found.description())).setAuthor(escapeCharacters(found.author()));
-                    embed.setImage("attachment://" + "image_" + mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png"));
-//                    ctx.channel.sendFile(mapFile.file()).addFile(imageFile).embed(embed.build()).queue();
-//                    embed.setImage("attachment://output.png");
+                    String imageFileName = mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png");
+                    Log.debug("File size of map: @", stream.readAllBytes().length);
+                    mapToPng(stream, imageFileName);
+                    File imageFile = new File("temp/" + "image_" + imageFileName);
+                    embed.setImage("attachment://" + "image_" + imageFileName);
                     MessageBuilder mb = new MessageBuilder();
                     mb.addEmbed(embed);
                     mb.addFile(imageFile);
@@ -256,50 +267,40 @@ public class ComCommands {
                     return;
                 }
                 try {
-                    EmbedBuilder eb = new EmbedBuilder()
+                    EmbedBuilder embed = new EmbedBuilder()
                             .setTitle(ioMain.serverName)
                             .addField("Players", String.valueOf(Groups.player.size()), true)
                             .addField("Map", Vars.state.map.name(), true)
                             .addField("Wave", String.valueOf(state.wave), true)
                             .addField("TPS", String.valueOf(Core.graphics.getFramesPerSecond()), true)
                             .addField("Next wave in", Math.round(state.wavetime / 60) + " seconds.", true);
-                    if (ctx.args.length > 1) {
-                        if (state.is(GameState.State.playing) && Objects.equals(ctx.args[1], "preview")) {
-                            CompletableFuture.runAsync(() -> {
-                                try {
-                                    Fi file = Core.settings.getDataDirectory().child("../temp/map." + saveExtension);
+                    // preview 
+//                    Fi mapFile = Core.settings.getDataDirectory().child("../temp/map_" + Vars.state.map.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + saveExtension);
+                    Fi tempDir = new Fi("temp/");
+                    Fi mapFile = tempDir.child("map_" + Vars.state.map.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + "." + saveExtension);
+                    Core.app.post(() -> {
+                        try {
+                            SaveIO.write(mapFile);
+                            info("Saved to @", mapFile);
+                            debug(mapFile.absolutePath());
 
-                                    Core.app.post(() -> {
-                                        SaveIO.save(file);
-                                        info("Saved to @.", file);
-                                    });
-
-                                    try {
-                                        String absolute = map.getMap(file).get(0);
-                                        debug(absolute);
-
-                                        eb.setImage("attachment://output.png");
-                                        MessageBuilder mb = new MessageBuilder();
-                                        mb.addEmbed(eb);
-                                        mb.addFile(new File(absolute));
-//                                mb.addAttachment(mapfile.file());
-                                        mb.send(ctx.channel);
-                                    } catch (Exception e) {
-                                        String err = Strings.neatError(e, true);
-                                        int max = 900;
-//                    errDelete(msg, "Error parsing map.", err.length() < max ? err : err.substring(0, max));
-                                    }
-                                } catch (Exception e) {
-                                    debug(e.getMessage());
-                                    e.printStackTrace();
-                                    ctx.reply("An error has occurred.");
-                                    ctx.channel.sendMessage(eb);
-                                }
-                            });
+                            InputStream stream = mapFile.readByteStream();
+                            debug(mapFile.length());
+                            String imageFileName = mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png");
+                            mapToPng(stream, imageFileName);
+                            File imageFile = new File("temp/" + "image_" + imageFileName);
+                            debug("image size: " + imageFile.length());
+                            embed.setImage("attachment://" + "image_" + imageFileName);
+                            MessageBuilder mb = new MessageBuilder();
+                            mb.addEmbed(embed);
+                            mb.addFile(imageFile);
+                            mb.send(ctx.channel).thenRun(mapFile::delete);
+//                            mapFile.delete();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-                    } else {
-                        ctx.channel.sendMessage(eb);
-                    }
+                    });
+
                 } catch (Exception e) {
                     debug(e.getMessage());
                     e.printStackTrace();
@@ -359,13 +360,14 @@ public class ComCommands {
             public void run(Context ctx) {
                 if (ctx.args.length == 1) {
                     StringBuilder publicCommands = new StringBuilder();
-                    StringBuilder restrictedCommands = new StringBuilder();
                     StringBuilder management = new StringBuilder();
                     StringBuilder moderation = new StringBuilder();
                     StringBuilder mapReviewer = new StringBuilder();
 
+                    ArrayList<Command> commandList = new ArrayList<>(handler.getAllCommands());
+                    Collections.shuffle(commandList);
 
-                    for (Command command : handler.getAllCommands()) {
+                    for (Command command : commandList) {
                         if (command.hidden) continue;
                         if (!command.hasPermission(ctx)) continue;
                         if (!Objects.equals(command.category, "public")) {
@@ -448,73 +450,69 @@ public class ComCommands {
             }
 
             public void run(Context ctx) {
-                CompletableFuture.runAsync(() -> {
-                    EmbedBuilder eb = new EmbedBuilder();
-                    String target = "";
-                    if (ctx.args.length > 1) {
-                        target = ctx.args[1];
+                EmbedBuilder eb = new EmbedBuilder();
+                String target = "";
+                if (ctx.args.length > 1) {
+                    target = ctx.args[1];
+                }
+                List roles = new List();
+                for (Role r : ctx.author.asUser().get().getRoles(ctx.event.getServer().get())) {
+                    if (r != null) {
+                        roles.add(r.getIdAsString());
                     }
-                    List roles = new List();
-                    for (Role r : ctx.author.asUser().get().getRoles(ctx.event.getServer().get())) {
-                        if (r != null) {
-                            roles.add(r.getIdAsString());
-                        }
-                    }
-                    debug(target);
-                    if (target.length() > 0) {
-                        int rank = 0;
-                        for (Role role : ctx.author.asUser().get().getRoles(ctx.event.getServer().get())) {
-                            if (rankRoles.containsKey(role.getIdAsString())) {
-                                if (rankRoles.get(role.getIdAsString()) > rank) {
-                                    rank = rankRoles.get(role.getIdAsString());
-                                }
+                }
+                debug(target);
+                if (target.length() > 0) {
+                    int rank = 0;
+                    for (Role role : ctx.author.asUser().get().getRoles(ctx.event.getServer().get())) {
+                        if (rankRoles.containsKey(role.getIdAsString())) {
+                            if (rankRoles.get(role.getIdAsString()) > rank) {
+                                rank = rankRoles.get(role.getIdAsString());
                             }
                         }
-                        Player player = findPlayer(target);
-                        if (player != null) {
-                            PlayerData pd = getData(player.uuid());
-                            if (pd != null) {
-                                if (pd.rank < rank) {
-                                    pd.rank = rank;
-                                } else {
-                                    // verify the action
-                                    PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-                                    EmbedBuilder eb2 = new EmbedBuilder()
-                                            .setTitle("Please head over to Mindustry to complete the process!");
-                                    ctx.channel.sendMessage(eb2);
-                                    tdata.task = Timer.schedule(() -> {
-                                        eb.setTitle("Command terminated");
-                                        eb.setDescription("Player did not accept the action!");
-                                        eb.setColor(new Color(0xff0000));
-                                        ctx.channel.sendMessage(eb);
-                                        tdata.redeemKey = -1;
-                                    }, 120);
-                                    tdata.redeem = ctx.author.getIdAsString();
-                                    int key = (int) (Math.random() * 100);
-                                    key += Math.random() * 1000;
-                                    debug(key);
-                                    tdata.redeemKey = key;
-                                    player.sendMessage("Please enter this code: [cyan]/redeem " + key + " [white]to complete the redeem process.");
-                                    return;
-                                }
-                                setData(player.uuid(), pd);
+                    }
+                    Player player = findPlayer(target);
+                    if (player != null) {
+                        PlayerData pd = getData(player.uuid());
+                        if (pd != null) {
+                            if (pd.rank < rank) {
+                                pd.rank = rank;
+                            } else {
+                                // verify the action
+                                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                                EmbedBuilder eb2 = new EmbedBuilder()
+                                        .setTitle("Please head over to Mindustry to complete the process!");
+                                ctx.channel.sendMessage(eb2);
+                                tdata.task = Timer.schedule(() -> {
+                                    eb.setTitle("Command terminated");
+                                    eb.setDescription("Player did not accept the action!");
+                                    eb.setColor(new Color(0xff0000));
+                                    ctx.channel.sendMessage(eb);
+                                    tdata.redeemKey = -1;
+                                }, 120);
+                                tdata.redeem = ctx.author.getIdAsString();
+                                int key = (int) (Math.random() * 100);
+                                key += Math.random() * 1000;
+                                debug(key);
+                                tdata.redeemKey = key;
+                                player.sendMessage("Please enter this code: [cyan]/redeem " + key + " [white]to complete the redeem process.");
+                                return;
                             }
-                            eb.setTitle("Command executed successfully");
-                            eb.setDescription("Promoted " + escapeEverything(player.name) + " to " + escapeEverything(rankNames.get(rank).name) + ".");
-                            ctx.channel.sendMessage(eb);
-//                            player.con.kick("Your rank was modified, please rejoin.", 0);
-                        } else {
-                            eb.setTitle("Command terminated");
-                            eb.setDescription("Player not online or not found.");
-                            ctx.channel.sendMessage(eb);
+                            setData(player.uuid(), pd);
                         }
-
+                        eb.setTitle("Command executed successfully");
+                        eb.setDescription("Promoted " + escapeEverything(player.name) + " to " + escapeEverything(rankNames.get(rank).name) + ".");
+                        player.name = rankNames.get(rank).tag + getPlayerInfo(player.uuid()).lastName;
+                        //                            player.con.kick("Your rank was modified, please rejoin.", 0);
                     } else {
                         eb.setTitle("Command terminated");
-                        eb.setDescription("Invalid arguments provided or no roles to redeem.");
-                        ctx.channel.sendMessage(eb);
+                        eb.setDescription("Player not online or not found.");
                     }
-                });
+                } else {
+                    eb.setTitle("Command terminated");
+                    eb.setDescription("Invalid arguments provided or no roles to redeem.");
+                }
+                ctx.channel.sendMessage(eb);
             }
 
         });

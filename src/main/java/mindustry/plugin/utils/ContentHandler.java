@@ -1,39 +1,32 @@
-package mindustry.plugin;
+package mindustry.plugin.utils;
 
 import arc.Core;
-import arc.files.*;
+import arc.files.Fi;
 import arc.graphics.Color;
-import arc.graphics.*;
-import arc.graphics.Pixmap.*;
+import arc.graphics.Texture;
 import arc.graphics.g2d.*;
-import arc.graphics.g2d.TextureAtlas.*;
-import arc.graphics.g2d.TextureAtlas.TextureAtlasData.*;
+import arc.graphics.g2d.TextureAtlas.AtlasRegion;
+import arc.graphics.g2d.TextureAtlas.TextureAtlasData;
 import arc.math.Mathf;
-import arc.struct.*;
-import arc.util.io.*;
-import arc.util.serialization.*;
+import arc.struct.ObjectMap;
+import arc.struct.Seq;
 import mindustry.Vars;
-import mindustry.content.Blocks;
 import mindustry.core.ContentLoader;
-import mindustry.core.GameState;
 import mindustry.core.Version;
-import mindustry.core.World;
 import mindustry.ctype.Content;
 import mindustry.ctype.ContentType;
-import mindustry.entities.units.*;
-import mindustry.game.*;
-import mindustry.io.*;
-import mindustry.world.*;
-import mindustry.world.blocks.environment.*;
+import mindustry.entities.units.BuildPlan;
+import mindustry.game.Schematic;
+import mindustry.game.Schematics;
+import mindustry.world.Block;
+import mindustry.world.blocks.environment.OreBlock;
 
-import javax.imageio.*;
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.*;
-import java.io.*;
-import java.util.zip.*;
-
-import static mindustry.Vars.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class ContentHandler {
     public static final byte[] mapHeader = {77, 83, 65, 86};

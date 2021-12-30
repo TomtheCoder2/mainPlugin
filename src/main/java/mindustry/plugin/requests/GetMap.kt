@@ -1,11 +1,10 @@
 package mindustry.plugin.requests
 
 import arc.files.Fi
-import arc.func.ConsT
 import arc.util.Http
 import arc.util.Log
 import arc.util.serialization.Base64Coder
-import mindustry.plugin.Utils
+import mindustry.plugin.utils.Utils
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.File

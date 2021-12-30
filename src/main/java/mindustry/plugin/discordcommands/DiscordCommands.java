@@ -1,54 +1,52 @@
 package mindustry.plugin.discordcommands;
 
-import java.awt.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.InputStreamReader;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.zip.InflaterInputStream;
-
-import arc.struct.Seq;
-import mindustry.game.Schematic;
-import mindustry.game.Schematics;
 import mindustry.gen.Call;
-import mindustry.plugin.ContentHandler;
-import mindustry.plugin.Utils;
 import mindustry.plugin.ioMain;
 import mindustry.plugin.requests.Translate;
+import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
-import mindustry.plugin.Utils.*;
-
-import mindustry.plugin.ioMain.*;
 import org.json.JSONObject;
 
-import static arc.util.Log.debug;
-import static mindustry.plugin.Utils.*;
+import java.awt.*;
+import java.util.*;
+
 import static mindustry.plugin.ioMain.*;
+import static mindustry.plugin.utils.Utils.*;
 
 /**
  * Represents a registry of commands
  */
 public class DiscordCommands implements MessageCreateListener {
-    private HashMap<String, Command> registry = new HashMap<>();
+    public static final TextChannel error_log_channel = getTextChannel("891677596117504020");
     private final Set<MessageCreatedListener> messageCreatedListenerRegistry = new HashSet<>();
     private final TextChannel admin_bot_channel = getTextChannel(admin_bot_channel_id);
     private final TextChannel staff_bot_channel = getTextChannel(staff_bot_channel_id);
     private final TextChannel bot_channel = getTextChannel(bot_channel_id);
     private final TextChannel apprentice_bot_channel = getTextChannel(ioMain.apprentice_bot_channel_id);
-    public static final TextChannel error_log_channel = getTextChannel("891677596117504020");
+    private final TextChannel live_chat_channel;
+    private HashMap<String, Command> registry = new HashMap<>();
 
 
     public DiscordCommands() {
         // stuff
+        if (!Objects.equals(live_chat_channel_id, "")) {
+            live_chat_channel = getTextChannel(live_chat_channel_id);
+        } else {
+            live_chat_channel = getTextChannel("881300954845179914");
+        }
     }
+
+    public static void tooFewArguments(Context ctx, Command command) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("Too few arguments!")
+                .setDescription("Usage: " + ioMain.prefix + command.name + " " + command.usage)
+                .setColor(Pals.error);
+        ctx.channel.sendMessage(eb);
+    }
+    // you can override the name of the command manually, for example for aliases
 
     /**
      * Register a command in the CommandRegistry
@@ -58,7 +56,6 @@ public class DiscordCommands implements MessageCreateListener {
     public void registerCommand(Command c) {
         registry.put(c.name.toLowerCase(), c);
     }
-    // you can override the name of the command manually, for example for aliases
 
     /**
      * Register a command in the CommandRegistry
@@ -92,13 +89,8 @@ public class DiscordCommands implements MessageCreateListener {
         }
 
 
-        TextChannel tc = getTextChannel("881300954845179914");
-        if (!Objects.equals(live_chat_channel_id, "") && message.startsWith(ioMain.prefix)) {
-            tc = getTextChannel(live_chat_channel_id);
-        }
-        assert tc != null;
         // check if it's a live chat message
-        if (event.getChannel().getId() == tc.getId() && !event.getMessageAuthor().isBotUser()) {
+        if (event.getChannel().getId() == live_chat_channel.getId() && !event.getMessageAuthor().isBotUser()) {
             if (event.getMessageContent().split(" ")[0].substring(prefix.length()).equals("translate") || event.getMessageContent().split(" ")[0].substring(prefix.length()).equals("t")) {
                 if (event.getMessageContent().split(" ").length < 3) {
                     event.getChannel().sendMessage(new EmbedBuilder()
@@ -235,14 +227,6 @@ public class DiscordCommands implements MessageCreateListener {
                 System.out.println(error2.toString());
             }
         }
-    }
-
-    public static void tooFewArguments(Context ctx, Command command) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("Too few arguments!")
-                .setDescription("Usage: " + ioMain.prefix + command.name + " " + command.usage)
-                .setColor(Pals.error);
-        ctx.channel.sendMessage(eb);
     }
 
     /**

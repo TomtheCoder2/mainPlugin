@@ -28,22 +28,23 @@ dependencies {
 //    compileOnly("com.github.fuzzbuck.Mindustry:core:$mindustryVersion")
 //    compileOnly("com.github.fuzzbuck.Mindustry:server:$mindustryVersion")
     implementation group: 'org.json', name: 'json', version: '20210307'
-    compileOnly 'org.springframework.data:spring-data-redis:2.5.4'
-    compileOnly 'redis.clients:jedis:3.6.3'
+    compileOnly 'org.springframework.data:spring-data-redis:2.6.0'
+//    compileOnly 'redis.clients:jedis:3.6.3'
     compileOnly('org.glassfish.jersey.core:jersey-client:3.0.3')
 //    compileOnly("redis.clients:jedis:3.2.0")
-    compileOnly('org.apache.commons:commons-pool2:2.10.0')
-    compileOnly('redis.clients:jedis:3.6.3')
+//    compileOnly('org.apache.commons:commons-pool2:2.15.0')
+//    compileOnly('redis.clients:jedis:3.6.3')
 
     implementation('org.javacord:javacord:3.3.2')
     compileOnly('javax.ws.rs:javax.ws.rs-api:2.1.1')
-    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'com.google.code.gson:gson:2.8.9'
     implementation("net.dv8tion:JDA:4.3.0_277")
 //    implementation 'org.postgresql:postgresql:42.2.24.jre7'
     // http://mvnrepository.com/artifact/postgresql/postgresql
     compileOnly group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-
+    runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j:2.17.0'
+    runtimeOnly 'ch.qos.logback:logback-classic:1.2.10'
 }
 
 jar {

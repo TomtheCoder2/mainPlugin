@@ -6,7 +6,7 @@ import mindustry.net.Administration;
 import java.sql.*;
 
 import static mindustry.Vars.netServer;
-import static mindustry.plugin.Utils.*;
+import static mindustry.plugin.utils.Utils.*;
 import static arc.util.Log.debug;
 
 public class Utils {

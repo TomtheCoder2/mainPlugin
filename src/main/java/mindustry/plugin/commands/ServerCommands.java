@@ -1,4 +1,4 @@
-package mindustry.plugin;
+package mindustry.plugin.commands;
 
 import arc.Core;
 import arc.Events;
@@ -23,11 +23,14 @@ import mindustry.maps.Map;
 import mindustry.maps.MapException;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
+import mindustry.plugin.utils.PersistentPlayerData;
+import mindustry.plugin.utils.Utils;
 import mindustry.plugin.database.PlayerData;
 import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
 import mindustry.plugin.discordcommands.RoleRestrictedCommand;
+import mindustry.plugin.ioMain;
 import mindustry.plugin.requests.GetMap;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
@@ -55,16 +58,15 @@ import java.util.zip.InflaterInputStream;
 import static arc.util.Log.err;
 import static arc.util.Log.info;
 import static mindustry.Vars.*;
-import static mindustry.plugin.Utils.*;
-import static mindustry.plugin.Utils.Categries.*;
+import static mindustry.plugin.utils.Utils.Categries.*;
+import static mindustry.plugin.utils.Utils.*;
+import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.requests.IPLookup.readJsonFromUrl;
-import static mindustry.plugin.database.Utils.*;
 
 public class ServerCommands {
-    public GetMap map = new GetMap();
-
     private final JSONObject data;
+    public GetMap map = new GetMap();
 
     public ServerCommands(JSONObject data) {
         this.data = data;
@@ -201,8 +203,16 @@ public class ServerCommands {
                 }
 
                 public void run(Context ctx) {
+                    getTextChannel(log_channel_id).sendMessage(new EmbedBuilder()
+                            .setTitle(ctx.author.getDisplayName() + " closed the server!")
+                            .setColor(new Color(0xff0000))).join();
+
+                    ctx.channel.sendMessage(new EmbedBuilder()
+                            .setTitle("Closed the server!")
+                            .setColor(new Color(0xff0000))).join();
                     net.dispose();
                     Core.app.exit();
+                    System.exit(1);
                 }
             });
         }
@@ -1092,6 +1102,7 @@ public class ServerCommands {
                     role = banRole;
                     category = moderation;
                     minArguments = 1;
+                    hidden = true;
                 }
 
                 public void run(Context ctx) {
@@ -1283,6 +1294,16 @@ public class ServerCommands {
                             Field field = UnitTypes.class.getDeclaredField(targetMech);
                             desiredUnit = (UnitType) field.get(null);
                         } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                            StringBuilder sb = new StringBuilder("All available units: \n");
+                            for (Field b : UnitTypes.class.getDeclaredFields()) {
+                                sb.append("`").append(b.getName()).append("`,");
+                            }
+                            EmbedBuilder eb = new EmbedBuilder()
+                                    .setTitle("Can't find Unit " + targetMech + "!")
+                                    .setColor(new Color(0xff0000))
+                                    .setDescription(sb.toString());
+                            ctx.channel.sendMessage(eb);
+                            return;
                         }
 
                         EmbedBuilder eb = new EmbedBuilder();
@@ -1849,15 +1870,27 @@ public class ServerCommands {
                     String target = ctx.args[1];
                     String targetBlock = ctx.args[2];
                     int targetRotation = 0;
-                    if (ctx.args[3] != null && !ctx.args[3].equals("")) {
-                        targetRotation = Integer.parseInt(ctx.args[3]);
+                    if (ctx.args.length >= 4) {
+                        if (ctx.args[3] != null && !ctx.args[3].equals("")) {
+                            targetRotation = Integer.parseInt(ctx.args[3]);
+                        }
                     }
-                    Block desiredBlock = Blocks.copperWall;
+                    Block desiredBlock;
 
                     try {
                         Field field = Blocks.class.getDeclaredField(targetBlock);
                         desiredBlock = (Block) field.get(null);
                     } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                        StringBuilder sb = new StringBuilder("All available blocks: \n");
+                        for (Field b : Blocks.class.getDeclaredFields()) {
+                            sb.append("`").append(b.getName()).append("`,");
+                        }
+                        EmbedBuilder eb = new EmbedBuilder()
+                                .setTitle("Can't find Block " + targetBlock + "!")
+                                .setColor(new Color(0xff0000))
+                                .setDescription(sb.toString());
+                        ctx.channel.sendMessage(eb);
+                        return;
                     }
 
                     EmbedBuilder eb = new EmbedBuilder();
@@ -2030,8 +2063,8 @@ public class ServerCommands {
                         }
                     });
                 }
-
             });
+
             handler.registerCommand(new RoleRestrictedCommand("setstats") {
                 {
                     help = "Change the player's statistics to the provided one.";
@@ -2209,7 +2242,7 @@ public class ServerCommands {
         }
 
         if (data.has("mapSubmissions_id")) {
-            TextChannel tc = ioMain.getTextChannel(ioMain.data.getString("mapSubmissions_id"));
+            TextChannel tc = getTextChannel(ioMain.data.getString("mapSubmissions_id"));
             handler.registerCommand(new Command("submitmap") {
                 {
                     help = " Submit a new map to be added into the server playlist in a .msav file format.";

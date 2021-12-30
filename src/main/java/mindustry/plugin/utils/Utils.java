@@ -1,16 +1,20 @@
-package mindustry.plugin;
+package mindustry.plugin.utils;
 
 import arc.Core;
 import arc.Events;
 import arc.files.Fi;
+import arc.graphics.Pixmap;
+import arc.graphics.PixmapIO;
 import arc.struct.Seq;
+import arc.util.Http;
+import arc.util.Log;
 import arc.util.Strings;
-import arc.util.serialization.Base64Coder;
 import mindustry.content.Blocks;
 import mindustry.game.EventType;
 import mindustry.game.Schematic;
 import mindustry.game.Schematics;
 import mindustry.game.Team;
+import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.maps.Map;
@@ -21,7 +25,9 @@ import mindustry.plugin.database.PlayerData;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.type.ItemSeq;
 import mindustry.type.ItemStack;
+import mindustry.ui.Menus;
 import mindustry.world.Block;
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.MessageAttachment;
@@ -35,11 +41,11 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.sql.*;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.*;
-import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,15 +65,15 @@ public class Utils {
     public static String user = null;
     public static String password = null;
     public static int chatMessageMaxSize = 256;
-    static String welcomeMessage = "";
-    static String statMessage = "";
-    static String reqMessage = "";
-    static String rankMessage = "";
-    static String ruleMessage = "";
-    static String noPermissionMessage = "You don't have the required rank for this command. Learn more about ranks [pink]/info[]";
+    public static String welcomeMessage = "";
+    public static String statMessage = "";
+    public static String reqMessage = "";
+    public static String rankMessage = "";
+    public static String ruleMessage = "";
+    public static String noPermissionMessage = "You don't have the required rank for this command. Learn more about ranks [pink]/info[]";
     // whether ip verification is in place (detect vpns, disallow their build rights)
-    static Boolean verification = false;
-    static String promotionMessage =
+    public static Boolean verification = false;
+    public static String promotionMessage =
             """
                     [sky]%player%, you have been promoted to [sky]<%rank%>[]!
                     [#4287f5]You reached a playtime of - %playtime% minutes!
@@ -76,12 +82,12 @@ public class Utils {
                     [sky]Enjoy your time on the [white][#ff2400]P[#ff4900]H[#ff6d00]O[#ff9200]E[#ffb600]N[#ffdb00]I[#ffff00]X [white]Servers[sky]!""";
     public static HashMap<Integer, Rank> rankNames = new HashMap<>();
     public static HashMap<Integer, Requirement> rankRequirements = new HashMap<>();
-    static HashMap<String, Integer> rankRoles = new HashMap<>();
-    static Seq<String> bannedNames = new Seq<>();
-    static Seq<String> onScreenMessages = new Seq<>();
-    static Seq<Block> bannedBlocks = new Seq<>();
-    static String eventIp = "";
-    static int eventPort = 1001;
+    public static HashMap<String, Integer> rankRoles = new HashMap<>();
+    public static Seq<String> bannedNames = new Seq<>();
+    public static Seq<String> onScreenMessages = new Seq<>();
+    public static Seq<Block> bannedBlocks = new Seq<>();
+    public static String eventIp = "";
+    public static int eventPort = 1001;
 
     public static void init() {
 //        "\uE816";
@@ -259,7 +265,6 @@ public class Utils {
      *
      * @note ik there are functions for that, but I like to do it with regex
      */
-
     public static boolean isValidIPAddress(String ip) {
 
         // Regex for digit from 0 to 255.
@@ -463,7 +468,7 @@ public class Utils {
     }
 
 
-    public static boolean checkIfSchem(MessageCreateEvent event ) {
+    public static boolean checkIfSchem(MessageCreateEvent event) {
         // check if it's a schem encoded in base64
         String message = event.getMessageContent();
         if (event.getMessageContent().startsWith("bXNjaA")) {
@@ -506,7 +511,7 @@ public class Utils {
             CompletableFuture<byte[]> cf = txtData.get(0).downloadAsByteArray();
             try {
                 byte[] data = cf.get();
-                String base64Encoded =new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data)))
+                String base64Encoded = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data)))
                         .lines().parallel().collect(Collectors.joining("\n"));
                 Schematic schem = contentHandler.parseSchematic(base64Encoded);
                 sendSchem(schem, new Context(event, null, null));
@@ -578,7 +583,9 @@ public class Utils {
         return message;
     }
 
-
+    /**
+     * log when a colonel+ bans a player
+     */
     public static void logBanMessage(Administration.PlayerInfo info, Context ctx, String reason, String action) {
         TextChannel log_channel = getTextChannel(log_channel_id);
         EmbedBuilder eb = new EmbedBuilder();
@@ -590,6 +597,9 @@ public class Utils {
         log_channel.sendMessage(eb);
     }
 
+    /**
+     * send the player not found message for discord commands
+     */
     public static void playerNotFound(String name, EmbedBuilder eb, Context ctx) {
         eb.setTitle("Command terminated");
         eb.setDescription("Player `" + escapeEverything(name) + "` not found.");
@@ -616,6 +626,18 @@ public class Utils {
         };
     }
 
+    /**
+     * Get a png from map (InputStream)
+     *
+     * @param imageFileName the name of the image where you want to save it
+     */
+    public static void mapToPng(InputStream stream, String imageFileName) throws IOException {
+        Http.post(maps_url + "/map").content(stream, stream.available()).timeout(30000).submit(res -> {
+            var pix = new Pixmap(res.getResultAsStream().readAllBytes());
+            PixmapIO.writePng(new Fi("temp/" + "image_" + imageFileName), pix); // Write to a file
+        });
+    }
+
     public static String rgbToString(float r, float g, float b) {
         String rs = Integer.toHexString((int) (r * 256));
         String gs = Integer.toHexString((int) (g * 256));
@@ -624,13 +646,20 @@ public class Utils {
     }
 
     /**
-     * Send message without response handling
-     *
-     * @param user    User to dm
-     * @param content message
+     * copy a file to another
      */
-    public void sendMessage(User user, String content) {
-        user.openPrivateChannel().join().sendMessage(content);
+    public static void copy(String path, Fi to) {
+        try {
+            final InputStream in = Utils.class.getClassLoader().getResourceAsStream(path);
+            final OutputStream out = to.write();
+
+            int data;
+            while ((data = in.read()) != -1) {
+                out.write(data);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -658,6 +687,186 @@ public class Utils {
 //            }
 //        }
 //    }
+
+    /**
+     * get a channel by id
+     */
+    public static TextChannel getTextChannel(String id) {
+        Optional<Channel> dc = api.getChannelById(id);
+        if (dc.isEmpty()) {
+            Log.err("[ERR!] discordplugin: channel not found! " + id);
+            return null;
+        }
+        Optional<TextChannel> dtc = dc.get().asTextChannel();
+        if (dtc.isEmpty()) {
+            Log.err("[ERR!] discordplugin: textchannel not found! " + id);
+            return null;
+        }
+        return dtc.get();
+    }
+
+    /**
+     * log a list of connections in the discord log channel
+     *
+     * @param connection whether they joined or left
+     */
+    public static void logConnections(TextChannel log_channel, List<String> leftPlayers, String connection) {
+        if (leftPlayers.size() > 0) {
+            EmbedBuilder eb = new EmbedBuilder();
+            eb.setTitle("Player " + connection + " Log");
+            StringBuilder desc = new StringBuilder();
+            for (String uuid : leftPlayers) {
+//                if (player == null) continue;
+                try {
+                    Administration.PlayerInfo info = getPlayerInfo(uuid);
+                    desc.append(String.format("`%s` : `%s `:%s\n", uuid, info.lastIP, escapeEverything(info.lastName)));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (Objects.equals(connection, "leave")) {
+                eb.setColor(new Color(0xff0000));
+            } else {
+                eb.setColor(new Color(0x00ff00));
+            }
+            eb.setDescription(desc.toString());
+            assert log_channel != null;
+            log_channel.sendMessage(eb);
+        }
+        leftPlayers.clear();
+    }
+
+    /**
+     * WIP
+     */
+    public static void execute(String command) throws IOException {
+        Process process = Runtime.getRuntime().exec(command);
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//        String line = "";
+////        StringBuilder output = new StringBuilder();
+//        while ((line = reader.readLine()) != null) {
+//            System.out.println(line);
+////            output.append(line);
+//        }
+    }
+
+    /**
+     * WIP
+     */
+    public static void restartApplication() throws IOException, URISyntaxException {
+        final String javaBin = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+        final File currentJar = new File(Core.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+        /* is it a jar file? */
+        if (!currentJar.getName().endsWith(".jar"))
+            return;
+
+        /* Build command: java -jar application.jar */
+        final ArrayList<String> command = new ArrayList<String>();
+//        command.add("screen -d -r v7 -X stuff $'");
+//        command.add("sleep");
+//        command.add("0\n");
+//        command.add("screen");
+//        command.add("-d");
+//        command.add("-r");
+//        command.add("v7");
+//        command.add("-X");
+//        command.add("stuff");
+//        command.add("java -jar server-release.jar\n");
+        command.add(javaBin);
+        command.add("-jar");
+        command.add(currentJar.getPath());
+//        command.add("'");
+
+        final ProcessBuilder builder = new ProcessBuilder(command);
+        System.out.println(builder.command());
+        builder.start();
+        System.exit(0);
+    }
+
+    /**
+     * create a rate menu for all players
+     */
+    public static void rateMenu() {
+        String mapName = state.map.name();
+        int id = Menus.registerMenu((player, selection) -> {
+            if (selection == 0) {
+                ratePositive(mapName, player);
+            } else if (selection == 1) {
+                rateNegative(mapName, player);
+            }
+        });
+        Call.menu(id,
+                "Rate this map! [pink]" + mapName,
+                "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
+                new String[][]{
+                        new String[]{"[green]Yes", "[scarlet]No"},
+                        new String[]{"Close"}
+                }
+        );
+    }
+
+    /**
+     * Create a menu to rate the current map for a player
+     */
+    public static void rateMenu(Player p) {
+        String mapName = state.map.name();
+        int id = Menus.registerMenu((player, selection) -> {
+            if (selection == 0) {
+                ratePositive(mapName, player);
+            } else if (selection == 1) {
+                rateNegative(mapName, player);
+            }
+        });
+        Call.menu(p.con, id,
+                "Rate this map! [pink]" + mapName,
+                "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
+                new String[][]{
+                        new String[]{"[green]Yes", "[scarlet]No"},
+                        new String[]{"Close"}
+                }
+        );
+    }
+
+    /**
+     * Rate a map positive
+     */
+    public static void rateNegative(String mapName, Player player) {
+        MapData voteMapData = getMapData(mapName);
+        if (voteMapData != null) {
+            voteMapData.negativeRating++;
+        } else {
+            voteMapData = new MapData(mapName);
+            voteMapData.negativeRating = 1;
+        }
+        rateMap(mapName, voteMapData);
+        player.sendMessage("Successfully gave a [red]negative [white]feedback for " + mapName + "[white]!");
+    }
+
+    /**
+     * Rate a map positive
+     */
+    public static void ratePositive(String mapName, Player player) {
+        MapData voteMapData = getMapData(mapName);
+        if (voteMapData != null) {
+            voteMapData.positiveRating++;
+        } else {
+            voteMapData = new MapData(mapName);
+            voteMapData.positiveRating = 1;
+        }
+        rateMap(mapName, voteMapData);
+        player.sendMessage("Successfully gave a [green]positive [white]feedback for " + mapName + "[white]!");
+    }
+
+    /**
+     * Send message without response handling
+     *
+     * @param user    User to dm
+     * @param content message
+     */
+    public void sendMessage(User user, String content) {
+        user.openPrivateChannel().join().sendMessage(content);
+    }
 
     /**
      * create and save Ranks
@@ -689,6 +898,9 @@ public class Utils {
 
     }
 
+    /**
+     * Requirements for ranks
+     */
     public static class Requirement {
         public int buildingsBuilt;
         public int gamesPlayed;
@@ -700,6 +912,7 @@ public class Utils {
             this.gamesPlayed = inputGamesPlayed;
         }
     }
+
 
 //        public static getCore(Team team){
 //        Tile[][] tiles = world.getTiles();

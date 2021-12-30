@@ -1,4 +1,6 @@
-package mindustry.plugin;
+package mindustry.plugin.utils;
+
+import mindustry.plugin.ioMain;
 
 public class Rainbow extends Thread {
     private Thread mt;
@@ -19,3 +21,4 @@ public class Rainbow extends Thread {
         }
     }
 }
+

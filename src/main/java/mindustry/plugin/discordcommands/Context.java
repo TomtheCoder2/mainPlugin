@@ -1,13 +1,13 @@
 package mindustry.plugin.discordcommands;
 
-import mindustry.plugin.Utils;
+import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.event.message.MessageCreateEvent;
 
-import static mindustry.plugin.Utils.*;
+import static mindustry.plugin.utils.Utils.*;
 
 import java.util.HashMap;
 

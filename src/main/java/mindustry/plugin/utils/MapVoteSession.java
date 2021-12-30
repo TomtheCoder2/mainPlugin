@@ -1,4 +1,4 @@
-package mindustry.plugin;
+package mindustry.plugin.utils;
 
 import arc.struct.ObjectSet;
 import arc.util.Timer;
@@ -11,17 +11,17 @@ import java.util.Formatter;
 
 import static mindustry.Vars.netServer;
 
-public class VoteSession {
+public class MapVoteSession {
     Map target;
     ObjectSet<String> voted = new ObjectSet<>();
-    VoteSession[] map;
+    MapVoteSession[] map;
     Timer.Task task;
     int votes;
 
     //voting round duration in seconds
     float voteDuration = 3f * 60;
 
-    public VoteSession(VoteSession[] map, Map target) {
+    public MapVoteSession(MapVoteSession[] map, Map target) {
         this.target = target;
         this.map = map;
         this.task = Timer.schedule(() -> {
@@ -41,7 +41,7 @@ public class VoteSession {
         return (int) (Groups.player.size() / 1.5f);
     }
 
-    void vote(Player player, int d) {
+    public void vote(Player player, int d) {
         votes += d;
         voted.addAll(player.uuid(), netServer.admins.getInfo(player.uuid()).lastIP);
         StringBuilder sbuf = new StringBuilder();
