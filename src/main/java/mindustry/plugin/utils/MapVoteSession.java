@@ -12,9 +12,9 @@ import java.util.Formatter;
 import static mindustry.Vars.netServer;
 
 public class MapVoteSession {
-    Map target;
-    ObjectSet<String> voted = new ObjectSet<>();
-    MapVoteSession[] map;
+    public Map target;
+    public ObjectSet<String> voted = new ObjectSet<>();
+    public MapVoteSession[] map;
     Timer.Task task;
     int votes;
 

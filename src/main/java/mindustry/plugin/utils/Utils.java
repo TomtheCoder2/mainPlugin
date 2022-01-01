@@ -7,7 +7,6 @@ import arc.graphics.Pixmap;
 import arc.graphics.PixmapIO;
 import arc.struct.Seq;
 import arc.util.Http;
-import arc.util.Log;
 import arc.util.Strings;
 import mindustry.content.Blocks;
 import mindustry.game.EventType;
@@ -20,9 +19,11 @@ import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.maps.Maps;
 import mindustry.net.Administration;
+import mindustry.plugin.data.PlayerData;
 import mindustry.plugin.database.MapData;
-import mindustry.plugin.database.PlayerData;
+import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
+import mindustry.plugin.ioMain;
 import mindustry.type.ItemSeq;
 import mindustry.type.ItemStack;
 import mindustry.ui.Menus;
@@ -52,6 +53,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static arc.util.Log.debug;
+import static arc.util.Log.err;
 import static mindustry.Vars.*;
 import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.discordcommands.DiscordCommands.error_log_channel;
@@ -67,6 +69,7 @@ public class Utils {
     public static int chatMessageMaxSize = 256;
     public static String welcomeMessage = "";
     public static String statMessage = "";
+    public static String infoMessage = "";
     public static String reqMessage = "";
     public static String rankMessage = "";
     public static String ruleMessage = "";
@@ -178,6 +181,7 @@ public class Utils {
         rankMessage = Core.settings.getString("rankMessage");
         welcomeMessage = Core.settings.getString("welcomeMessage");
         ruleMessage = Core.settings.getString("ruleMessage");
+        infoMessage = Core.settings.getString("infoMessage");
     }
 
     /**
@@ -589,12 +593,20 @@ public class Utils {
     public static void logBanMessage(Administration.PlayerInfo info, Context ctx, String reason, String action) {
         TextChannel log_channel = getTextChannel(log_channel_id);
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(action + " " + info.lastName);
+        eb.setTitle(action + " " + escapeEverything(info.lastName));
         eb.addField("UUID", info.id, true);
         eb.addField("IP", info.lastIP, true);
-        eb.addField("Banned by", ctx.author.getDiscriminatedName(), true);
+        eb.addField(action + " by", ctx.author.getDiscriminatedName(), true);
         eb.addField("Reason", reason, true);
         log_channel.sendMessage(eb);
+    }
+
+    public static void tooFewArguments(Context ctx, Command command) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("Too few arguments!")
+                .setDescription("Usage: " + ioMain.prefix + command.name + " " + command.usage)
+                .setColor(Pals.error);
+        ctx.channel.sendMessage(eb);
     }
 
     /**
@@ -632,9 +644,13 @@ public class Utils {
      * @param imageFileName the name of the image where you want to save it
      */
     public static void mapToPng(InputStream stream, String imageFileName) throws IOException {
-        Http.post(maps_url + "/map").content(stream, stream.available()).timeout(30000).submit(res -> {
+        debug("start function mapToPng");
+        Http.post(maps_url + "/map").content(stream, stream.available()).block(res -> {
+            debug("received data (mapToPng)");
             var pix = new Pixmap(res.getResultAsStream().readAllBytes());
             PixmapIO.writePng(new Fi("temp/" + "image_" + imageFileName), pix); // Write to a file
+            debug("image height: @", pix.height);
+            debug("image width: @", pix.height);
         });
     }
 
@@ -694,12 +710,12 @@ public class Utils {
     public static TextChannel getTextChannel(String id) {
         Optional<Channel> dc = api.getChannelById(id);
         if (dc.isEmpty()) {
-            Log.err("[ERR!] discordplugin: channel not found! " + id);
+            err("[ERR!] discordplugin: channel not found! " + id);
             return null;
         }
         Optional<TextChannel> dtc = dc.get().asTextChannel();
         if (dtc.isEmpty()) {
-            Log.err("[ERR!] discordplugin: textchannel not found! " + id);
+            err("[ERR!] discordplugin: textchannel not found! " + id);
             return null;
         }
         return dtc.get();
@@ -939,9 +955,9 @@ public class Utils {
         public static Color success = (Color.getHSBColor(108, 80, 100));
     }
 
-    public static class Categries {
-        public static String moderation = "moderation";
-        public static String management = "management";
-        public static String mapReviewer = "mapReviewer";
+    public static class Categories {
+        public static final String moderation = "Moderation";
+        public static final String management = "Management";
+        public static final String mapReviewer = "Map Reviewer";
     }
 }

@@ -1,9 +1,11 @@
-package mindustry.plugin.utils;
+package mindustry.plugin.data;
 //import arc.struct.Array;
 //import mindustry.entities.type.BaseUnit;
 //import mindustry.entities.type.Player;
 import arc.util.Timer;
 import mindustry.entities.bullet.BulletType;
+import mindustry.plugin.utils.Ratelimit;
+import mindustry.world.Tile;
 
 import java.io.Serializable;
 
@@ -28,6 +30,9 @@ public class PersistentPlayerData implements Serializable {
     public float sclLifetime;
     public float sclDamage;
 
+    public String tag;
+    public Tile tapTile;
+    public boolean inspector;
     public boolean snowBall = false;
 
 

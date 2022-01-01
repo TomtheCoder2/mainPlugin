@@ -1,8 +1,8 @@
-package mindustry.plugin.database;
+package mindustry.plugin.data;
 
-import mindustry.entities.bullet.BulletType;
+import mindustry.world.Tile;
 
-public class PlayerData implements Cloneable{
+public class PlayerData implements Cloneable {
     public String uuid;
     public int rank;
     public int playTime = 0;
@@ -19,10 +19,12 @@ public class PlayerData implements Cloneable{
         this.rank = rank;
     }
 
-    public void reprocess(){
-        if(banReason == null) this.banReason = "";
-        if(discordLink == null) this.discordLink = "";
+    public void reprocess() {
+        if (banReason == null) this.banReason = "";
+        if (discordLink == null) this.discordLink = "";
     }
 
-    public Object clone()throws CloneNotSupportedException{return super.clone();}
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

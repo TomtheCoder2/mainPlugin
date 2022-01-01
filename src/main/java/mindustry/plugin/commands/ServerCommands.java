@@ -6,6 +6,7 @@ import arc.files.Fi;
 import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.Structs;
+import arc.util.Timer;
 import mindustry.content.Blocks;
 import mindustry.content.Bullets;
 import mindustry.content.UnitTypes;
@@ -23,15 +24,15 @@ import mindustry.maps.Map;
 import mindustry.maps.MapException;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
-import mindustry.plugin.utils.PersistentPlayerData;
-import mindustry.plugin.utils.Utils;
-import mindustry.plugin.database.PlayerData;
+import mindustry.plugin.data.PersistentPlayerData;
+import mindustry.plugin.data.PlayerData;
 import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
 import mindustry.plugin.discordcommands.RoleRestrictedCommand;
 import mindustry.plugin.ioMain;
 import mindustry.plugin.requests.GetMap;
+import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
@@ -48,21 +49,23 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.zip.InflaterInputStream;
 
 import static arc.util.Log.err;
 import static arc.util.Log.info;
 import static mindustry.Vars.*;
-import static mindustry.plugin.utils.Utils.Categries.*;
-import static mindustry.plugin.utils.Utils.*;
 import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.requests.IPLookup.readJsonFromUrl;
+import static mindustry.plugin.utils.Utils.Categories.*;
+import static mindustry.plugin.utils.Utils.*;
 
 public class ServerCommands {
     private final JSONObject data;
@@ -120,6 +123,48 @@ public class ServerCommands {
             String adminRole = data.getString("administrator_roleid");
             // TODO: make an update command to update the EI mod
 
+
+            handler.registerCommand(new RoleRestrictedCommand("enableJs") {
+                {
+                    help = "Enable/Disable js command for everyone.";
+                    role = adminRole;
+                    category = moderation;
+                    usage = "<true|false>";
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    switch (ctx.args[1]) {
+                        case "true", "t" -> {
+                            enableJs = true;
+                            if (enableJsTask != null) {
+                                enableJsTask.cancel();
+                            }
+                            enableJsTask = Timer.schedule(() -> {
+                                enableJs = false;
+                                Call.sendMessage("[accent]js command disabled for everyone!");
+                            }, 10 * 60);
+                            Call.sendMessage("[accent]Marshal " + ctx.author.getName() + "[accent] enabled the js command for everyone! Do [cyan]/js <script...>[accent] to use it.");
+                        }
+                        case "false", "f" -> {
+                            enableJs = false;
+                            Call.sendMessage("[accent]js command disabled for everyone!");
+                        }
+                        default -> {
+                            eb.setTitle("Error")
+                                    .setColor(new Color(0xff0000))
+                                    .setDescription("[scarlet]Second argument has to be true or false.");
+                            ctx.channel.sendMessage(eb);
+                            return;
+                        }
+                    }
+                    eb.setTitle((enableJs ? "Enabled" : "Disabled") + " js")
+                            .setDescription((enableJs ? "Enabled" : "Disabled") + " js for everyone" + (enableJs ? " for 10 minutes." : "."))
+                            .setColor(new Color((enableJs ? 0x00ff00 : 0xff0000)));
+                    ctx.channel.sendMessage(eb);
+                }
+            });
 
             handler.registerCommand(new RoleRestrictedCommand("start") {
                 {
@@ -260,6 +305,7 @@ public class ServerCommands {
                     category = moderation;
                     role = apprenticeRole;
                     apprenticeCommand = true;
+                    aliases.add("f");
                 }
 
                 @Override
@@ -287,10 +333,11 @@ public class ServerCommands {
                 {
                     help = "Ban the provided player for a specific duration with a specific reason.";
                     role = apprenticeRole;
-                    usage = "<player> <duration (minutes)> [reason...]";
+                    usage = "<player> <duration (minutes)> <reason...>";
                     category = moderation;
                     apprenticeCommand = true;
                     minArguments = 3;
+                    aliases.add("b");
                 }
 
                 public void run(Context ctx) {
@@ -324,8 +371,8 @@ public class ServerCommands {
                             Player player = findPlayer(uuid);
                             if (player != null) {
                                 player.con.kick(Packets.KickReason.banned);
-                                logBanMessage(info, ctx, reason, "Banned");
                             }
+                            logBanMessage(info, ctx, reason, "Banned");
                         } else {
                             playerNotFound(target, eb, ctx);
                             return;
@@ -342,6 +389,7 @@ public class ServerCommands {
                     category = moderation;
                     apprenticeCommand = true;
                     minArguments = 2;
+                    aliases.add("a");
                 }
 
                 public void run(Context ctx) {
@@ -390,6 +438,7 @@ public class ServerCommands {
                     category = moderation;
                     apprenticeCommand = true;
                     minArguments = 1;
+                    aliases.add("i");
                 }
 
                 public void run(Context ctx) {
@@ -647,6 +696,7 @@ public class ServerCommands {
                     category = moderation;
                     minArguments = 1;
                     hidden = true;
+                    aliases.add("il");
                 }
 
                 public void run(Context ctx) {
@@ -880,10 +930,10 @@ public class ServerCommands {
             handler.registerCommand(new RoleRestrictedCommand("ban") {
                 {
                     help = "Ban the provided player with a specific reason.";
-                    usage = "<player> [reason..]";
+                    usage = "<player> <reason...>";
                     role = banRole;
                     category = moderation;
-                    minArguments = 1;
+                    minArguments = 2;
                 }
 
                 public void run(Context ctx) {
@@ -1015,6 +1065,7 @@ public class ServerCommands {
                     role = banRole;
                     category = moderation;
                     minArguments = 1;
+                    aliases.add("k");
                 }
 
                 public void run(Context ctx) {
@@ -1063,6 +1114,7 @@ public class ServerCommands {
                         eb.setTitle("Unbanned `" + escapeEverything(info.lastName) + "`.");
                         ctx.channel.sendMessage(eb);
                         setData(target, pd);
+                        logBanMessage(info, ctx, "Not provided", "Unbanned");
                     } else {
                         eb.setTitle("UUID `" + escapeEverything(target) + "` not found in the database.");
                         eb.setColor(Pals.error);
@@ -1125,9 +1177,10 @@ public class ServerCommands {
 
             handler.registerCommand(new RoleRestrictedCommand("bans") {
                 {
-                    help = "Show all bans";
+                    help = "Show all perm bans";
                     role = banRole;
                     category = moderation;
+                    aliases.add("banlist");
                 }
 
                 @Override
@@ -1143,7 +1196,7 @@ public class ServerCommands {
                         info("Banned players [ID]:");
                         StringBuilder sb = new StringBuilder();
                         for (Administration.PlayerInfo info : bans) {
-                            sb.append("`").append(info.id).append("` / Last known name: ").append(escapeEverything(info.lastName));
+                            sb.append("`").append(info.id).append("` / ").append(escapeEverything(info.lastName)).append("\n");
                             info(" @ / Last known name: '@'", info.id, escapeEverything(info.lastName));
                         }
                         eb.addField("Banned players [ID]:", sb.toString());
@@ -1161,10 +1214,10 @@ public class ServerCommands {
                             Administration.PlayerInfo info = netServer.admins.findByIP(string);
                             if (info != null) {
                                 info("  '@' / Last known name: '@' / ID: '@'", string, info.lastName, info.id);
-                                sb.append("`").append(info.id).append("` / Last known name: ").append(escapeEverything(info.lastName)).append(" / ID: `").append(info.id).append("`");
+                                sb.append("`").append(info.id).append("` / ").append(escapeEverything(info.lastName)).append("\n");
                             } else {
                                 info("  '@' (No known name or info)", string);
-                                sb.append(string).append(" (No known name or info)");
+                                sb.append(string).append(" (No known name or info)\n");
                             }
                         }
                         eb.addField("Banned players [IP]:", sb.toString());
@@ -1178,6 +1231,7 @@ public class ServerCommands {
                     help = "Check the information about all players on the server.";
                     role = banRole;
                     category = moderation;
+                    aliases.add("pi");
                 }
 
                 public void run(Context ctx) {
@@ -1229,6 +1283,7 @@ public class ServerCommands {
                     role = banRole;
                     category = moderation;
                     minArguments = 1;
+                    aliases.add("l");
                 }
 
                 public void run(Context ctx) {
@@ -1467,6 +1522,7 @@ public class ServerCommands {
                     usage = "<playerid|ip|name> <name>";
                     category = management;
                     minArguments = 2;
+                    aliases.add("r");
                 }
 
                 public void run(Context ctx) {
@@ -1579,7 +1635,7 @@ public class ServerCommands {
                 {
                     help = "Change / set a message";
                     role = banRole;
-                    usage = "<stats|rule> <newmessage>";
+                    usage = "<stats|rule|info> <new message>";
                     category = management;
                     minArguments = 2;
                 }
@@ -1587,11 +1643,10 @@ public class ServerCommands {
                 public void run(Context ctx) {
                     String target = ctx.args[1].toLowerCase();
                     switch (target) {
-                        case "stats" -> {
+                        case "stats", "s" -> {
                             EmbedBuilder eb = new EmbedBuilder();
                             eb.setTitle("Command executed successfully");
                             String message = ctx.message.split(" ", 2)[1];
-//                        message = message.split(" ", 2)[1];
                             if (message.length() > 0) {
                                 System.out.println("new stat message: " + message);
                                 statMessage = message;
@@ -1604,37 +1659,7 @@ public class ServerCommands {
                             }
                             ctx.channel.sendMessage(eb);
                         }
-//                        case "req" -> {
-// EmbedBuilder eb = new EmbedBuilder();
-// eb.setTitle("Command executed successfully");
-// String message = ctx.message.split(" ", 2)[1];
-// if (message.length() > 0) {
-//     reqMessage = message;
-//     Core.settings.put("reqMessage", message);
-//     Core.settings.autosave();
-//     eb.setDescription("Changed reqMessage.");
-// } else {
-//     eb.setTitle("Command terminated");
-//     eb.setDescription("No message provided.");
-// }
-// ctx.channel.sendMessage(eb);
-//                        }
-//                        case "rank" -> {
-// EmbedBuilder eb = new EmbedBuilder();
-// eb.setTitle("Command executed successfully");
-// String message = ctx.message.split(" ", 2)[1];
-// if (message.length() > 0) {
-//     rankMessage = message;
-//     Core.settings.put("rankMessage", message);
-//     Core.settings.autosave();
-//     eb.setDescription("Changed rankMessage.");
-// } else {
-//     eb.setTitle("Command terminated");
-//     eb.setDescription("No message provided.");
-// }
-// ctx.channel.sendMessage(eb);
-//                        }
-                        case "rule" -> {
+                        case "rule", "r" -> {
                             EmbedBuilder eb = new EmbedBuilder();
                             eb.setTitle("Command executed successfully");
                             String message = ctx.message.split(" ", 2)[1];
@@ -1648,6 +1673,22 @@ public class ServerCommands {
                                 eb.setTitle("Command terminated");
                                 eb.setDescription("No message provided.");
                                 eb.setColor(Pals.error);
+                            }
+                            ctx.channel.sendMessage(eb);
+                        }
+                        case "info", "i" -> {
+                            EmbedBuilder eb = new EmbedBuilder();
+                            eb.setTitle("Command executed successfully");
+                            String message = ctx.message.split(" ", 2)[1];
+                            if (message.length() > 0) {
+                                System.out.println("new info message: " + message);
+                                infoMessage = message;
+                                Core.settings.put("infoMessage", message);
+                                Core.settings.autosave();
+                                eb.setDescription("Changed info message.");
+                            } else {
+                                eb.setTitle("Command terminated");
+                                eb.setDescription("No message provided.");
                             }
                             ctx.channel.sendMessage(eb);
                         }
@@ -1864,6 +1905,7 @@ public class ServerCommands {
                     usage = "<playerid|ip|name> <block> [rotation]";
                     category = management;
                     minArguments = 2;
+                    aliases.add("sb");
                 }
 
                 public void run(Context ctx) {
@@ -2002,11 +2044,13 @@ public class ServerCommands {
                 }
 
                 public void run(Context ctx) {
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.setTitle("Command executed successfully!");
-                    System.out.println(ctx.message);
-                    eb.setDescription("Output: " + mods.getScripts().runConsole(ctx.message));
-                    ctx.channel.sendMessage(eb);
+                    Core.app.post(() -> {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        eb.setTitle("Command executed successfully!");
+                        System.out.println(ctx.message);
+                        eb.setDescription("Output: " + mods.getScripts().runConsole(ctx.message));
+                        ctx.channel.sendMessage(eb);
+                    });
                 }
             });
 
@@ -2018,13 +2062,29 @@ public class ServerCommands {
                     role = banRole;
                     category = management;
                     minArguments = 2;
+                    aliases.add("sr");
                 }
 
                 public void run(Context ctx) {
                     CompletableFuture.runAsync(() -> {
                         EmbedBuilder eb = new EmbedBuilder();
                         String target = ctx.args[1];
+                        Pattern p = Pattern.compile("[0-9]+");
+                        if (!p.matcher(ctx.args[2]).matches()) {
+                            eb.setTitle("Error")
+                                    .setColor(new Color(0xff0000))
+                                    .setDescription("Second argument has to be a number");
+                            ctx.channel.sendMessage(eb);
+                            return;
+                        }
                         int targetRank = Integer.parseInt(ctx.args[2]);
+                        if (targetRank > rankNames.size() - 1 || targetRank < 0) {
+                            eb.setTitle("Error")
+                                    .setDescription("Rank has to be larger than -1 and smaller than " + (rankNames.size() - 1) + "!")
+                                    .setColor(new Color(0xff0000));
+                            ctx.channel.sendMessage(eb);
+                            return;
+                        }
                         if (target.length() > 0 && targetRank > -1) {
                             Player player = findPlayer(target);
                             String uuid = null;
@@ -2154,6 +2214,7 @@ public class ServerCommands {
                     role = reviewerRole;
                     usage = "<.msav attachment>";
                     category = mapReviewer;
+                    aliases.add("ul");
                 }
 
                 public void run(Context ctx) {
@@ -2210,6 +2271,7 @@ public class ServerCommands {
                     usage = "<mapname/mapid>";
                     category = mapReviewer;
                     minArguments = 1;
+                    aliases.add("rm");
                 }
 
                 @Override

@@ -1,5 +1,8 @@
 package mindustry.plugin.discordcommands;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /** Represents a command */
 public abstract class Command {
     public String name;
@@ -10,6 +13,7 @@ public abstract class Command {
     public boolean hidden = false;
     public boolean apprenticeCommand = false;
     public int minArguments = 0;
+    public List<String> aliases = new ArrayList<>();
 
     public Command(String name) {
         // ALWAYS -> always lowercase command names

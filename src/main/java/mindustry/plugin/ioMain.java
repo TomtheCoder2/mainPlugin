@@ -7,6 +7,8 @@ import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.util.*;
 import mindustry.Vars;
+import mindustry.content.Blocks;
+import mindustry.content.Fx;
 import mindustry.core.GameState;
 import mindustry.core.NetServer;
 import mindustry.entities.Effect;
@@ -15,12 +17,15 @@ import mindustry.game.Gamemode;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.graphics.Pal;
 import mindustry.maps.Map;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration;
 import mindustry.net.Administration.Config;
+import mindustry.plugin.data.PersistentPlayerData;
+import mindustry.plugin.data.PlayerData;
+import mindustry.plugin.data.TileInfo;
 import mindustry.plugin.database.MapData;
-import mindustry.plugin.database.PlayerData;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
 import mindustry.plugin.requests.Translate;
@@ -79,9 +84,11 @@ public class ioMain extends Plugin {
     //    public Timer.Task rateMapTask; // popup to force map rating
     public static ContentHandler contentHandler; // map and schem handler
     public static boolean previewSchem = false; // preview schem or not
-//    static Gson gson = new Gson();
-
+    //    static Gson gson = new Gson();
     public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
+    public static Boolean enableJs = false; // whether js is enabled for everyone
+    public static Timer.Task enableJsTask;
+    public static HashMap<Tile, TileInfo> tileInfoHashMap = new HashMap<>();
     private final long CDT = 300L;
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public ObjectMap<String, Role> discRoles = new ObjectMap<>();
@@ -259,6 +266,12 @@ public class ioMain extends Plugin {
             if (!leftPlayers.contains(uuid)) {
                 leftPlayers.add(uuid);
             }
+
+            if (currentlyKicking[0] != null) {
+                if (currentlyKicking[0].target == event.player) {
+                    currentlyKicking[0].left();
+                }
+            }
         });
 
 
@@ -279,7 +292,7 @@ public class ioMain extends Plugin {
                 joinedPlayers.add(player.uuid());
             }
             PlayerData pd = getData(player.uuid());
-            System.out.println(pd);
+//            System.out.println(pd);
 
             if (!playerDataGroup.containsKey(player.uuid())) {
                 PersistentPlayerData data = new PersistentPlayerData();
@@ -307,7 +320,7 @@ public class ioMain extends Plugin {
                     player.admin = true;
                 }
             } else { // not in database
-                System.out.println("new player connected: " + escapeColorCodes(event.player.name));
+                info("new player connected: " + escapeColorCodes(event.player.name));
                 setData(player.uuid(), new PlayerData(0));
 //                Call.infoMessage(player.con, formatMessage(player, welcomeMessage));
                 Call.sendMessage("[#" + Integer.toHexString(rankNames.get(0).color.getRGB()).substring(2) + "]" + rankNames.get(0).name + " [] " + player.name + "[accent] joined the front!");
@@ -347,16 +360,73 @@ public class ioMain extends Plugin {
         Events.on(EventType.BlockBuildEndEvent.class, event -> {
             if (event.unit.getPlayer() == null) return;
             if (event.breaking) return;
-//            PlayerData pd = getData(event.unit.getPlayer().uuid());
             PersistentPlayerData td = (playerDataGroup.getOrDefault(event.unit.getPlayer().uuid(), null));
             if (td == null) return;
             if (event.tile.block() != null) {
                 if (!bannedBlocks.contains(event.tile.block())) {
                     td.bbIncrementor++;
-//                    System.out.println(escapeColorCodes(event.unit.getPlayer().name) + " built a block");
-//                    pd.buildingsBuilt++;
-//                    setData(event.unit.getPlayer().uuid(), pd);
                 }
+            }
+        });
+
+        // log all tile taps
+        Events.on(EventType.TapEvent.class, tapEvent -> {
+            if (tapEvent.tile != null) {
+                Player player = tapEvent.player;
+                PersistentPlayerData pd = (playerDataGroup.getOrDefault(player.uuid(), null));
+
+                Tile t = tapEvent.tile;
+                assert pd != null;
+                pd.tapTile = t;
+                if (pd.inspector) {
+                    player.sendMessage("\n");
+                    Call.effect(player.con, Fx.placeBlock, t.worldx(), t.worldy(), 0.75f, Pal.accent);
+                    player.sendMessage("[orange]--[] [accent]tile [](" + t.x + ", " + t.y + ")[accent] block:[] " + ((t.block() == null || t.block() == Blocks.air) ? "[#545454]none" : t.block().name) + " [orange]--[]");
+                    TileInfo info = tileInfoHashMap.getOrDefault(t, new TileInfo());
+                    if (info.placedBy != null) {
+                        String pBy = (player.admin() ? info.placedByUUID + " " + info.placedBy : info.placedBy);
+                        player.sendMessage("[accent]last placed by:[] " + escapeColorCodes(pBy));
+                    }
+                    if (info.destroyedBy != null) {
+                        String dBy = (player.admin() ? info.destroyedByUUID + " " + info.destroyedBy : info.destroyedBy);
+                        player.sendMessage("[accent]last [scarlet]deconstructed[] by:[] " + escapeColorCodes(dBy));
+                    }
+                    if (t.block() == Blocks.air && info.wasHere != null) {
+                        player.sendMessage("[accent]block that was here:[] " + info.wasHere);
+                    }
+                    if (info.configuredBy != null) {
+                        String cBy = (player.admin() ? info.configuredByUUID + " " + info.configuredBy : info.configuredBy);
+                        player.sendMessage("[accent]last configured by:[] " + escapeColorCodes(cBy));
+                    }
+                }
+            }
+        });
+
+        Events.on(EventType.BuildSelectEvent.class, event -> {
+            if (event.builder.isPlayer()) {
+                if (event.tile != null) {
+                    Player player = event.builder.getPlayer();
+                    TileInfo info = tileInfoHashMap.getOrDefault(event.tile, new TileInfo());
+                    if (!event.breaking) {
+                        info.placedBy = player.name;
+                        info.placedByUUID = player.uuid();
+                        info.wasHere = (event.tile.block() != Blocks.air ? event.tile.block().localizedName : "[#545454]none");
+                    } else {
+                        info.destroyedBy = player.name;
+                        info.destroyedByUUID = player.uuid();
+                    }
+                    tileInfoHashMap.put(event.tile, info);
+                }
+            }
+        });
+
+        Events.on(EventType.TapEvent.class, event -> {
+            if (event.tile != null & event.player != null) {
+                TileInfo info = tileInfoHashMap.getOrDefault(event.tile, new TileInfo());
+                Player player = event.player;
+                info.configuredBy = player.name;
+                info.configuredByUUID = player.uuid();
+                tileInfoHashMap.put(event.tile, info);
             }
         });
 
@@ -488,7 +558,6 @@ public class ioMain extends Plugin {
                         }
                     }
                 }
-
                 return true;
             });
             netServer.admins.addChatFilter((player, message) -> {
@@ -510,9 +579,8 @@ public class ioMain extends Plugin {
                 }
                 return !tdata.frozen;
             });
+            info("Registered all filters.");
         });
-//        Core.app.post(this::loop);
-
     }
 
     // rainbow
@@ -737,17 +805,59 @@ public class ioMain extends Plugin {
                 Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(raw, player, message));
             });
 
-            handler.<Player>register("js", "<script...>", "Run arbitrary Javascript.", (arg, player) -> {
-                PlayerData pd = getData(player.uuid());
-                if (player.admin && Objects.requireNonNull(pd).rank >= 9) {
-                    player.sendMessage(mods.getScripts().runConsole(arg[0]));
+            handler.<Player>register("inspector", "Toggle inspector.", (args, player) -> {
+                PersistentPlayerData pd = (playerDataGroup.getOrDefault(player.uuid(), null));
+                pd.inspector = !pd.inspector;
+                player.sendMessage((pd.inspector ? "Enabled" : "Disabled") + " the inspector.");
+            });
 
+            handler.<Player>register("enablejs", "<true/false> [time]", "Enable/Disable js command for everyone. (Time in minutes)", (arg, player) -> {
+                PlayerData pd = getData(player.uuid());
+                if (arg.length > 1) {
+                    try {
+                        Integer.parseInt(arg[1]);
+                    } catch (Exception e) {
+                        player.sendMessage("[scarlet]Second argument has to be an Integer!");
+                    }
+                }
+                if (player.admin && Objects.requireNonNull(pd).rank >= 10) {
+                    switch (arg[0]) {
+                        case "true", "t" -> {
+                            enableJs = true;
+                            if (enableJsTask != null) {
+                                enableJsTask.cancel();
+                            }
+                            enableJsTask = Timer.schedule(() -> {
+                                enableJs = false;
+                                Call.sendMessage("[accent]js command disabled for everyone!");
+                            }, arg.length > 1 ? Integer.parseInt(arg[1]) * 60 : 10 * 60);
+                            Call.sendMessage("[accent]Marshal " + player.name + "[accent] enabled the js command for everyone" + (" for " + (enableJs ? (arg.length > 1 ? arg[1] : "10") + " minutes!" : "!")) + "Do [cyan]/js <script...>[accent] to use it.");
+                        }
+                        case "false", "f" -> {
+                            enableJs = false;
+                            Call.sendMessage("[accent]js command disabled for everyone!");
+                        }
+                        default -> {
+                            player.sendMessage("[scarlet]Second argument has to be true or false.");
+                            return;
+                        }
+                    }
+                    player.sendMessage((enableJs ? "[green]Enabled[accent]" : "[scarlet]Disabled[accent]") + " js for everyone" + (" for " + (enableJs ? (arg.length > 1 ? arg[1] : "10") + " minutes!" : "!")));
                 } else {
                     player.sendMessage("[scarlet]This command is restricted to admins!");
                 }
             });
 
-            handler.<Player>register("votekick", "[player]", "votekick a player.", (args, player) -> {
+            handler.<Player>register("js", "<script...>", "Run arbitrary Javascript.", (arg, player) -> {
+                PlayerData pd = getData(player.uuid());
+                if ((player.admin && Objects.requireNonNull(pd).rank >= 9) || enableJs) {
+                    player.sendMessage(mods.getScripts().runConsole(arg[0]));
+                } else {
+                    player.sendMessage("[scarlet]This command is restricted to admins!");
+                }
+            });
+
+            handler.<Player>register("votekick", "[player...]", "votekick a player.", (args, player) -> {
 //               Log.debug("vk @.", args[0]);
                 if (!Config.enableVotekick.bool()) {
                     player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
@@ -779,6 +889,14 @@ public class ioMain extends Plugin {
                     player.sendMessage(builder.toString());
                 } else {
                     Player found = findPlayer(args[0]);
+                    if (found == null) {
+                        if (args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))) {
+                            int id = Strings.parseInt(args[0].substring(1));
+                            found = Groups.player.find(p -> p.id() == id);
+                        } else {
+                            found = Groups.player.find(p -> p.name.equalsIgnoreCase(args[0]));
+                        }
+                    }
 
                     if (found != null) {
                         if (found == player) {
@@ -789,6 +907,8 @@ public class ioMain extends Plugin {
                             player.sendMessage("[scarlet]Local players cannot be kicked.");
                         } else if (found.team() != player.team()) {
                             player.sendMessage("[scarlet]Only players on your team can be kicked.");
+                        } else if (Objects.equals(found.uuid(), "VA8X0BlqyTsAAAAAFkLMBg==")) {
+                            player.sendMessage("[scarlet]Did you really expect to be able to kick [cyan]Nautilus[scarlet]?");
                         } else {
                             Timekeeper vtime = cooldowns.get(player.uuid(), () -> new Timekeeper(voteCooldown));
 
@@ -1150,6 +1270,19 @@ public class ioMain extends Plugin {
                 }
             });
 
+            handler.<Player>register("discord", "Place a message block below a player with links for our discord server.", (args, player) -> {
+                float x = player.getX();
+                float y = player.getY();
+                Tile tile = world.tileWorld(x, y);
+                if ((tile.block() == null || tile.block() == Blocks.air)) {
+                    tile.setNet(Blocks.message, player.team(), 0);
+                    tile.build.configure("https://discord.phoenix-network.dev\n\nor\n\nhttps://discord.gg/qtjqCUbbdR");
+                    player.sendMessage("[green]Successfully placed a message block.");
+                } else {
+                    player.sendMessage("[scarlet]Cant place a message block here, because there is already a block here!");
+                }
+            });
+
 //            handler.<Player>register("draugpet", "[active+] Spawn a draug mining drone for your team (disabled on pvp)", (args, player) -> {
 //                if(!state.rules.pvp || player.isAdmin) {
 //                    PlayerData pd = getData(player.uuid());
@@ -1299,21 +1432,15 @@ public class ioMain extends Plugin {
                 }
             });
 
-            handler.<Player>register("info", "Display your stats.", (args, player) -> { // self info
-                PlayerData pd = getData(player.uuid());
-                if (pd != null) {
-                    Call.infoMessage(player.con, formatMessage(player, statMessage));
-                }
+            handler.<Player>register("info", "Display info about our server.", (args, player) -> {
+                Call.infoMessage(player.con, infoMessage);
             });
 
-            handler.<Player>register("rules", "Server rules. Please read carefully.", (args, player) -> { // self info
-//                PlayerData pd = getData(player.uuid());
-
+            handler.<Player>register("rules", "Server rules. Please read carefully.", (args, player) -> {
                 Call.infoMessage(player.con, ruleMessage);
-
             });
 
-            handler.<Player>register("event", "Join an ongoing event (if there is one)", (args, player) -> { // self info
+            handler.<Player>register("event", "Join an ongoing event (if there is one)", (args, player) -> {
                 if (eventIp.length() > 0) {
                     Call.connect(player.con, eventIp, eventPort);
                 } else {
@@ -1381,16 +1508,16 @@ public class ioMain extends Plugin {
             });
 
             handler.<Player>register("rtv", "Vote to change the map.", (args, player) -> { // self info
-                if (currentlyKicking[0] == null) {
+                if (currentMapVoting[0] == null) {
                     player.sendMessage("[scarlet]No map is being voted on.");
                 } else {
                     //hosts can vote all they want
-                    if (player.uuid() != null && (currentlyKicking[0].voted.contains(player.uuid()) || currentlyKicking[0].voted.contains(netServer.admins.getInfo(player.uuid()).lastIP))) {
+                    if (player.uuid() != null && (currentMapVoting[0].voted.contains(player.uuid()) || currentMapVoting[0].voted.contains(netServer.admins.getInfo(player.uuid()).lastIP))) {
                         player.sendMessage("[scarlet]You've already voted. Sit down.");
                         return;
                     }
 
-                    currentlyKicking[0].vote(player, 1);
+                    currentMapVoting[0].vote(player, 1);
                 }
             });
 

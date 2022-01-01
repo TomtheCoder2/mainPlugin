@@ -1,7 +1,7 @@
 package mindustry.plugin.database;
 
-import arc.util.Log;
 import mindustry.net.Administration;
+import mindustry.plugin.data.PlayerData;
 
 import java.sql.*;
 
@@ -169,7 +169,7 @@ public class Utils {
 //            pstmt.setString(1, column);
             pstmt.setInt(1, limit);
             pstmt.setInt(2, offset);
-            debug(pstmt);
+//            debug(pstmt);
             // get the result
             ResultSet rs = pstmt.executeQuery();
             int c = 0; // count
@@ -239,7 +239,7 @@ public class Utils {
 //            pstmt.setString(1, column);
             pstmt.setInt(1, limit);
             pstmt.setInt(2, offset);
-            debug(pstmt);
+//            debug(pstmt);
             // get the result
             ResultSet rs = pstmt.executeQuery();
             int c = 0; // count
@@ -296,7 +296,7 @@ public class Utils {
             // replace ? with the name
             pstmt.setString(1, name);
             // get the result
-            debug(pstmt);
+//            debug(pstmt);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 // create a new Player to return
@@ -348,7 +348,7 @@ public class Utils {
                 pstmt.setLong(4 + 1, mapdata.highscoreWaves);
                 pstmt.setLong(5 + 1, mapdata.playtime);
                 pstmt.setLong(6 + 1, mapdata.shortestGame);
-                Log.debug(pstmt);
+//                Log.debug(pstmt);
 
                 // send the data
                 int affectedRows = pstmt.executeUpdate();
@@ -381,7 +381,7 @@ public class Utils {
             try (Connection conn = connect();
                  PreparedStatement pstmt = conn.prepareStatement(SQL)) {
 
-                debug(mapdata.name.replaceAll("\\W", ""));
+//                debug(mapdata.name.replaceAll("\\W", ""));
 
                 // set all variables
                 pstmt.setInt(1, mapdata.positiveRating);
@@ -391,7 +391,7 @@ public class Utils {
                 pstmt.setLong(5, mapdata.playtime);
                 pstmt.setLong(6, mapdata.shortestGame);
                 pstmt.setString(7, name);
-                debug(pstmt);
+//                debug(pstmt);
                 pstmt.executeUpdate();
                 //                debug("affctected rows: " + affectedrows);
                 conn.close();

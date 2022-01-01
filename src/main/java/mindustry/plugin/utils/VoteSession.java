@@ -7,7 +7,8 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.net.Administration;
-import mindustry.plugin.database.PlayerData;
+import mindustry.plugin.data.PersistentPlayerData;
+import mindustry.plugin.data.PlayerData;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;
@@ -16,7 +17,8 @@ import java.time.Instant;
 import static mindustry.Vars.netServer;
 import static mindustry.plugin.database.Utils.getData;
 import static mindustry.plugin.database.Utils.setData;
-import static mindustry.plugin.ioMain.*;
+import static mindustry.plugin.ioMain.log_channel_id;
+import static mindustry.plugin.ioMain.playerDataGroup;
 
 public class VoteSession {
     public Player target;
@@ -41,8 +43,9 @@ public class VoteSession {
                 logVk(false);
                 // unfreeze the player
                 PersistentPlayerData tdata = (playerDataGroup.getOrDefault(target.uuid(), null));
-                assert tdata != null;
-                tdata.frozen = false;
+                if (tdata != null) {
+                    tdata.frozen = false;
+                }
                 map[0] = null;
                 task.cancel();
             }
@@ -90,7 +93,7 @@ public class VoteSession {
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Votekick " + (success ? "succeeded" : "failed") + "!")
                 .addField("Target:", Utils.escapeEverything(target.name) + "\n" + target.uuid())
-                .setColor(success ? new Color(0xff0000) : new Color(0x00ff00))
+                .setColor(success ? new Color(0xff0000) : new Color(0xFFff00))
                 .addField("Started by:", Utils.escapeEverything(startedVk.name) + "\n" + startedVk.uuid());
         Utils.getTextChannel(log_channel_id).sendMessage(eb);
     }
@@ -112,5 +115,15 @@ public class VoteSession {
 
     public int votesRequired() {
         return 2 + (Groups.player.size() > 4 ? 1 : 0);
+    }
+
+    public void left() {
+        Call.sendMessage(Strings.format("[scarlet]Target left.[scarlet] @[orange] will be banned from the server for @ minutes.", target.name, (kickDuration / 60 * 2)));
+        logVk(true);
+
+        // ban in database
+        banInDatabase(target, startedVk.name);
+        map[0] = null;
+        task.cancel();
     }
 }

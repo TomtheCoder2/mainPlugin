@@ -27,7 +27,8 @@ public class DiscordCommands implements MessageCreateListener {
     private final TextChannel bot_channel = getTextChannel(bot_channel_id);
     private final TextChannel apprentice_bot_channel = getTextChannel(ioMain.apprentice_bot_channel_id);
     private final TextChannel live_chat_channel;
-    private HashMap<String, Command> registry = new HashMap<>();
+    public HashMap<String, Command> registry = new HashMap<>();
+    public HashMap<String, Command> aliasRegistry = new HashMap<>();
 
 
     public DiscordCommands() {
@@ -39,13 +40,6 @@ public class DiscordCommands implements MessageCreateListener {
         }
     }
 
-    public static void tooFewArguments(Context ctx, Command command) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("Too few arguments!")
-                .setDescription("Usage: " + ioMain.prefix + command.name + " " + command.usage)
-                .setColor(Pals.error);
-        ctx.channel.sendMessage(eb);
-    }
     // you can override the name of the command manually, for example for aliases
 
     /**
@@ -55,6 +49,10 @@ public class DiscordCommands implements MessageCreateListener {
      */
     public void registerCommand(Command c) {
         registry.put(c.name.toLowerCase(), c);
+
+        for (String alias : c.aliases) {
+            aliasRegistry.put(alias.toLowerCase(), c);
+        }
     }
 
     /**
@@ -87,7 +85,6 @@ public class DiscordCommands implements MessageCreateListener {
         if (previewSchem) {
             if (checkIfSchem(event)) return;
         }
-
 
         // check if it's a live chat message
         if (event.getChannel().getId() == live_chat_channel.getId() && !event.getMessageAuthor().isBotUser()) {
@@ -146,7 +143,7 @@ public class DiscordCommands implements MessageCreateListener {
         if (args.length > 1) newMessage = message.substring(commandLength + 1);
 
         // get the command to check the category
-        Command command = registry.get(name.toLowerCase());
+        Command command = registry.getOrDefault(name.toLowerCase(), aliasRegistry.get(name.toLowerCase()));
         // you can only run not public commands in #staff-bot and #admin-bot
         if (!Objects.equals(command.category, "public")) {
             if (event.getChannel().getId() != Long.parseLong(staff_bot_channel_id)
@@ -195,7 +192,7 @@ public class DiscordCommands implements MessageCreateListener {
      * @param ctx  the context of the command
      */
     public void runCommand(String name, Context ctx) {
-        Command command = registry.get(name.toLowerCase());
+        Command command = registry.getOrDefault(name.toLowerCase(), aliasRegistry.get(name.toLowerCase()));
         if (command == null) {
             return;
         }
@@ -255,6 +252,6 @@ public class DiscordCommands implements MessageCreateListener {
      * @return return true if there is a command, else return false
      */
     public boolean isCommand(String name) {
-        return registry.containsKey(name.toLowerCase());
+        return registry.containsKey(name.toLowerCase()) || aliasRegistry.containsKey(name.toLowerCase());
     }
 }

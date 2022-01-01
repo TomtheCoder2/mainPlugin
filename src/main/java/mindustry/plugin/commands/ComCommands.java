@@ -15,9 +15,9 @@ import mindustry.gen.Player;
 import mindustry.io.SaveIO;
 import mindustry.maps.Map;
 import mindustry.mod.Mods;
-import mindustry.plugin.utils.PersistentPlayerData;
+import mindustry.plugin.data.PersistentPlayerData;
+import mindustry.plugin.data.PlayerData;
 import mindustry.plugin.database.MapData;
-import mindustry.plugin.database.PlayerData;
 import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
@@ -40,9 +40,9 @@ import static arc.util.Log.debug;
 import static arc.util.Log.info;
 import static mindustry.Vars.saveExtension;
 import static mindustry.Vars.state;
-import static mindustry.plugin.utils.Utils.*;
 import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.ioMain.*;
+import static mindustry.plugin.utils.Utils.*;
 
 public class ComCommands {
 //    public static ContentHandler contentHandler = new ContentHandler();
@@ -140,6 +140,7 @@ public class ComCommands {
                     String imageFileName = mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png");
                     Log.debug("File size of map: @", stream.readAllBytes().length);
                     mapToPng(stream, imageFileName);
+                    debug("received image!");
                     File imageFile = new File("temp/" + "image_" + imageFileName);
                     embed.setImage("attachment://" + "image_" + imageFileName);
                     MessageBuilder mb = new MessageBuilder();
@@ -179,6 +180,7 @@ public class ComCommands {
         handler.registerCommand(new Command("players") {
             {
                 help = "Check who is online and their ids.";
+                aliases.add("p");
             }
 
             public void run(Context ctx) {
@@ -256,6 +258,7 @@ public class ComCommands {
         handler.registerCommand(new Command("status") {
             {
                 help = "Get basic server information.";
+                aliases.add("s");
             }
 
             public void run(Context ctx) {
@@ -355,6 +358,7 @@ public class ComCommands {
             {
                 help = "Display all available commands and their usage.";
                 usage = "[command]";
+                aliases.add("h");
             }
 
             public void run(Context ctx) {
@@ -381,21 +385,21 @@ public class ComCommands {
                             }
                         }
                         switch (command.category) {
-                            case "moderation" -> {
+                            case Categories.moderation -> {
                                 moderation.append("**").append(command.name).append("** ");
 //                                if (!command.usage.equals("")) {
 //                                    moderation.append(command.usage);
 //                                }
                                 moderation.append("\n");
                             }
-                            case "management" -> {
+                            case Categories.management -> {
                                 management.append("**").append(command.name).append("** ");
 //                                if (!command.usage.equals("")) {
 //                                    management.append(command.usage);
 //                                }
                                 management.append("\n");
                             }
-                            case "mapReviewer" -> {
+                            case Categories.mapReviewer -> {
                                 mapReviewer.append("**").append(command.name).append("** ");
 //                                if (!command.usage.equals("")) {
 //                                    mapReviewer.append(command.usage);
@@ -426,15 +430,36 @@ public class ComCommands {
                     ctx.channel.sendMessage(embed);
                 } else {
                     EmbedBuilder embed = new EmbedBuilder();
-                    for (Command command : handler.getAllCommands()) {
-                        if (command.name.equals(ctx.args[1])) {
-                            embed.setTitle(command.name)
-                                    .setDescription(command.help);
-                            if (!command.usage.equals("")) {
-                                embed.addField("Usage:", ioMain.prefix + command.name + " " + command.usage);
-                            }
-                            embed.addField("Category:", command.category);
+                    if (Objects.equals(ctx.args[1], "aliases")) {
+                        embed.setTitle("All aliases");
+                        StringBuilder aliases = new StringBuilder();
+                        for (String alias : handler.aliasRegistry.keySet()) {
+                            aliases.append(alias).append(" -> ").append(handler.aliasRegistry.get(alias).name).append("\n");
                         }
+                        embed.setDescription(aliases.toString());
+                        ctx.channel.sendMessage(embed);
+                        return;
+                    }
+                    Command command = handler.registry.getOrDefault(ctx.args[1].toLowerCase(), handler.aliasRegistry.get(ctx.args[1].toLowerCase()));
+                    if (command == null) {
+                        embed.setColor(new Color(0xff0000))
+                                .setTitle("Error")
+                                .setDescription("Couldn't find this command!");
+                        ctx.channel.sendMessage(embed);
+                        return;
+                    }
+                    embed.setTitle(command.name)
+                            .setDescription(command.help);
+                    if (!command.usage.equals("")) {
+                        embed.addField("Usage:", ioMain.prefix + command.name + " " + command.usage);
+                    }
+                    embed.addField("Category:", command.category);
+                    StringBuilder aliases = new StringBuilder();
+                    if (command.aliases.size() > 0) {
+                        for (String alias : command.aliases) {
+                            aliases.append(alias).append(", ");
+                        }
+                        embed.addField("Aliases:", aliases.toString());
                     }
                     ctx.channel.sendMessage(embed);
                 }
