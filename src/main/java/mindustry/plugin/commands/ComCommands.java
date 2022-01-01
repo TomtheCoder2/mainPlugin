@@ -480,12 +480,6 @@ public class ComCommands {
                 if (ctx.args.length > 1) {
                     target = ctx.args[1];
                 }
-                List roles = new List();
-                for (Role r : ctx.author.asUser().get().getRoles(ctx.event.getServer().get())) {
-                    if (r != null) {
-                        roles.add(r.getIdAsString());
-                    }
-                }
                 debug(target);
                 if (target.length() > 0) {
                     int rank = 0;
