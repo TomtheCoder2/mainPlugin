@@ -1,7 +1,8 @@
 {
   "name": "DiscordPlugin",
+  "displayName": "[cyan]Discord Plugin",
   "author": "Nautilus",
   "main": "mindustry.plugin.ioMain",
-  "description": "interaction with discord",
-  "version": 1.130
+  "description": "Interaction with discord.",
+  "version": 1.15
 }

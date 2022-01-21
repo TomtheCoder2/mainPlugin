@@ -5,9 +5,9 @@ import mindustry.plugin.data.PlayerData;
 
 import java.sql.*;
 
+import static arc.util.Log.debug;
 import static mindustry.Vars.netServer;
 import static mindustry.plugin.utils.Utils.*;
-import static arc.util.Log.debug;
 
 public class Utils {
     /**
@@ -285,7 +285,7 @@ public class Utils {
      * get all infos about a specific map
      */
     public static MapData getMapData(String name) {
-        name = name.replaceAll("\\W", "");
+        name = escapeEverything(name).replaceAll("\\W", "");
         String SQL = "SELECT name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame "
                 + "FROM mapdata "
                 + "WHERE name = ?";
@@ -327,7 +327,7 @@ public class Utils {
      * rate a map
      */
     public static void rateMap(String name, MapData mapdata) {
-        name = name.replaceAll("\\W", "");
+        name = escapeEverything(name).replaceAll("\\W", "");
         if (getMapData(name) == null) {
             // define all variables
             String SQL = "INSERT INTO mapdata(name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame) "

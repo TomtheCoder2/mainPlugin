@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.files.Fi;
 import arc.struct.Seq;
+import arc.struct.StringMap;
 import arc.util.Log;
 import arc.util.Structs;
 import arc.util.Timer;
@@ -22,6 +23,7 @@ import mindustry.gen.Unit;
 import mindustry.io.SaveIO;
 import mindustry.maps.Map;
 import mindustry.maps.MapException;
+import mindustry.mod.Mods;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.data.PersistentPlayerData;
@@ -44,22 +46,24 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
 
 import java.awt.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.zip.InflaterInputStream;
 
-import static arc.util.Log.err;
-import static arc.util.Log.info;
+import static arc.util.Log.*;
 import static mindustry.Vars.*;
 import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.ioMain.*;
@@ -69,9 +73,11 @@ import static mindustry.plugin.utils.Utils.*;
 
 public class ServerCommands {
     private final JSONObject data;
+    private final TextChannel log_channel;
     public GetMap map = new GetMap();
 
     public ServerCommands(JSONObject data) {
+        log_channel = getTextChannel(log_channel_id);
         this.data = data;
     }
 
@@ -122,6 +128,109 @@ public class ServerCommands {
         if (data.has("administrator_roleid")) {
             String adminRole = data.getString("administrator_roleid");
             // TODO: make an update command to update the EI mod
+
+            handler.registerCommand(new RoleRestrictedCommand("uploadmod") {
+                {
+                    help = "Upload a new mod (Include a .zip file with command message)";
+                    role = adminRole;
+                    usage = "<.zip attachment>";
+                    category = management;
+                    aliases.add("umod");
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    Seq<MessageAttachment> ml = new Seq<>();
+                    for (MessageAttachment ma : ctx.event.getMessageAttachments()) {
+                        if (ma.getFileName().split("\\.")[ma.getFileName().split("\\.").length - 1].trim().equals("zip")) {
+                            ml.add(ma);
+                        }
+                    }
+                    if (ml.size != 1) {
+                        eb.setTitle("Mod upload terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("You need to add one valid .zip file!");
+                        ctx.channel.sendMessage(eb);
+                        return;
+                    } else if (Core.settings.getDataDirectory().child("mods").child(ml.get(0).getFileName()).exists()) {
+                        eb.setTitle("Mod upload terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("There is already a mod with this name on the server!");
+                        ctx.channel.sendMessage(eb);
+                        return;
+                    }
+                    // more custom filename checks possible
+
+                    CompletableFuture<byte[]> cf = ml.get(0).downloadAsByteArray();
+                    Fi fh = Core.settings.getDataDirectory().child("mods").child(ml.get(0).getFileName());
+
+                    try {
+                        byte[] data = cf.get();
+//                        if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
+//                            eb.setTitle("Mod upload terminated.");
+//                            eb.setColor(Pals.error);
+//                            eb.setDescription("Mod file corrupted or invalid.");
+//                            ctx.channel.sendMessage(eb);
+//                            return;
+//                        }
+                        fh.writeBytes(cf.get(), false);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    maps.reload();
+                    eb.setTitle("Mod upload completed.");
+                    eb.setDescription(ml.get(0).getFileName() + " was added successfully into the mod folder!\n" +
+                            "Restart the server (`<restart <server>`) to activate the mod!");
+                    ctx.channel.sendMessage(eb);
+//                    Utils.LogAction("uploadmap", "Uploaded a new map", ctx.author, null);
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("removemod") {
+                {
+                    help = "Remove a mod from the folder";
+                    role = adminRole;
+                    usage = "<mapname/mapid>";
+                    category = mapReviewer;
+                    minArguments = 1;
+                    aliases.add("rmod");
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    debug(ctx.message);
+                    Mods.LoadedMod mod = getMod(ctx.message);
+                    if (mod == null) {
+                        eb.setTitle("Command terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("Mod not found");
+                        ctx.channel.sendMessage(eb);
+                        return;
+                    }
+                    debug(mod.file.file().getAbsoluteFile().getAbsolutePath());
+                    Path path = Paths.get(mod.file.file().getAbsoluteFile().getAbsolutePath());
+                    mod.dispose();
+
+                    try {
+                        Files.delete(path);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        eb.setTitle("There was an error performing this command.")
+                                .setDescription(e.getMessage())
+                                .setColor(new Color(0xff0000));
+                        return;
+                    }
+                    if (mod.file.file().getAbsoluteFile().delete()) {
+                        eb.setTitle("Command executed.");
+                        eb.setDescription(mod.name + " was successfully removed from the folder.\nRestart the server to disable the mod (`<restart <server>`).");
+                    } else {
+                        eb.setTitle("There was an error performing this command.")
+                                .setColor(new Color(0xff0000));
+                    }
+                    ctx.channel.sendMessage(eb);
+                }
+            });
 
 
             handler.registerCommand(new RoleRestrictedCommand("enableJs") {
@@ -273,6 +382,7 @@ public class ServerCommands {
                     category = moderation;
                     role = apprenticeRole;
                     apprenticeCommand = true;
+                    aliases.add("m");
                 }
 
                 @Override
@@ -336,34 +446,44 @@ public class ServerCommands {
                     usage = "<player> <duration (minutes)> <reason...>";
                     category = moderation;
                     apprenticeCommand = true;
-                    minArguments = 3;
+                    minArguments = 2;
                     aliases.add("b");
                 }
 
                 public void run(Context ctx) {
-                    CompletableFuture.runAsync(() -> {
-                        EmbedBuilder eb = new EmbedBuilder();
-                        String target = ctx.args[1];
-                        String targetDuration = ctx.args[2];
-                        String reason = ctx.message.substring(target.length() + targetDuration.length() + 2);
-                        long now = Instant.now().getEpochSecond();
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1];
+                    String targetDuration = ctx.args[2];
+                    String reason;
+                    long now = Instant.now().getEpochSecond();
 
-                        Administration.PlayerInfo info = getPlayerInfo(target);
-                        if (info != null) {
-                            String uuid = info.id;
-                            String banId = uuid.substring(0, 4);
-                            PlayerData pd = getData(uuid);
-                            long until = now + Integer.parseInt(targetDuration) * 60L;
-                            if (pd != null) {
-//     pd.banned = true;
-                                pd.bannedUntil = until;
-                                pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
-                                setData(uuid, pd);
-                            }
+                    Administration.PlayerInfo info = getPlayerInfo(target);
+                    if (info != null) {
+                        String uuid = info.id;
+                        String banId = uuid.substring(0, 4);
+                        PlayerData pd = getData(uuid);
+                        long until;
+                        try {
+                            until = now + Integer.parseInt(targetDuration) * 60L;
+                            reason = ctx.message.substring(target.length() + targetDuration.length() + 2);
+                        } catch (Exception e) {
+//                                EmbedBuilder err = new EmbedBuilder()
+//                                        .setTitle("Second argument has to be a number!")
+//                                        .setColor(new Color(0xff0000));
+//                                ctx.channel.sendMessage(err);
+//                                return;
+                            e.printStackTrace();
+                            until = now + (long) (2 * 356 * 24 * 60 * 60); // 2 years
+                            reason = ctx.message.substring(target.length() + 1);
+                        }
+                        if (pd != null) {
+                            pd.bannedUntil = until;
+                            pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
+                            setData(uuid, pd);
 
                             eb.setTitle("Banned " + escapeEverything(info.lastName) + " for " + targetDuration + " minutes. ");
                             eb.addField("Ban ID", banId);
-                            eb.addField("For", targetDuration + " minutes.");
+                            eb.addField("For", (until - now) / 60 + " minutes.");
                             eb.addField("Until", epochToString(until));
                             eb.addInlineField("Reason", reason);
                             ctx.channel.sendMessage(eb);
@@ -375,9 +495,10 @@ public class ServerCommands {
                             logBanMessage(info, ctx, reason, "Banned");
                         } else {
                             playerNotFound(target, eb, ctx);
-                            return;
                         }
-                    });
+                    } else {
+                        playerNotFound(target, eb, ctx);
+                    }
                 }
             });
 
@@ -942,7 +1063,7 @@ public class ServerCommands {
                         String target = ctx.args[1];
                         String reason = ctx.message.substring(target.length() + 1);
 
-                        Administration.PlayerInfo info = null;
+                        Administration.PlayerInfo info;
                         Player player = findPlayer(target);
                         if (player != null) {
                             info = netServer.admins.getInfo(player.uuid());
@@ -955,22 +1076,27 @@ public class ServerCommands {
                             String banId = uuid.substring(0, 4);
                             PlayerData pd = getData(uuid);
                             if (pd != null) {
+                                // set ban in database
                                 pd.banned = true;
                                 pd.banReason = reason + "\n[accent]Ban ID:[] " + banId;
                                 setData(uuid, pd);
-                            }
-                            netServer.admins.banPlayerIP(info.lastIP);
-                            eb.setTitle("Banned `" + escapeEverything(info.lastName) + "` permanently.");
-                            eb.addField("UUID", uuid);
-                            eb.addField("Ban ID", banId);
-                            eb.addField("IP", info.lastIP);
-                            eb.addInlineField("Reason", reason);
-                            ctx.channel.sendMessage(eb);
 
-                            if (player != null) {
-                                player.con.kick(Packets.KickReason.banned);
+                                // send messages on discord
+                                netServer.admins.banPlayerIP(info.lastIP);
+                                eb.setTitle("Banned `" + escapeEverything(info.lastName) + "` permanently.");
+                                eb.addField("UUID", uuid);
+                                eb.addField("Ban ID", banId);
+                                eb.addField("IP", info.lastIP);
+                                eb.addInlineField("Reason", reason);
+                                ctx.channel.sendMessage(eb);
+
+                                if (player != null) {
+                                    player.con.kick(Packets.KickReason.banned);
+                                }
+                                logBanMessage(info, ctx, reason, "Banned");
+                            } else {
+                                playerNotFound(target, eb, ctx);
                             }
-                            logBanMessage(info, ctx, reason, "Banned");
                         } else {
                             playerNotFound(target, eb, ctx);
                         }
@@ -1064,7 +1190,7 @@ public class ServerCommands {
                     usage = "<player> [reason..]";
                     role = banRole;
                     category = moderation;
-                    minArguments = 1;
+                    minArguments = 2;
                     aliases.add("k");
                 }
 
@@ -1343,7 +1469,7 @@ public class ServerCommands {
                     String target = ctx.args[1];
                     String targetMech = ctx.args[2];
 //                    Mech desiredMech = Mechs.alpha;
-                    UnitType desiredUnit = UnitTypes.alpha;
+                    UnitType desiredUnit;
                     if (target.length() > 0 && targetMech.length() > 0) {
                         try {
                             Field field = UnitTypes.class.getDeclaredField(targetMech);
@@ -2111,13 +2237,19 @@ public class ServerCommands {
                                 if (player != null) {
                                     player.name = rankNames.get(rank).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "").replaceAll("\\|(.*)\\|", "");
                                 }
+                                // log the action
+                                EmbedBuilder logEb = new EmbedBuilder()
+                                        .setTitle(escapeEverything(info.lastName) + "'s rank was set to " + rankNames.get(rank).name + "!")
+                                        .setColor(new Color(0x00ff00))
+                                        .addField("UUID", uuid)
+                                        .addField("By", ctx.author.getDiscriminatedName());
+                                log_channel.sendMessage(logEb);
                             } else {
                                 playerNotFound(target, eb, ctx);
                                 return;
                             }
 
-                            if (targetRank == rankNames.size() - 1) {
-                                assert player != null;
+                            if (targetRank == rankNames.size() - 1 && player != null) {
                                 netServer.admins.adminPlayer(player.uuid(), player.usid());
                             }
                         }
@@ -2348,7 +2480,6 @@ public class ServerCommands {
                     }
                     eb.setTitle("Map upload completed.");
                     eb.setDescription(ml.get(0).getFileName() + " was successfully queued for review by moderators!");
-                    ctx.channel.sendMessage(eb);
                     EmbedBuilder eb2 = new EmbedBuilder()
                             .setTitle("A map submission has been made for " + ioMain.serverName)
                             .setAuthor(ctx.author)
@@ -2358,36 +2489,33 @@ public class ServerCommands {
 
                     try {
                         InputStream data = ml.get(0).downloadAsInputStream();
-                        File outFile = new File("./temp/upload.msav");
-                        java.nio.file.Files.copy(
-                                data,
-                                outFile.toPath(),
-                                StandardCopyOption.REPLACE_EXISTING);
+//                        java.nio.file.Files.copy(
+//                                data,
+//                                mapFile.file().toPath(),
+//                                StandardCopyOption.REPLACE_EXISTING);
+                        StringMap meta = getMeta(data);
+                        Fi mapFile = new Fi("./temp/map_submit_" + meta.get("name").replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msav");
 
-                        List<String> mapData = map.getMap(new Fi("./temp/upload.msav"));
-                        System.out.println(mapData.get(0));
 
                         EmbedBuilder embed = new EmbedBuilder()
-                                .setTitle(escapeEverything(mapData.get(6)))
-                                .setDescription(escapeCharacters(mapData.get(5)) + "\nSize: " + mapData.get(7))
+                                .setTitle(escapeEverything(meta.get("name")))
+//                                .setDescription(escapeCharacters(mapData.get(5)) + "\nSize: " + mapData.get(7))
+                                .setDescription(meta.get("description"))
                                 .setAuthor(ctx.author.getName(), ctx.author.getAvatar().getUrl().toString(), ctx.author.getAvatar().getUrl().toString())
 //     .setImage("attachment://" + mapData.get(6) + ".png");
-                                .setImage("attachment://output.png")
+//                                .setImage("attachment://output.png")
                                 .setColor(new Color(0xF8D452))
-                                .setFooter("Date: " + mapData.get(4));
-                        MessageBuilder mb = new MessageBuilder();
-                        mb.addEmbed(embed);
-                        InputStream PNG = new FileInputStream(mapData.get(0));
-                        mb.addFile(new File(mapData.get(0))); // mapData.get(6) + ".png"
-                        InputStream initialStream = new FileInputStream(
-                                new File("./temp/upload.msav"));
-                        mb.addAttachment(initialStream, mapData.get(6) + ".msav");
-                        mb.send(tc);
+                                .setFooter("Size: " + meta.getInt("width") + " * " + meta.getInt("height"));
+                        mapFile.writeBytes(cf.get(), false);
+                        debug("mapFile size: @", mapFile.length());
+                        attachMapPng(mapFile, embed, tc);
+                        mapFile.delete();
                     } catch (Exception e) {
                         System.out.println(e);
                     }
                     assert tc != null;
 //                    tc.sendMessage(eb2);
+                    ctx.channel.sendMessage(eb);
                 }
             });
 

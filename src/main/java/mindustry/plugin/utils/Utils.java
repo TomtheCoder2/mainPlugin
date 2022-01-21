@@ -5,9 +5,14 @@ import arc.Events;
 import arc.files.Fi;
 import arc.graphics.Pixmap;
 import arc.graphics.PixmapIO;
+import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.struct.StringMap;
 import arc.util.Http;
+import arc.util.Log;
 import arc.util.Strings;
+import arc.util.io.CounterInputStream;
+import com.github.kevinsawicki.http.HttpRequest;
 import mindustry.content.Blocks;
 import mindustry.game.EventType;
 import mindustry.game.Schematic;
@@ -16,8 +21,11 @@ import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.io.SaveIO;
+import mindustry.io.SaveVersion;
 import mindustry.maps.Map;
 import mindustry.maps.Maps;
+import mindustry.mod.Mods;
 import mindustry.net.Administration;
 import mindustry.plugin.data.PlayerData;
 import mindustry.plugin.database.MapData;
@@ -51,6 +59,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.zip.InflaterInputStream;
 
 import static arc.util.Log.debug;
 import static arc.util.Log.err;
@@ -170,6 +179,7 @@ public class Utils {
         bannedNames.add("Volas Y0uKn0w1sR34Lp");
         bannedNames.add("IgruhaOrg");
         bannedNames.add("андрей");
+        bannedNames.add("THIS IS MY KINGDOM CUM, THIS IS MY CUM");
 
         bannedBlocks.add(Blocks.conveyor);
         bannedBlocks.add(Blocks.titaniumConveyor);
@@ -372,6 +382,10 @@ public class Utils {
             info = netServer.admins.getInfoOptional(target);
         }
         return info;
+    }
+
+    public static Mods.LoadedMod getMod(String name) {
+        return mods.list().find(p -> escapeColorCodes(p.meta.name).equalsIgnoreCase(name) || escapeColorCodes(p.meta.displayName).equalsIgnoreCase(name));
     }
 
     public static boolean isInt(String str) {
@@ -596,7 +610,7 @@ public class Utils {
         eb.setTitle(action + " " + escapeEverything(info.lastName));
         eb.addField("UUID", info.id, true);
         eb.addField("IP", info.lastIP, true);
-        eb.addField(action + " by", ctx.author.getDiscriminatedName(), true);
+        eb.addField(action + " by", "<@" + ctx.author.getIdAsString() + ">", true);
         eb.addField("Reason", reason, true);
         log_channel.sendMessage(eb);
     }
@@ -646,12 +660,88 @@ public class Utils {
     public static void mapToPng(InputStream stream, String imageFileName) throws IOException {
         debug("start function mapToPng");
         Http.post(maps_url + "/map").content(stream, stream.available()).block(res -> {
+            debug(res.getStatus());
             debug("received data (mapToPng)");
             var pix = new Pixmap(res.getResultAsStream().readAllBytes());
             PixmapIO.writePng(new Fi("temp/" + "image_" + imageFileName), pix); // Write to a file
             debug("image height: @", pix.height);
             debug("image width: @", pix.height);
         });
+    }
+
+    /**
+     * Send a map to the mindServ to get a png
+     *
+     * @param map        map File
+     * @param outputFile where the png should be saved
+     * @return whether it was successfully
+     */
+    public static boolean getMapImage(File map, File outputFile) {
+        try {
+            HttpRequest req = HttpRequest.post(maps_url + "/map");
+            req.contentType("application/octet-stream");
+            req.send(map);
+
+            if (req.ok()) {
+                req.receive(outputFile);
+                return true;
+            }
+            Log.warn("@:@", req.code(), req.body());
+            return false;
+        } catch (HttpRequest.HttpRequestException e) {
+            Log.err("Content Server is not running.\n", e);
+            return false;
+        } catch (Exception e) {
+            Log.err(e);
+            return false;
+        }
+    }
+
+    public static void attachMapPng(Map found, EmbedBuilder embed, Context ctx) throws IOException {
+        Fi mapFile = found.file;
+        attachMapPng(mapFile, embed, ctx);
+    }
+
+    public static void attachMapPng(Fi mapFile, EmbedBuilder embed, Context ctx) throws IOException {
+        attachMapPng(mapFile, embed, ctx.channel);
+    }
+
+    public static void attachMapPng(Fi mapFile, EmbedBuilder embed, TextChannel channel) throws IOException {
+        InputStream stream = mapFile.readByteStream();
+        String imageFileName = mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png");
+        Log.debug("File size of map: @", stream.readAllBytes().length);
+        File imageFile = new File("temp/" + "image_" + imageFileName);
+        MessageBuilder mb = new MessageBuilder();
+        if (getMapImage(mapFile.file(), imageFile)) {
+            debug("received image!");
+            embed.setImage("attachment://" + "image_" + imageFileName);
+            mb.addEmbed(embed);
+            mb.addFile(imageFile);
+            mb.addAttachment(mapFile.file());
+            mb.send(channel).join();
+            imageFile.delete();
+        } else {
+            mb.addEmbed(embed);
+            mb.addAttachment(mapFile.file());
+            mb.send(channel).join();
+        }
+    }
+
+    /**
+     * get meta data from a map saved as a file converted to an inputStream
+     */
+    public static StringMap getMeta(InputStream is) throws IOException {
+        InputStream ifs = new InflaterInputStream(is);
+        CounterInputStream counter = new CounterInputStream(ifs);
+        DataInputStream stream = new DataInputStream(counter);
+
+        SaveIO.readHeader(stream);
+        int version = stream.readInt();
+        SaveVersion ver = SaveIO.getSaveWriter(version);
+        StringMap[] metaOut = {null};
+        ver.region("meta", stream, counter, in -> metaOut[0] = ver.readStringMap(in));
+
+        return metaOut[0];
     }
 
     public static String rgbToString(float r, float g, float b) {
@@ -959,5 +1049,12 @@ public class Utils {
         public static final String moderation = "Moderation";
         public static final String management = "Management";
         public static final String mapReviewer = "Map Reviewer";
+    }
+
+    public static class uMap {
+        public String name, author, description;
+        public ObjectMap<String, String> tags = new ObjectMap<>();
+        public BufferedImage image;
+        public BufferedImage terrain;
     }
 }

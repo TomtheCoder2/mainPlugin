@@ -2,7 +2,6 @@ package mindustry.plugin.commands;
 
 import arc.Core;
 import arc.files.Fi;
-import arc.util.Log;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.Items;
@@ -29,8 +28,6 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 
 import java.awt.*;
-import java.io.File;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -135,19 +132,7 @@ public class ComCommands {
                 }
                 embed.setFooter(found.width + "x" + found.height);
                 try {
-                    Fi mapFile = found.file;
-                    InputStream stream = mapFile.readByteStream();
-                    String imageFileName = mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png");
-                    Log.debug("File size of map: @", stream.readAllBytes().length);
-                    mapToPng(stream, imageFileName);
-                    debug("received image!");
-                    File imageFile = new File("temp/" + "image_" + imageFileName);
-                    embed.setImage("attachment://" + "image_" + imageFileName);
-                    MessageBuilder mb = new MessageBuilder();
-                    mb.addEmbed(embed);
-                    mb.addFile(imageFile);
-                    mb.addAttachment(mapFile.file());
-                    mb.send(ctx.channel);
+                    attachMapPng(found, embed, ctx);
 //                    ctx.channel.sendFile(mapFile.file()).embed(eb.build()).queue();
                 } catch (Exception e) {
                     ctx.sendEmbed(false, ":eyes: **internal server error**");
@@ -177,6 +162,44 @@ public class ComCommands {
 //                });
             }
         });
+
+        handler.registerCommand(new Command("mod") {
+            {
+                help = "Get info about a specific mod.";
+                usage = "<mod>";
+            }
+
+            @Override
+            public void run(Context ctx) {
+                EmbedBuilder eb = new EmbedBuilder();
+                if (ctx.args.length > 1) {
+                    Mods.LoadedMod mod = getMod(ctx.message);
+                    if (mod != null) {
+                        eb.setTitle(mod.meta.displayName())
+                                .addField("Internal Name: ", mod.name)
+                                .addField("Version: ", mod.meta.version)
+                                .addField("Author: ", mod.meta.author)
+                                .addField("Description: ", mod.meta.description);
+                    } else {
+                        eb.setTitle("Error")
+                                .setColor(new Color(0xff0000))
+                                .setDescription("No mod with name " + ctx.args[1] + " found.");
+                    }
+                } else {
+                    eb.setTitle("Mods")
+                            .setColor(new Color(0x00ff00));
+                    if (!Vars.mods.list().isEmpty()) {
+                        for (Mods.LoadedMod mod : Vars.mods.list()) {
+                            eb.addField(mod.meta.displayName(), mod.meta.version, true);
+                        }
+                    } else {
+                        eb.setDescription("No mods found.");
+                    }
+                }
+                ctx.channel.sendMessage(eb);
+            }
+        });
+
         handler.registerCommand(new Command("players") {
             {
                 help = "Check who is online and their ids.";
@@ -287,17 +310,7 @@ public class ComCommands {
                             info("Saved to @", mapFile);
                             debug(mapFile.absolutePath());
 
-                            InputStream stream = mapFile.readByteStream();
-                            debug(mapFile.length());
-                            String imageFileName = mapFile.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_").replaceAll(".msav", ".png");
-                            mapToPng(stream, imageFileName);
-                            File imageFile = new File("temp/" + "image_" + imageFileName);
-                            debug("image size: " + imageFile.length());
-                            embed.setImage("attachment://" + "image_" + imageFileName);
-                            MessageBuilder mb = new MessageBuilder();
-                            mb.addEmbed(embed);
-                            mb.addFile(imageFile);
-                            mb.send(ctx.channel).thenRun(mapFile::delete);
+                            attachMapPng(mapFile, embed, ctx);
 //                            mapFile.delete();
                         } catch (Exception e) {
                             e.printStackTrace();

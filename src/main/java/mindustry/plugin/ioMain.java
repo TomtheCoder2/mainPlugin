@@ -78,7 +78,7 @@ public class ioMain extends Plugin {
     public static JSONObject data; //token, channel_id, role_id
     public static String apiKey = "";
     public static int effectId = 0; // effect id for the snowball
-    public static List<String> joinedPlayers = new ArrayList<>();
+    public static ArrayList<String> joinedPlayers = new ArrayList<>();
     public static List<String> leftPlayers = new ArrayList<>();
     public static long passedMapTime = 0;
     //    public Timer.Task rateMapTask; // popup to force map rating
@@ -89,7 +89,11 @@ public class ioMain extends Plugin {
     public static Boolean enableJs = false; // whether js is enabled for everyone
     public static Timer.Task enableJsTask;
     public static HashMap<Tile, TileInfo> tileInfoHashMap = new HashMap<>();
+    public static int logCount = 0; // only log join/leaves every 5 minutes
+    public static TextChannel live_chat_channel;
+    public static TextChannel log_channel;
     private final long CDT = 300L;
+    private final ObjectMap<Long, String> CommandCooldowns = new ObjectMap<>(); //uuid
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public ObjectMap<String, Role> discRoles = new ObjectMap<>();
     public NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
@@ -102,7 +106,6 @@ public class ioMain extends Plugin {
     ObjectMap<String, Timekeeper> cooldowns = new ObjectMap<>();
     // current kick sessions
     VoteSession[] currentlyKicking = {null};
-    private ObjectMap<Long, String> CommandCooldowns = new ObjectMap<>(); //uuid
     private JSONObject alldata;
 
     // register event handlers and create variables in the constructor
@@ -138,6 +141,7 @@ public class ioMain extends Plugin {
             System.out.printf("url: %s, user: %s, password: %s%n", url, user, password);
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
+            return;
         }
 //        try {
 //            // doesn't work on the first couple tries but after that it works, IDK why
@@ -172,6 +176,11 @@ public class ioMain extends Plugin {
         rainbowThread.setDaemon(false);
         rainbowThread.start();
 
+
+        // set the channels
+        live_chat_channel = getTextChannel(live_chat_channel_id);
+        log_channel = getTextChannel(log_channel_id);
+
         TextChannel tc = getTextChannel("881300954845179914");
         if (!Objects.equals(live_chat_channel_id, "")) {
             tc = getTextChannel(live_chat_channel_id);
@@ -184,7 +193,7 @@ public class ioMain extends Plugin {
                 if (event.message.charAt(0) != '/') {
                     Player player = event.player;
                     assert player != null;
-                    PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                    PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
                     assert tdata != null;
                     if (!tdata.muted) {
                         finalTc.sendMessage("**" + escapeEverything(event.player.name) + "**: " + event.message);
@@ -241,12 +250,13 @@ public class ioMain extends Plugin {
         // force map votes with popup
         Timer.schedule(() -> {
             for (Player player : Groups.player) {
-                assert player != null; // ...idk how even
+                if (player == null) continue; // ...idk how even
                 PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
-                assert tdata != null;
-                if (!tdata.votedMap) {
-                    rateMenu(player);
-                    tdata.votedMap = true;
+                if (tdata != null) {
+                    if (!tdata.votedMap) {
+                        rateMenu(player);
+                        tdata.votedMap = true;
+                    }
                 }
             }
         }, 0, 120);
@@ -261,7 +271,9 @@ public class ioMain extends Plugin {
         Events.on(EventType.PlayerLeave.class, event -> {
             String uuid = event.player.uuid();
             //free ram
-            playerDataGroup.remove(uuid);
+            if (playerDataGroup.get(uuid) != null) {
+                playerDataGroup.remove(uuid);
+            }
 
             if (!leftPlayers.contains(uuid)) {
                 leftPlayers.add(uuid);
@@ -280,7 +292,7 @@ public class ioMain extends Plugin {
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;
             if (bannedNames.contains(player.name)) {
-                player.con.kick("[scarlet]Download the game from legitimate sources to join.\n[accent]https://anuke.itch.io/mindustry");
+                player.con.kick("[scarlet]Please change your name.");
                 return;
             }
 //            EmbedBuilder eb = new EmbedBuilder();
@@ -288,15 +300,22 @@ public class ioMain extends Plugin {
 //            eb.setDescription(String.format("`%s` • `%d `:%s", player.uuid(), player.id, escapeColorCodes(player.name)));
 //            assert log_channel != null;
 //            log_channel.sendMessage(eb);
-            if (!joinedPlayers.contains(player)) {
-                joinedPlayers.add(player.uuid());
-            }
             PlayerData pd = getData(player.uuid());
-//            System.out.println(pd);
 
             if (!playerDataGroup.containsKey(player.uuid())) {
                 PersistentPlayerData data = new PersistentPlayerData();
                 playerDataGroup.put(player.uuid(), data);
+            }
+
+            // check if he's impersonating a rank
+            String escapedName = escapeColorCodes(player.name).replaceAll("\\[accent\\]", "");
+            for (java.util.Map.Entry<Integer, Rank> rank : rankNames.entrySet()) {
+                if (rank.getKey() == 0) continue;
+                if (escapedName.toLowerCase().startsWith(escapeColorCodes(rank.getValue().tag).replaceAll("\\[accent\\]", ""))) {
+                    player.con.kick("[scarlet]Dont impersonate a rank.");
+                    info("Player " + escapedName + " tried to impersonate rank: " + rank.getValue().name);
+                    return;
+                }
             }
 
             if (pd != null) {
@@ -311,16 +330,17 @@ public class ioMain extends Plugin {
 //                }
                 if (pd.banned || pd.bannedUntil > Instant.now().getEpochSecond()) {
                     player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason + "\n[white] If you what to appeal join our discord server: [cyan]" + discordInviteLink);
+                    return;
                 }
                 int rank = pd.rank;
                 Call.sendMessage("[#" + Integer.toHexString(rankNames.get(rank).color.getRGB()).substring(2) + "]" + rankNames.get(rank).name + " [] " + player.name + "[accent] joined the front!");
                 player.name = rankNames.get(rank).tag + player.name;
                 // just give marshals admin when they join
-                if (rank == 9) {
+                if (rank == rankNames.size() - 1) {
                     player.admin = true;
                 }
             } else { // not in database
-                info("new player connected: " + escapeColorCodes(event.player.name));
+                info("New player connected: " + escapeColorCodes(event.player.name));
                 setData(player.uuid(), new PlayerData(0));
 //                Call.infoMessage(player.con, formatMessage(player, welcomeMessage));
                 Call.sendMessage("[#" + Integer.toHexString(rankNames.get(0).color.getRGB()).substring(2) + "]" + rankNames.get(0).name + " [] " + player.name + "[accent] joined the front!");
@@ -352,20 +372,29 @@ public class ioMain extends Plugin {
 //            });
 //            player.sendMessage(welcomeMessage);
             Call.infoMessage(player.con, welcomeMessage);
+
+            if (!joinedPlayers.contains(player.uuid())) {
+                joinedPlayers.add(player.uuid());
+            }
         });
 
 //        Events.on(EventType.d)
 
         // player built building
         Events.on(EventType.BlockBuildEndEvent.class, event -> {
-            if (event.unit.getPlayer() == null) return;
-            if (event.breaking) return;
-            PersistentPlayerData td = (playerDataGroup.getOrDefault(event.unit.getPlayer().uuid(), null));
-            if (td == null) return;
-            if (event.tile.block() != null) {
-                if (!bannedBlocks.contains(event.tile.block())) {
-                    td.bbIncrementor++;
+            try {
+                if (event.unit.getPlayer() == null) return;
+                if (event.breaking) return;
+                PersistentPlayerData td = playerDataGroup.get(event.unit.getPlayer().uuid());
+                if (td == null) return;
+                if (event.tile.block() != null) {
+                    if (!bannedBlocks.contains(event.tile.block())) {
+                        td.bbIncrementor++;
+                    }
                 }
+            } catch (Exception e ) {
+                err("There was an error while saving block status: ");
+                e.printStackTrace();
             }
         });
 
@@ -373,12 +402,12 @@ public class ioMain extends Plugin {
         Events.on(EventType.TapEvent.class, tapEvent -> {
             if (tapEvent.tile != null) {
                 Player player = tapEvent.player;
-                PersistentPlayerData pd = (playerDataGroup.getOrDefault(player.uuid(), null));
+                PersistentPlayerData ppd = (playerDataGroup.getOrDefault(player.uuid(), null));
 
                 Tile t = tapEvent.tile;
-                assert pd != null;
-                pd.tapTile = t;
-                if (pd.inspector) {
+                if (ppd == null) return;
+                ppd.tapTile = t;
+                if (ppd.inspector) {
                     player.sendMessage("\n");
                     Call.effect(player.con, Fx.placeBlock, t.worldx(), t.worldy(), 0.75f, Pal.accent);
                     player.sendMessage("[orange]--[] [accent]tile [](" + t.x + ", " + t.y + ")[accent] block:[] " + ((t.block() == null || t.block() == Blocks.air) ? "[#545454]none" : t.block().name) + " [orange]--[]");
@@ -512,7 +541,14 @@ public class ioMain extends Plugin {
 
             // log the game over
             assert log_channel != null;
-            log_channel.sendMessage(new EmbedBuilder().setTitle("Game over!").setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves").setColor(new Color(0x33FFEC)));
+            if (Groups.player.size() > 0) {
+                EmbedBuilder gameOverEmbed = new EmbedBuilder()
+                        .setTitle("Game over!")
+                        .setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves and " + Groups.player.size() + " players!")
+                        .setColor(new Color(0x33FFEC));
+                log_channel.sendMessage(gameOverEmbed);
+                live_chat_channel.sendMessage(gameOverEmbed);
+            }
 
 //            // force map vote
 //            rateMapTask.cancel(); // cancel the task if gameover before 5 min
@@ -584,7 +620,7 @@ public class ioMain extends Plugin {
     }
 
     // rainbow
-    public static Timer.Task loop() {
+    public static void loop() {
         for (Player player : Groups.player) {
             try {
                 PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
@@ -611,13 +647,8 @@ public class ioMain extends Plugin {
             } catch (Exception ignored) {
             }
         }
-
-//        Core.app.post(this::loop);
-        return null;
     }
 
-
-    //    Core.app.post(this::loop);
     public static boolean checkChatRatelimit(String message, Player player) {
         // copied almost exactly from mindustry core, will probably need updating
         // will also update the user's global chat ratelimits
@@ -649,63 +680,68 @@ public class ioMain extends Plugin {
         return true;
     }
 
+
     public static void update(TextChannel log_channel, DiscordApi api) {
-        // log player joins
-        logConnections(log_channel, joinedPlayers, "join");
+        try {
+            if ((logCount & 5) == 0) {
+                // log player joins
+                logConnections(log_channel, joinedPlayers, "join");
 
-        logConnections(log_channel, leftPlayers, "leave");
-        for (Player p : Groups.player) {
-            PlayerData pd = getData(p.uuid());
-            if (pd == null) return;
-//
-            // update buildings built
-            PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(p.uuid(), null));
-            if (tdata != null) {
-                if (tdata.bbIncrementor > 0) {
-                    pd.buildingsBuilt = pd.buildingsBuilt + tdata.bbIncrementor;
-                    tdata.bbIncrementor = 0;
-                }
+                logConnections(log_channel, leftPlayers, "leave");
             }
+            logCount++;
+            for (Player p : Groups.player) {
+                PlayerData pd = getData(p.uuid());
+                if (pd == null) return;
 //
-//
-            pd.playTime++;
-            // check if someone gets promoted
-            for (var entry : rankRequirements.entrySet()) {
-                if (pd.rank <= entry.getKey() - 1 && pd.playTime >= entry.getValue().playtime &&
-                        pd.buildingsBuilt >= entry.getValue().buildingsBuilt &&
-                        pd.gamesPlayed >= entry.getValue().gamesPlayed) {
-                    Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
-                    if (pd.rank < entry.getKey()) pd.rank = entry.getKey();
-                    System.out.println(escapeEverything(p) + " got promoted to " + rankNames.get(pd.rank).name + "!");
+                // update buildings built
+                PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(p.uuid(), null));
+                if (tdata != null) {
+                    if (tdata.bbIncrementor > 0) {
+                        pd.buildingsBuilt = pd.buildingsBuilt + tdata.bbIncrementor;
+                        tdata.bbIncrementor = 0;
+                    }
                 }
+//
+//
+                pd.playTime++;
+                // check if someone gets promoted
+                for (var entry : rankRequirements.entrySet()) {
+                    if (pd.rank <= entry.getKey() - 1 && pd.playTime >= entry.getValue().playtime &&
+                            pd.buildingsBuilt >= entry.getValue().buildingsBuilt &&
+                            pd.gamesPlayed >= entry.getValue().gamesPlayed) {
+                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
+                        if (pd.rank < entry.getKey()) pd.rank = entry.getKey();
+                        info(escapeEverything(p) + " got promoted to " + rankNames.get(pd.rank).name + "!");
+                    }
+                }
+
+                setData(p.uuid(), pd);
+                playerDataGroup.put(p.uuid(), tdata); // update tdata with the new stuff
             }
 
-            setData(p.uuid(), pd);
-            ioMain.playerDataGroup.put(p.uuid(), tdata); // update tdata with the new stuff
-        }
-
-        if (state.is(GameState.State.playing)) {
-            if (Mathf.chance(0.01f)) {
-                api.updateActivity("( ͡° ͜ʖ ͡°)");
-                System.out.println("( ͡° ͜ʖ ͡°)");
+            if (state.is(GameState.State.playing)) {
+                if (Mathf.chance(0.01f)) {
+                    api.updateActivity("( ͡° ͜ʖ ͡°)");
+                    System.out.println("( ͡° ͜ʖ ͡°)");
+                } else {
+                    api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
+                }
             } else {
-                api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
-            }
-        } else {
-            api.updateActivity("Not hosting. Please Host a game. Ping an admin");
-            // restart the server:
-            Map result;
-            Gamemode preset = Gamemode.survival;
-            result = maps.getShuffleMode().next(preset, state.map);
-            info("Randomized next map to be @.", result.name());
-            world.loadMap(result, result.applyRules(preset));
-            state.rules = result.applyRules(preset);
-            logic.play();
-            assert error_log_channel != null;
-            error_log_channel.sendMessage(" <@770240444466069514> ");
-            error_log_channel.sendMessage(new EmbedBuilder().setColor(new Color(0xff0000)).setTitle("Server crashed. Restarting!"));
-            String command = "sh shellScripts/restart.sh";
-            return;
+                api.updateActivity("Not hosting. Please Host a game. Ping an admin");
+                // restart the server:
+                Map result;
+                Gamemode preset = Gamemode.survival;
+                result = maps.getShuffleMode().next(preset, state.map);
+                info("Randomized next map to be @.", result.name());
+                world.loadMap(result, result.applyRules(preset));
+                state.rules = result.applyRules(preset);
+                logic.play();
+                assert error_log_channel != null;
+                error_log_channel.sendMessage(" <@770240444466069514> ");
+                error_log_channel.sendMessage(new EmbedBuilder().setColor(new Color(0xff0000)).setTitle("Server crashed. Restarting!"));
+                String command = "sh shellScripts/restart.sh";
+                return;
 //            try {
 ////                execute(command);
 //                ProcessBuilder processBuilder = new ProcessBuilder("nohup", "sh", "./shellScripts/restart.sh");
@@ -727,20 +763,25 @@ public class ioMain extends Plugin {
 //                        .setTitle("Failed to restart server!")
 //                        .setDescription(e.getMessage()));
 //            }
-        }
-        // update the playtime of the current map
-        String mapName = state.map.name();
-        MapData mapData = getMapData(mapName);
-        if (mapData != null) {
-            mapData.playtime++;
-        } else {
-            mapData = new MapData(mapName);
-            mapData.playtime = 1;
-        }
-        rateMap(mapName, mapData);
-        passedMapTime++;
+            }
 
-        debug("Updated database!");
+            // update the playtime of the current map
+            String mapName = state.map.name();
+            MapData mapData = getMapData(mapName);
+            if (mapData != null) {
+                mapData.playtime++;
+            } else {
+                mapData = new MapData(mapName);
+                mapData.playtime = 1;
+            }
+            rateMap(mapName, mapData);
+            passedMapTime++;
+
+            debug("Updated database!");
+        } catch (Exception e) {
+            err("There was an error in the update loop: ");
+            e.printStackTrace();
+        }
     }
 
 
@@ -754,10 +795,16 @@ public class ioMain extends Plugin {
 //            rateMapTask.cancel();
             rateMenu();
         });
-        handler.register("vote", "<y/n>", "Vote for current votekick", arg -> {
+        handler.register("vote", "<y/n/c>", "Vote for current votekick", arg -> {
             if (currentlyKicking[0] == null) {
                 info("[scarlet]Nobody is being voted on.");
             } else {
+                if (arg[0].equalsIgnoreCase("c")) {
+                    currentlyKicking[0].map[0] = null;
+                    currentlyKicking[0].task.cancel();
+                    Call.sendMessage("[scarlet]Server []canceled the kick.");
+                }
+
                 int sign = switch (arg[0].toLowerCase()) {
                     case "y", "yes" -> 1;
                     case "n", "no" -> -1;
@@ -936,10 +983,21 @@ public class ioMain extends Plugin {
                 }
             });
 
-            handler.<Player>register("vote", "<y/n>", "Vote to kick the current player.", (arg, player) -> {
+            handler.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Or cancel the current kick.", (arg, player) -> {
                 if (currentlyKicking[0] == null) {
                     player.sendMessage("[scarlet]Nobody is being voted on.");
                 } else {
+                    if (arg[0].equalsIgnoreCase("c")) {
+                        if (currentlyKicking[0].startedVk == player || player.admin) {
+                            currentlyKicking[0].map[0] = null;
+                            currentlyKicking[0].task.cancel();
+                            Call.sendMessage("[scarlet]" + player.name + " []canceled the current kick.");
+                        } else {
+                            player.sendMessage("[scarlet]This command is restricted to the player who started the votekick and admins");
+                        }
+                        return;
+                    }
+
                     if (player.isLocal()) {
                         player.sendMessage("[scarlet]Local players can't vote. Kick the player yourself instead.");
                         return;
@@ -1478,12 +1536,15 @@ public class ioMain extends Plugin {
 
             MapVoteSession[] currentMapVoting = {null};
 
-            handler.<Player>register("changemap", "<map...>", " Vote to change to a specific map.", (args, player) -> {
+            handler.<Player>register("changemap", "[map...]", " Vote to change to a specific map.", (args, player) -> {
                 if (!state.rules.pvp || player.admin) {
-//                    PlayerData pd = getData(player.uuid());
-//                    if (pd != null && pd.rank >= 2) {
 
-                    mindustry.maps.Map found = getMapBySelector(args[0]);
+                    mindustry.maps.Map found;
+                    if (args.length > 0) {
+                        found = getMapBySelector(args[0]);
+                    } else {
+                        found = getMapBySelector(String.valueOf((int) (Math.random() * 5)));
+                    }
 
                     if (found != null) {
                         if (!vtime.get()) {
