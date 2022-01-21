@@ -180,6 +180,8 @@ public class Utils {
         bannedNames.add("IgruhaOrg");
         bannedNames.add("андрей");
         bannedNames.add("THIS IS MY KINGDOM CUM, THIS IS MY CUM");
+        bannedNames.add("卐");
+        bannedNames.add("cum");
 
         bannedBlocks.add(Blocks.conveyor);
         bannedBlocks.add(Blocks.titaniumConveyor);
