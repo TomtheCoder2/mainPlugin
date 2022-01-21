@@ -1,5 +1,10 @@
 name: Deployment
 
+on:
+  push:
+    tags:
+      - 'v*'
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
