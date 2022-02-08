@@ -46,7 +46,7 @@ public class VoteSession {
                         .setDescription("Not enough votes to kick " + escapeEverything(target.name) + "."));
                 logVk(false);
                 // unfreeze the player
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(target.uuid(), null));
+                PersistentPlayerData tdata = playerDataGroup.get(target.uuid());
                 if (tdata != null) {
                     tdata.frozen = false;
                 }
@@ -144,6 +144,16 @@ public class VoteSession {
 
         // ban in database
         banInDatabase(target, startedVk.name);
+        map[0] = null;
+        task.cancel();
+    }
+
+    public void cancel(Player player) {
+        Call.sendMessage("[scarlet]" + player.name + " []canceled the current kick.");
+        PersistentPlayerData ppd = playerDataGroup.get(player.uuid());
+        if (ppd != null) {
+            ppd.frozen = false;
+        }
         map[0] = null;
         task.cancel();
     }

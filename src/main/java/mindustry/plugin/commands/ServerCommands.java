@@ -70,6 +70,8 @@ import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.requests.IPLookup.readJsonFromUrl;
 import static mindustry.plugin.utils.Utils.Categories.*;
 import static mindustry.plugin.utils.Utils.*;
+import static mindustry.plugin.utils.ranks.Utils.listRanks;
+import static mindustry.plugin.utils.ranks.Utils.rankNames;
 
 public class ServerCommands {
     private final JSONObject data;

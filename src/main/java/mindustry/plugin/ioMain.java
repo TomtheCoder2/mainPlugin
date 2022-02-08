@@ -30,6 +30,7 @@ import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
 import mindustry.plugin.requests.Translate;
 import mindustry.plugin.utils.*;
+import mindustry.plugin.utils.ranks.Rank;
 import mindustry.world.Tile;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
@@ -37,6 +38,7 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.util.logging.FallbackLoggerConfiguration;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -54,6 +56,7 @@ import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.discordcommands.DiscordCommands.error_log_channel;
 import static mindustry.plugin.effect.EffectHelper.getEffect;
 import static mindustry.plugin.utils.Utils.*;
+import static mindustry.plugin.utils.ranks.Utils.*;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setDebug;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setTrace;
 
@@ -63,7 +66,6 @@ public class ioMain extends Plugin {
 //    public static Prefs prefs = new Prefs(prefsFile);
 //    public GetMap map = new GetMap();
     public static final Fi pluginDir = new Fi("./config/mods/");
-    //    public static JedisPool pool;
     public static DiscordApi api = null;
     public static String prefix = ".";
     public static String live_chat_channel_id = "";
@@ -93,7 +95,7 @@ public class ioMain extends Plugin {
     public static TextChannel live_chat_channel;
     public static TextChannel log_channel;
     private final long CDT = 300L;
-    private final ObjectMap<Long, String> CommandCooldowns = new ObjectMap<>(); //uuid
+    private final ObjectMap<Long, String> CommandCooldowns = new ObjectMap<>(); // uuid
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public ObjectMap<String, Role> discRoles = new ObjectMap<>();
     public NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
@@ -101,77 +103,79 @@ public class ioMain extends Plugin {
 //    protected Interval timer = new Interval(1);
     //cooldown between votes
     float voteCooldown = 0;
-    //register commands that run on the server
-    // cooldowns per player
+    // register commands that run on the server
+    // cool-downs per player
     ObjectMap<String, Timekeeper> cooldowns = new ObjectMap<>();
     // current kick sessions
     VoteSession[] currentlyKicking = {null};
-    private JSONObject alldata;
 
     // register event handlers and create variables in the constructor
     public ioMain() {
-        setDebug(false); // disable debug logs from javacord
+        info("Starting Discord Plugin...");
+        // disable debug logs from javacord (doesnt work tho, idk why)
+        setDebug(false);
+        FallbackLoggerConfiguration.setDebug(false);
+        FallbackLoggerConfiguration.setTrace(false);
+        JSONObject allData;
         try { // read settings
             String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
-            JSONObject alldata;
-            JSONObject data;
-            data = alldata = new JSONObject(new JSONTokener(pureJson));
+            allData = new JSONObject(new JSONTokener(pureJson));
             // url, username and password to connect to the database
-            url = alldata.getString("url");
-            user = alldata.getString("user");
-            password = alldata.getString("password");
+            url = allData.getString("url");
+            user = allData.getString("user");
+            password = allData.getString("password");
             // url to connect to the MindServ
-            maps_url = alldata.getString("maps_url");
+            maps_url = allData.getString("maps_url");
             // for the live chat between the discord server and the mindustry server
-            live_chat_channel_id = alldata.getString("live_chat_channel_id");
+            live_chat_channel_id = allData.getString("live_chat_channel_id");
             // log joins bans etc
-            log_channel_id = alldata.getString("log_channel_id");
+            log_channel_id = allData.getString("log_channel_id");
             // channel to give feedback for maps
-            map_rating_channel_id = alldata.getString("map_rating_channel_id");
+            map_rating_channel_id = allData.getString("map_rating_channel_id");
             // iplookup api key
-            apapi_key = alldata.getString("apapi_key");
+            apapi_key = allData.getString("apapi_key");
             // bot channels
-            bot_channel_id = alldata.getString("bot_channel_id");
-            apprentice_bot_channel_id = alldata.getString("apprentice_bot_channel");
-            staff_bot_channel_id = alldata.getString("staff_bot_channel_id");
-            admin_bot_channel_id = alldata.getString("admin_bot_channel_id");
+            bot_channel_id = allData.getString("bot_channel_id");
+            apprentice_bot_channel_id = allData.getString("apprentice_bot_channel");
+            staff_bot_channel_id = allData.getString("staff_bot_channel_id");
+            admin_bot_channel_id = allData.getString("admin_bot_channel_id");
             // link to join our discord server
-            discordInviteLink = alldata.getString("discordInviteLink");
-            previewSchem = alldata.getBoolean("previewSchem");
+            discordInviteLink = allData.getString("discordInviteLink");
+            previewSchem = allData.getBoolean("previewSchem");
             System.out.printf("url: %s, user: %s, password: %s%n", url, user, password);
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
             return;
         }
-//        try {
-//            // doesn't work on the first couple tries but after that it works, IDK why
-//            connect();
-//            connect();
-//            connect();
-//            connect();
-//        } catch (SQLException throwables) {
-//            throwables.printStackTrace();
-//            System.out.println(throwables);
-//        }
+        try { // test connection
+            connect();
+        } catch (Exception e) {
+            err("Could not login to PostgresSQL database!");
+        }
         Utils.init();
         EffectHelper.init();
 
         try {
             String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
-            data = alldata = new JSONObject(new JSONTokener(pureJson));
+            data = allData = new JSONObject(new JSONTokener(pureJson));
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
         }
         try {
-            api = new DiscordApiBuilder().setToken(alldata.getString("token")).login().join();
-            Log.info("logged in as: " + api.getYourself());
+            api = new DiscordApiBuilder().setToken(allData.getString("token")).login().join();
+            Log.info("Logged in as: " + api.getYourself());
         } catch (Exception e) {
             Log.err("Couldn't log into discord.");
         }
-        BotThread bt = new BotThread(api, Thread.currentThread(), alldata);
+        // start bot thread for handling commands and other messages
+        BotThread bt = new BotThread(api, Thread.currentThread(), allData);
         bt.setDaemon(false);
         bt.start();
 
+        /**
+         * start rainbow command to change color of the names\n
+         * This runs as a thread for performance reasons
+         * */
         Rainbow rainbowThread = new Rainbow(Thread.currentThread());
         rainbowThread.setDaemon(false);
         rainbowThread.start();
@@ -185,9 +189,10 @@ public class ioMain extends Plugin {
         if (!Objects.equals(live_chat_channel_id, "")) {
             tc = getTextChannel(live_chat_channel_id);
         } else {
-            System.err.println("couldn't fin live_chat_channel_id!");
+            System.err.println("couldn't find live_chat_channel_id!");
         }
         if (tc != null) {
+            // if there's a live channel create a chat filter to send all messages to Discord
             TextChannel finalTc = tc;
             Events.on(EventType.PlayerChatEvent.class, event -> {
                 if (event.message.charAt(0) != '/') {
@@ -202,17 +207,6 @@ public class ioMain extends Plugin {
                     }
                 }
             });
-        }
-
-
-        // database
-        try {
-//            pool = new JedisPool(new JedisPoolConfig(), "localhost");
-//            pool = new JedisPool();
-//            Log.info("jedis database loaded");
-        } catch (Exception e) {
-            e.printStackTrace();
-            Core.app.exit();
         }
 
         // setup prefix
@@ -232,6 +226,8 @@ public class ioMain extends Plugin {
         if (data.has("api_key")) {
             apiKey = data.getString("api_key");
             Log.info("api_key set successfully");
+        } else {
+            warn("No api key for ip lookups (ipapi).");
         }
 
         // display on screen messages
@@ -265,12 +261,12 @@ public class ioMain extends Plugin {
 //            contentHandler = new ContentHandler();
             Log.info("Everything's loaded !");
         });
-        // update every tick
 
+        // update every tick
         // player disconnected
         Events.on(EventType.PlayerLeave.class, event -> {
             String uuid = event.player.uuid();
-            //free ram
+            // free ram
             if (playerDataGroup.get(uuid) != null) {
                 playerDataGroup.remove(uuid);
             }
@@ -295,22 +291,21 @@ public class ioMain extends Plugin {
                 player.con.kick("[scarlet]Please change your name.");
                 return;
             }
-//            EmbedBuilder eb = new EmbedBuilder();
-//            eb.setTitle("Player Join Log");
-//            eb.setDescription(String.format("`%s` • `%d `:%s", player.uuid(), player.id, escapeColorCodes(player.name)));
-//            assert log_channel != null;
-//            log_channel.sendMessage(eb);
+            // check if the player is already in the database
             PlayerData pd = getData(player.uuid());
 
+            // put the player in the playerDataGroup, which saves player data while the player is online
             if (!playerDataGroup.containsKey(player.uuid())) {
                 PersistentPlayerData data = new PersistentPlayerData();
                 playerDataGroup.put(player.uuid(), data);
             }
 
             // check if he's impersonating a rank
+            // remove all color codes, so it's not possible to just change the color of the rank symbol
             String escapedName = escapeColorCodes(player.name).replaceAll("\\[accent\\]", "");
             for (java.util.Map.Entry<Integer, Rank> rank : rankNames.entrySet()) {
                 if (rank.getKey() == 0) continue;
+                // compare the player's potential escaped rank symbol with the escaped symbols from the utils
                 if (escapedName.toLowerCase().startsWith(escapeColorCodes(rank.getValue().tag).replaceAll("\\[accent\\]", ""))) {
                     player.con.kick("[scarlet]Dont impersonate a rank.");
                     info("Player " + escapedName + " tried to impersonate rank: " + rank.getValue().name);
@@ -392,7 +387,7 @@ public class ioMain extends Plugin {
                         td.bbIncrementor++;
                     }
                 }
-            } catch (Exception e ) {
+            } catch (Exception e) {
                 err("There was an error while saving block status: ");
                 e.printStackTrace();
             }
@@ -491,9 +486,7 @@ public class ioMain extends Plugin {
                     }
 
                     final String color = EffectHelper.properties.get(key + ".color", "#ffffff");
-                    final int rotation = Integer.parseInt(
-                            EffectHelper.properties.get(key + ".rotation", "0")
-                    );
+                    final int rotation = Integer.parseInt(EffectHelper.properties.get(key + ".rotation", "0"));
 
                     final Effect eff = getEffect(name);
                     final EffectObject place = new EffectObject(eff, p.getX(), p.getY(), rotation, arc.graphics.Color.valueOf(color));
@@ -542,10 +535,7 @@ public class ioMain extends Plugin {
             // log the game over
             assert log_channel != null;
             if (Groups.player.size() > 0) {
-                EmbedBuilder gameOverEmbed = new EmbedBuilder()
-                        .setTitle("Game over!")
-                        .setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves and " + Groups.player.size() + " players!")
-                        .setColor(new Color(0x33FFEC));
+                EmbedBuilder gameOverEmbed = new EmbedBuilder().setTitle("Game over!").setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves and " + Groups.player.size() + " players!").setColor(new Color(0x33FFEC));
                 log_channel.sendMessage(gameOverEmbed);
                 live_chat_channel.sendMessage(gameOverEmbed);
             }
@@ -707,9 +697,7 @@ public class ioMain extends Plugin {
                 pd.playTime++;
                 // check if someone gets promoted
                 for (var entry : rankRequirements.entrySet()) {
-                    if (pd.rank <= entry.getKey() - 1 && pd.playTime >= entry.getValue().playtime &&
-                            pd.buildingsBuilt >= entry.getValue().buildingsBuilt &&
-                            pd.gamesPlayed >= entry.getValue().gamesPlayed) {
+                    if (pd.rank <= entry.getKey() - 1 && pd.playTime >= entry.getValue().playtime && pd.buildingsBuilt >= entry.getValue().buildingsBuilt && pd.gamesPlayed >= entry.getValue().gamesPlayed) {
                         Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
                         if (pd.rank < entry.getKey()) pd.rank = entry.getKey();
                         info(escapeEverything(p) + " got promoted to " + rankNames.get(pd.rank).name + "!");
@@ -968,11 +956,12 @@ public class ioMain extends Plugin {
                             session.vote(player, 1);
 
                             // freeze the player
-                            PersistentPlayerData tdata = (playerDataGroup.getOrDefault(found.uuid(), null));
-                            assert tdata != null;
-                            tdata.frozen = !tdata.frozen;
-                            player.sendMessage("[cyan]Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(found));
-                            found.sendMessage("[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " for during the votekick!");
+                            PersistentPlayerData tdata = playerDataGroup.get(found.uuid());
+                            if (tdata != null) {
+                                tdata.frozen = !tdata.frozen;
+                                player.sendMessage("[cyan]Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(found));
+                                found.sendMessage("[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " during the votekick!");
+                            }
 
                             vtime.reset();
                             currentlyKicking[0] = session;
@@ -989,9 +978,7 @@ public class ioMain extends Plugin {
                 } else {
                     if (arg[0].equalsIgnoreCase("c")) {
                         if (currentlyKicking[0].startedVk == player || player.admin) {
-                            currentlyKicking[0].map[0] = null;
-                            currentlyKicking[0].task.cancel();
-                            Call.sendMessage("[scarlet]" + player.name + " []canceled the current kick.");
+                            currentlyKicking[0].cancel(player);
                         } else {
                             player.sendMessage("[scarlet]This command is restricted to the player who started the votekick and admins");
                         }
@@ -1050,13 +1037,7 @@ public class ioMain extends Plugin {
                                 }
                             }
                             System.out.println(roleList);
-                            getTextChannel(log_channel_id).sendMessage(new EmbedBuilder()
-                                    .setTitle("Updated roles!")
-                                    .addField("Discord Name", ioMain.api.getUserById(tdata.redeem).get().getName(), true)
-                                    .addField("In Game Name", tdata.origName, true)
-                                    .addField("In Game UUID", player.uuid(), true)
-                                    .addField("Added roles", roleList.toString(), true)
-                            );
+                            getTextChannel(log_channel_id).sendMessage(new EmbedBuilder().setTitle("Updated roles!").addField("Discord Name", ioMain.api.getUserById(tdata.redeem).get().getName(), true).addField("In Game Name", tdata.origName, true).addField("In Game UUID", player.uuid(), true).addField("Added roles", roleList.toString(), true));
                             player.sendMessage("Successfully redeem to account: [green]" + ioMain.api.getUserById(tdata.redeem).get().getName());
                             tdata.task.cancel();
                         } else {
@@ -1146,10 +1127,7 @@ public class ioMain extends Plugin {
                         }
                     }
                     case "advice" -> {
-                        EmbedBuilder eb = new EmbedBuilder()
-                                .setTitle("Feedback for map " + escapeEverything(mapName) + "!")
-                                .addField("Advice", args[1])
-                                .addField("By", escapeEverything(player.name));
+                        EmbedBuilder eb = new EmbedBuilder().setTitle("Feedback for map " + escapeEverything(mapName) + "!").addField("Advice", args[1]).addField("By", escapeEverything(player.name));
                         assert map_rating_channel != null;
                         map_rating_channel.sendMessage(eb);
                         player.sendMessage("Successfully gave an [cyan]advice [white]for " + mapName + "[white]!");
@@ -1295,27 +1273,16 @@ public class ioMain extends Plugin {
                             if (args.length > 1) {
                                 Role ro = discRoles.get("861523420076179457");
 //                                Role role = .getRoleById(661155250123702302L);
-                                new MessageBuilder()
-                                        .setEmbed(new EmbedBuilder()
-                                                .setTitle("Potential griefer online")
+                                new MessageBuilder().setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
 //                                                .setDescription("<@&861523420076179457>")
-                                                .addField("name", escapeColorCodes(found.name))
-                                                .addField("reason", args[1])
-                                                .setColor(Color.RED)
-                                                .setFooter("Reported by " + player.name))
-                                        .send(tc_c);
+                                        .addField("name", escapeColorCodes(found.name)).addField("reason", args[1]).setColor(Color.RED).setFooter("Reported by " + player.name)).send(tc_c);
                                 assert tc_c != null;
                                 tc_c.sendMessage("<@&882340213551140935>");
                             } else {
                                 Role ro = discRoles.get("861523420076179457");
-                                new MessageBuilder()
-                                        .setEmbed(new EmbedBuilder()
-                                                .setTitle("Potential griefer online")
+                                new MessageBuilder().setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
 //                                                .setDescription("<@&861523420076179457>")
-                                                .addField("name", escapeColorCodes(found.name))
-                                                .setColor(Color.RED)
-                                                .setFooter("Reported by " + player.name))
-                                        .send(tc_c);
+                                        .addField("name", escapeColorCodes(found.name)).setColor(Color.RED).setFooter("Reported by " + player.name)).send(tc_c);
                                 assert tc_c != null;
                                 tc_c.sendMessage("<@&882340213551140935>");
                             }
@@ -1538,7 +1505,10 @@ public class ioMain extends Plugin {
 
             handler.<Player>register("changemap", "[map...]", " Vote to change to a specific map.", (args, player) -> {
                 if (!state.rules.pvp || player.admin) {
-
+                    if (currentMapVoting[0] != null) {
+                        player.sendMessage("[scarlet]There is already a map being voted on. Type /rtv to vote.");
+                        return;
+                    }
                     mindustry.maps.Map found;
                     if (args.length > 0) {
                         found = getMapBySelector(args[0]);

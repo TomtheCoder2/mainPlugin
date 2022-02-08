@@ -40,6 +40,8 @@ import static mindustry.Vars.state;
 import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.utils.Utils.*;
+import static mindustry.plugin.utils.ranks.Utils.rankNames;
+import static mindustry.plugin.utils.ranks.Utils.rankRoles;
 
 public class ComCommands {
 //    public static ContentHandler contentHandler = new ContentHandler();
@@ -52,6 +54,7 @@ public class ComCommands {
                 help = "Sends a message to in-game chat.";
                 usage = "<message>";
                 minArguments = 1;
+                hidden = true;
             }
 
             public void run(Context ctx) {

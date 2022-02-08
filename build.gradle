@@ -35,7 +35,7 @@ dependencies {
 //    compileOnly('org.apache.commons:commons-pool2:2.15.0')
 //    compileOnly('redis.clients:jedis:3.6.3')
 
-    implementation('org.javacord:javacord:3.3.2')
+    implementation('org.javacord:javacord:3.4.0')
     compileOnly('javax.ws.rs:javax.ws.rs-api:2.1.1')
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation("net.dv8tion:JDA:4.3.0_277")
