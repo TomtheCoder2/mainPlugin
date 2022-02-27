@@ -13,6 +13,9 @@ import arc.util.Log;
 import arc.util.Strings;
 import arc.util.io.CounterInputStream;
 import com.github.kevinsawicki.http.HttpRequest;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mindustry.content.Blocks;
 import mindustry.game.EventType;
 import mindustry.game.Schematic;
@@ -53,7 +56,6 @@ import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
@@ -66,7 +68,8 @@ import static arc.util.Log.err;
 import static mindustry.Vars.*;
 import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.discordcommands.DiscordCommands.error_log_channel;
-import static mindustry.plugin.ioMain.*;
+import static mindustry.plugin.ioMain.api;
+import static mindustry.plugin.ioMain.contentHandler;
 import static mindustry.plugin.utils.ranks.Utils.rankNames;
 //import java.sql.*;
 
@@ -492,24 +495,6 @@ public class Utils {
     }
 
     /**
-     * log when a colonel+ bans a player
-     */
-    public static void logBanMessage(Administration.PlayerInfo info, Context ctx, String reason, String action) {
-        TextChannel log_channel = getTextChannel(log_channel_id);
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(action + " " + escapeEverything(info.lastName));
-        eb.addField("UUID", info.id, true);
-        eb.addField("IP", info.lastIP, true);
-        eb.addField(action + " by", "<@" + ctx.author.getIdAsString() + ">", true);
-        eb.addField("Reason", reason, true);
-        if (log_channel == null) {
-            err("No log channel found for logging ban message!");
-            return;
-        }
-        log_channel.sendMessage(eb);
-    }
-
-    /**
      * if there are too few arguments for the command
      */
     public static void tooFewArguments(Context ctx, Command command) {
@@ -714,34 +699,113 @@ public class Utils {
     }
 
     /**
-     * log a list of connections in the discord log channel
+     * Converts a {@link JsonObject} to {@link EmbedBuilder}.
+     * Supported Fields: Title, Author, Description, Color, Fields, Thumbnail, Footer.
      *
-     * @param connection whether they joined or left
+     * @param json The JsonObject
+     * @return The Embed
      */
-    public static void logConnections(TextChannel log_channel, List<String> leftPlayers, String connection) {
-        if (leftPlayers.size() > 0) {
-            EmbedBuilder eb = new EmbedBuilder();
-            eb.setTitle("Player " + connection + " Log");
-            StringBuilder desc = new StringBuilder();
-            for (String uuid : leftPlayers) {
-//                if (player == null) continue;
-                try {
-                    Administration.PlayerInfo info = getPlayerInfo(uuid);
-                    desc.append(String.format("`%s` : `%s `:%s\n", uuid, info.lastIP, escapeEverything(info.lastName)));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            if (Objects.equals(connection, "leave")) {
-                eb.setColor(new Color(0xff0000));
-            } else {
-                eb.setColor(new Color(0x00ff00));
-            }
-            eb.setDescription(desc.toString());
-            assert log_channel != null;
-            log_channel.sendMessage(eb);
+    public static EmbedBuilder jsonToEmbed(JsonObject json) {
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+
+        JsonPrimitive titleObj = json.getAsJsonPrimitive("title");
+        if (titleObj != null) { // Make sure the object is not null before adding it onto the embed.
+            embedBuilder.setTitle(titleObj.getAsString());
         }
-        leftPlayers.clear();
+
+        JsonObject authorObj = json.getAsJsonObject("author");
+        if (authorObj != null) {
+            String authorName = authorObj.get("name").getAsString();
+            String authorIconUrl = authorObj.get("icon_url").getAsString();
+            String authorUrl = null;
+            if (authorObj.get("url") != null)
+                authorUrl = authorObj.get("url").getAsString();
+            if (authorIconUrl != null) // Make sure the icon_url is not null before adding it onto the embed. If its null then add just the author's name.
+                embedBuilder.setAuthor(authorName, (authorUrl != null ? authorUrl : "https://www.youtube.com/watch?v=iik25wqIuFo"), authorIconUrl); // little rickroll
+            else
+                embedBuilder.setAuthor(authorName);
+        }
+
+        JsonPrimitive descObj = json.getAsJsonPrimitive("description");
+        if (descObj != null) {
+            embedBuilder.setDescription(descObj.getAsString());
+        }
+
+        JsonPrimitive colorObj = json.getAsJsonPrimitive("color");
+        if (colorObj != null) {
+            Color color = new Color(colorObj.getAsInt());
+            embedBuilder.setColor(color);
+        }
+
+        JsonObject imageObj = json.getAsJsonObject("image");
+        if (imageObj != null) {
+            embedBuilder.setImage(imageObj.get("url").getAsString());
+        }
+
+        JsonArray fieldsArray = json.getAsJsonArray("fields");
+        if (fieldsArray != null) {
+            // Loop over the fields array and add each one by order to the embed.
+            fieldsArray.forEach(ele -> {
+                debug(ele);
+                if (ele != null && !ele.isJsonNull()) {
+                    String name = ele.getAsJsonObject().get("name").getAsString();
+                    String content = ele.getAsJsonObject().get("value").getAsString();
+                    boolean inline = ele.getAsJsonObject().get("inline").getAsBoolean();
+                    embedBuilder.addField(name, content, inline);
+                }
+            });
+        }
+
+        JsonObject thumbnailObj = json.getAsJsonObject("thumbnail");
+        if (thumbnailObj != null) {
+            embedBuilder.setThumbnail(thumbnailObj.get("url").getAsString());
+        }
+
+        JsonPrimitive timeStampObj = json.getAsJsonPrimitive("timestamp");
+        if (timeStampObj != null) {
+            if (timeStampObj.getAsBoolean()) {
+                embedBuilder.setTimestampToNow();
+            }
+        }
+
+        JsonObject footerObj = json.getAsJsonObject("footer");
+        if (footerObj != null) {
+            String content = footerObj.get("text").getAsString();
+            String footerIconUrl = footerObj.get("icon_url").getAsString();
+
+            if (footerIconUrl != null)
+                embedBuilder.setFooter(content, footerIconUrl);
+            else
+                embedBuilder.setFooter(content);
+        }
+
+        return embedBuilder;
+    }
+
+
+    // copied and pasted from the internet, hope it works
+    public static boolean onlyDigits(String str) {
+        // Regex to check string
+        // contains only digits
+        String regex = "[0-9]+";
+
+        // Compile the ReGex
+        Pattern p = Pattern.compile(regex);
+
+        // If the string is empty
+        // return false
+        if (str == null) {
+            return false;
+        }
+
+        // Find match between given string
+        // and regular expression
+        // using Pattern.matcher()
+        Matcher m = p.matcher(str);
+
+        // Return if the string
+        // matched the ReGex
+        return m.matches();
     }
 
     /**

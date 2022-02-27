@@ -210,7 +210,7 @@ public class DiscordCommands implements MessageCreateListener {
         try {
             command.run(ctx);
         } catch (Exception error) {
-            System.out.println(Arrays.toString(error.getStackTrace()));
+            error.printStackTrace();
             System.out.println(error.getMessage());
             try {
                 EmbedBuilder eb = new EmbedBuilder()
@@ -221,7 +221,7 @@ public class DiscordCommands implements MessageCreateListener {
                 error_log_channel.sendMessage(eb);
             } catch (Exception error2) {
                 System.out.println("There was an error at outputting the error!!!");
-                System.out.println(error2.toString());
+                error2.printStackTrace();
             }
         }
     }

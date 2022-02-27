@@ -348,7 +348,7 @@ public class Utils {
                 pstmt.setLong(4 + 1, mapdata.highscoreWaves);
                 pstmt.setLong(5 + 1, mapdata.playtime);
                 pstmt.setLong(6 + 1, mapdata.shortestGame);
-//                Log.debug(pstmt);
+//                CustomLog.debug(pstmt);
 
                 // send the data
                 int affectedRows = pstmt.executeUpdate();

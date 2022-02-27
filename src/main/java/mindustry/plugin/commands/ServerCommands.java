@@ -8,6 +8,10 @@ import arc.struct.StringMap;
 import arc.util.Log;
 import arc.util.Structs;
 import arc.util.Timer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import mindustry.content.Blocks;
 import mindustry.content.Bullets;
 import mindustry.content.UnitTypes;
@@ -35,10 +39,12 @@ import mindustry.plugin.discordcommands.RoleRestrictedCommand;
 import mindustry.plugin.ioMain;
 import mindustry.plugin.requests.GetMap;
 import mindustry.plugin.utils.Utils;
+import mindustry.plugin.utils.ranks.Rank;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -57,9 +63,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.zip.InflaterInputStream;
 
@@ -68,6 +75,8 @@ import static mindustry.Vars.*;
 import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.requests.IPLookup.readJsonFromUrl;
+import static mindustry.plugin.utils.CustomLog.logAction;
+import static mindustry.plugin.utils.LogAction.*;
 import static mindustry.plugin.utils.Utils.Categories.*;
 import static mindustry.plugin.utils.Utils.*;
 import static mindustry.plugin.utils.ranks.Utils.listRanks;
@@ -96,7 +105,7 @@ public class ServerCommands {
                 Seq<Map> mapList = maps.customMaps();
                 for (int i = 0; i < mapList.size; i++) {
                     Map m = mapList.get(i);
-                    eb.addField(m.name(), m.width + " x " + m.height);
+                    eb.addField(escapeEverything(m.name()), m.width + " x " + m.height, true);
                 }
                 ctx.channel.sendMessage(eb);
             }
@@ -494,7 +503,7 @@ public class ServerCommands {
                             if (player != null) {
                                 player.con.kick(Packets.KickReason.banned);
                             }
-                            logBanMessage(info, ctx, reason, "Banned");
+                            logAction(ban, info, ctx, reason);
                         } else {
                             playerNotFound(target, eb, ctx);
                         }
@@ -592,6 +601,76 @@ public class ServerCommands {
 
         if (data.has("moderator_roleid")) {
             String banRole = data.getString("moderator_roleid");
+
+            handler.registerCommand(new RoleRestrictedCommand("say") {
+                {
+                    help = "Say something as the bot.";
+                    usage = "<channel> <message>";
+                    role = banRole;
+                    category = management;
+                    minArguments = 2;
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    String channelName = ctx.args[1].replaceAll("<#", "").replaceAll(">", "");
+                    String message = ctx.message.split(" ", 2)[1];
+                    TextChannel channel = null;
+                    if (onlyDigits(channelName)) {
+                        channel = getTextChannel(channelName);
+                    } else {
+                        Collection<Channel> channels = api.getChannelsByName(channelName);
+                        if (!channels.isEmpty()) {
+                            channel = getTextChannel(String.valueOf(channels.stream().toList().get(0).getId()));
+                        }
+                    }
+                    if (channel == null) {
+                        ctx.channel.sendMessage(new EmbedBuilder()
+                                .setTitle("Error")
+                                .setDescription("Could not find text channel " + channelName)
+                                .setColor(new Color(0xff0000)));
+                        return;
+                    }
+                    if (!message.startsWith("```") && !message.startsWith("```json")) {
+                        channel.sendMessage(new EmbedBuilder().setTitle(message));
+                    } else {
+                        EmbedBuilder eb;
+                        try {
+                            message = message.replaceAll("```json", "").replaceAll("```", "");
+                            Gson gson = new GsonBuilder()
+                                    .setLenient()
+                                    .create();
+//                            debug(message);
+                            JsonElement element = gson.fromJson(message, JsonElement.class);
+                            JsonObject jsonObj = element.getAsJsonObject();
+
+                            eb = jsonToEmbed(jsonObj);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            ctx.sendEmbed(new EmbedBuilder()
+                                    .setTitle("Error")
+                                    .setColor(new Color(0xff0000))
+                                    .setDescription("There was an error while parsing the json object: \n" + e.getMessage()));
+                            return;
+                        }
+                        debug(eb.toString());
+                        try {
+                            channel.sendMessage(eb).get();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            ctx.sendEmbed(new EmbedBuilder()
+                                    .setTitle("Error")
+                                    .setColor(new Color(0xff0000))
+                                    .setDescription("There was an error while sending the message: \n" + e.getMessage()));
+                            return;
+                        }
+                    }
+                    ctx.sendEmbed(new EmbedBuilder()
+                            .setTitle("Successfully sent Message")
+                            .setDescription("Successfully sent message in channel: <#" + channel.getId() + ">")
+                            .setColor(new Color(0x00ff00)));
+                }
+            });
 
             handler.registerCommand(new RoleRestrictedCommand("weapon") {
                 {
@@ -1095,7 +1174,7 @@ public class ServerCommands {
                                 if (player != null) {
                                     player.con.kick(Packets.KickReason.banned);
                                 }
-                                logBanMessage(info, ctx, reason, "Banned");
+                                logAction(ban, info, ctx, reason);
                             } else {
                                 playerNotFound(target, eb, ctx);
                             }
@@ -1109,7 +1188,7 @@ public class ServerCommands {
             handler.registerCommand(new RoleRestrictedCommand("blacklist") {
                 {
                     help = "Ban a player by the provided uuid.";
-                    usage = "<uuid>";
+                    usage = "<uuid> [reason]";
                     role = banRole;
                     category = moderation;
                     minArguments = 1;
@@ -1119,6 +1198,7 @@ public class ServerCommands {
                     EmbedBuilder eb = new EmbedBuilder()
                             .setTimestampToNow();
                     String target = ctx.args[1];
+                    String reason = ctx.args[2];
                     PlayerData pd = getData(target);
                     Administration.PlayerInfo info = netServer.admins.getInfoOptional(target);
 
@@ -1127,7 +1207,7 @@ public class ServerCommands {
                         setData(target, pd);
                         eb.setTitle("Blacklisted successfully.");
                         eb.setDescription("`" + escapeEverything(info.lastName) + "` was banned.");
-                        logBanMessage(info, ctx, null, "Blacklisted");
+                        logAction(blacklist, info, ctx, reason);
                     } else {
                         eb.setTitle("Command terminated");
                         eb.setColor(Pals.error);
@@ -1178,7 +1258,7 @@ public class ServerCommands {
 
                             player.con.kick(Packets.KickReason.banned);
                             Administration.PlayerInfo info = netServer.admins.getInfo(player.uuid());
-                            logBanMessage(info, ctx, reason, "Banned");
+                            logAction(ban, info, ctx, reason);
                         } else {
                             playerNotFound(target, eb, ctx);
                         }
@@ -1211,7 +1291,7 @@ public class ServerCommands {
 
                         player.con.kick(Packets.KickReason.kick);
                         Administration.PlayerInfo info = netServer.admins.getInfo(player.uuid());
-                        logBanMessage(info, ctx, reason, "Kicked");
+                        logAction(kick, info, ctx, reason);
                     } else {
                         playerNotFound(target, eb, ctx);
                         return;
@@ -1242,7 +1322,7 @@ public class ServerCommands {
                         eb.setTitle("Unbanned `" + escapeEverything(info.lastName) + "`.");
                         ctx.channel.sendMessage(eb);
                         setData(target, pd);
-                        logBanMessage(info, ctx, "Not provided", "Unbanned");
+                        logAction(unban, info, ctx, null);
                     } else {
                         eb.setTitle("UUID `" + escapeEverything(target) + "` not found in the database.");
                         eb.setColor(Pals.error);
@@ -1369,7 +1449,7 @@ public class ServerCommands {
                         if (!player.admin) {
                             msg.append(" : ").append(player.con.address).append(" : ").append(player.uuid()).append("\n");
                         } else {
-                            msg.append("\n");
+                            msg.append(" : ").append(player.con.address).append(" : ").append(player.uuid()).append("`(admin)`\n");
                         }
                     }
                     msg.append("```");
@@ -1382,12 +1462,10 @@ public class ServerCommands {
                     }
                     for (Player player : Groups.player) {
                         lijst.append("`* ");
-                        if (player.admin()) {
-                            lijst.append(String.format("%-44s:` ", "admin"));
-                        } else {
-                            lijst.append(String.format("%-24s : %-16s :` ", player.uuid(), player.con.address));
-                        }
-                        lijst.append(escapeEverything(player.name)).append("\n");
+                        lijst.append(String.format("%-24s : %-16s :` ", player.uuid(), player.con.address));
+                        lijst.append(escapeEverything(player.name));
+                        if (player.admin) lijst.append("`(admin)`");
+                        lijst.append("\n");
                     }
 
                     new MessageBuilder()
@@ -2197,15 +2275,29 @@ public class ServerCommands {
                     CompletableFuture.runAsync(() -> {
                         EmbedBuilder eb = new EmbedBuilder();
                         String target = ctx.args[1];
-                        Pattern p = Pattern.compile("[0-9]+");
-                        if (!p.matcher(ctx.args[2]).matches()) {
-                            eb.setTitle("Error")
+                        String targetRankString = ctx.args[2];
+                        int targetRank = -1;
+                        if (!onlyDigits(targetRankString)) {
+                            // try to get it by name
+                            for (java.util.Map.Entry<Integer, Rank> rank : rankNames.entrySet()) {
+                                if (rank.getValue().name.toLowerCase(Locale.ROOT).startsWith(targetRankString.toLowerCase(Locale.ROOT))) {
+                                    targetRank = rank.getKey();
+                                    break;
+                                }
+                            }
+                        } else {
+                            try {
+                                targetRank = Integer.parseInt(ctx.args[2]);
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        if (targetRank == -1) {
+                            ctx.sendEmbed(new EmbedBuilder()
+                                    .setTitle("Error")
                                     .setColor(new Color(0xff0000))
-                                    .setDescription("Second argument has to be a number");
-                            ctx.channel.sendMessage(eb);
+                                    .setDescription("Could not find rank " + targetRankString));
                             return;
                         }
-                        int targetRank = Integer.parseInt(ctx.args[2]);
                         if (targetRank > rankNames.size() - 1 || targetRank < 0) {
                             eb.setTitle("Error")
                                     .setDescription("Rank has to be larger than -1 and smaller than " + (rankNames.size() - 1) + "!")
@@ -2239,13 +2331,7 @@ public class ServerCommands {
                                 if (player != null) {
                                     player.name = rankNames.get(rank).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "").replaceAll("\\|(.*)\\|", "");
                                 }
-                                // log the action
-                                EmbedBuilder logEb = new EmbedBuilder()
-                                        .setTitle(escapeEverything(info.lastName) + "'s rank was set to " + rankNames.get(rank).name + "!")
-                                        .setColor(new Color(0x00ff00))
-                                        .addField("UUID", uuid)
-                                        .addField("By", ctx.author.getDiscriminatedName());
-                                log_channel.sendMessage(logEb);
+                                logAction(setRank, info, ctx, null);
                             } else {
                                 playerNotFound(target, eb, ctx);
                                 return;
@@ -2256,6 +2342,59 @@ public class ServerCommands {
                             }
                         }
                     });
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("ip") {
+                {
+                    help = "Ip tools";
+                    usage = "<check|ban|unban> <ip> [reason]";
+                    category = moderation;
+                    role = banRole;
+                    minArguments = 2;
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    String op = ctx.args[1];
+                    String targetIp = ctx.args[2];
+                    String reason = null;
+                    if (ctx.args.length > 3) {
+                        reason = ctx.message.split(" ", 3)[2];
+                    }
+                    EmbedBuilder eb = new EmbedBuilder();
+
+                    switch (op) {
+                        case "check", "c" -> {
+                            Seq<String> bans = netServer.admins.getBannedIPs();
+                            eb.setTitle(targetIp + (bans.contains(targetIp) ? "is" : "is not") + " banned");
+                        }
+                        case "ban", "b" -> {
+                            netServer.admins.banPlayerIP(targetIp);
+                            eb.setTitle("Banned " + targetIp)
+                                    .setColor(new Color(0xff0000));
+                            for (Player player : Groups.player) {
+                                if (netServer.admins.isIDBanned(player.uuid()) || netServer.admins.isIPBanned(player.uuid())) {
+                                    Call.sendMessage("[scarlet]" + player.name + " has been banned.");
+                                    player.con.kick(Packets.KickReason.banned);
+                                }
+                            }
+                            logAction(ipBan, ctx, reason, targetIp);
+                        }
+                        case "unban", "u", "ub" -> {
+                            if (netServer.admins.unbanPlayerIP(targetIp) || netServer.admins.unbanPlayerID(targetIp)) {
+                                eb.setTitle("Unbanned Ip " + targetIp)
+                                        .setColor(new Color(0x00ff00));
+                                info("Unbanned player: @", targetIp);
+                                logAction(ipUnban, ctx, reason, targetIp);
+                            } else {
+                                err("That IP is not banned!");
+                                eb.setTitle("That IP/ID is not banned!")
+                                        .setColor(new Color(0xff0000));
+                            }
+                        }
+                    }
+                    ctx.channel.sendMessage(eb);
                 }
             });
 
@@ -2355,7 +2494,8 @@ public class ServerCommands {
                     EmbedBuilder eb = new EmbedBuilder();
                     Seq<MessageAttachment> ml = new Seq<>();
                     for (MessageAttachment ma : ctx.event.getMessageAttachments()) {
-                        if (ma.getFileName().split("\\.", 2)[1].trim().equals("msav")) {
+                        String[] splitMessage = ma.getFileName().split("\\.");
+                        if (splitMessage[splitMessage.length - 1].trim().equals("msav")) {
                             ml.add(ma);
                         }
                     }
@@ -2365,36 +2505,48 @@ public class ServerCommands {
                         eb.setDescription("You need to add one valid .msav file!");
                         ctx.channel.sendMessage(eb);
                         return;
-                    } else if (Core.settings.getDataDirectory().child("maps").child(ml.get(0).getFileName()).exists()) {
-                        eb.setTitle("Map upload terminated.");
-                        eb.setColor(Pals.error);
-                        eb.setDescription("There is already a map with this name on the server!");
-                        ctx.channel.sendMessage(eb);
-                        return;
                     }
-                    // more custom filename checks possible
-
-                    CompletableFuture<byte[]> cf = ml.get(0).downloadAsByteArray();
-                    Fi fh = Core.settings.getDataDirectory().child("maps").child(ml.get(0).getFileName());
-
-                    try {
-                        byte[] data = cf.get();
-                        if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
-                            eb.setTitle("Map upload terminated.");
-                            eb.setColor(Pals.error);
-                            eb.setDescription("Map file corrupted or invalid.");
-                            ctx.channel.sendMessage(eb);
-                            return;
+                    for (MessageAttachment ma : ml) {
+                        boolean updated = false;
+                        if (Core.settings.getDataDirectory().child("maps").child(ma.getFileName()).exists()) {
+                            // update the map
+//                            Core.settings.getDataDirectory().child("maps").child(ma.getFileName()).delete();
+                            updated = true;
+//                        eb.setTitle("Map upload terminated.");
+//                        eb.setColor(Pals.error);
+//                        eb.setDescription("There is already a map with this name on the server!");
+//                        ctx.channel.sendMessage(eb);
+//                        return;
                         }
-                        fh.writeBytes(cf.get(), false);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        // more custom filename checks possible
+
+                        CompletableFuture<byte[]> cf = ma.downloadAsByteArray();
+                        Fi fh = Core.settings.getDataDirectory().child("maps").child(ma.getFileName());
+
+                        try {
+                            byte[] data = cf.get();
+                            if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
+                                eb.setTitle("Map upload terminated.");
+                                eb.setColor(Pals.error);
+                                eb.setDescription("Map file `" + fh.name() + "` corrupted or invalid.");
+                                ctx.channel.sendMessage(eb);
+                                continue;
+                            }
+                            if (updated)
+                                Core.settings.getDataDirectory().child("maps").child(ma.getFileName()).delete();
+                            fh.writeBytes(cf.get(), false);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        maps.reload();
+                        eb.setTitle("Map upload completed.");
+                        if (updated)
+                            eb.setDescription("Successfully updated " + ma.getFileName());
+                        else
+                            eb.setDescription(ma.getFileName() + " was added successfully into the playlist!");
+                        ctx.channel.sendMessage(eb);
+                        logAction((updated ? updateMap : uploadMap), null, ctx, null, ma);
                     }
-                    maps.reload();
-                    eb.setTitle("Map upload completed.");
-                    eb.setDescription(ml.get(0).getFileName() + " was added succesfully into the playlist!");
-                    ctx.channel.sendMessage(eb);
-//                    Utils.LogAction("uploadmap", "Uploaded a new map", ctx.author, null);
                 }
             });
 
@@ -2491,12 +2643,9 @@ public class ServerCommands {
 
                     try {
                         InputStream data = ml.get(0).downloadAsInputStream();
-//                        java.nio.file.Files.copy(
-//                                data,
-//                                mapFile.file().toPath(),
-//                                StandardCopyOption.REPLACE_EXISTING);
                         StringMap meta = getMeta(data);
                         Fi mapFile = new Fi("./temp/map_submit_" + meta.get("name").replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msav");
+                        mapFile.writeBytes(cf.get(), false);
 
 
                         EmbedBuilder embed = new EmbedBuilder()
@@ -2508,16 +2657,15 @@ public class ServerCommands {
 //                                .setImage("attachment://output.png")
                                 .setColor(new Color(0xF8D452))
                                 .setFooter("Size: " + meta.getInt("width") + " * " + meta.getInt("height"));
-                        mapFile.writeBytes(cf.get(), false);
                         debug("mapFile size: @", mapFile.length());
                         attachMapPng(mapFile, embed, tc);
-                        mapFile.delete();
+//                        mapFile.delete();
                     } catch (Exception e) {
-                        System.out.println(e);
+                        e.printStackTrace();
                     }
                     assert tc != null;
 //                    tc.sendMessage(eb2);
-                    ctx.channel.sendMessage(eb);
+//                    ctx.channel.sendMessage(eb);
                 }
             });
 

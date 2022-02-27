@@ -55,6 +55,7 @@ import static mindustry.Vars.*;
 import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.discordcommands.DiscordCommands.error_log_channel;
 import static mindustry.plugin.effect.EffectHelper.getEffect;
+import static mindustry.plugin.utils.CustomLog.logConnections;
 import static mindustry.plugin.utils.Utils.*;
 import static mindustry.plugin.utils.ranks.Utils.*;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setDebug;
@@ -66,6 +67,7 @@ public class ioMain extends Plugin {
 //    public static Prefs prefs = new Prefs(prefsFile);
 //    public GetMap map = new GetMap();
     public static final Fi pluginDir = new Fi("./config/mods/");
+    private static final String lennyFace = "( \u0361\u00B0 \u035C\u0296 \u0361\u00B0)";
     public static DiscordApi api = null;
     public static String prefix = ".";
     public static String live_chat_channel_id = "";
@@ -112,6 +114,7 @@ public class ioMain extends Plugin {
     // register event handlers and create variables in the constructor
     public ioMain() {
         info("Starting Discord Plugin...");
+        info(lennyFace);
         // disable debug logs from javacord (doesnt work tho, idk why)
         setDebug(false);
         FallbackLoggerConfiguration.setDebug(false);
@@ -344,17 +347,17 @@ public class ioMain extends Plugin {
 //            CompletableFuture.runAsync(() -> {
 //                if(verification) {
 //                    if (pd != null && !pd.verified) {
-//                        Log.info("Unverified player joined: " + player.name);
+//                        CustomLog.info("Unverified player joined: " + player.name);
 //                        String url = "http://api.vpnblocker.net/v2/json/" + player.con.address + "/" + apiKey;
 //                        String pjson = ClientBuilder.newClient().target(url).request().accept(MediaType.APPLICATION_JSON).get(String.class);
 //
 //                        JSONObject json = new JSONObject(new JSONTokener(pjson));
 //                        if (json.has("host-ip")) {
 //                            if (json.getBoolean("host-ip")) { // verification failed
-//                                Log.info("IP verification failed for: " + player.name);
+//                                CustomLog.info("IP verification failed for: " + player.name);
 //                                Call.onInfoMessage(player.con, verificationMessage);
 //                            } else {
-//                                Log.info("IP verification success for: " + player.name);
+//                                CustomLog.info("IP verification success for: " + player.name);
 //                                pd.verified = true;
 //                                setData(player.uuid(), pd);
 //                            }
@@ -710,8 +713,8 @@ public class ioMain extends Plugin {
 
             if (state.is(GameState.State.playing)) {
                 if (Mathf.chance(0.01f)) {
-                    api.updateActivity("( ͡° ͜ʖ ͡°)");
-                    System.out.println("( ͡° ͜ʖ ͡°)");
+                    api.updateActivity(lennyFace);
+                    System.out.println(lennyFace);
                 } else {
                     api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
                 }
@@ -893,7 +896,7 @@ public class ioMain extends Plugin {
             });
 
             handler.<Player>register("votekick", "[player...]", "votekick a player.", (args, player) -> {
-//               Log.debug("vk @.", args[0]);
+//               CustomLog.debug("vk @.", args[0]);
                 if (!Config.enableVotekick.bool()) {
                     player.sendMessage("[scarlet]Vote-kick is disabled on this server.");
                     return;
