@@ -55,21 +55,21 @@ public class Utils {
          * */
         rankNames.put(1, new Rank("[accent]|[white]\uE865[accent]|[]", "Soldier", new Color(0xC0C3C4)));
         rankNames.put(2, new Rank("[accent]|[white]\uE861[accent]|[]", "Corporal", new Color(0x969A9D)));
-        rankNames.put(3, new Rank("[accent]|[white]\uE861[accent]|[]", "Brigadier", new Color(0x84888B)));
+        rankNames.put(3, new Rank("[accent]|[white]\uE804[accent]|[]", "Brigadier", new Color(0x84888B)));
         rankNames.put(4, new Rank("[accent]|[white]\uE826[accent]|[]", "Sargeant", new Color(0x717578)));
         rankNames.put(5, new Rank("[accent]|[white]\uE806[accent]|[]", "Major", new Color(0x515456)));
         rankNames.put(6, new Rank("[accent]|[white]\uE810[accent]|[]", "Lieutenant", "Be decorated by General/Marshal", new Color(0x708374)));
         rankNames.put(7, new Rank("[accent]|[white]\uE811[accent]|[]", "Captain", "Create maps or code for the server", new Color(0x456F43)));
-        rankNames.put(8, new Rank("[accent]|[white]\uE864[accent]|[]", "Colonel", "Apply at our discord server (Junior Mod)", new Color(0x405B32)));
+        rankNames.put(8, new Rank("[accent]|[white]\uE864[accent]|[]", "Colonel", "Apply at our discord server (Junior Mod)", new Color(0x405B32)));//app mod
         rankNames.put(9, new Rank("[accent]|[white]\uE817[accent]|[]", "General", "Be decorated from Colonel", new Color(0x0A6216))); // mod
         rankNames.put(10, new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", "Be admin", new Color(0xffcc00))); // admin
 
 
-        rankRequirements.put(1, new Requirement(300, 3000 * 2, 5));
-        rankRequirements.put(2, new Requirement(600, 6000 * 2, 10));
-        rankRequirements.put(3, new Requirement(1200, 12000 * 2, 20));
-        rankRequirements.put(4, new Requirement(2400, 24000 * 2, 40));
-        rankRequirements.put(5, new Requirement(4800, 48000 * 2, 80));
+        rankRequirements.put(1, new Requirement(300,  6000,  5));
+        rankRequirements.put(2, new Requirement(600,  12000, 10));
+        rankRequirements.put(3, new Requirement(1200, 24000, 20));
+        rankRequirements.put(4, new Requirement(2400, 48000, 40));
+        rankRequirements.put(5, new Requirement(4800, 96000, 80));
 
 
         rankRoles.put("897568732749115403", 1);
