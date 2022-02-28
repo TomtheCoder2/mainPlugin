@@ -6,3 +6,4 @@
 scp.bat
 /config/*.bin
 /config/*.log
+/config/

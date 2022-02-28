@@ -175,6 +175,9 @@ public class ioMain extends Plugin {
         bt.setDaemon(false);
         bt.start();
 
+        FallbackLoggerConfiguration.setDebug(false);
+        FallbackLoggerConfiguration.setTrace(false);
+
         /**
          * start rainbow command to change color of the names\n
          * This runs as a thread for performance reasons
