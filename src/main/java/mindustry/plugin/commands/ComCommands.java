@@ -31,6 +31,7 @@ import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Objects;
 
 import static arc.util.Log.debug;
@@ -66,7 +67,7 @@ public class ComCommands {
                     Call.sendMessage("[sky]" + ctx.author.getName() + " @discord >[] " + ctx.message);
                     eb.setTitle("Command executed");
                     eb.setDescription("Your message was sent successfully..");
-                    ctx.channel.sendMessage(eb);
+                    ctx.sendMessage(eb);
                 } else {
                     ctx.reply("Message too big.");
                 }
@@ -93,7 +94,7 @@ public class ComCommands {
                     info("No mods found.");
                     eb.setDescription("No mods found.");
                 }
-                ctx.channel.sendMessage(eb);
+                ctx.sendMessage(eb);
             }
         });
 
@@ -111,6 +112,14 @@ public class ComCommands {
                 }
 
                 Map found = getMapBySelector(ctx.message.trim());
+                if (found == null) {
+                    for (Map map : Vars.maps.customMaps()) {
+                        if (escapeEverything(map.name()).trim().toLowerCase(Locale.ROOT).startsWith(ctx.message.trim().toLowerCase(Locale.ROOT))) {
+                            found = map;
+                            break;
+                        }
+                    }
+                }
                 if (found == null) {
                     ctx.reply("Map not found!");
                     return;
@@ -199,7 +208,7 @@ public class ComCommands {
                         eb.setDescription("No mods found.");
                     }
                 }
-                ctx.channel.sendMessage(eb);
+                ctx.sendMessage(eb);
             }
         });
 
@@ -292,7 +301,7 @@ public class ComCommands {
                     EmbedBuilder eb = new EmbedBuilder()
                             .setTitle("Not hosting, please ping an admin!")
                             .setColor(Pals.error);
-                    ctx.channel.sendMessage(eb);
+                    ctx.sendMessage(eb);
                     return;
                 }
                 try {
@@ -366,7 +375,7 @@ public class ComCommands {
                 eb.addInlineField("phase fabric: ", core.get(Items.phaseFabric) + "\n");
                 eb.addInlineField("surge alloy: ", core.get(Items.surgeAlloy) + "\n");
 
-                ctx.channel.sendMessage(eb);
+                ctx.sendMessage(eb);
             }
         });
 
@@ -522,7 +531,7 @@ public class ComCommands {
                                     eb.setTitle("Command terminated");
                                     eb.setDescription("Player did not accept the action!");
                                     eb.setColor(new Color(0xff0000));
-                                    ctx.channel.sendMessage(eb);
+                                    ctx.sendMessage(eb);
                                     tdata.redeemKey = -1;
                                 }, 120);
                                 tdata.redeem = ctx.author.getIdAsString();
@@ -547,7 +556,7 @@ public class ComCommands {
                     eb.setTitle("Command terminated");
                     eb.setDescription("Invalid arguments provided or no roles to redeem.");
                 }
-                ctx.channel.sendMessage(eb);
+                ctx.sendMessage(eb);
             }
 
         });

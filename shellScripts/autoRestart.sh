@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 screen -r v7
 
 while true; do
@@ -7,7 +7,6 @@ while true; do
     if [ $? -eq 0 ]; then
         echo "server exited cleanly"
     else
-#        java -jar server-release.jar
         echo "server crashed"
     fi
 done

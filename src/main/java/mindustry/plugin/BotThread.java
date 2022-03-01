@@ -1,7 +1,6 @@
 package mindustry.plugin;
 
-import mindustry.plugin.commands.ComCommands;
-import mindustry.plugin.commands.ServerCommands;
+import mindustry.plugin.commands.*;
 import mindustry.plugin.discordcommands.DiscordCommands;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
@@ -31,7 +30,12 @@ public class BotThread extends Thread {
         // register commands
         this.api.addMessageCreateListener(commandHandler);
         new ComCommands().registerCommands(commandHandler);
-        new ServerCommands(data).registerCommands(commandHandler);
+//        new ServerCommands(data).registerCommands(commandHandler);
+        new Admin(data).registerCommands(commandHandler);
+        new Apprentice(data).registerCommands(commandHandler);
+        new MapReviewer(data).registerCommands(commandHandler);
+        new Moderator(data).registerCommands(commandHandler);
+        new Public().registerCommands(commandHandler);
         //new MessageCreatedListeners(data).registerListeners(commandHandler);
     }
 

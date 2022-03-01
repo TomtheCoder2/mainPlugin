@@ -200,7 +200,7 @@ public class DiscordCommands implements MessageCreateListener {
             EmbedBuilder eb = new EmbedBuilder()
                     .setTitle("No permissions!")
                     .setDescription("You need higher permissions to execute this command.");
-            ctx.channel.sendMessage(eb);
+            ctx.sendMessage(eb);
             return;
         }
         if (command.minArguments > ctx.args.length - 1) {
