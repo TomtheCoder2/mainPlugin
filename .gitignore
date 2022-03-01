@@ -7,3 +7,5 @@ scp.bat
 /config/*.bin
 /config/*.log
 /config/
+/config/mods/
+/config/maps
