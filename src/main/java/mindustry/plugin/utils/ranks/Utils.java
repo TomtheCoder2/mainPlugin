@@ -60,9 +60,10 @@ public class Utils {
         rankNames.put(5, new Rank("[accent]|[white]\uE806[accent]|[]", "Major", new Color(0x515456)));
         rankNames.put(6, new Rank("[accent]|[white]\uE810[accent]|[]", "Lieutenant", "Be decorated by General/Marshal", new Color(0x708374)));
         rankNames.put(7, new Rank("[accent]|[white]\uE811[accent]|[]", "Captain", "Create maps or code for the server", new Color(0x456F43)));
-        rankNames.put(8, new Rank("[accent]|[white]\uE864[accent]|[]", "Colonel", "Apply at our discord server (Junior Mod)", new Color(0x405B32)));//app mod
-        rankNames.put(9, new Rank("[accent]|[white]\uE817[accent]|[]", "General", "Be decorated from Colonel", new Color(0x0A6216))); // mod
-        rankNames.put(10, new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", "Be admin", new Color(0xffcc00))); // admin
+        rankNames.put(8, new Rank("[accent]|[white]\uE808[accent]|[]", "Map reviewer", "Apply at our discord server", new Color(0x5a844f))); 
+        rankNames.put(9, new Rank("[accent]|[white]\uE864[accent]|[]", "Colonel", "Apply at our discord server (Junior Mod)", new Color(0x405B32)));//app mod
+        rankNames.put(10, new Rank("[accent]|[white]\uE817[accent]|[]", "General", "Be decorated from Colonel", new Color(0x0A6216))); // mod
+        rankNames.put(11, new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", "Be admin", new Color(0xffcc00))); // admin
 
 
         rankRequirements.put(1, new Requirement(300,  6000,  5));
