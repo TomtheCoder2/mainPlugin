@@ -150,77 +150,76 @@ public class MapReviewer {
                     ctx.sendMessage(eb);
                 }
             });
-        }
 
-        if (data.has("mapSubmissions_id")) {
-            TextChannel tc = getTextChannel(ioMain.data.getString("mapSubmissions_id"));
-            handler.registerCommand(new Command("submitmap") {
-                {
-                    help = " Submit a new map to be added into the server playlist in a .msav file format.";
-                    usage = "<.msav attachment>";
-                }
+            if (data.has("mapSubmissions_id")) {
+                TextChannel tc = getTextChannel(ioMain.data.getString("mapSubmissions_id"));
+                handler.registerCommand(new Command("submitmap") {
+                    {
+                        help = " Submit a new map to be added into the server playlist in a .msav file format.";
+                        usage = "<.msav attachment>";
+                    }
 
-                public void run(Context ctx) {
-                    EmbedBuilder eb = new EmbedBuilder();
-                    Seq<MessageAttachment> ml = new Seq<>();
-                    for (MessageAttachment ma : ctx.event.getMessageAttachments()) {
-                        if (ma.getFileName().split("\\.", 2)[1].trim().equals("msav")) {
-                            ml.add(ma);
+                    public void run(Context ctx) {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        Seq<MessageAttachment> ml = new Seq<>();
+                        for (MessageAttachment ma : ctx.event.getMessageAttachments()) {
+                            if (ma.getFileName().split("\\.", 2)[1].trim().equals("msav")) {
+                                ml.add(ma);
+                            }
                         }
-                    }
-                    if (ml.size != 1) {
-                        eb.setTitle("Map upload terminated.");
-                        eb.setColor(Utils.Pals.error);
-                        eb.setDescription("You need to add one valid .msav file!");
-                        ctx.sendMessage(eb);
-                        return;
-                    } else if (Core.settings.getDataDirectory().child("maps").child(ml.get(0).getFileName()).exists()) {
-                        eb.setTitle("Map upload terminated.");
-                        eb.setColor(Utils.Pals.error);
-                        eb.setDescription("There is already a map with this name on the server!");
-                        ctx.sendMessage(eb);
-                        return;
-                    }
-                    CompletableFuture<byte[]> cf = ml.get(0).downloadAsByteArray();
-
-                    try {
-                        byte[] data = cf.get();
-                        if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
+                        if (ml.size != 1) {
                             eb.setTitle("Map upload terminated.");
                             eb.setColor(Utils.Pals.error);
-                            eb.setDescription("Map file corrupted or invalid.");
+                            eb.setDescription("You need to add one valid .msav file!");
+                            ctx.sendMessage(eb);
+                            return;
+                        } else if (Core.settings.getDataDirectory().child("maps").child(ml.get(0).getFileName()).exists()) {
+                            eb.setTitle("Map upload terminated.");
+                            eb.setColor(Utils.Pals.error);
+                            eb.setDescription("There is already a map with this name on the server!");
                             ctx.sendMessage(eb);
                             return;
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        CompletableFuture<byte[]> cf = ml.get(0).downloadAsByteArray();
+
+                        try {
+                            byte[] data = cf.get();
+                            if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
+                                eb.setTitle("Map upload terminated.");
+                                eb.setColor(Utils.Pals.error);
+                                eb.setDescription("Map file corrupted or invalid.");
+                                ctx.sendMessage(eb);
+                                return;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        eb.setTitle("Map upload completed.");
+                        eb.setDescription(ml.get(0).getFileName() + " was successfully queued for review by moderators!");
+
+                        try {
+                            InputStream data = ml.get(0).downloadAsInputStream();
+                            StringMap meta = getMeta(data);
+                            Fi mapFile = new Fi("./temp/map_submit_" + meta.get("name").replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msav");
+                            mapFile.writeBytes(cf.get(), false);
+
+                            EmbedBuilder embed = new EmbedBuilder()
+                                    .setTitle(escapeEverything(meta.get("name")))
+                                    .setDescription(meta.get("description"))
+                                    .setAuthor(ctx.author.getName(), ctx.author.getAvatar().getUrl().toString(), ctx.author.getAvatar().getUrl().toString())
+                                    .setColor(new Color(0xF8D452))
+                                    .setFooter("Size: " + meta.getInt("width") + " X " + meta.getInt("height"));
+                            debug("mapFile size: @", mapFile.length());
+                            attachMapPng(mapFile, embed, tc);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        assert tc != null;
+                        tc.sendMessage("<@&" + reviewerRole + ">");
+                        ctx.sendMessage(eb);
                     }
-                    eb.setTitle("Map upload completed.");
-                    eb.setDescription(ml.get(0).getFileName() + " was successfully queued for review by moderators!");
-
-                    try {
-                        InputStream data = ml.get(0).downloadAsInputStream();
-                        StringMap meta = getMeta(data);
-                        Fi mapFile = new Fi("./temp/map_submit_" + meta.get("name").replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msav");
-                        mapFile.writeBytes(cf.get(), false);
-
-                        EmbedBuilder embed = new EmbedBuilder()
-                                .setTitle(escapeEverything(meta.get("name")))
-                                .setDescription(meta.get("description"))
-                                .setAuthor(ctx.author.getName(), ctx.author.getAvatar().getUrl().toString(), ctx.author.getAvatar().getUrl().toString())
-                                .setColor(new Color(0xF8D452))
-                                .setFooter("Size: " + meta.getInt("width") + " X " + meta.getInt("height"));
-                        debug("mapFile size: @", mapFile.length());
-                        attachMapPng(mapFile, embed, tc);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    assert tc != null;
-                    ctx.sendMessage(eb);
-                }
-            });
-
-
+                });
+            }
         }
     }
 }

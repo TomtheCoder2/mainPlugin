@@ -10,6 +10,7 @@ import arc.struct.Seq;
 import arc.struct.StringMap;
 import arc.util.Http;
 import arc.util.Log;
+import arc.util.Reflect;
 import arc.util.Strings;
 import arc.util.io.CounterInputStream;
 import com.github.kevinsawicki.http.HttpRequest;
@@ -35,6 +36,7 @@ import mindustry.plugin.database.MapData;
 import mindustry.plugin.discordcommands.Command;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.ioMain;
+import mindustry.server.ServerControl;
 import mindustry.type.ItemSeq;
 import mindustry.type.ItemStack;
 import mindustry.ui.Menus;
@@ -367,6 +369,17 @@ public class Utils {
             throw new RuntimeException("unreachable");
         }
         maps.reload();
+    }
+
+    public static void changeToMap(Map targetMap) {
+        Core.app.getListeners().each(lst -> {
+            if (lst instanceof ServerControl) {
+                ServerControl scont = (ServerControl) lst;
+                Reflect.set(scont, "nextMapOverride", targetMap);
+                Events.fire(new EventType.GameOverEvent(Team.crux));
+                return;
+            }
+        });
     }
 
 

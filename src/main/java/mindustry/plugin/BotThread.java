@@ -35,7 +35,7 @@ public class BotThread extends Thread {
         new Apprentice(data).registerCommands(commandHandler);
         new MapReviewer(data).registerCommands(commandHandler);
         new Moderator(data).registerCommands(commandHandler);
-        new Public().registerCommands(commandHandler);
+        new Public(data).registerCommands(commandHandler);
         //new MessageCreatedListeners(data).registerListeners(commandHandler);
     }
 

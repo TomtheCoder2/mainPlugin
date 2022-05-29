@@ -28,6 +28,7 @@ import mindustry.plugin.data.TileInfo;
 import mindustry.plugin.database.MapData;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
+import mindustry.plugin.mapChange.MapChange;
 import mindustry.plugin.requests.Translate;
 import mindustry.plugin.utils.*;
 import mindustry.plugin.utils.ranks.Rank;
@@ -49,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import mindustry.plugin.utils.ranks.Requirement;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -96,15 +98,17 @@ public class ioMain extends Plugin {
     public static int logCount = 0; // only log join/leaves every 5 minutes
     public static TextChannel live_chat_channel;
     public static TextChannel log_channel;
+    public static Boolean enableMapRatingPopups = true;
     private final long CDT = 300L;
     private final ObjectMap<Long, String> CommandCooldowns = new ObjectMap<>(); // uuid
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public ObjectMap<String, Role> discRoles = new ObjectMap<>();
     public NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
+    public MapChange mapChange = new MapChange();
     //    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
 //    protected Interval timer = new Interval(1);
     //cooldown between votes
-    float voteCooldown = 0;
+    float voteCooldown = 120;
     // register commands that run on the server
     // cool-downs per player
     ObjectMap<String, Timekeeper> cooldowns = new ObjectMap<>();
@@ -145,6 +149,9 @@ public class ioMain extends Plugin {
             // link to join our discord server
             discordInviteLink = allData.getString("discordInviteLink");
             previewSchem = allData.getBoolean("previewSchem");
+            if (allData.has("enableMapRatingPopups")) {
+                enableMapRatingPopups = allData.getBoolean("enableMapRatingPopups");
+            }
             System.out.printf("url: %s, user: %s, password: %s%n", url, user, password);
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
@@ -207,7 +214,13 @@ public class ioMain extends Plugin {
                     PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
                     assert tdata != null;
                     if (!tdata.muted) {
-                        finalTc.sendMessage("**" + escapeEverything(event.player.name) + "**: " + event.message);
+                        StringBuilder sb = new StringBuilder(event.message);
+                        for (int i = event.message.length() - 1; i >= 0; i--) {
+                            if (sb.charAt(i) >= 0xF80 && sb.charAt(i) <= 0x107F) {
+                                sb.deleteCharAt(i);
+                            }
+                        }
+                        finalTc.sendMessage("**" + escapeEverything(event.player.name) + "**: " + sb);
                     } else {
                         player.sendMessage("[cyan]You are muted!");
                     }
@@ -250,18 +263,20 @@ public class ioMain extends Plugin {
         }, 0, 10);
 
         // force map votes with popup
-        Timer.schedule(() -> {
-            for (Player player : Groups.player) {
-                if (player == null) continue; // ...idk how even
-                PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
-                if (tdata != null) {
-                    if (!tdata.votedMap) {
-                        rateMenu(player);
-                        tdata.votedMap = true;
+        if (enableMapRatingPopups) {
+            Timer.schedule(() -> {
+                for (Player player : Groups.player) {
+                    if (player == null) continue; // ...idk how even
+                    PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
+                    if (tdata != null) {
+                        if (!tdata.votedMap) {
+                            rateMenu(player);
+                            tdata.votedMap = true;
+                        }
                     }
                 }
-            }
-        }, 0, 120);
+            }, 0, 120);
+        }
 
         Events.on(EventType.ServerLoadEvent.class, event -> {
 //            contentHandler = new ContentHandler();
@@ -676,7 +691,6 @@ public class ioMain extends Plugin {
         return true;
     }
 
-
     public static void update(TextChannel log_channel, DiscordApi api) {
         try {
             if ((logCount & 5) == 0) {
@@ -778,9 +792,9 @@ public class ioMain extends Plugin {
         }
     }
 
-
     @Override
     public void registerServerCommands(CommandHandler handler) {
+        mapChange.registerServerCommands(handler);
         handler.register("update", "Update the database with the new current data", arg -> {
             TextChannel log_channel = getTextChannel("882342315438526525");
             update(log_channel, api);
@@ -1507,56 +1521,107 @@ public class ioMain extends Plugin {
 
             Timekeeper vtime = new Timekeeper(voteCooldown);
 
-            MapVoteSession[] currentMapVoting = {null};
+            final MapVoteSession[] currentMapVoting = {null};
 
-            handler.<Player>register("changemap", "[map...]", " Vote to change to a specific map.", (args, player) -> {
-                if (!state.rules.pvp || player.admin) {
-                    if (currentMapVoting[0] != null) {
-                        player.sendMessage("[scarlet]There is already a map being voted on. Type /rtv to vote.");
-                        return;
-                    }
+//            handler.<Player>register("changemap", "[map...]", " Vote to change to a specific map.", (args, player) -> {
+//                if (!state.rules.pvp || player.admin) {
+//                    if (currentMapVoting[0][0] != null) {
+//                        player.sendMessage("[scarlet]There is already a map being voted on. Type /rtv to vote.");
+//                        return;
+//                    }
+//                    mindustry.maps.Map found;
+//                    if (args.length > 0) {
+//                        found = getMapBySelector(args[0]);
+//                    } else {
+//                        found = getMapBySelector(String.valueOf((int) (Math.random() * 5)));
+//                    }
+//
+//                    if (found != null) {
+//                        if (!vtime.get()) {
+//                            player.sendMessage("[scarlet]You must wait " + voteCooldown / 20 + " minutes between nominations.");
+//                            return;
+//                        }
+//
+//                        MapVoteSession session = new MapVoteSession(currentMapVoting[0], found);
+//
+//                        session.vote(player, 1);
+//                        vtime.reset();
+//                        currentMapVoting[0][0] = session;
+//                    } else {
+//                        player.sendMessage("[scarlet]No map[orange]'" + args[0] + "'[scarlet] found.");
+//                    }
+////                    } else {
+////                        player.sendMessage(noPermissionMessage);
+////                    }
+//                } else {
+//                    player.sendMessage("[scarlet]This command is disabled on pvp.");
+//                }
+//            });
+
+            handler.<Player>register("rtv", "[map...]", "Vote to change the map.", (args, player) -> {
+                if (currentMapVoting[0] == null) {
                     mindustry.maps.Map found;
                     if (args.length > 0) {
                         found = getMapBySelector(args[0]);
+                        if (found == null) {
+                            String targetMap = escapeEverything(args[0]);
+                            for (Map map : maps.customMaps()) {
+                                if (escapeEverything(map.name()).startsWith(targetMap)) {
+                                    found = map;
+                                    break;
+                                }
+                            }
+                        }
                     } else {
                         found = getMapBySelector(String.valueOf((int) (Math.random() * 5)));
                     }
-
                     if (found != null) {
                         if (!vtime.get()) {
                             player.sendMessage("[scarlet]You must wait " + voteCooldown / 20 + " minutes between nominations.");
                             return;
                         }
 
-                        MapVoteSession session = new MapVoteSession(currentMapVoting, found);
+                        MapVoteSession session = new MapVoteSession(currentMapVoting[0], found);
 
-                        session.vote(player, 1);
+                        if (!session.vote(player, 1)) {
+                            currentMapVoting[0] = session;
+                        } else {
+                            currentMapVoting[0] = null;
+                        }
                         vtime.reset();
-                        currentMapVoting[0] = session;
                     } else {
                         player.sendMessage("[scarlet]No map[orange]'" + args[0] + "'[scarlet] found.");
                     }
-//                    } else {
-//                        player.sendMessage(noPermissionMessage);
-//                    }
-                } else {
-                    player.sendMessage("[scarlet]This command is disabled on pvp.");
-                }
-            });
-
-            handler.<Player>register("rtv", "Vote to change the map.", (args, player) -> { // self info
-                if (currentMapVoting[0] == null) {
-                    player.sendMessage("[scarlet]No map is being voted on.");
                 } else {
                     //hosts can vote all they want
-                    if (player.uuid() != null && (currentMapVoting[0].voted.contains(player.uuid()) || currentMapVoting[0].voted.contains(netServer.admins.getInfo(player.uuid()).lastIP))) {
+                    if (player.uuid() != null &&
+                            (currentMapVoting[0].voted.contains(player.uuid()) ||
+                                    currentMapVoting[0].voted.contains(netServer.admins.getInfo(player.uuid()).lastIP))) {
                         player.sendMessage("[scarlet]You've already voted. Sit down.");
                         return;
                     }
 
-                    currentMapVoting[0].vote(player, 1);
+                    if (currentMapVoting[0].vote(player, 1)) {
+                        currentMapVoting[0] = null;
+                    }
                 }
             });
+
+//            mapChange.registerClientCommands(handler);
+
+//            handler.<Player>register("rtv", "Vote to change the map.", (args, player) -> { // self info
+//                if (currentMapVoting[0][0] == null) {
+//                    player.sendMessage("[scarlet]No map is being voted on.");
+//                } else {
+//                    //hosts can vote all they want
+//                    if (player.uuid() != null && (currentMapVoting[0][0].voted.contains(player.uuid()) || currentMapVoting[0][0].voted.contains(netServer.admins.getInfo(player.uuid()).lastIP))) {
+//                        player.sendMessage("[scarlet]You've already voted. Sit down.");
+//                        return;
+//                    }
+//
+//                    currentMapVoting[0][0].vote(player, 1);
+//                }
+//            });
 
             handler.<Player>register("req", "Show the requirements for all ranks", (args, player) -> { // self info
 //                for (Map.Entry<Integer, Rank> rank : rankNames.entrySet()) {

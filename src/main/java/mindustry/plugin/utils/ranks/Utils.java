@@ -2,6 +2,7 @@ package mindustry.plugin.utils.ranks;
 
 import java.awt.*;
 import java.util.HashMap;
+import mindustry.plugin.utils.ranks.Rank;
 
 public class Utils {
     public static HashMap<Integer, Rank> rankNames = new HashMap<>();
@@ -11,7 +12,7 @@ public class Utils {
     public static void init() {
         //        "\uE816";
         // set all ranks
-        rankNames.put(0, new Rank("[#7d7d7d][]", "Civilian", "The new combatants at the front", new Color(0xffffff)));
+        rankNames.put(0, new Rank("[#7d7d7d][]", "Civilian", "The new combatants at the front", new Color(0x7ab7cb)));
         // first try:
 //        rankNames.put(1, new Rank("[accent]<[white]\uE802[accent]>[]", "private"));
 //        rankNames.put(2, new Rank("[accent]<[white]\uE813[accent]>[]", "general"));
@@ -53,17 +54,17 @@ public class Utils {
          * -General (uE817)
          * -Marshall (uE814)
          * */
-        rankNames.put(1, new Rank("[accent]|[white]\uE865[accent]|[]", "Soldier", new Color(0xC0C3C4)));
-        rankNames.put(2, new Rank("[accent]|[white]\uE861[accent]|[]", "Corporal", new Color(0x969A9D)));
-        rankNames.put(3, new Rank("[accent]|[white]\uE804[accent]|[]", "Brigadier", new Color(0x84888B)));
-        rankNames.put(4, new Rank("[accent]|[white]\uE826[accent]|[]", "Sargeant", new Color(0x717578)));
-        rankNames.put(5, new Rank("[accent]|[white]\uE806[accent]|[]", "Major", new Color(0x515456)));
-        rankNames.put(6, new Rank("[accent]|[white]\uE810[accent]|[]", "Lieutenant", "Be decorated by General/Marshal", new Color(0x708374)));
-        rankNames.put(7, new Rank("[accent]|[white]\uE811[accent]|[]", "Captain", "Create maps or code for the server", new Color(0x6d8966)));
-        rankNames.put(8, new Rank("[accent]|[white]\uE808[accent]|[]", "Map reviewer", "Apply at our discord server", new Color(0x5a844f))); 
-        rankNames.put(9, new Rank("[accent]|[white]\uE864[accent]|[]", "Colonel", "Apply at our discord server (Junior Mod)", new Color(0x44673b)));//app mod
-        rankNames.put(10, new Rank("[accent]|[white]\uE817[accent]|[]", "General", "Be decorated from Colonel", new Color(0x2e4828))); // mod
-        rankNames.put(11, new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", "Be admin", new Color(0xffcc00))); // admin
+        rankNames.put(1, new Rank("[accent]|[white]\uE865[accent]|[]", "Soldier", new Color(0x7ac3cb)));
+        rankNames.put(2, new Rank("[accent]|[white]\uE861[accent]|[]", "Corporal", new Color(0x7acbc6)));
+        rankNames.put(3, new Rank("[accent]|[white]\uE804[accent]|[]", "Brigadier", new Color(0x7acbb8)));
+        rankNames.put(4, new Rank("[accent]|[white]\uE826[accent]|[]", "Sargeant", new Color(0x7acba1)));
+        rankNames.put(5, new Rank("[accent]|[white]\uE806[accent]|[]", "Major", new Color(0x7acb8f)));
+        rankNames.put(6, new Rank("[accent]|[white]\uE810[accent]|[]", "Lieutenant", "Be decorated by General/Marshal", new Color(0x80cb7a)));
+        rankNames.put(7, new Rank("[accent]|[white]\uE811[accent]|[]", "Captain", "Create maps or code for the server", new Color(0x97cb7a)));
+        rankNames.put(8, new Rank("[accent]|[white]\uE808[accent]|[]", "Map reviewer", "Apply at our discord server", new Color(0xb5cb7a)));
+        rankNames.put(9, new Rank("[accent]|[white]\uE864[accent]|[]", "Colonel", "Apply at our discord server (Junior Mod)", new Color(0xcbc47a)));//app mod
+        rankNames.put(10, new Rank("[accent]|[white]\uE817[accent]|[]", "General", "Be decorated from Colonel", new Color(0xcbb07a))); // mod
+        rankNames.put(11, new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", "Be admin", new Color(0xcb9c7a))); // admin
 
 
         rankRequirements.put(1, new Requirement(300,  6000,  5));

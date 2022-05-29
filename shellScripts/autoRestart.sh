@@ -1,5 +1,5 @@
 #!/bin/bash
-screen -r v7
+screen -r mod
 
 while true; do
     java -jar server-release.jar

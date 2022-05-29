@@ -14,14 +14,14 @@ import static mindustry.Vars.netServer;
 public class MapVoteSession {
     public Map target;
     public ObjectSet<String> voted = new ObjectSet<>();
-    public MapVoteSession[] map;
+    public MapVoteSession map;
     Timer.Task task;
     int votes;
 
     //voting round duration in seconds
     float voteDuration = 3f * 60;
 
-    public MapVoteSession(MapVoteSession[] map, Map target) {
+    public MapVoteSession(MapVoteSession map, Map target) {
         this.target = target;
         this.map = map;
         this.task = Timer.schedule(() -> {
@@ -31,7 +31,7 @@ public class MapVoteSession {
                 fmt.format("[lightgray]Vote failed. Not enough votes to switch map to[accent] %b[lightgray].",
                         target.name());
                 Call.sendMessage(sbuf.toString());
-                map[0] = null;
+                this.map = null;
                 task.cancel();
             }
         }, voteDuration);
@@ -41,7 +41,7 @@ public class MapVoteSession {
         return (int) (Groups.player.size() / 1.5f);
     }
 
-    public void vote(Player player, int d) {
+    public boolean vote(Player player, int d) {
         votes += d;
         voted.addAll(player.uuid(), netServer.admins.getInfo(player.uuid()).lastIP);
         StringBuilder sbuf = new StringBuilder();
@@ -49,7 +49,7 @@ public class MapVoteSession {
         fmt.format("[orange]%s[lightgray] has voted to change the map to[orange] %s[].[accent] (%d/%d)\n[lightgray]Type[orange] /rtv to agree.",
                 player.name, target.name(), votes, votesRequired());
         Call.sendMessage(sbuf.toString());
-        checkPass();
+        return checkPass();
     }
 
     boolean checkPass() {
@@ -59,9 +59,10 @@ public class MapVoteSession {
             fmt.format("[orange]Vote passed.[scarlet] changing map to %s.", target.name());
             Call.sendMessage(sbuf.toString());
 //            Call.sendMessage(Strings.format("[orange]Vote passed.[scarlet] changing map to %s.", target.name()));
-            Utils.changeMap(target);
-            map[0] = null;
+            Utils.changeToMap(target);
+            map = null;
             task.cancel();
+            voted.clear();
             return true;
         }
         return false;

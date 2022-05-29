@@ -4,6 +4,7 @@ import arc.Core;
 import arc.files.Fi;
 import arc.struct.Seq;
 import arc.util.Log;
+import arc.util.Time;
 import arc.util.Timer;
 import mindustry.core.GameState;
 import mindustry.game.Gamemode;
@@ -12,6 +13,7 @@ import mindustry.maps.Map;
 import mindustry.maps.MapException;
 import mindustry.mod.Mods;
 import mindustry.net.Administration;
+import mindustry.net.Packets;
 import mindustry.plugin.discordcommands.Context;
 import mindustry.plugin.discordcommands.DiscordCommands;
 import mindustry.plugin.discordcommands.RoleRestrictedCommand;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import static arc.util.Log.*;
@@ -89,7 +92,8 @@ public class Admin {
                                     return;
                                 }
                             } else if (c.isString()) {
-                                c.set(ctx.args[2].replace("\\n", "\n"));
+                                debug(Arrays.toString(ctx.message.split(" ", 3)));
+                                c.set(ctx.message.split(" ", 2)[1].replace("\\n", "\n"));
                             }
 
 //                            info("@ set to @.", c.name(), c.get());
@@ -341,9 +345,12 @@ public class Admin {
                     ctx.channel.sendMessage(new EmbedBuilder()
                             .setTitle("Closed the server!")
                             .setColor(new Color(0xff0000))).join();
-                    net.dispose();
-                    Core.app.exit();
-                    System.exit(1);
+
+                    Log.info("&ly--SERVER RESTARTING--");
+                    Time.runTask(6f * 10f, () -> {
+                        netServer.kickAll(Packets.KickReason.serverRestarting);
+                        Time.runTask(5f, () -> System.exit(2));
+                    });
                 }
             });
         }

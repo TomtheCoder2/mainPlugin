@@ -4,50 +4,6 @@ import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
 import arc.util.Structs;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import mindustry.content.Bullets;
-import mindustry.content.UnitTypes;
-import mindustry.core.GameState;
-import mindustry.entities.bullet.BulletType;
-import mindustry.game.Team;
-import mindustry.gen.Call;
-import mindustry.gen.Groups;
-import mindustry.gen.Player;
-import mindustry.gen.Unit;
-import mindustry.net.Administration;
-import mindustry.net.Packets;
-import mindustry.plugin.data.PersistentPlayerData;
-import mindustry.plugin.data.PlayerData;
-import mindustry.plugin.discordcommands.Context;
-import mindustry.plugin.discordcommands.DiscordCommands;
-import mindustry.plugin.discordcommands.RoleRestrictedCommand;
-import mindustry.plugin.ioMain;
-import mindustry.plugin.requests.GetMap;
-import mindustry.plugin.utils.ranks.Rank;
-import mindustry.type.Item;
-import mindustry.type.UnitType;
-import org.json.JSONObject;
-
-import java.awt.*;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.IntStream;
-
-import arc.Core;
-import arc.Events;
-import arc.files.Fi;
-import arc.struct.Seq;
-import arc.struct.StringMap;
-import arc.util.Log;
-import arc.util.Structs;
 import arc.util.Timer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -59,16 +15,12 @@ import mindustry.content.UnitTypes;
 import mindustry.core.GameState;
 import mindustry.entities.bullet.BulletType;
 import mindustry.game.EventType.GameOverEvent;
-import mindustry.game.Gamemode;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
-import mindustry.io.SaveIO;
 import mindustry.maps.Map;
-import mindustry.maps.MapException;
-import mindustry.mod.Mods;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.data.PersistentPlayerData;
@@ -87,21 +39,13 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
 
 import java.awt.*;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
@@ -109,7 +53,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
-import java.util.zip.InflaterInputStream;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -118,7 +61,8 @@ import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.requests.IPLookup.readJsonFromUrl;
 import static mindustry.plugin.utils.CustomLog.logAction;
 import static mindustry.plugin.utils.LogAction.*;
-import static mindustry.plugin.utils.Utils.Categories.*;
+import static mindustry.plugin.utils.Utils.Categories.management;
+import static mindustry.plugin.utils.Utils.Categories.moderation;
 import static mindustry.plugin.utils.Utils.*;
 import static mindustry.plugin.utils.ranks.Utils.listRanks;
 import static mindustry.plugin.utils.ranks.Utils.rankNames;
@@ -126,9 +70,24 @@ import static mindustry.plugin.utils.ranks.Utils.rankNames;
 public class Moderator {
     private final JSONObject data;
     public GetMap map = new GetMap();
+    private Timer.Task testTask = null;
+    private boolean runningTask = false;
+    private int maxTps, avgTps, iterations;
+    private  int minTps = Integer.MAX_VALUE;
 
     public Moderator(JSONObject data) {
         this.data = data;
+    }
+
+    public void scanTPS() {
+        if (runningTask) {
+            int tps = Core.graphics.getFramesPerSecond();
+            maxTps = Math.max(maxTps, tps);
+            minTps = Math.min(minTps, tps);
+            avgTps = (iterations * avgTps + tps) / (iterations + 1);
+            iterations++;
+        }
+        Core.app.post(this::scanTPS);
     }
 
     public void registerCommands(DiscordCommands handler) {
@@ -152,6 +111,47 @@ public class Moderator {
                             .setTitle("Triggered a garbage collection!")
                             .setColor(new Color(0x00ff00))
                             .setDescription(pre - post + " MB collected. Memory usage now at " + post + " MB."));
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("test") {
+                {
+                    help = "Test the server stability.";
+                    role = banRole;
+                    category = management;
+                    usage = "<time>";
+                    minArguments = 1;
+                }
+
+                public void run(Context ctx) {
+                    if (testTask == null) {
+                        int time = Integer.parseInt(ctx.args[1]);
+                        testTask = Timer.schedule(() -> {
+                            runningTask = false;
+                            testTask = null;
+                            ctx.sendMessage(new EmbedBuilder()
+                                    .setTitle("Stability test complete!")
+                                    .setColor(new Color(0x00ff00))
+                                    .setDescription("Average TPS: " + avgTps + "\n" +
+                                            "Max TPS: " + maxTps + "\n" +
+                                            "Min TPS: " + minTps + "\n" +
+                                            "Iterations: " + iterations));
+                        }, time);
+                        runningTask = true;
+                        iterations = 0;
+                        maxTps = 0;
+                        avgTps = 0;
+                        minTps = Integer.MAX_VALUE;
+                        Core.app.post(() -> {
+                            scanTPS();
+                        });
+                        ctx.sendMessage(new EmbedBuilder()
+                                .setTitle("Stability test started!")
+                                .setColor(new Color(0x00ff00))
+                                .setDescription("Time: " + time + " seconds"));
+                    } else {
+                        ctx.sendEmbed(new EmbedBuilder().setTitle("Already running a test!").setColor(Color.RED));
+                    }
                 }
             });
 
