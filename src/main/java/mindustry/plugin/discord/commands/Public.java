@@ -1,10 +1,10 @@
-package mindustry.plugin.commands;
+package mindustry.plugin.discord.commands;
 
 import arc.struct.Seq;
 import mindustry.maps.Map;
-import mindustry.plugin.discordcommands.Command;
-import mindustry.plugin.discordcommands.Context;
-import mindustry.plugin.discordcommands.DiscordCommands;
+import mindustry.plugin.discord.discordcommands.Command;
+import mindustry.plugin.discord.discordcommands.Context;
+import mindustry.plugin.discord.discordcommands.DiscordCommands;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package mindustry.plugin.commands;
+package mindustry.plugin.discord.commands;
 
 import arc.Core;
 import arc.files.Fi;
@@ -17,9 +17,9 @@ import mindustry.mod.Mods;
 import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.data.PlayerData;
 import mindustry.plugin.database.MapData;
-import mindustry.plugin.discordcommands.Command;
-import mindustry.plugin.discordcommands.Context;
-import mindustry.plugin.discordcommands.DiscordCommands;
+import mindustry.plugin.discord.discordcommands.Command;
+import mindustry.plugin.discord.discordcommands.Context;
+import mindustry.plugin.discord.discordcommands.DiscordCommands;
 import mindustry.plugin.ioMain;
 import mindustry.plugin.requests.GetMap;
 import mindustry.world.modules.ItemModule;
@@ -315,7 +315,7 @@ public class ComCommands {
                     // preview 
 //                    Fi mapFile = Core.settings.getDataDirectory().child("../temp/map_" + Vars.state.map.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + saveExtension);
                     Fi tempDir = new Fi("temp/");
-                    Fi mapFile = tempDir.child("map_" + Vars.state.map.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + "." + saveExtension);
+                    Fi mapFile = tempDir.child("map_" + escapeEverything(Vars.state.map.name()).replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + "." + saveExtension);
                     Core.app.post(() -> {
                         try {
                             SaveIO.write(mapFile);

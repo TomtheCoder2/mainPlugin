@@ -1,12 +1,13 @@
 package mindustry.plugin;
 
-import mindustry.plugin.commands.*;
-import mindustry.plugin.discordcommands.DiscordCommands;
+import mindustry.plugin.discord.commands.*;
+import mindustry.plugin.discord.discordcommands.DiscordCommands;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
 import org.json.JSONObject;
 
-import static mindustry.plugin.ioMain.*;
+import static mindustry.plugin.ioMain.log_channel_id;
+import static mindustry.plugin.ioMain.update;
 import static mindustry.plugin.utils.Utils.getTextChannel;
 
 public class BotThread extends Thread {

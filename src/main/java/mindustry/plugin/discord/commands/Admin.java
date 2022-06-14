@@ -1,4 +1,4 @@
-package mindustry.plugin.commands;
+package mindustry.plugin.discord.commands;
 
 import arc.Core;
 import arc.files.Fi;
@@ -14,9 +14,9 @@ import mindustry.maps.MapException;
 import mindustry.mod.Mods;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
-import mindustry.plugin.discordcommands.Context;
-import mindustry.plugin.discordcommands.DiscordCommands;
-import mindustry.plugin.discordcommands.RoleRestrictedCommand;
+import mindustry.plugin.discord.discordcommands.Context;
+import mindustry.plugin.discord.discordcommands.DiscordCommands;
+import mindustry.plugin.discord.discordcommands.RoleRestrictedCommand;
 import mindustry.plugin.requests.GetMap;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageAttachment;

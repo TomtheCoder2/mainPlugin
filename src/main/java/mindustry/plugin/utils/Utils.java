@@ -33,8 +33,8 @@ import mindustry.mod.Mods;
 import mindustry.net.Administration;
 import mindustry.plugin.data.PlayerData;
 import mindustry.plugin.database.MapData;
-import mindustry.plugin.discordcommands.Command;
-import mindustry.plugin.discordcommands.Context;
+import mindustry.plugin.discord.discordcommands.Command;
+import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.ioMain;
 import mindustry.server.ServerControl;
 import mindustry.type.ItemSeq;
@@ -70,7 +70,7 @@ import static arc.util.Log.debug;
 import static arc.util.Log.err;
 import static mindustry.Vars.*;
 import static mindustry.plugin.database.Utils.*;
-import static mindustry.plugin.discordcommands.DiscordCommands.error_log_channel;
+import static mindustry.plugin.discord.discordcommands.DiscordCommands.error_log_channel;
 import static mindustry.plugin.ioMain.api;
 import static mindustry.plugin.ioMain.contentHandler;
 import static mindustry.plugin.utils.ranks.Utils.rankNames;
@@ -377,7 +377,7 @@ public class Utils {
                 ServerControl scont = (ServerControl) lst;
                 Reflect.set(scont, "nextMapOverride", targetMap);
                 Events.fire(new EventType.GameOverEvent(Team.crux));
-                return;
+                Reflect.set(scont, "nextMapOverride", null);
             }
         });
     }
@@ -614,8 +614,12 @@ public class Utils {
             mb.addEmbed(embed);
             mb.addAttachment(imageFile);
             mb.addAttachment(mapFile.file());
-            mb.send(channel).join();
-            imageFile.delete();
+            try {
+                mb.send(channel).get();
+            } catch (Exception e) {
+                Log.err(e);
+            }
+//            imageFile.delete();
         } else {
             embed.setFooter("Content Server is not running.");
             mb.addEmbed(embed);
@@ -765,7 +769,10 @@ public class Utils {
                 if (ele != null && !ele.isJsonNull()) {
                     String name = ele.getAsJsonObject().get("name").getAsString();
                     String content = ele.getAsJsonObject().get("value").getAsString();
-                    boolean inline = ele.getAsJsonObject().get("inline").getAsBoolean();
+                    boolean inline = false;
+                    if (ele.getAsJsonObject().has("inline")) {
+                        inline = ele.getAsJsonObject().get("inline").getAsBoolean();
+                    }
                     embedBuilder.addField(name, content, inline);
                 }
             });

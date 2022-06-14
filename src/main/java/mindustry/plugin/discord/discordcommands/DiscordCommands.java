@@ -1,4 +1,4 @@
-package mindustry.plugin.discordcommands;
+package mindustry.plugin.discord.discordcommands;
 
 import mindustry.gen.Call;
 import mindustry.plugin.ioMain;

@@ -56,6 +56,7 @@ public class Utils {
             } else {
                 debug(rs.next());
             }
+            rs.close();
             conn.close();
         } catch (SQLException ex) {
             debug(ex.getMessage());
@@ -102,6 +103,7 @@ public class Utils {
                         if (rs.next()) {
                             id = rs.getLong(1);
                         }
+                        rs.close();
                     } catch (SQLException ex) {
                         debug(ex.getMessage());
                     }

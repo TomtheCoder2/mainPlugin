@@ -1,4 +1,4 @@
-package mindustry.plugin.discordcommands;
+package mindustry.plugin.discord.discordcommands;
 
 import java.util.ArrayList;
 import java.util.List;

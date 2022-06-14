@@ -1,4 +1,4 @@
-package mindustry.plugin.discordcommands;
+package mindustry.plugin.discord.discordcommands;
 
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.channel.TextChannel;
@@ -10,7 +10,7 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import java.awt.*;
 import java.util.HashMap;
 
-import static mindustry.plugin.discordcommands.DiscordCommands.error_log_channel;
+import static mindustry.plugin.discord.discordcommands.DiscordCommands.error_log_channel;
 import static mindustry.plugin.utils.Utils.Pals;
 
 /**

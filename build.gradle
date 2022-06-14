@@ -38,7 +38,7 @@ dependencies {
 
     implementation('org.javacord:javacord:3.4.0')
     compileOnly('javax.ws.rs:javax.ws.rs-api:2.1.1')
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.9.0'
     implementation("net.dv8tion:JDA:4.3.0_277")
 //    implementation 'org.postgresql:postgresql:42.2.24.jre7'
     // http://mvnrepository.com/artifact/postgresql/postgresql
@@ -56,11 +56,9 @@ jar {
     version = null
     exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
     from {
         configurations.runtimeClasspath.findAll { !it.name.endsWith('pom') }.collect { it.isDirectory() ? it : zipTree(it) }
     }
-
 }
 buildscript {
     ext.kotlin_version = '1.6.0'

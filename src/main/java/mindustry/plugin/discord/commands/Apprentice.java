@@ -1,4 +1,4 @@
-package mindustry.plugin.commands;
+package mindustry.plugin.discord.commands;
 
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -7,9 +7,9 @@ import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.data.PlayerData;
-import mindustry.plugin.discordcommands.Context;
-import mindustry.plugin.discordcommands.DiscordCommands;
-import mindustry.plugin.discordcommands.RoleRestrictedCommand;
+import mindustry.plugin.discord.discordcommands.Context;
+import mindustry.plugin.discord.discordcommands.DiscordCommands;
+import mindustry.plugin.discord.discordcommands.RoleRestrictedCommand;
 import mindustry.plugin.requests.GetMap;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;

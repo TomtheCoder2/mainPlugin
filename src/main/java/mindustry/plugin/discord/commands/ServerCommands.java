@@ -1,8 +1,11 @@
-package mindustry.plugin.commands;
+package mindustry.plugin.discord.commands;
 
 import arc.Core;
 import arc.Events;
+import arc.files.Fi;
 import arc.struct.Seq;
+import arc.struct.StringMap;
+import arc.util.Log;
 import arc.util.Structs;
 import arc.util.Timer;
 import com.google.gson.Gson;
@@ -15,20 +18,24 @@ import mindustry.content.UnitTypes;
 import mindustry.core.GameState;
 import mindustry.entities.bullet.BulletType;
 import mindustry.game.EventType.GameOverEvent;
+import mindustry.game.Gamemode;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
+import mindustry.io.SaveIO;
 import mindustry.maps.Map;
+import mindustry.maps.MapException;
+import mindustry.mod.Mods;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.data.PlayerData;
-import mindustry.plugin.discordcommands.Command;
-import mindustry.plugin.discordcommands.Context;
-import mindustry.plugin.discordcommands.DiscordCommands;
-import mindustry.plugin.discordcommands.RoleRestrictedCommand;
+import mindustry.plugin.discord.discordcommands.Command;
+import mindustry.plugin.discord.discordcommands.Context;
+import mindustry.plugin.discord.discordcommands.DiscordCommands;
+import mindustry.plugin.discord.discordcommands.RoleRestrictedCommand;
 import mindustry.plugin.ioMain;
 import mindustry.plugin.requests.GetMap;
 import mindustry.plugin.utils.Utils;
@@ -39,13 +46,21 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
 
 import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
@@ -53,6 +68,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.IntStream;
+import java.util.zip.InflaterInputStream;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -61,36 +77,589 @@ import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.requests.IPLookup.readJsonFromUrl;
 import static mindustry.plugin.utils.CustomLog.logAction;
 import static mindustry.plugin.utils.LogAction.*;
-import static mindustry.plugin.utils.Utils.Categories.management;
-import static mindustry.plugin.utils.Utils.Categories.moderation;
+import static mindustry.plugin.utils.Utils.Categories.*;
 import static mindustry.plugin.utils.Utils.*;
 import static mindustry.plugin.utils.ranks.Utils.listRanks;
 import static mindustry.plugin.utils.ranks.Utils.rankNames;
 
-public class Moderator {
+@Deprecated
+public class ServerCommands {
     private final JSONObject data;
+    private final TextChannel log_channel;
     public GetMap map = new GetMap();
-    private Timer.Task testTask = null;
-    private boolean runningTask = false;
-    private int maxTps, avgTps, iterations;
-    private  int minTps = Integer.MAX_VALUE;
 
-    public Moderator(JSONObject data) {
+    public ServerCommands(JSONObject data) {
+        log_channel = getTextChannel(log_channel_id);
         this.data = data;
     }
 
-    public void scanTPS() {
-        if (runningTask) {
-            int tps = Core.graphics.getFramesPerSecond();
-            maxTps = Math.max(maxTps, tps);
-            minTps = Math.min(minTps, tps);
-            avgTps = (iterations * avgTps + tps) / (iterations + 1);
-            iterations++;
-        }
-        Core.app.post(this::scanTPS);
-    }
-
     public void registerCommands(DiscordCommands handler) {
+
+        handler.registerCommand(new Command("maps") {
+            {
+                help = "Check a list of available maps and their ids.";
+            }
+
+            public void run(Context ctx) {
+                EmbedBuilder eb = new EmbedBuilder();
+                eb.setTitle("**All available maps in the playlist:**");
+                Seq<Map> mapList = maps.customMaps();
+                for (int i = 0; i < mapList.size; i++) {
+                    Map m = mapList.get(i);
+                    eb.addField(escapeEverything(m.name()), m.width + " x " + m.height, true);
+                }
+                ctx.sendMessage(eb);
+            }
+        });
+
+        if (data.has("appeal_roleid") && data.has("appeal_channel_id")) {
+            String appealRole = data.getString("appeal_roleid");
+            TextChannel appeal_channel = getTextChannel(data.getString("appeal_channel_id"));
+
+            handler.registerCommand(new Command("appeal") {
+                {
+                    help = "Request an appeal";
+                }
+
+                public void run(Context ctx) {
+                    ctx.author.asUser().get().addRole(api.getRoleById(appealRole).get());
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("Successfully requested an appeal")
+                            .setDescription("Please head over to <#" + appeal_channel.getIdAsString() + ">!");
+                    ctx.sendMessage(eb);
+                    EmbedBuilder appealMessage = new EmbedBuilder()
+                            .setTitle("Please use this format to appeal:")
+                            .addField("1.Names", "All names used in game.")
+                            .addField("2.Screenshot", "Send a screenshot of your ban screen")
+                            .addField("3.Reason", "Explain what you did and why you want to get unbanned");
+                    appeal_channel.sendMessage("<@" + ctx.author.getIdAsString() + ">");
+                    appeal_channel.sendMessage(appealMessage);
+                }
+            });
+        }
+        if (data.has("administrator_roleid")) {
+            String adminRole = data.getString("administrator_roleid");
+            // TODO: make an update command to update the EI mod
+
+            handler.registerCommand(new RoleRestrictedCommand("config") {
+                {
+                    help = "Configure server settings.";
+                    usage = "[name] [value...]";
+                    role = adminRole;
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    if (ctx.args.length == 1) {
+//                        info("All config values:");
+                        eb.setTitle("All config values:");
+                        for (Administration.Config c : Administration.Config.all) {
+//                            info("&lk| @: @", c.name(), "&lc&fi" + c.get());
+//                            info("&lk| | &lw" + c.description);
+//                            info("&lk|");
+                            eb.addField(escapeEverything(c.name()) + ": " + c.get(), c.description, true);
+                        }
+                        ctx.sendMessage(eb);
+                        return;
+                    }
+
+                    try {
+                        Administration.Config c = Administration.Config.valueOf(ctx.args[1]);
+                        if (ctx.args.length == 2) {
+//                            info("'@' is currently @.", c.name(), c.get());
+                            eb.setTitle("'" + c.name() + "' is currently " + c.get() + ".");
+                            ctx.sendMessage(eb);
+                        } else {
+                            if (c.isBool()) {
+                                c.set(ctx.args[2].equals("on") || ctx.args[2].equals("true"));
+                            } else if (c.isNum()) {
+                                try {
+                                    c.set(Integer.parseInt(ctx.args[2]));
+                                } catch (NumberFormatException e) {
+//                                    err("Not a valid number: @", ctx.args[2]);
+                                    eb.setTitle("Not a valid Number: " + ctx.args[2]).setColor(new Color(0xff0000));
+                                    ctx.sendMessage(eb);
+                                    return;
+                                }
+                            } else if (c.isString()) {
+                                c.set(ctx.args[2].replace("\\n", "\n"));
+                            }
+
+//                            info("@ set to @.", c.name(), c.get());
+                            eb.setTitle(c.name() + " set to " + c.get() + ".");
+                            ctx.sendMessage(eb);
+                            Core.settings.forceSave();
+                        }
+                    } catch (IllegalArgumentException e) {
+//                        err("Unknown config: '@'. Run the command with no arguments to get a list of valid configs.", ctx.args[1]);
+                        eb.setTitle("Error")
+                                .setDescription("Unknown config: '" + ctx.args[1] + "'. Run the command with no arguments to get a list of valid configs.")
+                                .setColor(new Color(0xff0000));
+                        ctx.sendMessage(eb);
+                    }
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("uploadmod") {
+                {
+                    help = "Upload a new mod (Include a .zip file with command message)";
+                    role = adminRole;
+                    usage = "<.zip attachment>";
+                    category = management;
+                    aliases.add("umod");
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    Seq<MessageAttachment> ml = new Seq<>();
+                    for (MessageAttachment ma : ctx.event.getMessageAttachments()) {
+                        if (ma.getFileName().split("\\.")[ma.getFileName().split("\\.").length - 1].trim().equals("zip")) {
+                            ml.add(ma);
+                        }
+                    }
+                    if (ml.size != 1) {
+                        eb.setTitle("Mod upload terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("You need to add one valid .zip file!");
+                        ctx.sendMessage(eb);
+                        return;
+                    } else if (Core.settings.getDataDirectory().child("mods").child(ml.get(0).getFileName()).exists()) {
+                        eb.setTitle("Mod upload terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("There is already a mod with this name on the server!");
+                        ctx.sendMessage(eb);
+                        return;
+                    }
+                    // more custom filename checks possible
+
+                    CompletableFuture<byte[]> cf = ml.get(0).downloadAsByteArray();
+                    Fi fh = Core.settings.getDataDirectory().child("mods").child(ml.get(0).getFileName());
+
+                    try {
+                        byte[] data = cf.get();
+//                        if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
+//                            eb.setTitle("Mod upload terminated.");
+//                            eb.setColor(Pals.error);
+//                            eb.setDescription("Mod file corrupted or invalid.");
+//                            ctx.sendMessage(eb);
+//                            return;
+//                        }
+                        fh.writeBytes(cf.get(), false);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    maps.reload();
+                    eb.setTitle("Mod upload completed.");
+                    eb.setDescription(ml.get(0).getFileName() + " was added successfully into the mod folder!\n" +
+                            "Restart the server (`<restart <server>`) to activate the mod!");
+                    ctx.sendMessage(eb);
+//                    Utils.LogAction("uploadmap", "Uploaded a new map", ctx.author, null);
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("removemod") {
+                {
+                    help = "Remove a mod from the folder";
+                    role = adminRole;
+                    usage = "<mapname/mapid>";
+                    category = mapReviewer;
+                    minArguments = 1;
+                    aliases.add("rmod");
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    debug(ctx.message);
+                    Mods.LoadedMod mod = getMod(ctx.message);
+                    if (mod == null) {
+                        eb.setTitle("Command terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("Mod not found");
+                        ctx.sendMessage(eb);
+                        return;
+                    }
+                    debug(mod.file.file().getAbsoluteFile().getAbsolutePath());
+                    Path path = Paths.get(mod.file.file().getAbsoluteFile().getAbsolutePath());
+                    mod.dispose();
+
+                    try {
+                        Files.delete(path);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        eb.setTitle("There was an error performing this command.")
+                                .setDescription(e.getMessage())
+                                .setColor(new Color(0xff0000));
+                        return;
+                    }
+                    if (mod.file.file().getAbsoluteFile().delete()) {
+                        eb.setTitle("Command executed.");
+                        eb.setDescription(mod.name + " was successfully removed from the folder.\nRestart the server to disable the mod (`<restart <server>`).");
+                    } else {
+                        eb.setTitle("There was an error performing this command.")
+                                .setColor(new Color(0xff0000));
+                    }
+                    ctx.sendMessage(eb);
+                }
+            });
+
+
+            handler.registerCommand(new RoleRestrictedCommand("enableJs") {
+                {
+                    help = "Enable/Disable js command for everyone.";
+                    role = adminRole;
+                    category = moderation;
+                    usage = "<true|false>";
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    switch (ctx.args[1]) {
+                        case "true", "t" -> {
+                            enableJs = true;
+                            if (enableJsTask != null) {
+                                enableJsTask.cancel();
+                            }
+                            enableJsTask = Timer.schedule(() -> {
+                                enableJs = false;
+                                Call.sendMessage("[accent]js command disabled for everyone!");
+                            }, 10 * 60);
+                            Call.sendMessage("[accent]Marshal " + ctx.author.getName() + "[accent] enabled the js command for everyone! Do [cyan]/js <script...>[accent] to use it.");
+                        }
+                        case "false", "f" -> {
+                            enableJs = false;
+                            Call.sendMessage("[accent]js command disabled for everyone!");
+                        }
+                        default -> {
+                            eb.setTitle("Error")
+                                    .setColor(new Color(0xff0000))
+                                    .setDescription("[scarlet]Second argument has to be true or false.");
+                            ctx.sendMessage(eb);
+                            return;
+                        }
+                    }
+                    eb.setTitle((enableJs ? "Enabled" : "Disabled") + " js")
+                            .setDescription((enableJs ? "Enabled" : "Disabled") + " js for everyone" + (enableJs ? " for 10 minutes." : "."))
+                            .setColor(new Color((enableJs ? 0x00ff00 : 0xff0000)));
+                    ctx.sendMessage(eb);
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("start") {
+                {
+                    help = "Restart the server. Will default to survival and a random map if not specified.";
+                    role = adminRole;
+                    category = management;
+                    usage = "[mapname] [mode]";
+                }
+
+                public void run(Context ctx) {
+                    net.closeServer();
+                    state.set(GameState.State.menu);
+
+                    // start the server again
+                    EmbedBuilder eb = new EmbedBuilder();
+                    Gamemode preset = Gamemode.survival;
+
+                    if (ctx.args.length > 2) {
+                        try {
+                            preset = Gamemode.valueOf(ctx.args[2]);
+                        } catch (IllegalArgumentException e) {
+                            err("No gamemode '@' found.", ctx.args[2]);
+                            eb.setTitle("Command terminated.");
+                            eb.setColor(Pals.error);
+                            eb.setDescription("No gamemode " + ctx.args[2] + " found.");
+                            ctx.sendMessage(eb);
+                            return;
+                        }
+                    }
+
+                    Map result;
+                    if (ctx.args.length > 1) {
+                        result = getMapBySelector(ctx.args[1]);
+                        if (result == null) {
+                            eb.setTitle("Command terminated.");
+                            eb.setColor(Pals.error);
+                            eb.setDescription("Map \"" + escapeCharacters(ctx.args[1]) + "\" not found!");
+                            ctx.sendMessage(eb);
+                            return;
+                        }
+                    } else {
+                        result = maps.getShuffleMode().next(preset, state.map);
+                        info("Randomized next map to be @.", result.name());
+                    }
+
+                    info("Loading map...");
+
+                    logic.reset();
+//                    lastMode = preset;
+//                    Core.settings.put("lastServerMode", lastMode.name());
+                    try {
+                        world.loadMap(result, result.applyRules(preset));
+                        state.rules = result.applyRules(preset);
+                        logic.play();
+
+                        info("Map loaded.");
+                        eb.setTitle("Map loaded!");
+                        eb.setColor(Pals.success);
+                        eb.setDescription("Hosting map: " + result.name());
+                        ctx.sendMessage(eb);
+
+                        netServer.openServer();
+                    } catch (MapException e) {
+                        Log.err(e.map.name() + ": " + e.getMessage());
+                        eb.setTitle("Command terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("e.map.name() + \": \" + e.getMessage()");
+                        ctx.sendMessage(eb);
+                        return;
+                    }
+                }
+            });
+        }
+
+        if (data.has("exit_roleid")) {
+            handler.registerCommand(new RoleRestrictedCommand("exit") {
+                {
+                    help = "Close the server.";
+                    role = data.getString("exit_roleid");
+                    category = management;
+                }
+
+                public void run(Context ctx) {
+                    getTextChannel(log_channel_id).sendMessage(new EmbedBuilder()
+                            .setTitle(ctx.author.getDisplayName() + " closed the server!")
+                            .setColor(new Color(0xff0000))).join();
+
+                    ctx.channel.sendMessage(new EmbedBuilder()
+                            .setTitle("Closed the server!")
+                            .setColor(new Color(0xff0000))).join();
+                    net.dispose();
+                    Core.app.exit();
+                    System.exit(1);
+                }
+            });
+        }
+
+        if (data.has("apprentice_roleid")) {
+            String apprenticeRole = data.getString("apprentice_roleid");
+
+            handler.registerCommand(new RoleRestrictedCommand("mute") {
+                {
+                    help = "Mute a player. To unmute just use this command again.";
+                    usage = "<playerid|ip|name> [reason...]";
+                    minArguments = 1;
+                    category = moderation;
+                    role = apprenticeRole;
+                    apprenticeCommand = true;
+                    aliases.add("m");
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    String target = ctx.args[1];
+                    Player player = findPlayer(target);
+                    EmbedBuilder eb = new EmbedBuilder();
+                    if (player != null) {
+                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                        assert tdata != null;
+                        tdata.muted = !tdata.muted;
+                        eb.setTitle("Successfully " + (tdata.muted ? "muted" : "unmuted") + " " + escapeEverything(target));
+                        if (ctx.args.length > 2) {
+                            eb.addField("Reason", ctx.args[2]);
+                        }
+                        ctx.sendMessage(eb);
+                        Call.infoMessage(player.con, "[cyan]You got " + (tdata.muted ? "muted" : "unmuted") + " by a moderator. " + (ctx.args.length > 2 ? "Reason: " + ctx.message.split(" ", 2)[1] : ""));
+                    } else {
+                        playerNotFound(target, eb, ctx);
+                    }
+                }
+            });
+
+
+            handler.registerCommand(new RoleRestrictedCommand("freeze") {
+                {
+                    help = "Freeze a player. To unfreeze just use this command again.";
+                    usage = "<playerid|ip|name> [reason...]";
+                    minArguments = 1;
+                    category = moderation;
+                    role = apprenticeRole;
+                    apprenticeCommand = true;
+                    aliases.add("f");
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    String target = ctx.args[1];
+                    Player player = findPlayer(target);
+                    EmbedBuilder eb = new EmbedBuilder();
+                    if (player != null) {
+                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                        assert tdata != null;
+                        tdata.frozen = !tdata.frozen;
+                        eb.setTitle("Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(target));
+                        if (ctx.args.length > 2) {
+                            eb.addField("Reason", ctx.args[2]);
+                        }
+                        ctx.sendMessage(eb);
+                        Call.infoMessage(player.con, "[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " by a moderator. " + (ctx.args.length > 2 ? "Reason: " + ctx.message.split(" ", 2)[1] : ""));
+                    } else {
+                        playerNotFound(target, eb, ctx);
+                    }
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("banish") {
+                {
+                    help = "Ban the provided player for a specific duration with a specific reason.";
+                    role = apprenticeRole;
+                    usage = "<player> <duration (minutes)> <reason...>";
+                    category = moderation;
+                    apprenticeCommand = true;
+                    minArguments = 2;
+                    aliases.add("b");
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1];
+                    String targetDuration = ctx.args[2];
+                    String reason;
+                    long now = Instant.now().getEpochSecond();
+
+                    Administration.PlayerInfo info = getPlayerInfo(target);
+                    if (info != null) {
+                        String uuid = info.id;
+                        String banId = uuid.substring(0, 4);
+                        PlayerData pd = getData(uuid);
+                        long until;
+                        try {
+                            until = now + Integer.parseInt(targetDuration) * 60L;
+                            reason = ctx.message.substring(target.length() + targetDuration.length() + 2);
+                        } catch (Exception e) {
+//                                EmbedBuilder err = new EmbedBuilder()
+//                                        .setTitle("Second argument has to be a number!")
+//                                        .setColor(new Color(0xff0000));
+//                                ctx.channel.sendMessage(err);
+//                                return;
+                            e.printStackTrace();
+                            until = now + (long) (2 * 356 * 24 * 60 * 60); // 2 years
+                            reason = ctx.message.substring(target.length() + 1);
+                        }
+                        if (pd != null) {
+                            pd.bannedUntil = until;
+                            pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
+                            setData(uuid, pd);
+
+                            eb.setTitle("Banned " + escapeEverything(info.lastName) + " for " + targetDuration + " minutes. ");
+                            eb.addField("Ban ID", banId);
+                            eb.addField("For", (until - now) / 60 + " minutes.");
+                            eb.addField("Until", epochToString(until));
+                            eb.addInlineField("Reason", reason);
+                            ctx.sendMessage(eb);
+
+                            Player player = findPlayer(uuid);
+                            if (player != null) {
+                                player.con.kick(Packets.KickReason.banned);
+                            }
+                            logAction(ban, info, ctx, reason);
+                        } else {
+                            playerNotFound(target, eb, ctx);
+                        }
+                    } else {
+                        playerNotFound(target, eb, ctx);
+                    }
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("alert") {
+                {
+                    help = "Alerts a player(s) using on-screen messages.";
+                    role = apprenticeRole;
+                    usage = "<playerid|ip|name|teamid> <message>";
+                    category = moderation;
+                    apprenticeCommand = true;
+                    minArguments = 2;
+                    aliases.add("a");
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1].toLowerCase();
+
+                    if (target.equals("all")) {
+                        for (Player p : Groups.player) {
+                            Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
+                        }
+                        eb.setTitle("Command executed");
+                        eb.setDescription("Alert was sent to all players.");
+                        ctx.sendMessage(eb);
+                    } else if (target.matches("[0-9]+") && target.length() == 1) {
+                        for (Player p : Groups.player) {
+                            p.sendMessage("hello", player);
+                            if (p.team().id == Byte.parseByte(target)) {
+                                Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
+                            }
+                        }
+                        eb.setTitle("Command executed");
+                        eb.setDescription("Alert was sent to all players.");
+                        ctx.sendMessage(eb);
+                    } else {
+                        Player p = findPlayer(target);
+                        if (p != null) {
+                            Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
+                            eb.setTitle("Command executed");
+                            eb.setDescription("Alert was sent to " + escapeEverything(p));
+                        } else {
+                            eb.setTitle("Command terminated");
+                            eb.setColor(Pals.error);
+                            eb.setDescription("Player could not be found or is offline.");
+
+                        }
+                        ctx.sendMessage(eb);
+                    }
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("info") {
+                {
+                    help = "Get info about a specific player.";
+                    usage = "<player>";
+                    role = apprenticeRole;
+                    category = moderation;
+                    apprenticeCommand = true;
+                    minArguments = 1;
+                    aliases.add("i");
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    String target = ctx.args[1];
+                    long now = Instant.now().getEpochSecond();
+
+                    Administration.PlayerInfo info = null;
+                    Player player = findPlayer(target);
+                    if (player != null) {
+                        info = netServer.admins.getInfoOptional(player.uuid());
+                    }
+
+                    if (info != null) {
+                        eb.setTitle(escapeEverything(info.lastName) + "'s info");
+                        StringBuilder s = lookup(eb, info);
+                        eb.setDescription(s.toString());
+
+                    } else {
+                        eb.setTitle("Command terminated");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("Player could not be found or is offline.");
+                    }
+                    ctx.sendMessage(eb);
+                }
+            });
+        }
+
         if (data.has("moderator_roleid")) {
             String banRole = data.getString("moderator_roleid");
 
@@ -111,47 +680,6 @@ public class Moderator {
                             .setTitle("Triggered a garbage collection!")
                             .setColor(new Color(0x00ff00))
                             .setDescription(pre - post + " MB collected. Memory usage now at " + post + " MB."));
-                }
-            });
-
-            handler.registerCommand(new RoleRestrictedCommand("test") {
-                {
-                    help = "Test the server stability.";
-                    role = banRole;
-                    category = management;
-                    usage = "<time>";
-                    minArguments = 1;
-                }
-
-                public void run(Context ctx) {
-                    if (testTask == null) {
-                        int time = Integer.parseInt(ctx.args[1]);
-                        testTask = Timer.schedule(() -> {
-                            runningTask = false;
-                            testTask = null;
-                            ctx.sendMessage(new EmbedBuilder()
-                                    .setTitle("Stability test complete!")
-                                    .setColor(new Color(0x00ff00))
-                                    .setDescription("Average TPS: " + avgTps + "\n" +
-                                            "Max TPS: " + maxTps + "\n" +
-                                            "Min TPS: " + minTps + "\n" +
-                                            "Iterations: " + iterations));
-                        }, time);
-                        runningTask = true;
-                        iterations = 0;
-                        maxTps = 0;
-                        avgTps = 0;
-                        minTps = Integer.MAX_VALUE;
-                        Core.app.post(() -> {
-                            scanTPS();
-                        });
-                        ctx.sendMessage(new EmbedBuilder()
-                                .setTitle("Stability test started!")
-                                .setColor(new Color(0x00ff00))
-                                .setDescription("Time: " + time + " seconds"));
-                    } else {
-                        ctx.sendEmbed(new EmbedBuilder().setTitle("Already running a test!").setColor(Color.RED));
-                    }
                 }
             });
 
@@ -2068,6 +2596,203 @@ public class Moderator {
                 }
 
             });
+
+        }
+
+            /*handler.registerCommand(new Command("sendm"){ // use sendm to send embed messages when needed locally, disable for now
+                public void run(Context ctx){
+                    EmbedBuilder eb = new EmbedBuilder()
+ .setColor(Utils.Pals.info)
+ .setTitle("Support mindustry.io by donating, and receive custom ranks!")
+ .setUrl("https://donate.mindustry.io/")
+ .setDescription("By donating, you directly help me pay for the monthly server bills I receive for hosting 4 servers with **150+** concurrent players daily.")
+ .addField("VIP", "**VIP** is obtainable through __nitro boosting__ the server or __donating $1.59+__ to the server.", false)
+ .addField("__**MVP**__", "**MVP** is a more enchanced **vip** rank, obtainable only through __donating $3.39+__ to the server.", false)
+ .addField("Where do I get it?", "You can purchase **vip** & **mvp** ranks here: https://donate.mindustry.io", false)
+ .addField("\uD83E\uDD14 io is pay2win???", "Nope. All perks vips & mvp's gain are aesthetic items **or** items that indirectly help the team. Powerful commands that could give you an advantage are __disabled on pvp.__", true);
+                    ctx.sendMessage(eb);
+                }
+            });*/
+
+
+        if (data.has("mapSubmissions_roleid")) {
+            String reviewerRole = data.getString("mapSubmissions_roleid");
+            handler.registerCommand(new RoleRestrictedCommand("uploadmap") {
+                {
+                    help = "Upload a new map (Include a .msav file with command message)";
+                    role = reviewerRole;
+                    usage = "<.msav attachment>";
+                    category = mapReviewer;
+                    aliases.add("ul");
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    Seq<MessageAttachment> ml = new Seq<>();
+                    for (MessageAttachment ma : ctx.event.getMessageAttachments()) {
+                        String[] splitMessage = ma.getFileName().split("\\.");
+                        if (splitMessage[splitMessage.length - 1].trim().equals("msav")) {
+                            ml.add(ma);
+                        }
+                    }
+                    if (ml.size != 1) {
+                        eb.setTitle("Map upload terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("You need to add one valid .msav file!");
+                        ctx.sendMessage(eb);
+                        return;
+                    }
+                    for (MessageAttachment ma : ml) {
+                        boolean updated = false;
+                        if (Core.settings.getDataDirectory().child("maps").child(ma.getFileName()).exists()) {
+                            // update the map
+//                            Core.settings.getDataDirectory().child("maps").child(ma.getFileName()).delete();
+                            updated = true;
+//                        eb.setTitle("Map upload terminated.");
+//                        eb.setColor(Pals.error);
+//                        eb.setDescription("There is already a map with this name on the server!");
+//                        ctx.sendMessage(eb);
+//                        return;
+                        }
+                        // more custom filename checks possible
+
+                        CompletableFuture<byte[]> cf = ma.downloadAsByteArray();
+                        Fi fh = Core.settings.getDataDirectory().child("maps").child(ma.getFileName());
+
+                        try {
+                            byte[] data = cf.get();
+                            if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
+                                eb.setTitle("Map upload terminated.");
+                                eb.setColor(Pals.error);
+                                eb.setDescription("Map file `" + fh.name() + "` corrupted or invalid.");
+                                ctx.sendMessage(eb);
+                                continue;
+                            }
+                            if (updated)
+                                Core.settings.getDataDirectory().child("maps").child(ma.getFileName()).delete();
+                            fh.writeBytes(cf.get(), false);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        maps.reload();
+                        eb.setTitle("Map upload completed.");
+                        if (updated)
+                            eb.setDescription("Successfully updated " + ma.getFileName());
+                        else
+                            eb.setDescription(ma.getFileName() + " was added successfully into the playlist!");
+                        ctx.sendMessage(eb);
+                        logAction((updated ? updateMap : uploadMap), null, ctx, null, ma);
+                    }
+                }
+            });
+
+            handler.registerCommand(new RoleRestrictedCommand("removemap") {
+                {
+                    help = "Remove a map from the playlist (use mapname/mapid retrieved from the %maps command)".replace("%", ioMain.prefix);
+                    role = reviewerRole;
+                    usage = "<mapname/mapid>";
+                    category = mapReviewer;
+                    minArguments = 1;
+                    aliases.add("rm");
+                }
+
+                @Override
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    if (ctx.args.length < 2) {
+                        eb.setTitle("Command terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("Not enough arguments, use `%removemap <mapname/mapid>`".replace("%", ioMain.prefix));
+                        ctx.sendMessage(eb);
+                        return;
+                    }
+                    Map found = getMapBySelector(ctx.message.trim());
+                    if (found == null) {
+                        eb.setTitle("Command terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("Map not found");
+                        ctx.sendMessage(eb);
+                        return;
+                    }
+
+                    maps.removeMap(found);
+                    maps.reload();
+
+                    eb.setTitle("Command executed.");
+                    eb.setDescription(found.name() + " was successfully removed from the playlist.");
+                    ctx.sendMessage(eb);
+                }
+            });
+        }
+
+        if (data.has("mapSubmissions_id")) {
+            TextChannel tc = getTextChannel(ioMain.data.getString("mapSubmissions_id"));
+            handler.registerCommand(new Command("submitmap") {
+                {
+                    help = " Submit a new map to be added into the server playlist in a .msav file format.";
+                    usage = "<.msav attachment>";
+                }
+
+                public void run(Context ctx) {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    Seq<MessageAttachment> ml = new Seq<>();
+                    for (MessageAttachment ma : ctx.event.getMessageAttachments()) {
+                        if (ma.getFileName().split("\\.", 2)[1].trim().equals("msav")) {
+                            ml.add(ma);
+                        }
+                    }
+                    if (ml.size != 1) {
+                        eb.setTitle("Map upload terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("You need to add one valid .msav file!");
+                        ctx.sendMessage(eb);
+                        return;
+                    } else if (Core.settings.getDataDirectory().child("maps").child(ml.get(0).getFileName()).exists()) {
+                        eb.setTitle("Map upload terminated.");
+                        eb.setColor(Pals.error);
+                        eb.setDescription("There is already a map with this name on the server!");
+                        ctx.sendMessage(eb);
+                        return;
+                    }
+                    CompletableFuture<byte[]> cf = ml.get(0).downloadAsByteArray();
+
+                    try {
+                        byte[] data = cf.get();
+                        if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
+                            eb.setTitle("Map upload terminated.");
+                            eb.setColor(Pals.error);
+                            eb.setDescription("Map file corrupted or invalid.");
+                            ctx.sendMessage(eb);
+                            return;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    eb.setTitle("Map upload completed.");
+                    eb.setDescription(ml.get(0).getFileName() + " was successfully queued for review by moderators!");
+
+                    try {
+                        InputStream data = ml.get(0).downloadAsInputStream();
+                        StringMap meta = getMeta(data);
+                        Fi mapFile = new Fi("./temp/map_submit_" + meta.get("name").replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msav");
+                        mapFile.writeBytes(cf.get(), false);
+
+                        EmbedBuilder embed = new EmbedBuilder()
+                                .setTitle(escapeEverything(meta.get("name")))
+                                .setDescription(meta.get("description"))
+                                .setAuthor(ctx.author.getName(), ctx.author.getAvatar().getUrl().toString(), ctx.author.getAvatar().getUrl().toString())
+                                .setColor(new Color(0xF8D452))
+                                .setFooter("Size: " + meta.getInt("width") + " X " + meta.getInt("height"));
+                        debug("mapFile size: @", mapFile.length());
+                        attachMapPng(mapFile, embed, tc);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    assert tc != null;
+                    ctx.sendMessage(eb);
+                }
+            });
+
 
         }
     }

@@ -1,4 +1,4 @@
-package mindustry.plugin.discordcommands;
+package mindustry.plugin.discord.discordcommands;
 
 import org.javacord.api.event.message.MessageCreateEvent;
 

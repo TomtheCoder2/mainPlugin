@@ -2,7 +2,7 @@ package mindustry.plugin.utils;
 
 import mindustry.net.Administration;
 import mindustry.plugin.data.PlayerData;
-import mindustry.plugin.discordcommands.Context;
+import mindustry.plugin.discord.discordcommands.Context;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
