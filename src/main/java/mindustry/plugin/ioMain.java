@@ -159,6 +159,7 @@ public class ioMain extends Plugin {
         try { // test connection
             connect();
         } catch (Exception e) {
+            err(e.toString());
             err("Could not login to PostgresSQL database!");
         }
         Utils.init();
