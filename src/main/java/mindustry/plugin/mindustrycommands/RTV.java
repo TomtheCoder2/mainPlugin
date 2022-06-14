@@ -200,7 +200,7 @@ public final class RTV {
             removeInvalid();
 
             for (var entry : votes) {
-                player.sendMessage(MindustryMsg.info("RTV", "Map [orange]" + entry.key + "[lightgray] has [orange]" +  entry.value.size + "[lightgray] votes"));
+                player.sendMessage(MindustryMsg.info("RTV", "Map [orange]" + entry.key + "[lightgray] has [orange]" +  entry.value.size + "[lightgray] / [orange]" + requiredVotes() + "[lightgray] votes"));
             }
         });
     }
