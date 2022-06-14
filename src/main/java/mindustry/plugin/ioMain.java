@@ -112,6 +112,8 @@ public class ioMain extends Plugin {
     public static NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
     public static MapChange mapChange = new MapChange();
 
+    RTV rtv = new RTV();
+
     // register event handlers and create variables in the constructor
     public ioMain() {
         info("Starting Discord Plugin...");
@@ -625,6 +627,8 @@ public class ioMain extends Plugin {
             });
             info("Registered all filters.");
         });
+
+        rtv.registerEvents();
     }
 
     // rainbow
@@ -853,7 +857,7 @@ public class ioMain extends Plugin {
             new ComCommands().registerCommands(handler);
             new Discord().registerCommands(handler);
             new Info().registerCommands(handler);
-            new mindustry.plugin.mindustrycommands.RTV().register(handler);
+            rtv.registerCommands(handler);
             new Moderation().registerCommands(handler);
         }
     }

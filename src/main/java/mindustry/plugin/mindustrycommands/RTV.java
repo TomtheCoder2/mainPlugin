@@ -136,7 +136,15 @@ public final class RTV {
         return null;
     }
 
-    public void register(CommandHandler handler) {
+
+    public void registerEvents() {
+        // Clear votes when a new game occurs.
+        Events.on(EventType.GameOverEvent.class, event -> {
+            votes.clear();
+        });
+    }
+
+    public void registerCommands(CommandHandler handler) {
         handler.<Player>register("rtv", "[map] [yesno]", "RTV to a different map", (args, player) -> {
             String mapQuery;
             if (args.length == 0) {
