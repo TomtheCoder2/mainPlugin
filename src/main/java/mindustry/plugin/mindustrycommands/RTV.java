@@ -81,7 +81,7 @@ public final class RTV {
             for (String ip : voteSet) {
                 boolean found = false;
                 for (Player player: Groups.player) {
-                    if (player.ip() == ip) {
+                    if (player.ip().equals(ip)) {
                         found = true;
                         break;
                     }
@@ -158,9 +158,9 @@ public final class RTV {
 
             boolean vote = true;
             if (args.length > 1) {
-                if (args[1] == "yes" || args[1] == "y") {
+                if (args[1].equals("yes") || args[1].equals("y")) {
                     vote = true;
-                } else if (args[1] == "no" || args[1] == "n") {
+                } else if (args[1].equals("no") || args[1].equals("n")) {
                     vote = false;
                 } else {
                     player.sendMessage(MindustryMsg.error("RTV", "Vote must be [orange]yes[scarlet] or [orange]no"));
@@ -188,7 +188,7 @@ public final class RTV {
 
                 Map mapObj = null;
                 for (Map map_ : Vars.maps.all()) {
-                    if (map_.name() == passedMap) {
+                    if (map_.name().equals(passedMap)) {
                         mapObj = map_;
                         break;
                     }

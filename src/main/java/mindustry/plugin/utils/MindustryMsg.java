@@ -4,7 +4,7 @@ package mindustry.plugin.utils;
 /** Utility package for formatting in-game messages. */
 public class MindustryMsg {
     public static String error(String category, String msg) {
-        return "[scarlet]<[blue]" + category + "[scarlet]>:" + msg;
+        return "[scarlet]<[blue]" + category + "[scarlet]>: " + msg;
     }   
 
     public static String info(String category, String msg) {
