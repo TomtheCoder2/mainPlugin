@@ -155,7 +155,7 @@ public final class RTV {
                 } else if (args[1] == "no" || args[1] == "n") {
                     vote = false;
                 } else {
-                    player.sendMessage(MindustryMsg.error("RTV", "Vote must be 'yes' or 'no'"));
+                    player.sendMessage(MindustryMsg.error("RTV", "Vote must be [orange]yes[scarlet] or [orange]no"));
                     return;
                 }
             }
@@ -163,7 +163,7 @@ public final class RTV {
             // configure voting
             String map = setVote(player, mapQuery, vote);
             if (map == null) {
-                player.sendMessage(MindustryMsg.error("RTV", "Map '" + mapQuery + "' not found."));
+                player.sendMessage(MindustryMsg.error("RTV", "Map [orange]" + mapQuery + "[scarlet] not found."));
             }
 
             removeInvalid();
@@ -193,6 +193,12 @@ public final class RTV {
                 }
 
                 changeMap(mapObj);
+            }
+        });
+
+        handler.<Player>register("rtvotes", "", "Show RTV votes", (args, player) -> {
+            for (var entry : votes) {
+                player.sendMessage(MindustryMsg.info("RTV", "Map [orange]" + entry.key + "[lightgray] has [orange]" +  entry.value.size + "[lightgray] votes"));
             }
         });
     }
