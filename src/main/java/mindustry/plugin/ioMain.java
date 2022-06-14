@@ -853,7 +853,7 @@ public class ioMain extends Plugin {
             new ComCommands().registerCommands(handler);
             new Discord().registerCommands(handler);
             new Info().registerCommands(handler);
-            new mindustry.plugin.mindustrycommands.Map().registerCommands(handler);
+            new mindustry.plugin.mindustrycommands.RTV().register(handler);
             new Moderation().registerCommands(handler);
         }
     }
