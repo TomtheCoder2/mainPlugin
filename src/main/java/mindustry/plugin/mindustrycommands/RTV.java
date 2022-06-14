@@ -197,6 +197,8 @@ public final class RTV {
         });
 
         handler.<Player>register("rtvotes", "", "Show RTV votes", (args, player) -> {
+            removeInvalid();
+
             for (var entry : votes) {
                 player.sendMessage(MindustryMsg.info("RTV", "Map [orange]" + entry.key + "[lightgray] has [orange]" +  entry.value.size + "[lightgray] votes"));
             }
