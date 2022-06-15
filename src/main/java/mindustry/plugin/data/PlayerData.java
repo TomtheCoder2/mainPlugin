@@ -1,7 +1,5 @@
 package mindustry.plugin.data;
 
-import mindustry.world.Tile;
-
 public class PlayerData implements Cloneable {
     public String uuid;
     public int rank;

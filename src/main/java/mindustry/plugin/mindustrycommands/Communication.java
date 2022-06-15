@@ -1,25 +1,20 @@
 package mindustry.plugin.mindustrycommands;
 
-import mindustry.plugin.MiniMod;
-
 import arc.util.CommandHandler;
 import arc.util.Strings;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
-import mindustry.plugin.data.PersistentPlayerData;
-import mindustry.plugin.data.PlayerData;
+import mindustry.plugin.MiniMod;
 import mindustry.plugin.requests.Translate;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.channel.TextChannel;
 import org.json.JSONObject;
 
 import static arc.util.Log.debug;
-import static mindustry.Vars.netServer;
-import static mindustry.plugin.database.Utils.getData;
 import static mindustry.plugin.ioMain.*;
-import static mindustry.plugin.utils.Utils.*;
-import static mindustry.plugin.utils.ranks.Utils.rankNames;
+import static mindustry.plugin.utils.Utils.escapeEverything;
+import static mindustry.plugin.utils.Utils.getTextChannel;
 
 public class Communication implements MiniMod {
     public void registerCommands(CommandHandler handler) {

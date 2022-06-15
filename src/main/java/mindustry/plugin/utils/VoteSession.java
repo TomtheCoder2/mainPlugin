@@ -25,9 +25,8 @@ public class VoteSession {
     public ObjectSet<String> voted = new ObjectSet<>();
     public VoteSession[] map;
     public Timer.Task task;
-    int votes;
     public Player startedVk = null;
-
+    int votes;
     //duration of a kick in seconds
     int kickDuration = 60 * 60;
     //voting round duration in seconds

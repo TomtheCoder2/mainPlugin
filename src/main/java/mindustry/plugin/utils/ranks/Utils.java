@@ -2,7 +2,6 @@ package mindustry.plugin.utils.ranks;
 
 import java.awt.*;
 import java.util.HashMap;
-import mindustry.plugin.utils.ranks.Rank;
 
 public class Utils {
     public static HashMap<Integer, Rank> rankNames = new HashMap<>();
@@ -67,8 +66,8 @@ public class Utils {
         rankNames.put(11, new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", "Be admin", new Color(0xcb9c7a))); // admin
 
 
-        rankRequirements.put(1, new Requirement(300,  6000,  5));
-        rankRequirements.put(2, new Requirement(600,  12000, 10));
+        rankRequirements.put(1, new Requirement(300, 6000, 5));
+        rankRequirements.put(2, new Requirement(600, 12000, 10));
         rankRequirements.put(3, new Requirement(1200, 24000, 20));
         rankRequirements.put(4, new Requirement(2400, 48000, 40));
         rankRequirements.put(5, new Requirement(4800, 96000, 80));

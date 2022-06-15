@@ -103,7 +103,6 @@ public class Context {
             eb.setColor(Pals.error);
         }
         channel.sendMessage(eb);
-        ;
     }
 
     public void sendEmbed(boolean success, String title, String description, HashMap<String, String> fields, boolean inline) {

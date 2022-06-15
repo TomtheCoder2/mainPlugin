@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.IOException
-import java.lang.Exception
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -39,7 +38,7 @@ class GetMap {
                 val data = response.headers()
                 val mappeddata = data.map()
                 val finalData: MutableList<String> = ArrayList()
-                val absolutePath: String = File("./temp/output.png").getCanonicalPath()
+                val absolutePath: String = File("./temp/output.png").canonicalPath
                 finalData.add(absolutePath)
                 for ((key, value) in mappeddata) {
                     if (key == "name" || key == "author" || key == "desc" || key == "size") {
@@ -61,14 +60,14 @@ class GetMap {
     fun getMap2(file: Fi): BufferedImage? {
         val stream: ByteArrayInputStream = file.readByteStream()
         val request: Http.HttpRequest = Http.post(Utils.maps_url + "/map").content(stream, stream.available().toLong())
-        var image: BufferedImage? = null;
+        var image: BufferedImage? = null
         request.submit { httpResponse: Http.HttpResponse ->
             val bytes: ByteArray = httpResponse.result
             val i = ImageIO.read(ByteArrayInputStream(bytes))
             println(httpResponse)
             image = i
         }
-        return image;
+        return image
     }
 
     companion object {

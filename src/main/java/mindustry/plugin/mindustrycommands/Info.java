@@ -1,11 +1,10 @@
 package mindustry.plugin.mindustrycommands;
 
-import mindustry.plugin.MiniMod;
-
 import arc.util.CommandHandler;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.plugin.MiniMod;
 import mindustry.plugin.data.PlayerData;
 
 import static mindustry.plugin.database.Utils.getData;

@@ -1,7 +1,5 @@
 package mindustry.plugin.mindustrycommands;
 
-import mindustry.plugin.MiniMod;
-
 import arc.util.CommandHandler;
 import arc.util.Strings;
 import arc.util.Timekeeper;
@@ -9,6 +7,7 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.net.Administration;
+import mindustry.plugin.MiniMod;
 import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.data.PlayerData;
 import mindustry.plugin.ioMain;

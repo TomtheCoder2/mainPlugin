@@ -1,18 +1,18 @@
 package mindustry.plugin.mindustrycommands;
 
-import mindustry.plugin.MiniMod;
-
 import arc.util.CommandHandler;
 import arc.util.Timer;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
+import mindustry.plugin.MiniMod;
 import mindustry.plugin.data.PlayerData;
 
 import java.util.Objects;
 
 import static mindustry.Vars.mods;
 import static mindustry.plugin.database.Utils.getData;
-import static mindustry.plugin.ioMain.*;
+import static mindustry.plugin.ioMain.enableJs;
+import static mindustry.plugin.ioMain.enableJsTask;
 
 public class Admin implements MiniMod {
     public void registerCommands(CommandHandler handler) {
