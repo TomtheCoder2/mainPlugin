@@ -45,23 +45,25 @@ public class Rainbow implements MiniMod {
                 return;
             }
 
-            RainbowData rainbowData = data.get(player.uuid());
-            if (rainbowData == null) { // toggle on
-                rainbowData = new RainbowData();
+            synchronized(data) {
+                RainbowData rainbowData = data.get(player.uuid());
+                if (rainbowData == null) { // toggle on
+                    rainbowData = new RainbowData();
 
-                if (args.length != 0) {
-                    try {
-                        rainbowData.speed = Integer.parseInt(args[0]);
-                    } catch(NumberFormatException e) {
-                        player.sendMessage(GameMsg.error("Rainbow", "Speed must be a number."));
-                    }
-                }                
+                    if (args.length != 0) {
+                        try {
+                            rainbowData.speed = Integer.parseInt(args[0]);
+                        } catch(NumberFormatException e) {
+                            player.sendMessage(GameMsg.error("Rainbow", "Speed must be a number."));
+                        }
+                    }                
 
-                data.put(player.uuid(), rainbowData);
-                player.sendMessage(GameMsg.custom("Rainbow", "sky", "Effect toggled on with speed [orange]" + rainbowData.speed + "[sky]."));
-            } else {  // toggle off
-                data.remove(player.uuid());
-                player.sendMessage(GameMsg.custom("Rainbow", "sky", "Effect toggled off."));
+                    data.put(player.uuid(), rainbowData);
+                    player.sendMessage(GameMsg.custom("Rainbow", "sky", "Effect toggled on with speed [orange]" + rainbowData.speed + "[sky]."));
+                } else {  // toggle off
+                    data.remove(player.uuid());
+                    player.sendMessage(GameMsg.custom("Rainbow", "sky", "Effect toggled off."));
+                }
             }
         });
     }
@@ -81,27 +83,29 @@ public class Rainbow implements MiniMod {
                     e.printStackTrace();
                 }
 
-                for (Player player : Groups.player) {
-                    RainbowData rainbowData = data.get(player.uuid());
-                    if (rainbowData == null) {
-                        continue;
-                    }
+                synchronized(data) {
+                    for (Player player : Groups.player) {
+                        RainbowData rainbowData = data.get(player.uuid());
+                        if (rainbowData == null) {
+                            continue;
+                        }
 
-                    var playerData = mindustry.plugin.database.Utils.getData(player.uuid());
-                    int rank = 0;
-                    if (playerData != null) {
-                        rank = playerData.rank;
-                    }
-                    
-                    // update rainbow (SINGULAR)
-                    rainbowData.hue += rainbowData.speed;
-                    rainbowData.hue = rainbowData.hue % 360;
-                    String hex = "#" + Color.HSVtoRGB(rainbowData.hue / 360f, 1f, 1f).toString().substring(0, -2);
-                    if (rank < mindustry.plugin.utils.ranks.Utils.rankNames.size() && rank >= 0) { // this should never be false
-                        player.name = "[" + hex + "]"
-                            + Utils.escapeColorCodes(mindustry.plugin.utils.ranks.Utils.rankNames.get(rank).tag)
-                            + "[" + hex + "]"
-                            + Utils.escapeEverything(player.name);
+                        var playerData = mindustry.plugin.database.Utils.getData(player.uuid());
+                        int rank = 0;
+                        if (playerData != null) {
+                            rank = playerData.rank;
+                        }
+                        
+                        // update rainbow (SINGULAR)
+                        rainbowData.hue += rainbowData.speed;
+                        rainbowData.hue = rainbowData.hue % 360;
+                        String hex = "#" + Color.HSVtoRGB(rainbowData.hue / 360f, 1f, 1f).toString().substring(0, -2);
+                        if (rank < mindustry.plugin.utils.ranks.Utils.rankNames.size() && rank >= 0) { // this should never be false
+                            player.name = "[" + hex + "]"
+                                + Utils.escapeColorCodes(mindustry.plugin.utils.ranks.Utils.rankNames.get(rank).tag)
+                                + "[" + hex + "]"
+                                + Utils.escapeEverything(player.name);
+                        }
                     }
                 }
             }
