@@ -24,7 +24,7 @@ public class Rainbow implements MiniMod {
     }
 
     // uuid => data
-    private static ObjectMap<String, RainbowData> data = new ObjectMap();
+    private ObjectMap<String, RainbowData> data = new ObjectMap();
 
     public void registerEvents() {
         RainbowThread thread = new RainbowThread(Thread.currentThread());
