@@ -36,7 +36,7 @@ public class Rainbow implements MiniMod {
         handler.<Player>register("rainbow", "[speed]", "Give your username a rainbow animation", (args, player) -> {
             synchronized(data) {
                 RainbowData rainbowData = data.get(player.uuid());
-                if (rainbowData == null) { // toggle on
+                if (rainbowData == null || args.length != 0) { // toggle on
                     rainbowData = new RainbowData();
 
                     if (args.length != 0) {
@@ -45,7 +45,7 @@ public class Rainbow implements MiniMod {
                         } catch(NumberFormatException e) {
                             player.sendMessage(GameMsg.error("Rainbow", "Speed must be a number."));
                         }
-                    }                
+                    }
 
                     data.put(player.uuid(), rainbowData);
                     player.sendMessage(GameMsg.custom("Rainbow", "sky", "Effect toggled on with speed [orange]" + rainbowData.speed + "[sky]."));
