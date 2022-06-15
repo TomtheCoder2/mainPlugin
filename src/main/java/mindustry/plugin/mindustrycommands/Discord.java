@@ -1,5 +1,7 @@
 package mindustry.plugin.mindustrycommands;
 
+import mindustry.plugin.MiniMod;
+
 import arc.util.CommandHandler;
 import mindustry.content.Blocks;
 import mindustry.gen.Call;
@@ -16,7 +18,7 @@ import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 import static mindustry.plugin.utils.Utils.getTextChannel;
 
-public class Discord {
+public class Discord implements MiniMod {
     public Discord() {
 
     }

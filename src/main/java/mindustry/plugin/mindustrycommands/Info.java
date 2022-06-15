@@ -1,5 +1,7 @@
 package mindustry.plugin.mindustrycommands;
 
+import mindustry.plugin.MiniMod;
+
 import arc.util.CommandHandler;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -11,7 +13,7 @@ import static mindustry.plugin.utils.Utils.*;
 import static mindustry.plugin.utils.ranks.Utils.inGameListRanks;
 import static mindustry.plugin.utils.ranks.Utils.listRequirements;
 
-public class Info {
+public class Info implements MiniMod {
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("info", "Display info about our server.", (args, player) -> {
             Call.infoMessage(player.con, infoMessage);

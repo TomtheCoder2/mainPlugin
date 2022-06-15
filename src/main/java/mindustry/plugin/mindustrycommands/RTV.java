@@ -1,6 +1,7 @@
 package mindustry.plugin.mindustrycommands;
 
-import mindustry.plugin.utils.MindustryMsg;
+import mindustry.plugin.MiniMod;
+import mindustry.plugin.utils.GameMsg;
 
 import arc.Core;
 import arc.util.CommandHandler;
@@ -19,7 +20,7 @@ import mindustry.game.Team;
 import mindustry.game.EventType;
 import mindustry.gen.Groups;
 
-public final class RTV {
+public final class RTV implements MiniMod {
     // map name => set<ip addr>
     private ObjectMap<String, ObjectSet<String>> votes = new ObjectMap();
 
@@ -163,7 +164,7 @@ public final class RTV {
                 } else if (args[1].equals("no") || args[1].equals("n")) {
                     vote = false;
                 } else {
-                    player.sendMessage(MindustryMsg.error("RTV", "Vote must be [orange]yes[scarlet] or [orange]no"));
+                    player.sendMessage(GameMsg.error("RTV", "Vote must be [orange]yes[scarlet] or [orange]no"));
                     return;
                 }
             }
@@ -171,20 +172,20 @@ public final class RTV {
             // configure voting
             String map = setVote(player, mapQuery, vote);
             if (map == null) {
-                player.sendMessage(MindustryMsg.error("RTV", "Map [orange]" + mapQuery + "[scarlet] not found."));
+                player.sendMessage(GameMsg.error("RTV", "Map [orange]" + mapQuery + "[scarlet] not found."));
             }
 
             removeInvalid();
 
             // send message
             int votes = getVote(map);
-            Call.sendMessage(MindustryMsg.info("RTV", "Player [orange]" + player.name + "[lightgray] has " + (vote ? "voted" : "redacted their vote") + " to change the map to [orange]" + map + "[lightgray] " + 
+            Call.sendMessage(GameMsg.info("RTV", "Player [orange]" + player.name + "[lightgray] has " + (vote ? "voted" : "redacted their vote") + " to change the map to [orange]" + map + "[lightgray] " + 
                 "(" + votes + "/" + requiredVotes() + ")" ));
 
             // check & change map
             String passedMap = check();
             if (passedMap != null) {
-                Call.sendMessage(MindustryMsg.success("RTV", "Changing map to [orange]" + passedMap));
+                Call.sendMessage(GameMsg.success("RTV", "Changing map to [orange]" + passedMap));
 
                 Map mapObj = null;
                 for (Map map_ : Vars.maps.all()) {
@@ -196,7 +197,7 @@ public final class RTV {
 
                 // WTF?
                 if (mapObj == null) {
-                    Call.sendMessage(MindustryMsg.error("RTV", "Map [orange]" + passedMap + "[scarlet] does not exist."));
+                    Call.sendMessage(GameMsg.error("RTV", "Map [orange]" + passedMap + "[scarlet] does not exist."));
                     return;
                 }
 
@@ -208,10 +209,10 @@ public final class RTV {
             removeInvalid();
 
             if (votes.size == 0) {
-                player.sendMessage(MindustryMsg.info("RTV", "No votes have been cast."));
+                player.sendMessage(GameMsg.info("RTV", "No votes have been cast."));
             } else {
                 for (var entry : votes) {
-                    player.sendMessage(MindustryMsg.info("RTV", "Map [orange]" + entry.key + "[lightgray] has [orange]" +  entry.value.size + "[lightgray] / " + requiredVotes() + " votes"));
+                    player.sendMessage(GameMsg.info("RTV", "Map [orange]" + entry.key + "[lightgray] has [orange]" +  entry.value.size + "[lightgray] / " + requiredVotes() + " votes"));
                 }
             }
         });

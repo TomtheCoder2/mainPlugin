@@ -1,5 +1,7 @@
 package mindustry.plugin.mindustrycommands;
 
+import mindustry.plugin.MiniMod;
+
 import arc.util.CommandHandler;
 import arc.util.Strings;
 import arc.util.Timekeeper;
@@ -30,7 +32,7 @@ import static mindustry.plugin.utils.ranks.Utils.rankNames;
 import static mindustry.plugin.utils.ranks.Utils.rankRoles;
 
 
-public class Moderation {
+public class Moderation implements MiniMod {
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("votekick", "[player...]", "votekick a player.", (args, player) -> {
 //               CustomLog.debug("vk @.", args[0]);
@@ -318,7 +320,7 @@ public class Moderation {
                     PlayerData pd = getData(p.uuid());
                     PersistentPlayerData tdata = (playerDataGroup.getOrDefault(p.uuid(), null));
                     if (tdata == null) continue; // shouldn't happen, ever
-                    tdata.doRainbow = false;
+//                    tdata.doRainbow = false;
                     if (pd == null) continue;
                     p.name = rankNames.get(pd.rank).tag + netServer.admins.getInfo(p.uuid()).lastName;
                 }

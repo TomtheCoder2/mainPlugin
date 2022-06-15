@@ -15,9 +15,6 @@ public class PersistentPlayerData implements Serializable {
     public int bbIncrementor = 0;
 //    public boolean spawnedLichPet;
 //    public boolean spawnedPowerGen;
-    public boolean rainbowColor = false;
-    public int hue;
-    public boolean doRainbow;
     public boolean muted = false;
     public boolean frozen = false;
     public boolean votedMap = false;
@@ -42,8 +39,4 @@ public class PersistentPlayerData implements Serializable {
     public Ratelimit rotateRatelimit = new Ratelimit(10, 1000);
 
     public PersistentPlayerData() {}
-
-    public void setHue(int i) {
-        this.hue = i;
-    }
 }
