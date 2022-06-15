@@ -1,5 +1,7 @@
 package mindustry.plugin.mindustrycommands;
 
+import mindustry.plugin.MiniMod;
+
 import arc.util.CommandHandler;
 import arc.util.Timer;
 import mindustry.gen.Call;
@@ -12,7 +14,7 @@ import static mindustry.Vars.mods;
 import static mindustry.plugin.database.Utils.getData;
 import static mindustry.plugin.ioMain.*;
 
-public class Admin {
+public class Admin implements MiniMod {
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("enablejs", "<true/false> [time]", "Enable/Disable js command for everyone. (Time in minutes)", (arg, player) -> {
             PlayerData pd = getData(player.uuid());

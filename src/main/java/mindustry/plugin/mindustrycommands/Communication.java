@@ -1,5 +1,7 @@
 package mindustry.plugin.mindustrycommands;
 
+import mindustry.plugin.MiniMod;
+
 import arc.util.CommandHandler;
 import arc.util.Strings;
 import mindustry.gen.Call;
@@ -19,7 +21,7 @@ import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.utils.Utils.*;
 import static mindustry.plugin.utils.ranks.Utils.rankNames;
 
-public class ComCommands {
+public class Communication implements MiniMod {
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("w", "<player> <text...>", "Whisper text to another player.", (args, player) -> {
             //find player by name
@@ -62,26 +64,6 @@ public class ComCommands {
             String raw = "[#" + player.team().color.toString() + "]<T> " + chatFormatter.format(player, message);
             Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(raw, player, message));
         });
-        handler.<Player>register("rainbow", "Give your username a rainbow animation", (args, player) -> {
-            PlayerData pd = getData(player.uuid());
-            if (pd == null) {
-                player.sendMessage("There was an error!");
-                return;
-            }
-            if (pd.rank >= 0) {
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-                if (tdata == null) return; // shouldn't happen, ever
-                if (tdata.doRainbow) {
-                    player.sendMessage("[sky]Rainbow effect toggled off.");
-                    tdata.doRainbow = false;
-                    player.name = rankNames.get(pd.rank).tag + netServer.admins.getInfo(player.uuid()).names.get(0);
-                } else {
-                    player.sendMessage("[sky]Rainbow effect toggled on.");
-                    tdata.doRainbow = true;
-                }
-            } else {
-                player.sendMessage(noPermissionMessage);
-            }
-        });
+
     }
 }

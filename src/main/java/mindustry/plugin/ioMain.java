@@ -29,7 +29,6 @@ import mindustry.plugin.database.MapData;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
 import mindustry.plugin.mapChange.MapChange;
-import mindustry.plugin.mindustrycommands.*;
 import mindustry.plugin.utils.*;
 import mindustry.plugin.utils.ranks.Rank;
 import mindustry.world.Tile;
@@ -112,7 +111,15 @@ public class ioMain extends Plugin {
     public static NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
     public static MapChange mapChange = new MapChange();
 
-    RTV rtv = new RTV();
+    protected MiniMod[] minimods = new MiniMod[] {
+        new mindustry.plugin.mindustrycommands.RTV(),
+        new mindustry.plugin.mindustrycommands.Admin(),
+        new mindustry.plugin.mindustrycommands.Communication(),
+        new mindustry.plugin.mindustrycommands.Discord(),
+        new mindustry.plugin.mindustrycommands.Info(),
+        new mindustry.plugin.mindustrycommands.Moderation(),
+        new mindustry.plugin.mindustrycommands.Rainbow(),
+    };
 
     // register event handlers and create variables in the constructor
     public ioMain() {
@@ -184,15 +191,6 @@ public class ioMain extends Plugin {
 
         FallbackLoggerConfiguration.setDebug(false);
         FallbackLoggerConfiguration.setTrace(false);
-
-        /**
-         * start rainbow command to change color of the names\n
-         * This runs as a thread for performance reasons
-         * */
-        Rainbow rainbowThread = new Rainbow(Thread.currentThread());
-        rainbowThread.setDaemon(false);
-        rainbowThread.start();
-
 
         // set the channels
         live_chat_channel = getTextChannel(live_chat_channel_id);
@@ -629,37 +627,9 @@ public class ioMain extends Plugin {
             info("Registered all filters.");
         });
 
-        rtv.registerEvents();
-    }
-
-    // rainbow
-    public static void loop() {
-        for (Player player : Groups.player) {
-            try {
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-                if (tdata == null) {
-                    continue;
-                }
-                if (tdata.doRainbow) {
-                    int rank = Objects.requireNonNull(getData(player.uuid())).rank;
-                    // update rainbows
-                    String playerNameUnmodified = tdata.origName;
-                    int hue = tdata.hue;
-                    if (hue < 360) {
-                        hue = hue + 5;
-                    } else {
-                        hue = 0;
-                    }
-
-                    String hex = "#" + Integer.toHexString(Color.getHSBColor(hue / 360f, 1f, 1f).getRGB()).substring(2);
-                    if (rank < rankNames.size() && rank > -1) {
-                        player.name = "[" + hex + "]" + escapeColorCodes(rankNames.get(rank).tag) + "[" + hex + "]" + escapeEverything(player.name);
-                    }
-                    tdata.setHue(hue);
-                }
-            } catch (Exception ignored) {
-            }
-        }
+        for (MiniMod minimod : minimods) {
+            minimod.registerEvents();
+        }        
     }
 
     public static boolean checkChatRatelimit(String message, Player player) {
@@ -854,12 +824,9 @@ public class ioMain extends Plugin {
     @Override
     public void registerClientCommands(CommandHandler handler) {
         if (api != null) {
-            new Admin().registerCommands(handler);
-            new ComCommands().registerCommands(handler);
-            new Discord().registerCommands(handler);
-            new Info().registerCommands(handler);
-            rtv.registerCommands(handler);
-            new Moderation().registerCommands(handler);
+            for (MiniMod minimod : minimods) {
+                minimod.registerCommands(handler);
+            }
         }
     }
 }
