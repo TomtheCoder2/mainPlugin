@@ -36,7 +36,11 @@ public class Rainbow implements MiniMod {
         handler.<Player>register("rainbow", "[speed]", "Give your username a rainbow animation", (args, player) -> {
             // check rank
             PlayerData dbData = mindustry.plugin.database.Utils.getData(player.uuid());
-            if (dbData.rank < 0) {
+            int rank = -1;
+            if (dbData != null) {
+                rank = dbData.rank;
+            }
+            if (rank < 0) {
                 player.sendMessage(GameMsg.noPerms("Rainbow"));
                 return;
             }
