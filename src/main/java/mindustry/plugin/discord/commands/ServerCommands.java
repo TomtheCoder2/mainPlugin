@@ -877,7 +877,7 @@ public class ServerCommands {
                         fields.put("Bullet lifetime", String.valueOf(life));
                         fields.put("Bullet velocity", String.valueOf(vel));
                         ctx.sendEmbed(true, "Modded " + escapeEverything(player.name) + "'s gun", fields, true);
-                    } else if (ctx.args[0].toLowerCase().equals("all")) {
+                    } else if (ctx.args[0].equalsIgnoreCase("all")) {
                         for (Player p : Groups.player) {
                             PlayerData pd = getData(player.uuid());
                             assert pd != null;
@@ -2643,17 +2643,14 @@ public class ServerCommands {
                         return;
                     }
                     for (MessageAttachment ma : ml) {
-                        boolean updated = false;
-                        if (Core.settings.getDataDirectory().child("maps").child(ma.getFileName()).exists()) {
-                            // update the map
-//                            Core.settings.getDataDirectory().child("maps").child(ma.getFileName()).delete();
-                            updated = true;
-//                        eb.setTitle("Map upload terminated.");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("There is already a map with this name on the server!");
-//                        ctx.sendMessage(eb);
-//                        return;
-                        }
+                        boolean updated = Core.settings.getDataDirectory().child("maps").child(ma.getFileName()).exists();
+                        // update the map
+                        //                            Core.settings.getDataDirectory().child("maps").child(ma.getFileName()).delete();
+                        //                        eb.setTitle("Map upload terminated.");
+                        //                        eb.setColor(Pals.error);
+                        //                        eb.setDescription("There is already a map with this name on the server!");
+                        //                        ctx.sendMessage(eb);
+                        //                        return;
                         // more custom filename checks possible
 
                         CompletableFuture<byte[]> cf = ma.downloadAsByteArray();

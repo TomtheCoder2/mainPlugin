@@ -1,30 +1,30 @@
 package mindustry.plugin.mindustrycommands;
 
-import mindustry.plugin.MiniMod;
-import mindustry.plugin.utils.GameMsg;
-
+import arc.ApplicationListener;
 import arc.Core;
-import arc.util.CommandHandler;
+import arc.Events;
 import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
+import arc.util.CommandHandler;
 import arc.util.Reflect;
-import arc.ApplicationListener;
-import arc.Events;
-
-import mindustry.gen.Call;
-import mindustry.gen.Player;
 import mindustry.Vars;
-import mindustry.maps.Map;
-import mindustry.server.ServerControl;
-import mindustry.game.Team;
 import mindustry.game.EventType;
+import mindustry.game.Team;
+import mindustry.gen.Call;
 import mindustry.gen.Groups;
+import mindustry.gen.Player;
+import mindustry.maps.Map;
+import mindustry.plugin.MiniMod;
+import mindustry.plugin.utils.GameMsg;
+import mindustry.server.ServerControl;
 
 public final class RTV implements MiniMod {
     // map name => set<ip addr>
-    private ObjectMap<String, ObjectSet<String>> votes = new ObjectMap();
+    private final ObjectMap<String, ObjectSet<String>> votes = new ObjectMap();
 
-    /** Returns the most popular map, or null if it does not exist. */
+    /**
+     * Returns the most popular map, or null if it does not exist.
+     */
     private String popularMap() {
         int maxVotes = 0;
         String map = null;
@@ -39,11 +39,13 @@ public final class RTV implements MiniMod {
     }
 
     private String randomMap() {
-        int idx = (int)(Math.random() * (double)Vars.maps.customMaps().size);
+        int idx = (int) (Math.random() * (double) Vars.maps.customMaps().size);
         return Vars.maps.customMaps().get(idx).name();
     }
 
-    /** Sets a vote on the `votes` HashMap. Returns the map name. Return value may be null. */
+    /**
+     * Sets a vote on the `votes` HashMap. Returns the map name. Return value may be null.
+     */
     private String setVote(Player player, String mapQuery, boolean vote) {
         Map map = queryMap(mapQuery);
         if (map == null) {
@@ -63,7 +65,9 @@ public final class RTV implements MiniMod {
         return map.name();
     }
 
-    /** Gets the number of votes for a particular map. */
+    /**
+     * Gets the number of votes for a particular map.
+     */
     private int getVote(String map) {
         ObjectSet<String> voteset = votes.get(map);
         if (voteset == null) {
@@ -73,15 +77,17 @@ public final class RTV implements MiniMod {
         }
     }
 
-    /** Removes invalid votes from the `votes` hashmap. */
+    /**
+     * Removes invalid votes from the `votes` hashmap.
+     */
     private void removeInvalid() {
-        for (ObjectSet<String> voteSet: votes.values()) {
+        for (ObjectSet<String> voteSet : votes.values()) {
             // Add IP addresses that are no longer in the game
             // to invalidIPs.
             ObjectSet<String> invalidIPs = new ObjectSet();
             for (String ip : voteSet) {
                 boolean found = false;
-                for (Player player: Groups.player) {
+                for (Player player : Groups.player) {
                     if (player.ip().equals(ip)) {
                         found = true;
                         break;
@@ -94,15 +100,17 @@ public final class RTV implements MiniMod {
             }
 
             // remove all from invalid IPs
-            for (String ip: invalidIPs) {
+            for (String ip : invalidIPs) {
                 voteSet.remove(ip);
             }
         }
     }
 
-    /** Returns a map for a given query. Return value may be null. */
+    /**
+     * Returns a map for a given query. Return value may be null.
+     */
     private Map queryMap(String query) {
-        for (Map map: Vars.maps.all()) {
+        for (Map map : Vars.maps.all()) {
             if (map.name().replaceAll(" ", "").toLowerCase().contains(query.replaceAll(" ", "").toLowerCase())) {
                 return map;
             }
@@ -112,7 +120,7 @@ public final class RTV implements MiniMod {
     }
 
     private void changeMap(Map map) {
-        for (ApplicationListener listener: Core.app.getListeners()) {
+        for (ApplicationListener listener : Core.app.getListeners()) {
             if (listener instanceof ServerControl) {
                 Reflect.set(listener, "nextMapOverride", map);
                 Events.fire(new EventType.GameOverEvent(Team.crux));
@@ -121,12 +129,16 @@ public final class RTV implements MiniMod {
         }
     }
 
-    /** Returns the number of required votes for a map to pass, which is a simple majority. */
+    /**
+     * Returns the number of required votes for a map to pass, which is a simple majority.
+     */
     private int requiredVotes() {
         return (Groups.player.size() / 2) + 1;
     }
 
-    /** Returns the name of the map if a vote passed, otherwise null. Assumes that filterInvalid() was already called. */
+    /**
+     * Returns the name of the map if a vote passed, otherwise null. Assumes that filterInvalid() was already called.
+     */
     private String check() {
         for (var entry : votes) {
             if (entry.value.size >= requiredVotes()) {
@@ -179,8 +191,8 @@ public final class RTV implements MiniMod {
 
             // send message
             int votes = getVote(map);
-            Call.sendMessage(GameMsg.info("RTV", "Player [orange]" + player.name + "[lightgray] has " + (vote ? "voted" : "redacted their vote") + " to change the map to [orange]" + map + "[lightgray] " + 
-                "(" + votes + "/" + requiredVotes() + ")" ));
+            Call.sendMessage(GameMsg.info("RTV", "Player [orange]" + player.name + "[lightgray] has " + (vote ? "voted" : "redacted their vote") + " to change the map to [orange]" + map + "[lightgray] " +
+                    "(" + votes + "/" + requiredVotes() + ")"));
 
             // check & change map
             String passedMap = check();
@@ -212,7 +224,7 @@ public final class RTV implements MiniMod {
                 player.sendMessage(GameMsg.info("RTV", "No votes have been cast."));
             } else {
                 for (var entry : votes) {
-                    player.sendMessage(GameMsg.info("RTV", "Map [orange]" + entry.key + "[lightgray] has [orange]" +  entry.value.size + "[lightgray] / " + requiredVotes() + " votes"));
+                    player.sendMessage(GameMsg.info("RTV", "Map [orange]" + entry.key + "[lightgray] has [orange]" + entry.value.size + "[lightgray] / " + requiredVotes() + " votes"));
                 }
             }
         });

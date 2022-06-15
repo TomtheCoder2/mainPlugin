@@ -14,10 +14,10 @@ public class Rank {
     /**
      * Create a new rank
      *
-     * @param t name tag (gets displayed before the player names starts, for example: <*>Nautilus)
-     * @param n name of the rank (for example: Moderator)
+     * @param t    name tag (gets displayed before the player names starts, for example: <*>Nautilus)
+     * @param n    name of the rank (for example: Moderator)
      * @param desc description for the rank
-     * @param col the color of the rank
+     * @param col  the color of the rank
      */
     public Rank(String t, String n, String desc, Color col) {
         this.tag = t;
@@ -29,8 +29,8 @@ public class Rank {
     /**
      * Create a new rank
      *
-     * @param t name tag (gets displayed before the player names starts, for example: <*>Nautilus)
-     * @param n name of the rank (for example: Moderator)
+     * @param t   name tag (gets displayed before the player names starts, for example: <*>Nautilus)
+     * @param n   name of the rank (for example: Moderator)
      * @param col the color of the rank
      */
     public Rank(String t, String n, Color col) {

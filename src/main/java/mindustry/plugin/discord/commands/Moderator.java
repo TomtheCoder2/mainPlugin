@@ -73,7 +73,7 @@ public class Moderator {
     private Timer.Task testTask = null;
     private boolean runningTask = false;
     private int maxTps, avgTps, iterations;
-    private  int minTps = Integer.MAX_VALUE;
+    private int minTps = Integer.MAX_VALUE;
 
     public Moderator(JSONObject data) {
         this.data = data;
@@ -349,7 +349,7 @@ public class Moderator {
                         fields.put("Bullet lifetime", String.valueOf(life));
                         fields.put("Bullet velocity", String.valueOf(vel));
                         ctx.sendEmbed(true, "Modded " + escapeEverything(player.name) + "'s gun", fields, true);
-                    } else if (ctx.args[0].toLowerCase().equals("all")) {
+                    } else if (ctx.args[0].equalsIgnoreCase("all")) {
                         for (Player p : Groups.player) {
                             PlayerData pd = getData(player.uuid());
                             assert pd != null;

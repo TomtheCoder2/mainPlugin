@@ -13,8 +13,8 @@ import static mindustry.plugin.utils.Utils.getTextChannel;
 public class BotThread extends Thread {
     public DiscordApi api;
     public DiscordCommands commandHandler = new DiscordCommands();
-    private Thread mt;
-    private JSONObject data;
+    private final Thread mt;
+    private final JSONObject data;
 
     /**
      * start the bot thread

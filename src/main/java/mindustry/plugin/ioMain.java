@@ -29,7 +29,9 @@ import mindustry.plugin.database.MapData;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
 import mindustry.plugin.mapChange.MapChange;
-import mindustry.plugin.utils.*;
+import mindustry.plugin.utils.ContentHandler;
+import mindustry.plugin.utils.Utils;
+import mindustry.plugin.utils.VoteSession;
 import mindustry.plugin.utils.ranks.Rank;
 import mindustry.world.Tile;
 import org.javacord.api.DiscordApi;
@@ -55,7 +57,8 @@ import static mindustry.plugin.discord.discordcommands.DiscordCommands.error_log
 import static mindustry.plugin.effect.EffectHelper.getEffect;
 import static mindustry.plugin.utils.CustomLog.logConnections;
 import static mindustry.plugin.utils.Utils.*;
-import static mindustry.plugin.utils.ranks.Utils.*;
+import static mindustry.plugin.utils.ranks.Utils.rankNames;
+import static mindustry.plugin.utils.ranks.Utils.rankRequirements;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setDebug;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setTrace;
 
@@ -111,14 +114,14 @@ public class ioMain extends Plugin {
     public static NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
     public static MapChange mapChange = new MapChange();
 
-    protected MiniMod[] minimods = new MiniMod[] {
-        new mindustry.plugin.mindustrycommands.RTV(),
-        new mindustry.plugin.mindustrycommands.Admin(),
-        new mindustry.plugin.mindustrycommands.Communication(),
-        new mindustry.plugin.mindustrycommands.Discord(),
-        new mindustry.plugin.mindustrycommands.Info(),
-        new mindustry.plugin.mindustrycommands.Moderation(),
-        new mindustry.plugin.mindustrycommands.Rainbow(),
+    protected MiniMod[] minimods = new MiniMod[]{
+            new mindustry.plugin.mindustrycommands.RTV(),
+            new mindustry.plugin.mindustrycommands.Admin(),
+            new mindustry.plugin.mindustrycommands.Communication(),
+            new mindustry.plugin.mindustrycommands.Discord(),
+            new mindustry.plugin.mindustrycommands.Info(),
+            new mindustry.plugin.mindustrycommands.Moderation(),
+            new mindustry.plugin.mindustrycommands.Rainbow(),
     };
 
     // register event handlers and create variables in the constructor
@@ -629,7 +632,7 @@ public class ioMain extends Plugin {
 
         for (MiniMod minimod : minimods) {
             minimod.registerEvents();
-        }        
+        }
     }
 
     public static boolean checkChatRatelimit(String message, Player player) {

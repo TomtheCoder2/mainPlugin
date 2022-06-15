@@ -1,11 +1,10 @@
 package mindustry.plugin.discord.discordcommands;
 
-import java.util.Optional;
-
+import arc.util.Log;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.permission.Role;
 
-import arc.util.Log;
+import java.util.Optional;
 
 public abstract class RoleRestrictedCommand extends Command {
     public String role = null;

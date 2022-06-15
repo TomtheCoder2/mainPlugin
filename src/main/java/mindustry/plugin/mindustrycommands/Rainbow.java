@@ -3,28 +3,17 @@ package mindustry.plugin.mindustrycommands;
 import arc.graphics.Color;
 import arc.struct.ObjectMap;
 import arc.util.CommandHandler;
+import mindustry.gen.Groups;
+import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.data.PlayerData;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Utils;
-import mindustry.gen.Groups;
-import mindustry.gen.Player;
 
 public class Rainbow implements MiniMod {
 
-    private static class RainbowData {
-        public int hue;
-        public int speed; // d_hue
-
-        // Defaults
-        public RainbowData() {
-            hue = (int)(Math.random() * 360);
-            speed = 5;
-        }
-    }
-
     // uuid => data
-    private ObjectMap<String, RainbowData> data = new ObjectMap();
+    private final ObjectMap<String, RainbowData> data = new ObjectMap();
 
     public void registerEvents() {
         RainbowThread thread = new RainbowThread(Thread.currentThread());
@@ -42,7 +31,7 @@ public class Rainbow implements MiniMod {
                     if (args.length != 0) {
                         try {
                             rainbowData.speed = Integer.parseInt(args[0]);
-                        } catch(NumberFormatException e) {
+                        } catch (NumberFormatException e) {
                             player.sendMessage(GameMsg.error("Rainbow", "Speed must be a number."));
                         }
                     }
@@ -57,8 +46,19 @@ public class Rainbow implements MiniMod {
         });
     }
 
+    private static class RainbowData {
+        public int hue;
+        public int speed; // d_hue
+
+        // Defaults
+        public RainbowData() {
+            hue = (int) (Math.random() * 360);
+            speed = 5;
+        }
+    }
+
     private class RainbowThread extends Thread {
-        private Thread mainThread;
+        private final Thread mainThread;
 
         public RainbowThread(Thread mainThread) {
             this.mainThread = mainThread;
@@ -72,7 +72,7 @@ public class Rainbow implements MiniMod {
                     e.printStackTrace();
                 }
 
-                synchronized(data) {
+                synchronized (data) {
                     for (Player player : Groups.player) {
                         RainbowData rainbowData = data.get(player.uuid());
                         if (rainbowData == null) {
@@ -84,7 +84,7 @@ public class Rainbow implements MiniMod {
                         if (playerData != null) {
                             rank = playerData.rank;
                         }
-                        
+
                         // update rainbow (SINGULAR)
                         rainbowData.hue += rainbowData.speed;
                         rainbowData.hue = rainbowData.hue % 360;
@@ -93,9 +93,9 @@ public class Rainbow implements MiniMod {
                         hex = hex.substring(0, hex.length() - 2);
                         if (rank < mindustry.plugin.utils.ranks.Utils.rankNames.size() && rank >= 0) { // this should never be false
                             player.name = "[" + hex + "]"
-                                + Utils.escapeColorCodes(mindustry.plugin.utils.ranks.Utils.rankNames.get(rank).tag)
-                                + "[" + hex + "]"
-                                + Utils.escapeEverything(player.name);
+                                    + Utils.escapeColorCodes(mindustry.plugin.utils.ranks.Utils.rankNames.get(rank).tag)
+                                    + "[" + hex + "]"
+                                    + Utils.escapeEverything(player.name);
                         }
                     }
                 }

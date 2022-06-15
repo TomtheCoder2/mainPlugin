@@ -10,7 +10,6 @@ import arc.struct.Seq;
 import arc.struct.StringMap;
 import arc.util.Http;
 import arc.util.Log;
-import arc.util.Reflect;
 import arc.util.Strings;
 import arc.util.io.CounterInputStream;
 import com.github.kevinsawicki.http.HttpRequest;
@@ -36,7 +35,6 @@ import mindustry.plugin.database.MapData;
 import mindustry.plugin.discord.discordcommands.Command;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.ioMain;
-import mindustry.server.ServerControl;
 import mindustry.type.ItemSeq;
 import mindustry.type.ItemStack;
 import mindustry.ui.Menus;
@@ -244,7 +242,6 @@ public class Utils {
         } catch (Exception e) {
             System.out.println(e);
         }
-        ;
         return message;
     }
 
@@ -382,7 +379,7 @@ public class Utils {
                 .setColor(new Color(0x00ffff))
                 .setAuthor(ctx.author)
                 .setTitle(schem.name());
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
         for (ItemStack item : req) {
             Collection<KnownCustomEmoji> emojis = api.getCustomEmojisByNameIgnoreCase(item.item.name.replaceAll("-", ""));
 //            eb.addField(emoijs.iterator().next().getMentionTag(), String.valueOf(item.amount), true);

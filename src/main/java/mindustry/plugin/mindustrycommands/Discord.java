@@ -1,20 +1,17 @@
 package mindustry.plugin.mindustrycommands;
 
-import mindustry.plugin.MiniMod;
-
 import arc.util.CommandHandler;
 import mindustry.content.Blocks;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
-import mindustry.plugin.requests.Translate;
+import mindustry.plugin.MiniMod;
 import mindustry.world.Tile;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.json.JSONObject;
 
-import static arc.util.Log.debug;
 import static mindustry.Vars.world;
-import static mindustry.plugin.ioMain.*;
+import static mindustry.plugin.ioMain.CDT;
+import static mindustry.plugin.ioMain.CommandCooldowns;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 import static mindustry.plugin.utils.Utils.getTextChannel;
 

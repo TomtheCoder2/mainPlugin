@@ -5,7 +5,9 @@ import arc.func.Cons;
 
 import java.time.Instant;
 
-/** Simple ratelimit */
+/**
+ * Simple ratelimit
+ */
 public class Ratelimit {
     public int eventLimit = 10;
     public int findTime = 1000;
@@ -14,12 +16,14 @@ public class Ratelimit {
 
     private boolean noUpdate = false;
 
-    public Ratelimit() {}
+    public Ratelimit() {
+    }
 
     /**
      * The constructor
+     *
      * @param eventLimit Event limit
-     * @param findTime Time interval in milliseconds
+     * @param findTime   Time interval in milliseconds
      */
     public Ratelimit(int eventLimit, int findTime) {
         this.eventLimit = eventLimit;
@@ -28,6 +32,7 @@ public class Ratelimit {
 
     /**
      * Helper to update begin time
+     *
      * @return True if in new interval, false otherwise
      */
     private void updateBegin() {
@@ -40,6 +45,7 @@ public class Ratelimit {
 
     /**
      * Check and update ratelimit
+     *
      * @return True if ratelimit exceeded, false otherwise
      */
     public boolean get() {
@@ -50,6 +56,7 @@ public class Ratelimit {
 
     /**
      * Check ratelimit
+     *
      * @return True if ratelimit exceeded, false otherwise
      */
     public boolean check() {
@@ -57,7 +64,9 @@ public class Ratelimit {
         return count > eventLimit;
     }
 
-    /** Get number of events in current interval */
+    /**
+     * Get number of events in current interval
+     */
     public int events() {
         updateBegin();
         return count;
@@ -65,6 +74,7 @@ public class Ratelimit {
 
     /**
      * Provide count next tick. Will inhibit reset
+     *
      * @param fn Function to be run
      */
     public void nextTick(Cons<Ratelimit> fn) {
