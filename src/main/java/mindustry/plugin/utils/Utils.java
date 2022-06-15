@@ -371,18 +371,6 @@ public class Utils {
         maps.reload();
     }
 
-    public static void changeToMap(Map targetMap) {
-        Core.app.getListeners().each(lst -> {
-            if (lst instanceof ServerControl) {
-                ServerControl scont = (ServerControl) lst;
-                Reflect.set(scont, "nextMapOverride", targetMap);
-                Events.fire(new EventType.GameOverEvent(Team.crux));
-                Reflect.set(scont, "nextMapOverride", null);
-            }
-        });
-    }
-
-
     // region discord
 
     /**
