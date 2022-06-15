@@ -1908,7 +1908,7 @@ public class Moderator {
                         }
                         if (targetRank > rankNames.size() - 1 || targetRank < 0) {
                             eb.setTitle("Error")
-                                    .setDescription("Rank has to be larger than -1 and smaller than " + (rankNames.size() - 1) + "!")
+                                    .setDescription("Rank has to be larger than -1 and smaller than " + rankNames.size() + "!")
                                     .setColor(new Color(0xff0000));
                             ctx.sendMessage(eb);
                             return;
