@@ -118,6 +118,7 @@ public class ioMain extends Plugin {
         new mindustry.plugin.mindustrycommands.Discord(),
         new mindustry.plugin.mindustrycommands.Info(),
         new mindustry.plugin.mindustrycommands.Moderation(),
+        new mindustry.plugin.mindustrycommands.Rainbow(),
     };
 
     // register event handlers and create variables in the constructor
