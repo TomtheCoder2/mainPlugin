@@ -23,20 +23,9 @@ public class Rainbow implements MiniMod {
 
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("rainbow", "[speed]", "Give your username a rainbow animation", (args, player) -> {
-            // check rank
-            PlayerData dbData = mindustry.plugin.database.Utils.getData(player.uuid());
-            int rank = -1;
-            if (dbData != null) {
-                rank = dbData.rank;
-            }
-            if (rank < 0) {
-                player.sendMessage(GameMsg.noPerms("Rainbow"));
-                return;
-            }
-
-            synchronized (data) {
+            synchronized(data) {
                 RainbowData rainbowData = data.get(player.uuid());
-                if (rainbowData == null) { // toggle on
+                if (rainbowData == null || args.length != 0) { // toggle on
                     rainbowData = new RainbowData();
 
                     if (args.length != 0) {
@@ -99,7 +88,9 @@ public class Rainbow implements MiniMod {
                         // update rainbow (SINGULAR)
                         rainbowData.hue += rainbowData.speed;
                         rainbowData.hue = rainbowData.hue % 360;
-                        String hex = "#" + Color.HSVtoRGB(rainbowData.hue / 360f, 1f, 1f).toString().substring(0, -2);
+                        String hex = "#" + Color.HSVtoRGB(rainbowData.hue, 100, 100).toString();
+                        
+                        hex = hex.substring(0, hex.length() - 2);
                         if (rank < mindustry.plugin.utils.ranks.Utils.rankNames.size() && rank >= 0) { // this should never be false
                             player.name = "[" + hex + "]"
                                     + Utils.escapeColorCodes(mindustry.plugin.utils.ranks.Utils.rankNames.get(rank).tag)
