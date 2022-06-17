@@ -2,7 +2,6 @@ package mindustry.plugin.discord.discordcommands;
 
 import mindustry.gen.Call;
 import mindustry.plugin.ioMain;
-import mindustry.plugin.requests.Translate;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -88,36 +87,6 @@ public class DiscordCommands implements MessageCreateListener {
 
         // check if it's a live chat message
         if (event.getChannel().getId() == live_chat_channel.getId() && !event.getMessageAuthor().isBotUser()) {
-            if (event.getMessageContent().split(" ")[0].substring(prefix.length()).equals("translate") || event.getMessageContent().split(" ")[0].substring(prefix.length()).equals("t")) {
-                if (event.getMessageContent().split(" ").length < 3) {
-                    event.getChannel().sendMessage(new EmbedBuilder()
-                            .setTitle("Too few arguments!")
-                            .setColor(new Color(0xff0000))
-                    );
-                    return;
-                }
-                try {
-                    String[] args = message.split(" ", 3);
-                    JSONObject res = new JSONObject(Translate.translate(escapeEverything(args[2]), args[1]));
-                    if (res.has("translated") && res.getJSONObject("translated").has("text")) {
-                        String translated = res.getJSONObject("translated").getString("text");
-                        Call.sendMessage("[sky]" + event.getMessageAuthor().getName() + "@discord >[] " + translated);
-                        event.getMessage().delete();
-                        event.getChannel().sendMessage("<translated>**" + event.getMessageAuthor().getName() + "@discord**: " + translated);
-                    } else {
-                        event.getChannel().sendMessage(new EmbedBuilder()
-                                .setTitle("There was an error!")
-                                .setColor(new Color(0xff0000))
-                                .setDescription("There was an error: " + (res.has("error") ? res.getString("error") : "No more information, ask Nautilus!")));
-                    }
-                } catch (Exception e) {
-                    event.getChannel().sendMessage(new EmbedBuilder()
-                            .setTitle("There was an error!")
-                            .setColor(new Color(0xff0000))
-                            .setDescription("There was an error: " + e.getMessage()));
-                }
-                return;
-            }
             System.out.println(event.getMessageContent());
 //            String message = event.getMessage().getContent().toString();
 //            message = message.replaceAll("<@![0-9]+>", message.substring(message.indexOf("<@!") + 2, (message.indexOf("<@!") + 18)));

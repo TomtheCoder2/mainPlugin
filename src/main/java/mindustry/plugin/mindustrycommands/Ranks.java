@@ -215,7 +215,7 @@ public class Ranks implements MiniMod {
         });
 
         handler.<Player>register("ranks", "Show all ranks.", (args, player) -> { // self info
-            StringBuilder sb = new StringBuilder("[accent]List of all ranks:\n");
+            StringBuilder sb = new StringBuilder("[accent]Ranks\n");
             for (int i = 0; i < Rank.all.length; i++) {
                 Rank rank = Rank.all[i];
                 sb.append(rank.tag)

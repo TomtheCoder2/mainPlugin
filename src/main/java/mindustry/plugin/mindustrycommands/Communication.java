@@ -1,5 +1,6 @@
 package mindustry.plugin.mindustrycommands;
 
+import arc.Core;
 import arc.util.CommandHandler;
 import arc.util.Log;
 import arc.util.Strings;
@@ -24,8 +25,18 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Communication implements MiniMod {
+    private TranslateThread translateThread;
+
+    public void registerEvents() {
+        translateThread = new TranslateThread();
+        translateThread.start();
+    }
+
     @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("w", "<player> <text...>", "Whisper text to another player.", (args, player) -> {
@@ -44,21 +55,19 @@ public class Communication implements MiniMod {
             other.sendMessage("[orange][[[gray]whisper from [#ffd37f]" + Strings.stripColors(player.name) + "[orange]]: [gray]" + args[1]);
             player.sendMessage("[orange][[[gray]whisper to [#ffd37f]" + Strings.stripColors(other.name) + "[orange]]: [gray]" + args[1]);
         });
-        handler.<Player>register("translate", "<language> <text...>", "Translate your message", (arg, player) -> {
-            Translate.Resp result = Translate.translate(arg[1], "auto", arg[0]);
-            if (result.error != null) {
-                player.sendMessage(GameMsg.error("TR", "Translation failed: " + result.error + " (host [sky]" + result.host + "[scarlet])"));
-            } else {
-                player.sendMessage(GameMsg.info("TR", "[white]'" + arg[1] + "'[lightgray]  is translated as [orange]" + result.text + "[lightgray] (powered by [sky]" + result.host + "[lightgray])"));
+        handler.<Player>register("translate", "<language> <text...>", "Translate a message", (arg, player) -> {
+            var req = new TranslateThread.Req(player, arg[1], "auto", arg[0]);
+            req.toServer = false;
+            if(!translateThread.add(req)) {
+                player.sendMessage(GameMsg.error("TR", "There are currently too many translations to process your request; try again later"));
             }
         });
 
-        handler.<Player>register("en", "<language> <text...>", "Send a message in English", (arg, player) -> {
-            Translate.Resp result = Translate.translate(arg[1], arg[0], "en");
-            if (result.error != null) {
-                player.sendMessage(GameMsg.error("TR", "Translation failed: " + result.error + " (host [sky]" + result.host + "[scarlet])"));
-            } else {
-                Call.sendMessage(GameMsg.custom("TR", "white", "([orange]" + player.name() + "[white]): " + result.text + " [lightgray](powered by [sky]" + result.host + "[lightgray])"));
+        handler.<Player>register("en", "<text...>", "Translate & send a message in English", (arg, player) -> {
+            var req = new TranslateThread.Req(player, arg[0], "auto", "en");
+            req.toServer = true;
+            if(!translateThread.add(req)) {
+                player.sendMessage(GameMsg.error("TR", "There are currently too many translations to process your request; try again later"));
             }
         });
         handler.removeCommand("t");
@@ -69,6 +78,63 @@ public class Communication implements MiniMod {
             Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(raw, player, message));
         });
 
+    }
+}
+
+/** Runs the translations & sends messages to discord and chat */
+class TranslateThread extends Thread {
+    public static class Req {
+        /** Player to send translation to. */
+        Player player;
+        /** Whether to send the message to the entire server */
+        boolean toServer;
+
+        String text;
+        String fromLang;
+        String toLang;
+
+        public Req(Player player, String text, String fromLang, String toLang) {
+            this.player = player;
+            this.text = text;
+            this.fromLang=  fromLang;
+            this.toLang = toLang;
+        }
+    }
+
+    protected BlockingQueue<Req> queue = new LinkedBlockingQueue<>(16);
+
+    /** Returns false if there are too many requests */
+    public boolean add(Req req) {
+        return this.queue.offer(req);
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            final Req req;
+            try {
+                req = queue.take();
+            } catch(InterruptedException e) {
+                Log.err(e);
+                continue;
+            }
+            final Translate.Resp resp = Translate.translate(req.text, req.fromLang, req.toLang);
+            
+            Core.app.post(() -> {
+                if (resp.error != null) {
+                    req.player.sendMessage(GameMsg.error("TR", "Translation failed: " + resp.error + " (host [sky]" + resp.host + "[scarlet])"));
+                } else {
+                    if (req.toServer) {
+                        Call.sendMessage(GameMsg.custom("TR", "white", "([orange]" + req.player.name + "[white]): "
+                            + resp.text + " [lightgray](powered by [sky]" + resp.host + "[lightgray])"));
+                        ioMain.live_chat_channel.sendMessage("**" + Utils.escapeEverything(req.player.name) + "**: [tr] " + resp.text);
+                    } else {
+                        req.player.sendMessage(GameMsg.info("TR", "[white]'" + req.text + "'[lightgray]  is translated as [orange]"
+                            + resp.text + "[lightgray] (powered by [sky]" + resp.host + "[lightgray])"));
+                    }
+                }
+            });
+        }
     }
 }
 
