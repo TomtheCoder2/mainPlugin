@@ -6,7 +6,7 @@ import mindustry.gen.Player;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.data.PersistentPlayerData;
-import mindustry.plugin.data.PlayerData;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.discord.discordcommands.DiscordCommands;
 import mindustry.plugin.discord.discordcommands.RoleRestrictedCommand;
@@ -18,8 +18,6 @@ import java.time.Instant;
 
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.player;
-import static mindustry.plugin.database.Utils.getData;
-import static mindustry.plugin.database.Utils.setData;
 import static mindustry.plugin.ioMain.playerDataGroup;
 import static mindustry.plugin.utils.CustomLog.logAction;
 import static mindustry.plugin.utils.LogAction.ban;
@@ -125,7 +123,7 @@ public class Apprentice {
                     if (info != null) {
                         String uuid = info.id;
                         String banId = uuid.substring(0, 4);
-                        PlayerData pd = getData(uuid);
+                        Database.Player pd = Database.getPlayerData(uuid);
                         long until;
                         try {
                             until = now + Integer.parseInt(targetDuration) * 60L;
@@ -143,7 +141,7 @@ public class Apprentice {
                         if (pd != null) {
                             pd.bannedUntil = until;
                             pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
-                            setData(uuid, pd);
+                            Database.setPlayerData(pd);
 
                             eb.setTitle("Banned " + escapeEverything(info.lastName) + " for " + targetDuration + " minutes. ");
                             eb.addField("Ban ID", banId);

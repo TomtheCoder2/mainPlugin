@@ -10,7 +10,6 @@ import mindustry.plugin.database.Database;
 import java.util.Objects;
 
 import static mindustry.Vars.mods;
-import static mindustry.plugin.database.Utils.getData;
 import static mindustry.plugin.ioMain.enableJs;
 import static mindustry.plugin.ioMain.enableJsTask;
 

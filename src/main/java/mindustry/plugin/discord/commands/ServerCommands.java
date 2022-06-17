@@ -31,7 +31,7 @@ import mindustry.mod.Mods;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.data.PersistentPlayerData;
-import mindustry.plugin.data.PlayerData;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.discordcommands.Command;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.discord.discordcommands.DiscordCommands;
@@ -39,7 +39,7 @@ import mindustry.plugin.discord.discordcommands.RoleRestrictedCommand;
 import mindustry.plugin.ioMain;
 import mindustry.plugin.requests.GetMap;
 import mindustry.plugin.utils.Utils;
-import mindustry.plugin.utils.ranks.Rank;
+import mindustry.plugin.utils.Rank;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
@@ -72,7 +72,6 @@ import java.util.zip.InflaterInputStream;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
-import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.requests.IPLookup.readJsonFromUrl;
 import static mindustry.plugin.utils.CustomLog.logAction;
@@ -80,7 +79,6 @@ import static mindustry.plugin.utils.LogAction.*;
 import static mindustry.plugin.utils.Utils.Categories.*;
 import static mindustry.plugin.utils.Utils.*;
 import static mindustry.plugin.utils.ranks.Utils.listRanks;
-import static mindustry.plugin.utils.ranks.Utils.rankNames;
 
 @Deprecated
 public class ServerCommands {
@@ -533,7 +531,7 @@ public class ServerCommands {
                     if (info != null) {
                         String uuid = info.id;
                         String banId = uuid.substring(0, 4);
-                        PlayerData pd = getData(uuid);
+                        Database.Player pd = Database.getPlayerData(uuid);
                         long until;
                         try {
                             until = now + Integer.parseInt(targetDuration) * 60L;
@@ -551,7 +549,7 @@ public class ServerCommands {
                         if (pd != null) {
                             pd.bannedUntil = until;
                             pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
-                            setData(uuid, pd);
+                            Database.setPlayerData(pd);
 
                             eb.setTitle("Banned " + escapeEverything(info.lastName) + " for " + targetDuration + " minutes. ");
                             eb.addField("Ban ID", banId);
@@ -865,28 +863,28 @@ public class ServerCommands {
                     HashMap<String, String> fields = new HashMap<>();
                     Player player = findPlayer(ctx.args[0]);
                     if (player != null) {
-                        PlayerData pd = getData(player.uuid());
+                        Database.Player pd = Database.getPlayerData(player.uuid());
                         assert pd != null;
                         PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
                         tdata.bt = desiredBulletType;
                         tdata.sclDamage = dmg;
                         tdata.sclLifetime = life;
                         tdata.sclVelocity = vel;
-                        setData(player.uuid(), pd);
+                        Database.setPlayerData(pd);
                         fields.put("Bullet", ctx.args[1]);
                         fields.put("Bullet lifetime", String.valueOf(life));
                         fields.put("Bullet velocity", String.valueOf(vel));
                         ctx.sendEmbed(true, "Modded " + escapeEverything(player.name) + "'s gun", fields, true);
                     } else if (ctx.args[0].equalsIgnoreCase("all")) {
                         for (Player p : Groups.player) {
-                            PlayerData pd = getData(player.uuid());
+                            Database.Player pd = Database.getPlayerData(player.uuid());
                             assert pd != null;
                             PersistentPlayerData tdata = (playerDataGroup.getOrDefault(p.uuid(), null));
                             tdata.bt = desiredBulletType;
                             tdata.sclDamage = dmg;
                             tdata.sclLifetime = life;
                             tdata.sclVelocity = vel;
-                            setData(p.uuid(), pd);
+                            Database.setPlayerData(pd);
                         }
                         fields.put("Bullet", ctx.args[1]);
                         fields.put("Bullet lifetime", String.valueOf(life));
@@ -965,21 +963,28 @@ public class ServerCommands {
                         }
                     }
                     boolean showUUID = ctx.channel.getId() != Long.parseLong(bot_channel_id) && ctx.channel.getId() != Long.parseLong(apprentice_bot_channel_id);
+
+
                     switch (ctx.args[1].toLowerCase()) {
                         case "playtime", "p" -> {
-                            eb.setDescription(ranking(10, "playTime", offset, showUUID));
+                            var ranking = Database.rankPlayers(10, "playTime", offset);
+                            eb.setDescription(formatPlayerRanking(ranking, "playTime", showUUID));
                         }
                         case "games", "gamesplayed", "g" -> {
-                            eb.setDescription(ranking(10, "gamesPlayed", offset, showUUID));
+                            var ranking = Database.rankPlayers(10, "gamesPlayed", offset);
+                            eb.setDescription(formatPlayerRanking(ranking, "gamesPlayed", showUUID));
                         }
                         case "buildings", "buildingsbuilt", "b" -> {
-                            eb.setDescription(ranking(10, "buildingsBuilt", offset, showUUID));
+                            var ranking = Database.rankPlayers(10, "buildingsBuilt", offset);
+                            eb.setDescription(formatPlayerRanking(ranking, "buildingsBuilt", showUUID));
                         }
                         case "negative", "n" -> {
-                            eb.setDescription(ranking(10, "negativeRating", offset));
+                            var ranking = Database.rankMaps(10, "negativeRating", offset);
+                            eb.setDescription(formatMapRanking(ranking, "negativeRating"));
                         }
                         case "positive" -> {
-                            eb.setDescription(ranking(10, "positiveRating", offset));
+                            var ranking = Database.rankMaps(10, "positiveRating", offset);
+                            eb.setDescription(formatMapRanking(ranking, "positiveRating"));
                         }
                         default -> {
                             eb.setDescription("Please select a valid stat");
@@ -1291,12 +1296,12 @@ public class ServerCommands {
                         if (info != null) {
                             String uuid = info.id;
                             String banId = uuid.substring(0, 4);
-                            PlayerData pd = getData(uuid);
+                            Database.Player pd = Database.getPlayerData(uuid);
                             if (pd != null) {
                                 // set ban in database
                                 pd.banned = true;
                                 pd.banReason = reason + "\n[accent]Ban ID:[] " + banId;
-                                setData(uuid, pd);
+                                Database.setPlayerData(pd);
 
                                 // send messages on discord
                                 netServer.admins.banPlayerIP(info.lastIP);
@@ -1335,12 +1340,12 @@ public class ServerCommands {
                             .setTimestampToNow();
                     String target = ctx.args[1];
                     String reason = ctx.args[2];
-                    PlayerData pd = getData(target);
+                    Database.Player pd = Database.getPlayerData(target);
                     Administration.PlayerInfo info = netServer.admins.getInfoOptional(target);
 
                     if (pd != null && info != null) {
                         pd.banned = true;
-                        setData(target, pd);
+                        Database.setPlayerData(pd);
                         eb.setTitle("Blacklisted successfully.");
                         eb.setDescription("`" + escapeEverything(info.lastName) + "` was banned.");
                         logAction(blacklist, info, ctx, reason);
@@ -1375,13 +1380,13 @@ public class ServerCommands {
                         if (player != null) {
                             String uuid = player.uuid();
                             String banId = uuid.substring(0, 4);
-                            PlayerData pd = getData(uuid);
+                            Database.Player pd = Database.getPlayerData(uuid);
                             long until = now + Integer.parseInt(targetDuration) * 60L;
                             if (pd != null) {
 //     pd.banned = true;
                                 pd.bannedUntil = until;
                                 pd.banReason = reason + "\n" + "[accent]Until: " + epochToString(until) + "\n[accent]Ban ID:[] " + banId;
-                                setData(uuid, pd);
+                                Database.setPlayerData(pd);
                             }
 
                             eb.setTitle("Banned `" + escapeEverything(player.name) + "` permanently.");
@@ -1448,7 +1453,7 @@ public class ServerCommands {
                 public void run(Context ctx) {
                     EmbedBuilder eb = new EmbedBuilder();
                     String target = ctx.args[1];
-                    PlayerData pd = getData(target);
+                    Database.Player pd = Database.getPlayerData(target);
 
                     if (pd != null) {
                         pd.banned = false;
@@ -1457,7 +1462,7 @@ public class ServerCommands {
                         netServer.admins.unbanPlayerID(target);
                         eb.setTitle("Unbanned `" + escapeEverything(info.lastName) + "`.");
                         ctx.sendMessage(eb);
-                        setData(target, pd);
+                        Database.setPlayerData(pd);
                         logAction(unban, info, ctx, null);
                     } else {
                         eb.setTitle("UUID `" + escapeEverything(target) + "` not found in the database.");
@@ -2415,9 +2420,10 @@ public class ServerCommands {
                         int targetRank = -1;
                         if (!onlyDigits(targetRankString)) {
                             // try to get it by name
-                            for (java.util.Map.Entry<Integer, Rank> rank : rankNames.entrySet()) {
-                                if (rank.getValue().name.toLowerCase(Locale.ROOT).startsWith(targetRankString.toLowerCase(Locale.ROOT))) {
-                                    targetRank = rank.getKey();
+                            for (int idx = 0; idx < Rank.all.length; idx++) {
+                                Rank rank = Rank.all[idx];
+                                if (rank.name.toLowerCase(Locale.ROOT).startsWith(targetRankString.toLowerCase(Locale.ROOT))) {
+                                    targetRank = idx;
                                     break;
                                 }
                             }
@@ -2434,9 +2440,9 @@ public class ServerCommands {
                                     .setDescription("Could not find rank " + targetRankString));
                             return;
                         }
-                        if (targetRank > rankNames.size() - 1 || targetRank < 0) {
+                        if (targetRank > Rank.all.length - 1 || targetRank < 0) {
                             eb.setTitle("Error")
-                                    .setDescription("Rank has to be larger than -1 and smaller than " + (rankNames.size() - 1) + "!")
+                                    .setDescription("Rank has to be larger than -1 and smaller than " + (Rank.all.length - 1) + "!")
                                     .setColor(new Color(0xff0000));
                             ctx.sendMessage(eb);
                             return;
@@ -2450,10 +2456,10 @@ public class ServerCommands {
                                 uuid = player.uuid();
                             }
 
-                            PlayerData pd = getData(uuid);
+                            Database.Player pd = Database.getPlayerData(uuid);
                             if (pd != null) {
                                 pd.rank = targetRank;
-                                setData(uuid, pd);
+                                Database.setPlayerData(pd);
                                 Administration.PlayerInfo info = null;
                                 if (player != null) {
                                     info = netServer.admins.getInfo(player.uuid());
@@ -2461,11 +2467,11 @@ public class ServerCommands {
                                     info = netServer.admins.getInfoOptional(target);
                                 }
                                 eb.setTitle("Command executed successfully");
-                                eb.setDescription("Promoted " + escapeEverything(info.names.get(0)) + " to " + rankNames.get(targetRank).name);
+                                eb.setDescription("Promoted " + escapeEverything(info.names.get(0)) + " to " + Rank.all[targetRank].name);
                                 ctx.sendMessage(eb);
                                 int rank = pd.rank;
                                 if (player != null) {
-                                    player.name = rankNames.get(rank).tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "").replaceAll("\\|(.*)\\|", "");
+                                    player.name = Rank.all[rank].tag + player.name.replaceAll(" ", "").replaceAll("<.*?>", "").replaceAll("\\|(.*)\\|", "");
                                 }
                                 logAction(setRank, info, ctx, null);
                             } else {
@@ -2473,7 +2479,7 @@ public class ServerCommands {
                                 return;
                             }
 
-                            if (targetRank == rankNames.size() - 1 && player != null) {
+                            if (targetRank == Rank.all.length - 1 && player != null) {
                                 netServer.admins.adminPlayer(player.uuid(), player.usid());
                             }
                         }
@@ -2572,13 +2578,13 @@ public class ServerCommands {
                                 playerNotFound(target, eb, ctx);
                                 return;
                             }
-                            PlayerData pd = getData(info.id);
+                            Database.Player pd = Database.getPlayerData(info.id);
                             if (pd != null) {
                                 pd.buildingsBuilt = buildingsBuilt;
                                 pd.gamesPlayed = gamesPlayed;
                                 pd.playTime = playTime;
                                 pd.rank = targetRank;
-                                setData(info.id, pd);
+                                Database.setPlayerData(pd);
                                 eb.setTitle("Command executed successfully");
                                 eb.setDescription(String.format("Set stats of %s to:\nPlaytime: %d\nBuildings built: %d\nGames played: %d", escapeEverything(player.name), playTime, buildingsBuilt, gamesPlayed));
 //     eb.setDescription("Promoted " + escapeCharacters(player.name) + " to " + targetRank);

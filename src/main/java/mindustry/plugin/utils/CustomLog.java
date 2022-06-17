@@ -1,7 +1,7 @@
 package mindustry.plugin.utils;
 
 import mindustry.net.Administration;
-import mindustry.plugin.data.PlayerData;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.discordcommands.Context;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAttachment;
@@ -12,10 +12,9 @@ import java.util.List;
 import java.util.Objects;
 
 import static arc.util.Log.err;
-import static mindustry.plugin.database.Utils.getData;
+import mindustry.plugin.database.Database;
 import static mindustry.plugin.ioMain.log_channel_id;
 import static mindustry.plugin.utils.Utils.*;
-import static mindustry.plugin.utils.ranks.Utils.rankNames;
 
 public class CustomLog {
     /**
@@ -84,8 +83,8 @@ public class CustomLog {
                         .addField("Uploaded by ", "<@" + ctx.author.getIdAsString() + ">", true);
             }
             case setRank -> {
-                PlayerData pd = getData(info.id);
-                eb.setTitle(escapeEverything(info.lastName) + "'s rank was set to " + rankNames.get(pd.rank).name + "!")
+                Database.Player pd = Database.getPlayerData(info.id);
+                eb.setTitle(escapeEverything(info.lastName) + "'s rank was set to " + Rank.all[pd.rank].name + "!")
                         .setColor(new Color(0x00ff00))
                         .addField("UUID", info.id)
                         .addField("By", "<@" + ctx.author.getIdAsString() + ">");

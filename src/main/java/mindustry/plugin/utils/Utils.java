@@ -30,9 +30,7 @@ import mindustry.maps.Map;
 import mindustry.maps.Maps;
 import mindustry.mod.Mods;
 import mindustry.net.Administration;
-import mindustry.plugin.data.PlayerData;
 import mindustry.plugin.database.Database;
-import mindustry.plugin.database.MapData;
 import mindustry.plugin.discord.discordcommands.Command;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.ioMain;
@@ -68,11 +66,9 @@ import java.util.zip.InflaterInputStream;
 import static arc.util.Log.debug;
 import static arc.util.Log.err;
 import static mindustry.Vars.*;
-import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.discord.discordcommands.DiscordCommands.error_log_channel;
 import static mindustry.plugin.ioMain.api;
 import static mindustry.plugin.ioMain.contentHandler;
-import static mindustry.plugin.utils.ranks.Utils.rankNames;
 //import java.sql.*;
 
 public class Utils {
@@ -94,9 +90,6 @@ public class Utils {
     public static int eventPort = 1001;
 
     public static void init() {
-        // initialize all rankNames
-        mindustry.plugin.utils.ranks.Utils.init();
-
         bannedNames.add("IGGGAMES");
         bannedNames.add("CODEX");
         bannedNames.add("VALVE");
@@ -105,11 +98,7 @@ public class Utils {
         bannedNames.add("IgruhaOrg");
         bannedNames.add("андрей");
         bannedNames.add("THIS IS MY KINGDOM CUM, THIS IS MY CUM");
-
-        bannedBlocks.add(Blocks.conveyor);
-        bannedBlocks.add(Blocks.titaniumConveyor);
-        bannedBlocks.add(Blocks.junction);
-        bannedBlocks.add(Blocks.router);
+        bannedNames.add("HITLER");
 
         statMessage = Core.settings.getString("statMessage");
         reqMessage = Core.settings.getString("reqMessage");
@@ -214,12 +203,12 @@ public class Utils {
             message = message.replaceAll("%player%", escapeCharacters(player.name));
             message = message.replaceAll("%map%", state.map.name());
             message = message.replaceAll("%wave%", String.valueOf(state.wave));
-            PlayerData pd = getData(player.uuid());
+            Database.Player pd = Database.getPlayerData(player.uuid());
             if (pd != null) {
                 message = message.replaceAll("%playtime%", String.valueOf(pd.playTime));
                 message = message.replaceAll("%games%", String.valueOf(pd.gamesPlayed));
                 message = message.replaceAll("%buildings%", String.valueOf(pd.buildingsBuilt));
-                message = message.replaceAll("%rank%", rankNames.get(pd.rank).tag + " " + escapeColorCodes(rankNames.get(pd.rank).name));
+                message = message.replaceAll("%rank%", Rank.all[pd.rank].tag + " " + escapeColorCodes(Rank.all[pd.rank].name));
 //                if(pd.discordLink.length() > 0){
 //                    User discordUser = api.getUserById(pd.discordLink).get(2, TimeUnit.SECONDS);
 //                    if(discordUser != null) {
@@ -412,7 +401,7 @@ public class Utils {
         if (n > 1000) {
             return String.format("%.1f", n / 1000.0);
         } else {
-            return n.toString();
+            return Integer.toString(n);
         }
     }
 
@@ -909,6 +898,46 @@ public class Utils {
         s.append("**\n\nCurrent Name with color codes: **\n");
         s.append(info.lastName);
         return s;
+    }
+
+    public static String formatMapRanking(Database.MapRank[] ranks, String column) {
+        StringBuilder sb = new StringBuilder("```\n");
+        sb.append("   ").append(String.format("%9s ", column)).append("Name\n");
+
+        for (int i = 0 ; i < ranks.length; i++) {
+            sb.append(String.format("%2d ", i+1));
+            sb.append(String.format("%9d ", ranks[i].stat));
+            sb.append(ranks[i].name);
+            sb.append("\n");
+        }
+        sb.append("```");
+        return sb.toString();
+    }
+
+    public static String formatPlayerRanking(Database.PlayerRank[] ranks, String column, boolean showUUID) {
+        StringBuilder sb = new StringBuilder("```\n");
+        sb.append("   ").append(String.format("%9s ", column));
+        if (showUUID) {
+            sb.append("UUID ");
+        }
+        sb.append("Name\n");
+        for (int i = 0 ; i < ranks.length; i++) {
+            sb.append(String.format("%2d ", i+1));
+            sb.append(String.format("%9d ", ranks[i].stat));
+
+            if (showUUID) {
+                sb.append(ranks[i].uuid).append( " ");
+            }
+            
+            final String uuid = ranks[i].uuid;
+            Player p = Groups.player.find(x -> x.uuid() == uuid);
+            if (p != null) {
+                sb.append(p.name);
+            }
+            sb.append("\n");
+        }
+        sb.append("```");
+        return sb.toString();
     }
 
     /**

@@ -166,11 +166,10 @@ public class Moderation implements MiniMod {
                     if (Integer.parseInt(arg[0]) == tdata.redeemKey) {
                         StringBuilder roleList = new StringBuilder();
                         Database.Player pd = Database.getPlayerData(player.uuid());
-                        for (int i = 0; i < Rank.roles.length; i++) {
-                            long roleID = Rank.roles[i];
-                            if (roleID < 0) continue;
+                        for (var entry: Rank.roles) {
+                            long roleID = entry.key;
                             assert pd != null;
-                            if (i <= pd.rank) {
+                            if (entry.value <= pd.rank) {
                                 System.out.println("add role: " + ioMain.api.getRoleById(roleID).get());
                                 roleList.append("<@").append(ioMain.api.getRoleById(roleID).get().getIdAsString()).append(">\n");
                                 ioMain.api.getUserById(tdata.redeem).get().addRole(ioMain.api.getRoleById(roleID).get());

@@ -2,6 +2,7 @@ package mindustry.plugin.discord.commands;
 
 import arc.Core;
 import arc.files.Fi;
+import arc.struct.LongSeq;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.Items;
@@ -15,13 +16,13 @@ import mindustry.io.SaveIO;
 import mindustry.maps.Map;
 import mindustry.mod.Mods;
 import mindustry.plugin.data.PersistentPlayerData;
-import mindustry.plugin.data.PlayerData;
-import mindustry.plugin.database.MapData;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.discordcommands.Command;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.discord.discordcommands.DiscordCommands;
 import mindustry.plugin.ioMain;
 import mindustry.plugin.requests.GetMap;
+import mindustry.plugin.utils.Rank;
 import mindustry.world.modules.ItemModule;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -30,6 +31,7 @@ import org.javacord.api.entity.permission.Role;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.Objects;
@@ -38,11 +40,8 @@ import static arc.util.Log.debug;
 import static arc.util.Log.info;
 import static mindustry.Vars.saveExtension;
 import static mindustry.Vars.state;
-import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.utils.Utils.*;
-import static mindustry.plugin.utils.ranks.Utils.rankNames;
-import static mindustry.plugin.utils.ranks.Utils.rankRoles;
 
 public class ComCommands {
 //    public static ContentHandler contentHandler = new ContentHandler();
@@ -128,7 +127,7 @@ public class ComCommands {
                 EmbedBuilder embed = new EmbedBuilder()
                         .setTitle(escapeCharacters(found.name()))
                         .setAuthor(escapeCharacters(found.author()));
-                MapData mapData = getMapData(escapeCharacters(found.name()));
+                Database.Map mapData = Database.getMapData(escapeCharacters(found.name()));
                 if (mapData != null) {
                     embed.setDescription(
                             escapeCharacters(found.description()) + "\n\n" +
@@ -137,7 +136,7 @@ public class ComCommands {
                                     "**Highscore Time: **" + mapData.highscoreTime + "\n" +
                                     "**Highscore Wave: **" + mapData.highscoreWaves + "\n" +
                                     "**Shortest Game: **" + mapData.shortestGame + "\n" +
-                                    "**Play Time: **" + mapData.playtime + "\n"
+                                    "**Play Time: **" + mapData.playTime + "\n"
                     );
                 } else {
                     embed.setDescription(escapeCharacters(found.description()));
@@ -509,15 +508,15 @@ public class ComCommands {
                 if (target.length() > 0) {
                     int rank = 0;
                     for (Role role : ctx.author.asUser().get().getRoles(ctx.event.getServer().get())) {
-                        if (rankRoles.containsKey(role.getIdAsString())) {
-                            if (rankRoles.get(role.getIdAsString()) > rank) {
-                                rank = rankRoles.get(role.getIdAsString());
+                        if (Rank.roles.containsKey(role.getId())) {
+                            if (Rank.roles.get(role.getId()) > rank) {
+                                rank = Rank.roles.get(role.getId());
                             }
                         }
                     }
                     Player player = findPlayer(target);
                     if (player != null) {
-                        PlayerData pd = getData(player.uuid());
+                        Database.Player pd = Database.getPlayerData(player.uuid());
                         if (pd != null) {
                             if (pd.rank < rank) {
                                 pd.rank = rank;
@@ -542,11 +541,11 @@ public class ComCommands {
                                 player.sendMessage("Please enter this code: [cyan]/redeem " + key + " [white]to complete the redeem process.");
                                 return;
                             }
-                            setData(player.uuid(), pd);
+                            Database.setPlayerData(pd);
                         }
                         eb.setTitle("Command executed successfully");
-                        eb.setDescription("Promoted " + escapeEverything(player.name) + " to " + escapeEverything(rankNames.get(rank).name) + ".");
-                        player.name = rankNames.get(rank).tag + getPlayerInfo(player.uuid()).lastName;
+                        eb.setDescription("Promoted " + escapeEverything(player.name) + " to " + escapeEverything(Rank.all[rank].name) + ".");
+                        player.name = Rank.all[rank].tag + getPlayerInfo(player.uuid()).lastName;
                         //                            player.con.kick("Your rank was modified, please rejoin.", 0);
                     } else {
                         eb.setTitle("Command terminated");

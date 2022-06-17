@@ -23,17 +23,16 @@ public class Rank {
         new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", new Color(0xcb9c7aff), "Admin", "Be admin"),                // 11
     };
 
-    /** List of discord roles */
-    public static final long[] roles = new long[] {
-        -1,
-        897568732749115403L, // 1
-        881618465117581352L, // 2
-        906958402100535296L, // 3
-        897565215670042645L, // 4
-        900369018110738442L, // 5
-        900369102978310206L, // 6        
-    };
 
+    public static final ObjectMap<Long, Integer> roles = ObjectMap.of(
+        897568732749115403L, 1,
+        881618465117581352L, 2,
+        906958402100535296L, 3,
+        897565215670042645L, 4,
+        900369018110738442L, 5,
+        900369102978310206L, 6
+    );
+    
     /** Represents the statistical requirements of a given role.  */
     public static class Req {
         public int buildingsBuilt;

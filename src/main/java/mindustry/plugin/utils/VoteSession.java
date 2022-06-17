@@ -8,15 +8,14 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.net.Administration;
 import mindustry.plugin.data.PersistentPlayerData;
-import mindustry.plugin.data.PlayerData;
+import mindustry.plugin.database.Database;
+
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;
 import java.time.Instant;
 
 import static mindustry.Vars.netServer;
-import static mindustry.plugin.database.Utils.getData;
-import static mindustry.plugin.database.Utils.setData;
 import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
@@ -119,11 +118,11 @@ public class VoteSession {
         long now = Instant.now().getEpochSecond();
         long until = now + kickDuration;
         String banId = target.uuid().substring(0, 4);
-        PlayerData pd = getData(target.uuid());
+        Database.Player pd = Database.getPlayerData(target.uuid());
         if (pd != null) {
             pd.bannedUntil = until;
             pd.banReason = "Votekicked by " + name + "[white]\n" + "[accent]Until: " + Utils.epochToString(until) + "\n[accent]Ban ID:[] " + banId;
-            setData(target.uuid(), pd);
+            Database.setPlayerData(pd);
         }
         Administration.PlayerInfo info = netServer.admins.getInfo(target.uuid());
         info.lastKicked = 0;
