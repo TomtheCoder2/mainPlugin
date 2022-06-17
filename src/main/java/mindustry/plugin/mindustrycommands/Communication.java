@@ -79,7 +79,7 @@ class Translate {
     private final static String[] SERVERS = new String[] {
         "libretranslate.de",
         "translate.argosopentech.com",
-        "translate.api.skitzen.com",
+//        "translate.api.skitzen.com", does not work
         "libretranslate.pussthecat.org",
         "translate.fortytwo-it.com",
         "translate.terraprint.co",
@@ -117,7 +117,8 @@ class Translate {
     /** Translates a piece of text
      */
     public static Resp translate(String text, String fromLang, String toLang) {
-        String server = SERVERS[serverIdx++];
+        String server = SERVERS[serverIdx];
+        serverIdx = (serverIdx + 1) % SERVERS.length;
 
         try {
             JSONObject reqObj = new JSONObject()
