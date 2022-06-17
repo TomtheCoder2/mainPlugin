@@ -678,6 +678,10 @@ public class ioMain extends Plugin {
                 }
             }
         });
+
+        for (MiniMod mod : minimods) {
+            mod.registerServerCommands(handler);
+        }
     }
 
     //register commands that player can invoke in-game
