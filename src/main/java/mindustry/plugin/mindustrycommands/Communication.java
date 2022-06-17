@@ -1,20 +1,29 @@
 package mindustry.plugin.mindustrycommands;
 
 import arc.util.CommandHandler;
+import arc.util.Log;
 import arc.util.Strings;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
-import mindustry.plugin.requests.Translate;
+import mindustry.plugin.ioMain;
+import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.channel.TextChannel;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import static arc.util.Log.debug;
 import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 import static mindustry.plugin.utils.Utils.getTextChannel;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 
 public class Communication implements MiniMod {
     @Override
@@ -36,21 +45,20 @@ public class Communication implements MiniMod {
             player.sendMessage("[orange][[[gray]whisper to [#ffd37f]" + Strings.stripColors(other.name) + "[orange]]: [gray]" + args[1]);
         });
         handler.<Player>register("translate", "<language> <text...>", "Translate your message", (arg, player) -> {
-            try {
-                JSONObject res = new JSONObject(Translate.translate(escapeEverything(arg[1]), arg[0]));
-                if (res.has("translated") && res.getJSONObject("translated").has("text")) {
-                    String translated = res.getJSONObject("translated").getString("text");
-                    debug(translated);
-                    Call.sendMessage("<translated>[orange][[[accent]" + player.name + "[orange]][white]: " + translated);
-                    TextChannel tc = getTextChannel(live_chat_channel_id);
-                    assert tc != null;
-                    tc.sendMessage("<translated>**" + escapeEverything(player.name) + "**: " + translated);
-                } else {
-                    debug(res);
-                    player.sendMessage("[scarlet]There was an error: " + (res.has("error") ? res.getString("error") : "No more information, ask Nautilus on discord!"));
-                }
-            } catch (Exception e) {
-                player.sendMessage("[scarlet]There was an error: " + e.getMessage());
+            Translate.Resp result = Translate.translate(arg[1], "auto", arg[0]);
+            if (result.error != null) {
+                player.sendMessage(GameMsg.error("TR", "Translation failed: " + result.error + " (host [sky]" + result.host + "[scarlet])"));
+            } else {
+                player.sendMessage(GameMsg.info("TR", "[white]'" + arg[1] + "'[lightgray]  is translated as [orange]" + result.text + "[lightgray] (powered by [sky]" + result.host + "[lightgray])"));
+            }
+        });
+
+        handler.<Player>register("en", "<language> <text...>", "Send a message in English", (arg, player) -> {
+            Translate.Resp result = Translate.translate(arg[1], arg[0], "en");
+            if (result.error != null) {
+                player.sendMessage(GameMsg.error("TR", "Translation failed: " + result.error + " (host [sky]" + result.host + "[scarlet])"));
+            } else {
+                Call.sendMessage(GameMsg.custom("TR", "white", "([orange]" + player.name() + "[white]): " + result.text + " [lightgray](powered by [sky]" + result.host + "[lightgray])"));
             }
         });
         handler.removeCommand("t");
@@ -61,5 +69,79 @@ public class Communication implements MiniMod {
             Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(raw, player, message));
         });
 
+    }
+}
+
+class Translate {
+    // Randomly cycle through servers to use translate.
+    // That way we decrease the load on any single server. 
+    // https://github.com/LibreTranslate/LibreTranslate#mirrors
+    private final static String[] SERVERS = new String[] {
+        "libretranslate.de",
+        "translate.argosopentech.com",
+        "translate.api.skitzen.com",
+        "libretranslate.pussthecat.org",
+        "translate.fortytwo-it.com",
+        "translate.terraprint.co",
+        "lt.vern.cc"
+    };
+
+    private static int serverIdx = 0;
+
+
+    private static String getHost(String server) {
+        String[] parts = server.split("\\.");
+        if (parts.length <= 1) {
+            return server;
+        } else {
+            return parts[parts.length-2] + "." + parts[parts.length-1];
+        }
+    }
+
+    public static class Resp {
+        public String text;
+        public String error;
+        public String host;
+
+        public Resp(String error, String host, boolean eeek) {
+            this.error = error;
+            this.host = host;
+        }
+
+        public Resp(String text, String host) {
+            this.text = text;
+            this.host = host;
+        }
+    }
+
+    /** Translates a piece of text
+     */
+    public static Resp translate(String text, String fromLang, String toLang) {
+        String server = SERVERS[serverIdx++];
+
+        try {
+            JSONObject reqObj = new JSONObject()
+                .put("q", text)
+                .put("source", fromLang)
+                .put("target", toLang);
+
+            HttpRequest req = HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(reqObj.toString()))
+                .uri(URI.create("https://" + server + "/translate"))
+                .setHeader("User-Agent", ioMain.class.getCanonicalName())
+                .setHeader("Content-Type", "application/json")
+    
+                .build();
+            HttpResponse<String> resp = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build().send(req, HttpResponse.BodyHandlers.ofString());
+            JSONObject respObj = new JSONObject(new JSONTokener(resp.body()));
+            if (respObj.has("error")) {
+                return new Resp(respObj.getString("error"), getHost(server), false);
+            }
+            return new Resp (respObj.getString("translatedText"), getHost(server));
+        } catch(Exception e) {
+            Log.err("Translate error for server: " +server);
+            e.printStackTrace();
+            return new Resp(e.toString(), getHost(server), false);
+        }
     }
 }
