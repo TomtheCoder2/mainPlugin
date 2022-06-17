@@ -28,6 +28,34 @@ import static mindustry.Vars.netServer;
 import static mindustry.Vars.world;
 
 public class Moderation implements MiniMod {
+/*    @Override
+    public void registerServerCommands(CommandHandler handler) {
+                handler.register("vote", "<y/n/c>", "Vote for current votekick", arg -> {
+            if (currentlyKicking[0] == null) {
+                info("[scarlet]Nobody is being voted on.");
+            } else {
+                if (arg[0].equalsIgnoreCase("c")) {
+                    currentlyKicking[0].map[0] = null;
+                    currentlyKicking[0].task.cancel();
+                    Call.sendMessage("[scarlet]Server []canceled the kick.");
+                }
+
+                int sign = switch (arg[0].toLowerCase()) {
+                    case "y", "yes" -> 1;
+                    case "n", "no" -> -1;
+                    default -> 0;
+                };
+
+                if (sign == 0) {
+                    info("[scarlet]Vote either 'y' (yes) or 'n' (no).");
+                    return;
+                }
+
+                currentlyKicking[0].vote(sign);
+            }
+        });
+    }*/
+
     @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("votekick", "[player...]", "votekick a player.", (args, player) -> {

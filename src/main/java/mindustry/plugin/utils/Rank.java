@@ -4,7 +4,7 @@ import arc.graphics.Color;
 import arc.struct.ObjectMap;
 
 /**
- * create and save Ranks
+ * Represents a rank.
  */
 public class Rank {
     /** List of ranks */
@@ -23,7 +23,7 @@ public class Rank {
         new Rank("[accent]|[white]\uE814[accent]|[]", "Marshal", new Color(0xcb9c7aff), "Admin", "Be admin"),                // 11
     };
 
-
+    /** A mapping from discord role IDs to rank indexes */
     public static final ObjectMap<Long, Integer> roles = ObjectMap.of(
         897568732749115403L, 1,
         881618465117581352L, 2,
@@ -32,7 +32,7 @@ public class Rank {
         900369018110738442L, 5,
         900369102978310206L, 6
     );
-    
+
     /** Represents the statistical requirements of a given role.  */
     public static class Req {
         public int buildingsBuilt;

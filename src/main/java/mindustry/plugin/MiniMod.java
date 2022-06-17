@@ -8,8 +8,13 @@ import arc.util.CommandHandler;
  * with common utility code.
  */
 public interface MiniMod {
+    /** Register client (game) commands */
     void registerCommands(CommandHandler handler);
 
+    /** Register server commands */
+    default void registerServerCommands(CommandHandler handler) {}
+
+    /** Initialize event handlers + timers */
     default void registerEvents() {
     }
 }

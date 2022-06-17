@@ -116,6 +116,7 @@ public class ioMain extends Plugin {
             new mindustry.plugin.mindustrycommands.Communication(),
             new mindustry.plugin.mindustrycommands.Discord(),
             new mindustry.plugin.mindustrycommands.Info(),
+            new mindustry.plugin.mindustrycommands.Ranks(),
             new mindustry.plugin.mindustrycommands.Moderation(),
             new mindustry.plugin.mindustrycommands.Rainbow(),
     };
@@ -667,30 +668,7 @@ public class ioMain extends Plugin {
             TextChannel log_channel = getTextChannel("882342315438526525");
             update(log_channel, api);
         });
-        handler.register("vote", "<y/n/c>", "Vote for current votekick", arg -> {
-            if (currentlyKicking[0] == null) {
-                info("[scarlet]Nobody is being voted on.");
-            } else {
-                if (arg[0].equalsIgnoreCase("c")) {
-                    currentlyKicking[0].map[0] = null;
-                    currentlyKicking[0].task.cancel();
-                    Call.sendMessage("[scarlet]Server []canceled the kick.");
-                }
 
-                int sign = switch (arg[0].toLowerCase()) {
-                    case "y", "yes" -> 1;
-                    case "n", "no" -> -1;
-                    default -> 0;
-                };
-
-                if (sign == 0) {
-                    info("[scarlet]Vote either 'y' (yes) or 'n' (no).");
-                    return;
-                }
-
-                currentlyKicking[0].vote(sign);
-            }
-        });
 
         handler.register("logging", "<trace/debug> <true/false>", "Enable or disable logging for javacord.", args -> {
             if (!Objects.equals(args[1], "false") && !Objects.equals(args[1], "true")) {

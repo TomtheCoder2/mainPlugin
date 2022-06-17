@@ -399,7 +399,7 @@ public class Utils {
     /** Format a number, adding "K" to the end if > 1000 */
     public static String formatInt(int n) {
         if (n > 1000) {
-            return String.format("%.1f", n / 1000.0);
+            return String.format("%.1fK", n / 1000.0);
         } else {
             return Integer.toString(n);
         }
