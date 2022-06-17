@@ -1,4 +1,4 @@
-package mindustry.plugin.utils;
+/*package mindustry.plugin.utils;
 
 import arc.struct.ObjectSet;
 import arc.util.Strings;
@@ -155,4 +155,4 @@ public class VoteSession {
         map[0] = null;
         task.cancel();
     }
-}
+}*/

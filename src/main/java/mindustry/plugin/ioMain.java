@@ -29,7 +29,6 @@ import mindustry.plugin.effect.EffectObject;
 import mindustry.plugin.mapChange.MapChange;
 import mindustry.plugin.utils.ContentHandler;
 import mindustry.plugin.utils.Utils;
-import mindustry.plugin.utils.VoteSession;
 import mindustry.plugin.utils.Rank;
 import mindustry.world.Tile;
 import org.javacord.api.DiscordApi;
@@ -99,12 +98,9 @@ public class ioMain extends Plugin {
     //    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
 //    protected Interval timer = new Interval(1);
     //cooldown between votes
-    public static float voteCooldown = 120;
     // register commands that run on the server
     // cool-downs per player
     public static ObjectMap<String, Timekeeper> cooldowns = new ObjectMap<>();
-    // current kick sessions
-    public static VoteSession[] currentlyKicking = {null};
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public static ObjectMap<String, Role> discRoles = new ObjectMap<>();
     public static NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
@@ -280,12 +276,6 @@ public class ioMain extends Plugin {
 
             if (!leftPlayers.contains(uuid)) {
                 leftPlayers.add(uuid);
-            }
-
-            if (currentlyKicking[0] != null) {
-                if (currentlyKicking[0].target == event.player) {
-                    currentlyKicking[0].left();
-                }
             }
         });
 
