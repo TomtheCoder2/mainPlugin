@@ -13,12 +13,10 @@ import java.io.Serializable;
 public class PersistentPlayerData implements Serializable {
     public String origName;
     //    public Array<BaseUnit> draugPets = new Array<>();
-    public int bbIncrementor = 0;
     //    public boolean spawnedLichPet;
 //    public boolean spawnedPowerGen;
     public boolean muted = false;
     public boolean frozen = false;
-    public boolean votedMap = false;
     public String redeem = null;
     public int redeemKey = -1;
     public Timer.Task task;

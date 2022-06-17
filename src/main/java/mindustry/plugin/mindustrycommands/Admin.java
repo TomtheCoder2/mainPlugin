@@ -5,7 +5,7 @@ import arc.util.Timer;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
-import mindustry.plugin.data.PlayerData;
+import mindustry.plugin.database.Database;
 
 import java.util.Objects;
 
@@ -15,9 +15,10 @@ import static mindustry.plugin.ioMain.enableJs;
 import static mindustry.plugin.ioMain.enableJsTask;
 
 public class Admin implements MiniMod {
+    @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("enablejs", "<true/false> [time]", "Enable/Disable js command for everyone. (Time in minutes)", (arg, player) -> {
-            PlayerData pd = getData(player.uuid());
+            Database.Player pd = Database.getPlayerData(player.uuid());
             if (arg.length > 1) {
                 try {
                     Integer.parseInt(arg[1]);
@@ -54,7 +55,7 @@ public class Admin implements MiniMod {
         });
 
         handler.<Player>register("js", "<script...>", "Run arbitrary Javascript.", (arg, player) -> {
-            PlayerData pd = getData(player.uuid());
+            Database.Player pd = Database.getPlayerData(player.uuid());
             if ((player.admin && Objects.requireNonNull(pd).rank >= 9) || enableJs) {
                 player.sendMessage(mods.getScripts().runConsole(arg[0]));
             } else {

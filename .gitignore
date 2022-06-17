@@ -9,3 +9,5 @@ scp.bat
 /config/
 /config/mods/
 /config/maps
+bin
+*.class

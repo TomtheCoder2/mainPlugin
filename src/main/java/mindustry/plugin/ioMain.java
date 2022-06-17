@@ -23,16 +23,14 @@ import mindustry.mod.Plugin;
 import mindustry.net.Administration;
 import mindustry.net.Administration.Config;
 import mindustry.plugin.data.PersistentPlayerData;
-import mindustry.plugin.data.PlayerData;
 import mindustry.plugin.data.TileInfo;
-import mindustry.plugin.database.MapData;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
 import mindustry.plugin.mapChange.MapChange;
 import mindustry.plugin.utils.ContentHandler;
 import mindustry.plugin.utils.Utils;
 import mindustry.plugin.utils.VoteSession;
-import mindustry.plugin.utils.ranks.Rank;
+import mindustry.plugin.utils.Rank;
 import mindustry.world.Tile;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
@@ -50,15 +48,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import mindustry.plugin.database.Database;
+
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
-import static mindustry.plugin.database.Utils.*;
 import static mindustry.plugin.discord.discordcommands.DiscordCommands.error_log_channel;
 import static mindustry.plugin.effect.EffectHelper.getEffect;
 import static mindustry.plugin.utils.CustomLog.logConnections;
 import static mindustry.plugin.utils.Utils.*;
-import static mindustry.plugin.utils.ranks.Utils.rankNames;
-import static mindustry.plugin.utils.ranks.Utils.rankRequirements;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setDebug;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setTrace;
 
@@ -87,7 +84,6 @@ public class ioMain extends Plugin {
     public static int effectId = 0; // effect id for the snowball
     public static ArrayList<String> joinedPlayers = new ArrayList<>();
     public static List<String> leftPlayers = new ArrayList<>();
-    public static long passedMapTime = 0;
     //    public Timer.Task rateMapTask; // popup to force map rating
     public static ContentHandler contentHandler; // map and schem handler
     public static boolean previewSchem = false; // preview schem or not
@@ -136,10 +132,7 @@ public class ioMain extends Plugin {
         try { // read settings
             String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
             allData = new JSONObject(new JSONTokener(pureJson));
-            // url, username and password to connect to the database
-            url = allData.getString("url");
-            user = allData.getString("user");
-            password = allData.getString("password");
+
             // url to connect to the MindServ
             maps_url = allData.getString("maps_url");
             // for the live chat between the discord server and the mindustry server
@@ -161,17 +154,24 @@ public class ioMain extends Plugin {
             if (allData.has("enableMapRatingPopups")) {
                 enableMapRatingPopups = allData.getBoolean("enableMapRatingPopups");
             }
-            System.out.printf("url: %s, user: %s, password: %s%n", url, user, password);
+
+            // connect to database
+            String dbURL = allData.getString("url");
+            String dbUser = allData.getString("user");
+            String dbPwd = allData.getString("password");
+            System.out.printf("url: %s, user: %s, password: %s%n\n", dbURL, dbUser, dbPwd);
+
+            try { // test connection
+                Database.connect(dbURL, dbUser, dbPwd);
+            } catch (Exception e) {
+                err(e.toString());
+                err("Could not login to PostgresSQL database!");
+            }
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
             return;
         }
-        try { // test connection
-            connect();
-        } catch (Exception e) {
-            err(e.toString());
-            err("Could not login to PostgresSQL database!");
-        }
+
         Utils.init();
         EffectHelper.init();
 
@@ -263,22 +263,6 @@ public class ioMain extends Plugin {
             }
         }, 0, 10);
 
-        // force map votes with popup
-        if (enableMapRatingPopups) {
-            Timer.schedule(() -> {
-                for (Player player : Groups.player) {
-                    if (player == null) continue; // ...idk how even
-                    PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
-                    if (tdata != null) {
-                        if (!tdata.votedMap) {
-                            rateMenu(player);
-                            tdata.votedMap = true;
-                        }
-                    }
-                }
-            }, 0, 120);
-        }
-
         Events.on(EventType.ServerLoadEvent.class, event -> {
 //            contentHandler = new ContentHandler();
             Log.info("Everything's loaded !");
@@ -313,8 +297,9 @@ public class ioMain extends Plugin {
                 player.con.kick("[scarlet]Please change your name.");
                 return;
             }
+
             // check if the player is already in the database
-            PlayerData pd = getData(player.uuid());
+            Database.Player pd = Database.getPlayerData(player.uuid());
 
             // put the player in the playerDataGroup, which saves player data while the player is online
             if (!playerDataGroup.containsKey(player.uuid())) {
@@ -325,42 +310,38 @@ public class ioMain extends Plugin {
             // check if he's impersonating a rank
             // remove all color codes, so it's not possible to just change the color of the rank symbol
             String escapedName = escapeColorCodes(player.name).replaceAll("\\[accent\\]", "");
-            for (java.util.Map.Entry<Integer, Rank> rank : rankNames.entrySet()) {
-                if (rank.getKey() == 0) continue;
-                // compare the player's potential escaped rank symbol with the escaped symbols from the utils
-                if (escapedName.toLowerCase().startsWith(escapeColorCodes(rank.getValue().tag).replaceAll("\\[accent\\]", ""))) {
+            for (int i = 0; i < Rank.all.length; i++) {
+                if (i == 0) continue;
+
+                Rank rank = Rank.all[i];
+                if (escapedName.toLowerCase().contains(escapeColorCodes(rank.tag).replaceAll("\\[accent\\]", ""))) {
                     player.con.kick("[scarlet]Dont impersonate a rank.");
-                    info("Player " + escapedName + " tried to impersonate rank: " + rank.getValue().name);
+                    Log.warn("Player " + escapedName + " tried to impersonate rank: " + rank.name);
                     return;
                 }
             }
 
+            // check for ban & give name
             if (pd != null) {
-//                try {
-//                    if (pd.discordLink == null) {
-//                        pd.reprocess();
-//                        setData(player.uuid(), pd);
-//                    }
-//                } catch (Exception ignored) {
-//                    pd.reprocess();
-//                    setData(player.uuid(), pd);
-//                }
                 if (pd.banned || pd.bannedUntil > Instant.now().getEpochSecond()) {
                     player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason + "\n[white] If you what to appeal join our discord server: [cyan]" + discordInviteLink);
                     return;
                 }
-                int rank = pd.rank;
-                Call.sendMessage("[#" + Integer.toHexString(rankNames.get(rank).color.getRGB()).substring(2) + "]" + rankNames.get(rank).name + " [] " + player.name + "[accent] joined the front!");
-                player.name = rankNames.get(rank).tag + player.name;
-                // just give marshals admin when they join
-                if (rank == rankNames.size() - 1) {
+
+                Rank rank = Rank.all[pd.rank];
+                Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
+                player.name = rank.tag + player.name;
+
+                // Give Marshals admin
+                if (pd.rank == Rank.all.length - 1) {
                     player.admin = true;
                 }
             } else { // not in database
                 info("New player connected: " + escapeColorCodes(event.player.name));
-                setData(player.uuid(), new PlayerData(0));
-//                Call.infoMessage(player.con, formatMessage(player, welcomeMessage));
-                Call.sendMessage("[#" + Integer.toHexString(rankNames.get(0).color.getRGB()).substring(2) + "]" + rankNames.get(0).name + " [] " + player.name + "[accent] joined the front!");
+                Database.setPlayerData(new Database.Player(player.uuid(), 0));
+
+                Rank rank = Rank.all[0];
+                Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
             }
 //
 //            CompletableFuture.runAsync(() -> {
@@ -388,6 +369,7 @@ public class ioMain extends Plugin {
 //                }
 //            });
 //            player.sendMessage(welcomeMessage);
+
             Call.infoMessage(player.con, welcomeMessage);
 
             if (!joinedPlayers.contains(player.uuid())) {
@@ -395,25 +377,6 @@ public class ioMain extends Plugin {
             }
         });
 
-//        Events.on(EventType.d)
-
-        // player built building
-        Events.on(EventType.BlockBuildEndEvent.class, event -> {
-            try {
-                if (event.unit.getPlayer() == null) return;
-                if (event.breaking) return;
-                PersistentPlayerData td = playerDataGroup.get(event.unit.getPlayer().uuid());
-                if (td == null) return;
-                if (event.tile.block() != null) {
-                    if (!bannedBlocks.contains(event.tile.block())) {
-                        td.bbIncrementor++;
-                    }
-                }
-            } catch (Exception e) {
-                err("There was an error while saving block status: ");
-                e.printStackTrace();
-            }
-        });
 
         // log all tile taps
         Events.on(EventType.TapEvent.class, tapEvent -> {
@@ -521,38 +484,7 @@ public class ioMain extends Plugin {
 //        rateMapTask = Timer.schedule(this::rateMenu, 120); // for the rateMenu to appear after 2 minutes after start
         Events.on(EventType.GameOverEvent.class, event -> {
             debug("Game over!");
-            for (Player p : Groups.player) {
-                PlayerData pd = getData(p.uuid());
-                if (pd != null) {
-                    pd.gamesPlayed++;
-                    Call.infoMessage(p.con, "[accent]+1 games played");
-                    setData(pd.uuid, pd);
-                }
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(p.uuid(), null));
-                if (tdata != null) {
-                    tdata.votedMap = false;
-                }
-
-            }
             update(log_channel, api);
-
-            // maybe update the highscore
-            String mapName = state.map.name();
-            MapData mapData = getMapData(mapName);
-            if (mapData == null) {
-                mapData = new MapData(mapName);
-                mapData.playtime = 1;
-            }
-            mapData.highscoreWaves = Math.max(mapData.highscoreWaves, state.stats.wavesLasted);
-            mapData.highscoreTime = Math.max(mapData.highscoreTime, passedMapTime);
-            if (mapData.shortestGame != 0) {
-                mapData.shortestGame = Math.min(mapData.shortestGame, passedMapTime);
-            } else {
-                mapData.shortestGame = passedMapTime;
-            }
-            rateMap(mapName, mapData);
-
-            passedMapTime = 0;
 
             // log the game over
             assert log_channel != null;
@@ -675,33 +607,6 @@ public class ioMain extends Plugin {
                 logConnections(log_channel, leftPlayers, "leave");
             }
             logCount++;
-            for (Player p : Groups.player) {
-                PlayerData pd = getData(p.uuid());
-                if (pd == null) return;
-//
-                // update buildings built
-                PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(p.uuid(), null));
-                if (tdata != null) {
-                    if (tdata.bbIncrementor > 0) {
-                        pd.buildingsBuilt = pd.buildingsBuilt + tdata.bbIncrementor;
-                        tdata.bbIncrementor = 0;
-                    }
-                }
-//
-//
-                pd.playTime++;
-                // check if someone gets promoted
-                for (var entry : rankRequirements.entrySet()) {
-                    if (pd.rank <= entry.getKey() - 1 && pd.playTime >= entry.getValue().playtime && pd.buildingsBuilt >= entry.getValue().buildingsBuilt && pd.gamesPlayed >= entry.getValue().gamesPlayed) {
-                        Call.infoMessage(p.con, Utils.formatMessage(p, promotionMessage));
-                        if (pd.rank < entry.getKey()) pd.rank = entry.getKey();
-                        info(escapeEverything(p) + " got promoted to " + rankNames.get(pd.rank).name + "!");
-                    }
-                }
-
-                setData(p.uuid(), pd);
-                playerDataGroup.put(p.uuid(), tdata); // update tdata with the new stuff
-            }
 
             if (state.is(GameState.State.playing)) {
                 if (Mathf.chance(0.01f)) {
@@ -748,18 +653,6 @@ public class ioMain extends Plugin {
 //            }
             }
 
-            // update the playtime of the current map
-            String mapName = state.map.name();
-            MapData mapData = getMapData(mapName);
-            if (mapData != null) {
-                mapData.playtime++;
-            } else {
-                mapData = new MapData(mapName);
-                mapData.playtime = 1;
-            }
-            rateMap(mapName, mapData);
-            passedMapTime++;
-
             debug("Updated database!");
         } catch (Exception e) {
             err("There was an error in the update loop: ");
@@ -773,10 +666,6 @@ public class ioMain extends Plugin {
         handler.register("update", "Update the database with the new current data", arg -> {
             TextChannel log_channel = getTextChannel("882342315438526525");
             update(log_channel, api);
-        });
-        handler.register("rate", "Force everyone to vote on the current map.", arg -> {
-//            rateMapTask.cancel();
-            rateMenu();
         });
         handler.register("vote", "<y/n/c>", "Vote for current votekick", arg -> {
             if (currentlyKicking[0] == null) {

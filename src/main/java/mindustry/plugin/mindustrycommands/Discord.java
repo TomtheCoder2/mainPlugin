@@ -16,10 +16,7 @@ import static mindustry.plugin.utils.Utils.escapeEverything;
 import static mindustry.plugin.utils.Utils.getTextChannel;
 
 public class Discord implements MiniMod {
-    public Discord() {
-
-    }
-
+    @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("bug", "[description...]", "Send a bug report to the discord server. (Please do not spam, because this command pings developers)", (args, player) -> {
             for (Long key : CommandCooldowns.keys()) {
@@ -43,18 +40,6 @@ public class Discord implements MiniMod {
                 bugReportChannel.sendMessage(eb);
                 Call.sendMessage("[sky]The bug is reported to discord.");
                 CommandCooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
-            }
-        });
-        handler.<Player>register("discord", "Place a message block below a player with links for our discord server.", (args, player) -> {
-            float x = player.getX();
-            float y = player.getY();
-            Tile tile = world.tileWorld(x, y);
-            if ((tile.block() == null || tile.block() == Blocks.air)) {
-                tile.setNet(Blocks.message, player.team(), 0);
-                tile.build.configure("https://discord.phoenix-network.dev\n\nor\n\nhttps://discord.gg/qtjqCUbbdR");
-                player.sendMessage("[green]Successfully placed a message block.");
-            } else {
-                player.sendMessage("[scarlet]Cant place a message block here, because there is already a block here!");
             }
         });
     }

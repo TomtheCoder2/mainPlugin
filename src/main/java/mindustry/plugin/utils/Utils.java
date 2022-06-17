@@ -31,6 +31,7 @@ import mindustry.maps.Maps;
 import mindustry.mod.Mods;
 import mindustry.net.Administration;
 import mindustry.plugin.data.PlayerData;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.database.MapData;
 import mindustry.plugin.discord.discordcommands.Command;
 import mindustry.plugin.discord.discordcommands.Context;
@@ -75,11 +76,8 @@ import static mindustry.plugin.utils.ranks.Utils.rankNames;
 //import java.sql.*;
 
 public class Utils {
-    public static String url = null;
     public static String maps_url = null;
     public static String apapi_key = null;
-    public static String user = null;
-    public static String password = null;
     public static int chatMessageMaxSize = 256;
     public static String welcomeMessage = "";
     public static String statMessage = "";
@@ -90,16 +88,8 @@ public class Utils {
     public static String noPermissionMessage = "You don't have the required rank for this command. Learn more about ranks [pink]/info[]";
     // whether ip verification is in place (detect VPNs, disallow their build rights)
     public static Boolean verification = false;
-    public static String promotionMessage =
-            """
-                    [sky]%player%, you have been promoted to [sky]<%rank%>[]!
-                    [#4287f5]You reached a playtime of - %playtime% minutes!
-                    [#f54263]You played a total of %games% games!
-                    [#9342f5]You built a total of %buildings% buildings!
-                    [sky]Enjoy your time on the [white][#ff2400]P[#ff4900]H[#ff6d00]O[#ff9200]E[#ffb600]N[#ffdb00]I[#ffff00]X [white]Servers[sky]!""";
     public static Seq<String> bannedNames = new Seq<>();
     public static Seq<String> onScreenMessages = new Seq<>();
-    public static Seq<Block> bannedBlocks = new Seq<>();
     public static String eventIp = "";
     public static int eventPort = 1001;
 
@@ -417,6 +407,14 @@ public class Utils {
         mb.send(ctx.channel);
     }
 
+    /** Format a number, adding "K" to the end if > 1000 */
+    public static String formatInt(int n) {
+        if (n > 1000) {
+            return String.format("%.1f", n / 1000.0);
+        } else {
+            return n.toString();
+        }
+    }
 
     /**
      * check if the message starts with the schematic prefix
@@ -866,9 +864,9 @@ public class Utils {
     public static StringBuilder lookup(EmbedBuilder eb, Administration.PlayerInfo info) {
         eb.addField("Times kicked", String.valueOf(info.timesKicked));
         StringBuilder s = new StringBuilder();
-        PlayerData pd = getData(info.id);
+        Database.Player pd = Database.getPlayerData(info.id);
         if (pd != null) {
-            eb.addField("Rank", rankNames.get(pd.rank).name, true);
+            eb.addField("Rank", Rank.all[pd.rank].name, true);
             eb.addField("Playtime", pd.playTime + " minutes", true);
             eb.addField("Games", String.valueOf(pd.gamesPlayed), true);
             eb.addField("Buildings built", String.valueOf(pd.buildingsBuilt), true);
@@ -911,80 +909,6 @@ public class Utils {
         s.append("**\n\nCurrent Name with color codes: **\n");
         s.append(info.lastName);
         return s;
-    }
-
-    /**
-     * create a rate menu for all players
-     */
-    public static void rateMenu() {
-        String mapName = state.map.name();
-        int id = Menus.registerMenu((player, selection) -> {
-            if (selection == 0) {
-                ratePositive(mapName, player);
-            } else if (selection == 1) {
-                rateNegative(mapName, player);
-            }
-        });
-        Call.menu(id,
-                "Rate this map! [pink]" + mapName,
-                "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
-                new String[][]{
-                        new String[]{"[green]Yes", "[scarlet]No"},
-                        new String[]{"Close"}
-                }
-        );
-    }
-
-    /**
-     * Create a menu to rate the current map for a player
-     */
-    public static void rateMenu(Player p) {
-        String mapName = state.map.name();
-        int id = Menus.registerMenu((player, selection) -> {
-            if (selection == 0) {
-                ratePositive(mapName, player);
-            } else if (selection == 1) {
-                rateNegative(mapName, player);
-            }
-        });
-        Call.menu(p.con, id,
-                "Rate this map! [pink]" + mapName,
-                "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
-                new String[][]{
-                        new String[]{"[green]Yes", "[scarlet]No"},
-                        new String[]{"Close"}
-                }
-        );
-    }
-
-    /**
-     * Rate a map positive
-     */
-    public static void rateNegative(String mapName, Player player) {
-        MapData voteMapData = getMapData(mapName);
-        if (voteMapData != null) {
-            voteMapData.negativeRating++;
-        } else {
-            voteMapData = new MapData(mapName);
-            voteMapData.negativeRating = 1;
-        }
-        rateMap(mapName, voteMapData);
-        player.sendMessage("Successfully gave a [red]negative [white]feedback for " + mapName + "[white]!");
-    }
-
-    /**
-     * Rate a map positive
-     */
-    public static void ratePositive(String mapName, Player player) {
-        MapData voteMapData = getMapData(mapName);
-        if (voteMapData != null) {
-            voteMapData.positiveRating++;
-        } else {
-            voteMapData = new MapData(mapName);
-            voteMapData.positiveRating = 1;
-        }
-        rateMap(mapName, voteMapData);
-        player.sendMessage("Successfully gave a [green]positive [white]feedback for " + mapName + "[white]!");
     }
 
     /**

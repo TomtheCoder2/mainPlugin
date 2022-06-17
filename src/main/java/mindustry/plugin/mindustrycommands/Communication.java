@@ -17,6 +17,7 @@ import static mindustry.plugin.utils.Utils.escapeEverything;
 import static mindustry.plugin.utils.Utils.getTextChannel;
 
 public class Communication implements MiniMod {
+    @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("w", "<player> <text...>", "Whisper text to another player.", (args, player) -> {
             //find player by name

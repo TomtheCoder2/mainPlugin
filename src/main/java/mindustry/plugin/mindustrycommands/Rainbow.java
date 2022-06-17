@@ -6,21 +6,23 @@ import arc.util.CommandHandler;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
-import mindustry.plugin.data.PlayerData;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.utils.GameMsg;
+import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 
 public class Rainbow implements MiniMod {
-
     // uuid => data
-    private final ObjectMap<String, RainbowData> data = new ObjectMap();
+    private final ObjectMap<String, RainbowData> data = new ObjectMap<>();
 
+    @Override
     public void registerEvents() {
         RainbowThread thread = new RainbowThread(Thread.currentThread());
         thread.setDaemon(false);
         thread.start();
     }
 
+    @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("rainbow", "[speed]", "Give your username a rainbow animation", (args, player) -> {
             synchronized(data) {
@@ -79,7 +81,7 @@ public class Rainbow implements MiniMod {
                             continue;
                         }
 
-                        var playerData = mindustry.plugin.database.Utils.getData(player.uuid());
+                        Database.Player playerData = Database.getPlayerData(player.uuid());
                         int rank = 0;
                         if (playerData != null) {
                             rank = playerData.rank;
@@ -91,9 +93,9 @@ public class Rainbow implements MiniMod {
                         String hex = "#" + Color.HSVtoRGB(rainbowData.hue, 100, 100).toString();
                         
                         hex = hex.substring(0, hex.length() - 2);
-                        if (rank < mindustry.plugin.utils.ranks.Utils.rankNames.size() && rank >= 0) { // this should never be false
+                        if (rank < Rank.all.length && rank >= 0) { // this should never be false
                             player.name = "[" + hex + "]"
-                                    + Utils.escapeColorCodes(mindustry.plugin.utils.ranks.Utils.rankNames.get(rank).tag)
+                                    + Rank.all[rank].tag
                                     + "[" + hex + "]"
                                     + Utils.escapeEverything(player.name);
                         }

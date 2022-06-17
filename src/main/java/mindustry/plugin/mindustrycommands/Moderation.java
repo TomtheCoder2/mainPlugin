@@ -9,8 +9,10 @@ import mindustry.gen.Player;
 import mindustry.net.Administration;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.data.PersistentPlayerData;
-import mindustry.plugin.data.PlayerData;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.ioMain;
+import mindustry.plugin.utils.Rank;
+import mindustry.plugin.utils.Utils;
 import mindustry.plugin.utils.VoteSession;
 import mindustry.world.Tile;
 import org.javacord.api.entity.channel.TextChannel;
@@ -24,14 +26,9 @@ import java.util.concurrent.ExecutionException;
 
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.world;
-import static mindustry.plugin.database.Utils.getData;
-import static mindustry.plugin.ioMain.*;
-import static mindustry.plugin.utils.Utils.*;
-import static mindustry.plugin.utils.ranks.Utils.rankNames;
-import static mindustry.plugin.utils.ranks.Utils.rankRoles;
-
 
 public class Moderation implements MiniMod {
+    @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("votekick", "[player...]", "votekick a player.", (args, player) -> {
 //               CustomLog.debug("vk @.", args[0]);
@@ -50,7 +47,7 @@ public class Moderation implements MiniMod {
                 return;
             }
 
-            if (currentlyKicking[0] != null) {
+            if (ioMain.currentlyKicking[0] != null) {
                 player.sendMessage("[scarlet]A vote is already in progress.");
                 return;
             }
@@ -64,7 +61,7 @@ public class Moderation implements MiniMod {
                 });
                 player.sendMessage(builder.toString());
             } else {
-                Player found = findPlayer(args[0]);
+                Player found = Utils.findPlayer(args[0]);
                 if (found == null) {
                     if (args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))) {
                         int id = Strings.parseInt(args[0].substring(1));
@@ -86,26 +83,26 @@ public class Moderation implements MiniMod {
                     } else if (Objects.equals(found.uuid(), "VA8X0BlqyTsAAAAAFkLMBg==")) {
                         player.sendMessage("[scarlet]Did you really expect to be able to kick [cyan]Nautilus[scarlet]?");
                     } else {
-                        Timekeeper vtime = cooldowns.get(player.uuid(), () -> new Timekeeper(voteCooldown));
+                        Timekeeper vtime = ioMain.cooldowns.get(player.uuid(), () -> new Timekeeper(ioMain.voteCooldown));
 
                         if (!vtime.get()) {
-                            player.sendMessage("[scarlet]You must wait " + voteCooldown / 60 + " minutes between votekicks.");
+                            player.sendMessage("[scarlet]You must wait " + ioMain.voteCooldown / 60 + " minutes between votekicks.");
                             return;
                         }
 
-                        VoteSession session = new VoteSession(currentlyKicking, found);
+                        VoteSession session = new VoteSession(ioMain.currentlyKicking, found);
                         session.vote(player, 1);
 
                         // freeze the player
-                        PersistentPlayerData tdata = playerDataGroup.get(found.uuid());
+                        PersistentPlayerData tdata = ioMain.playerDataGroup.get(found.uuid());
                         if (tdata != null) {
                             tdata.frozen = !tdata.frozen;
-                            player.sendMessage("[cyan]Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(found));
+                            player.sendMessage("[cyan]Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + Utils.escapeEverything(found));
                             found.sendMessage("[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " during the votekick!");
                         }
 
                         vtime.reset();
-                        currentlyKicking[0] = session;
+                        ioMain.currentlyKicking[0] = session;
                     }
                 } else {
                     player.sendMessage("[scarlet]No player [orange]'" + args[0] + "'[scarlet] found.");
@@ -114,12 +111,12 @@ public class Moderation implements MiniMod {
         });
 
         handler.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Or cancel the current kick.", (arg, player) -> {
-            if (currentlyKicking[0] == null) {
+            if (ioMain.currentlyKicking[0] == null) {
                 player.sendMessage("[scarlet]Nobody is being voted on.");
             } else {
                 if (arg[0].equalsIgnoreCase("c")) {
-                    if (currentlyKicking[0].startedVk == player || player.admin) {
-                        currentlyKicking[0].cancel(player);
+                    if (ioMain.currentlyKicking[0].startedVk == player || player.admin) {
+                        ioMain.currentlyKicking[0].cancel(player);
                     } else {
                         player.sendMessage("[scarlet]This command is restricted to the player who started the votekick and admins");
                     }
@@ -132,17 +129,17 @@ public class Moderation implements MiniMod {
                 }
 
                 //hosts can vote all they want
-                if ((currentlyKicking[0].voted.contains(player.uuid()) || currentlyKicking[0].voted.contains(netServer.admins.getInfo(player.uuid()).lastIP))) {
+                if ((ioMain.currentlyKicking[0].voted.contains(player.uuid()) || ioMain.currentlyKicking[0].voted.contains(netServer.admins.getInfo(player.uuid()).lastIP))) {
                     player.sendMessage("[scarlet]You've already voted. Sit down.");
                     return;
                 }
 
-                if (currentlyKicking[0].target == player) {
+                if (ioMain.currentlyKicking[0].target == player) {
                     player.sendMessage("[scarlet]You can't vote on your own trial.");
                     return;
                 }
 
-                if (currentlyKicking[0].target.team() != player.team()) {
+                if (ioMain.currentlyKicking[0].target.team() != player.team()) {
                     player.sendMessage("[scarlet]You can't vote for other teams.");
                     return;
                 }
@@ -158,27 +155,29 @@ public class Moderation implements MiniMod {
                     return;
                 }
 
-                currentlyKicking[0].vote(player, sign);
+                ioMain.currentlyKicking[0].vote(player, sign);
             }
         });
 
         handler.<Player>register("redeem", "<key>", "Verify the redeem command (Discord)", (arg, player) -> {
             try {
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
+                PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(player.uuid(), null));
                 if (tdata.redeemKey != -1) {
                     if (Integer.parseInt(arg[0]) == tdata.redeemKey) {
                         StringBuilder roleList = new StringBuilder();
-                        for (java.util.Map.Entry<String, Integer> entry : rankRoles.entrySet()) {
-                            PlayerData pd = getData(player.uuid());
+                        Database.Player pd = Database.getPlayerData(player.uuid());
+                        for (int i = 0; i < Rank.roles.length; i++) {
+                            long roleID = Rank.roles[i];
+                            if (roleID < 0) continue;
                             assert pd != null;
-                            if (entry.getValue() <= pd.rank) {
-                                System.out.println("add role: " + api.getRoleById(entry.getKey()).get());
-                                roleList.append("<@").append(api.getRoleById(entry.getKey()).get().getIdAsString()).append(">\n");
-                                ioMain.api.getUserById(tdata.redeem).get().addRole(api.getRoleById(entry.getKey()).get());
+                            if (i <= pd.rank) {
+                                System.out.println("add role: " + ioMain.api.getRoleById(roleID).get());
+                                roleList.append("<@").append(ioMain.api.getRoleById(roleID).get().getIdAsString()).append(">\n");
+                                ioMain.api.getUserById(tdata.redeem).get().addRole(ioMain.api.getRoleById(roleID).get());
                             }
                         }
                         System.out.println(roleList);
-                        getTextChannel(log_channel_id).sendMessage(new EmbedBuilder().setTitle("Updated roles!").addField("Discord Name", ioMain.api.getUserById(tdata.redeem).get().getName(), true).addField("In Game Name", tdata.origName, true).addField("In Game UUID", player.uuid(), true).addField("Added roles", roleList.toString(), true));
+                        Utils.getTextChannel(ioMain.log_channel_id).sendMessage(new EmbedBuilder().setTitle("Updated roles!").addField("Discord Name", ioMain.api.getUserById(tdata.redeem).get().getName(), true).addField("In Game Name", tdata.origName, true).addField("In Game UUID", player.uuid(), true).addField("Added roles", roleList.toString(), true));
                         player.sendMessage("Successfully redeem to account: [green]" + ioMain.api.getUserById(tdata.redeem).get().getName());
                         tdata.task.cancel();
                     } else {
@@ -196,51 +195,51 @@ public class Moderation implements MiniMod {
         });
 
         handler.<Player>register("inspector", "Toggle inspector.", (args, player) -> {
-            PersistentPlayerData pd = (playerDataGroup.getOrDefault(player.uuid(), null));
+            PersistentPlayerData pd = (ioMain.playerDataGroup.getOrDefault(player.uuid(), null));
             pd.inspector = !pd.inspector;
             player.sendMessage((pd.inspector ? "Enabled" : "Disabled") + " the inspector.");
         });
 
         handler.<Player>register("freeze", "<player> [reason...]", "Freeze a player. To unfreeze just use this command again.", (args, player) -> {
             if (player.admin()) {
-                Player target = findPlayer(args[0]);
+                Player target = Utils.findPlayer(args[0]);
                 if (target != null) {
-                    PersistentPlayerData tdata = (playerDataGroup.getOrDefault(target.uuid(), null));
+                    PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(target.uuid(), null));
                     assert tdata != null;
                     tdata.frozen = !tdata.frozen;
-                    player.sendMessage("[cyan]Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(target));
+                    player.sendMessage("[cyan]Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + Utils.escapeEverything(target));
                     Call.infoMessage(target.con, "[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " by a moderator. " + (args.length > 1 ? "Reason: " + args[1] : ""));
                 } else {
                     player.sendMessage("Player not found!");
                 }
             } else {
-                player.sendMessage(noPermissionMessage);
+                player.sendMessage(Utils.noPermissionMessage);
             }
         });
 
         handler.<Player>register("mute", "<player> [reason...]", "Mute a player. To unmute just use this command again.", (args, player) -> {
             if (player.admin()) {
-                Player target = findPlayer(args[0]);
+                Player target = Utils.findPlayer(args[0]);
                 if (target != null) {
-                    PersistentPlayerData tdata = (playerDataGroup.getOrDefault(target.uuid(), null));
+                    PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(target.uuid(), null));
                     assert tdata != null;
                     tdata.muted = !tdata.muted;
-                    player.sendMessage("[cyan]Successfully " + (tdata.muted ? "muted" : "unmuted") + " " + escapeEverything(target));
+                    player.sendMessage("[cyan]Successfully " + (tdata.muted ? "muted" : "unmuted") + " " + Utils.escapeEverything(target));
                     Call.infoMessage(target.con, "[cyan]You got " + (tdata.muted ? "muted" : "unmuted") + " by a moderator. " + (args.length > 1 ? "Reason: " + args[1] : ""));
                 } else {
                     player.sendMessage("Player not found!");
                 }
             } else {
-                player.sendMessage(noPermissionMessage);
+                player.sendMessage(Utils.noPermissionMessage);
             }
         });
-        TextChannel tc_c = getTextChannel("881300595875643452");
+        TextChannel tc_c = Utils.getTextChannel("881300595875643452");
         handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/gr' to get a list of ids)", (args, player) -> {
             //https://github.com/Anuken/Mindustry/blob/master/core/src/io/anuke/mindustry/core/NetServer.java#L300-L351
-            for (Long key : CommandCooldowns.keys()) {
-                if (key + CDT < System.currentTimeMillis() / 1000L) {
-                    CommandCooldowns.remove(key);
-                } else if (player.uuid().equals(CommandCooldowns.get(key))) {
+            for (Long key : ioMain.CommandCooldowns.keys()) {
+                if (key + ioMain.CDT < System.currentTimeMillis() / 1000L) {
+                    ioMain.CommandCooldowns.remove(key);
+                } else if (player.uuid().equals(ioMain.CommandCooldowns.get(key))) {
                     player.sendMessage("[scarlet]This command is on a 5 minute cooldown!");
                     return;
                 }
@@ -266,7 +265,7 @@ public class Moderation implements MiniMod {
                         }
                     }
                 } else {
-                    found = findPlayer(args[0]);
+                    found = Utils.findPlayer(args[0]);
                 }
                 if (found != null) {
                     if (found.admin()) {
@@ -276,23 +275,23 @@ public class Moderation implements MiniMod {
                     } else {
                         //send message
                         if (args.length > 1) {
-                            Role ro = discRoles.get("861523420076179457");
+                            Role ro = ioMain.discRoles.get("861523420076179457");
 //                                Role role = .getRoleById(661155250123702302L);
                             new MessageBuilder().setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
 //                                                .setDescription("<@&861523420076179457>")
-                                    .addField("name", escapeColorCodes(found.name)).addField("reason", args[1]).setColor(Color.RED).setFooter("Reported by " + player.name)).send(tc_c);
+                                    .addField("name", Utils.escapeColorCodes(found.name)).addField("reason", args[1]).setColor(Color.RED).setFooter("Reported by " + player.name)).send(tc_c);
                             assert tc_c != null;
                             tc_c.sendMessage("<@&882340213551140935>");
                         } else {
-                            Role ro = discRoles.get("861523420076179457");
+                            Role ro = ioMain.discRoles.get("861523420076179457");
                             new MessageBuilder().setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
 //                                                .setDescription("<@&861523420076179457>")
-                                    .addField("name", escapeColorCodes(found.name)).setColor(Color.RED).setFooter("Reported by " + player.name)).send(tc_c);
+                                    .addField("name", Utils.escapeColorCodes(found.name)).setColor(Color.RED).setFooter("Reported by " + player.name)).send(tc_c);
                             assert tc_c != null;
                             tc_c.sendMessage("<@&882340213551140935>");
                         }
                         Call.sendMessage(found.name + "[sky] is reported to discord.");
-                        CommandCooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
+                        ioMain.CommandCooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
                     }
                 } else {
                     player.sendMessage("[scarlet]No player[orange] '" + args[0] + "'[scarlet] found.");
@@ -309,23 +308,23 @@ public class Moderation implements MiniMod {
                 Tile targetTile = world.tileWorld(x, y);
                 Call.label(args[1], Float.parseFloat(args[0]), targetTile.worldx(), targetTile.worldy());
             } else {
-                player.sendMessage(noPermissionMessage);
+                player.sendMessage(Utils.noPermissionMessage);
             }
         });
 
         handler.<Player>register("reset", "Set everyone's name back to the original name.", (args, player) -> {
             if (player.admin) {
                 for (Player p : Groups.player) {
-                    PlayerData pd = getData(p.uuid());
-                    PersistentPlayerData tdata = (playerDataGroup.getOrDefault(p.uuid(), null));
+                    Database.Player pd = Database.getPlayerData(p.uuid());
+                    PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(p.uuid(), null));
                     if (tdata == null) continue; // shouldn't happen, ever
 //                    tdata.doRainbow = false;
                     if (pd == null) continue;
-                    p.name = rankNames.get(pd.rank).tag + netServer.admins.getInfo(p.uuid()).lastName;
+                    p.name = Rank.all[pd.rank].tag + netServer.admins.getInfo(p.uuid()).lastName;
                 }
                 player.sendMessage("[cyan]Reset names!");
             } else {
-                player.sendMessage(noPermissionMessage);
+                player.sendMessage(Utils.noPermissionMessage);
             }
         });
     }

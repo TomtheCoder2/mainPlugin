@@ -149,7 +149,7 @@ public final class RTV implements MiniMod {
         return null;
     }
 
-
+    @Override
     public void registerEvents() {
         // Clear votes when a new game occurs.
         Events.on(EventType.GameOverEvent.class, event -> {
@@ -157,6 +157,7 @@ public final class RTV implements MiniMod {
         });
     }
 
+    @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("rtv", "[map] [yesno]", "RTV to a different map", (args, player) -> {
             String mapQuery;
