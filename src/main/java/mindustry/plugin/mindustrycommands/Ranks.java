@@ -31,7 +31,7 @@ public class Ranks implements MiniMod {
 [sky]Enjoy your time on the [white][#ff2400]P[#ff4900]H[#ff6d00]O[#ff9200]E[#ffb600]N[#ffdb00]I[#ffff00]X [white]Servers[sky]!""";
 
     /** Number of buildings built that have not been stored to the database. */
-    private ObjectMap<String, Integer> buildingsBuiltCache;
+    private ObjectMap<String, Integer> buildingsBuiltCache = new ObjectMap<>();
     /** Blocks that do not count towards the stats for a player */
     private final static Block[] excludedBlocks = new Block[] {
         Blocks.conveyor,
