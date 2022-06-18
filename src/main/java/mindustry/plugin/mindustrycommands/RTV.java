@@ -183,7 +183,7 @@ public final class RTV implements MiniMod {
                     "(" + votes + "/" + requiredVotes() + "). " + (vote ? "Type [sky]/rtv[lightgray] to vote." : "")));
  
             // check & change map
-            boolean passed = votes > requiredVotes();
+            boolean passed = votes >= requiredVotes();
             if (passed) {
                 Call.sendMessage(GameMsg.success("RTV", "Changing map to [orange]" + session.map));
 
