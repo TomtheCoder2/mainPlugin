@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.world;
 
+/** Manages kicks, mutes, and bans */
 public class Moderation implements MiniMod {
     /** Duration to increase voting time by */
     private static final long VOTE_TIME = 30 * 1000;
@@ -51,7 +52,7 @@ public class Moderation implements MiniMod {
 
     /** Represents a vote kick session
      */
-    private static class VoteSession {
+    private class VoteSession {
         /** UUID of player to be kicked */
         public String target;
 
@@ -93,6 +94,13 @@ public class Moderation implements MiniMod {
             return votes;
         }
 
+        /** Cancels the task and removes it from the Moderation */
+        public void clear() {
+            canceled = true;
+            if (Moderation.this.session == this)
+                Moderation.this.session = null;
+        }
+
         public static class Task extends Timer.Task {
             private VoteSession session;
             public Task(VoteSession session) {
@@ -115,10 +123,10 @@ public class Moderation implements MiniMod {
                 if (session.countVotes() >= session.requiredVotes()) {
                     Call.sendMessage(GameMsg.info("Kick", "Vote passed. Defendant [orange]" + target.name + "[lightgray] will be banned for 60 minutes."));
                     kick(session);
-                    session = null;
+                    session.clear();
                 } else {
                     Call.sendMessage(GameMsg.info("Kick", "Vote for [orange]" + target.name + "[lightgray] failed."));
-                    session = null;
+                    session.clear();
                 }
 
                 this.log();
@@ -151,8 +159,7 @@ public class Moderation implements MiniMod {
             } else {
                 if (arg[0].equalsIgnoreCase("c")) {
                     Call.sendMessage("[scarlet]Server []canceled the kick.");
-                    session.canceled = true;
-                    session = null;
+                    session.clear();
                 }
 
                 int sign = switch (arg[0].toLowerCase()) {
@@ -199,8 +206,7 @@ public class Moderation implements MiniMod {
             if (session != null && session.target.equals(event.player.uuid())) {
                 Call.sendMessage(GameMsg.info("Kick", "[orange]" + event.player.name() + " [lightgray] has left while a defendant and will be banned for 60 minutes."));
                 kick(session);
-                session.canceled = true;
-                session = null;
+                session.clear();
             }
         });
     }
@@ -298,8 +304,7 @@ public class Moderation implements MiniMod {
 
             if (arg[0].equalsIgnoreCase("c")) {
                 if (session.plaintiff.equals(player.uuid()) || player.admin) {
-                    session.canceled = true;
-                    session = null;
+                    session.clear();
                     Call.sendMessage(GameMsg.info("Kick", "Player [orange]" + player.name() + "[lightgray] canceled the votekick of " + target.name + "."));
                 } else {
                     player.sendMessage(GameMsg.error("Kick", "[sky]/vote c[scarlet] can only be used by the plaintiff and admins."));
@@ -334,40 +339,6 @@ public class Moderation implements MiniMod {
                 "Type [sky]/kick y[lightgray] to agree and [sky]/kick n[lightgray] to disagree."));
 
             session.addVote(player.uuid(), sign);
-        });
-
-        handler.<Player>register("redeem", "<key>", "Verify the redeem command (Discord)", (arg, player) -> {
-            try {
-                PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(player.uuid(), null));
-                if (tdata.redeemKey != -1) {
-                    if (Integer.parseInt(arg[0]) == tdata.redeemKey) {
-                        StringBuilder roleList = new StringBuilder();
-                        Database.Player pd = Database.getPlayerData(player.uuid());
-                        for (var entry: Rank.roles) {
-                            long roleID = entry.key;
-                            assert pd != null;
-                            if (entry.value <= pd.rank) {
-                                System.out.println("add role: " + ioMain.api.getRoleById(roleID).get());
-                                roleList.append("<@").append(ioMain.api.getRoleById(roleID).get().getIdAsString()).append(">\n");
-                                ioMain.api.getUserById(tdata.redeem).get().addRole(ioMain.api.getRoleById(roleID).get());
-                            }
-                        }
-                        System.out.println(roleList);
-                        Utils.getTextChannel(ioMain.log_channel_id).sendMessage(new EmbedBuilder().setTitle("Updated roles!").addField("Discord Name", ioMain.api.getUserById(tdata.redeem).get().getName(), true).addField("In Game Name", tdata.origName, true).addField("In Game UUID", player.uuid(), true).addField("Added roles", roleList.toString(), true));
-                        player.sendMessage("Successfully redeem to account: [green]" + ioMain.api.getUserById(tdata.redeem).get().getName());
-                        tdata.task.cancel();
-                    } else {
-                        player.sendMessage("[scarlet]Wrong code!");
-                    }
-
-                    tdata.redeemKey = -1;
-                } else {
-                    player.sendMessage("Please use the redeem command on the discord server first");
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-                player.sendMessage("[scarlet]There was an error: " + e.getMessage());
-            }
         });
 
         handler.<Player>register("inspector", "Toggle inspector.", (args, player) -> {

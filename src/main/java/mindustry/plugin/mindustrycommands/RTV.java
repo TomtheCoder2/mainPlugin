@@ -7,6 +7,7 @@ import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.util.CommandHandler;
 import arc.util.Reflect;
+import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.game.Team;
@@ -19,91 +20,76 @@ import mindustry.plugin.utils.GameMsg;
 import mindustry.server.ServerControl;
 
 public final class RTV implements MiniMod {
-    // map name => set<ip addr>
-    private final ObjectMap<String, ObjectSet<String>> votes = new ObjectMap();
+    public static long VOTE_TIME = 60 * 1000;
+    private class Session {
+        /** UUIDs of people who vote  */
+        public ObjectSet<String> votes = new ObjectSet<>();
 
-    /**
-     * Returns the most popular map, or null if it does not exist.
-     */
-    private String popularMap() {
-        int maxVotes = 0;
-        String map = null;
-        for (var entry : votes) {
-            if (entry.value.size > maxVotes) {
-                maxVotes = entry.value.size;
-                map = entry.key;
+        /** Name of map */
+        public String map;
+
+        /** Time at which the RTV session ends */
+        public long endTime;
+
+        /** Whether the Task should stop itself */
+        public boolean canceled;
+
+        public Session(String map) {
+            this.map = map;
+            this.endTime = System.currentTimeMillis() + endTime;
+        }
+
+        /** Setes canceled to true and removes from the RTV */
+        public void clear() {
+            canceled = true;
+            if (RTV.this.session == Session.this)
+                RTV.this.session = null;
+        }
+
+        /** This task is responsible for ending the session if the time has expired */
+        public static class Task extends Timer.Task {
+            Session session;
+            public Task(Session session) {
+                this.session = session;
+            }
+
+            @Override
+            public void run() {
+                if (session.canceled) {
+                    return;
+                }
+
+                if (System.currentTimeMillis() < session.endTime) {
+                    Timer.schedule(new Task(session), session.endTime - System.currentTimeMillis());
+                    return;
+                }
+
+                // vote failed if not canceled
+                Call.sendMessage(GameMsg.error("RTV", "Vote for [orange]" + session.map + "[scarlet] has failed."));
+                session.clear();
             }
         }
 
-        return map;
+        /** Removes UUIDs of players that are no longer in Gruops.players */
+        public void removeInvalid() {
+            ObjectSet<String> invalids = new ObjectSet<>();
+            for (String uuid : votes) {
+                Player player = Groups.player.find(x -> x.uuid().equals(uuid));
+                if (player == null) {
+                    invalids.add(uuid);
+                }
+            }
+            for (String invalid : invalids) {
+                votes.remove(invalid);
+            }
+        }
     }
+
+    private Session session;
 
     private String randomMap() {
         int idx = (int) (Math.random() * (double) Vars.maps.customMaps().size);
         return Vars.maps.customMaps().get(idx).name();
-    }
-
-    /**
-     * Sets a vote on the `votes` HashMap. Returns the map name. Return value may be null.
-     */
-    private String setVote(Player player, String mapQuery, boolean vote) {
-        Map map = queryMap(mapQuery);
-        if (map == null) {
-            return null;
-        }
-
-        if (!votes.containsKey(map.name())) {
-            votes.put(map.name(), new ObjectSet());
-        }
-
-        ObjectSet<String> voteSet = votes.get(map.name());
-        if (vote) {
-            voteSet.add(player.ip());
-        } else {
-            voteSet.remove(player.ip());
-        }
-        return map.name();
-    }
-
-    /**
-     * Gets the number of votes for a particular map.
-     */
-    private int getVote(String map) {
-        ObjectSet<String> voteset = votes.get(map);
-        if (voteset == null) {
-            return 0;
-        } else {
-            return voteset.size;
-        }
-    }
-
-    /**
-     * Removes invalid votes from the `votes` hashmap.
-     */
-    private void removeInvalid() {
-        for (ObjectSet<String> voteSet : votes.values()) {
-            // Add IP addresses that are no longer in the game
-            // to invalidIPs.
-            ObjectSet<String> invalidIPs = new ObjectSet();
-            for (String ip : voteSet) {
-                boolean found = false;
-                for (Player player : Groups.player) {
-                    if (player.ip().equals(ip)) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    invalidIPs.add(ip);
-                }
-            }
-
-            // remove all from invalid IPs
-            for (String ip : invalidIPs) {
-                voteSet.remove(ip);
-            }
-        }
     }
 
     /**
@@ -119,7 +105,7 @@ public final class RTV implements MiniMod {
         return null;
     }
 
-    private void changeMap(Map map) {
+    private static void changeMap(Map map) {
         for (ApplicationListener listener : Core.app.getListeners()) {
             if (listener instanceof ServerControl) {
                 Reflect.set(listener, "nextMapOverride", map);
@@ -136,81 +122,76 @@ public final class RTV implements MiniMod {
         return (Groups.player.size() / 2) + 1;
     }
 
-    /**
-     * Returns the name of the map if a vote passed, otherwise null. Assumes that filterInvalid() was already called.
-     */
-    private String check() {
-        for (var entry : votes) {
-            if (entry.value.size >= requiredVotes()) {
-                return entry.key;
-            }
-        }
-
-        return null;
-    }
-
     @Override
     public void registerEvents() {
         // Clear votes when a new game occurs.
         Events.on(EventType.GameOverEvent.class, event -> {
-            votes.clear();
+            if (session != null)  {
+                session.clear();
+            }
         });
     }
 
     @Override
     public void registerCommands(CommandHandler handler) {
-        handler.<Player>register("rtv", "[map] [yesno]", "RTV to a different map", (args, player) -> {
-            String mapQuery;
-            if (args.length == 0) {
-                mapQuery = popularMap();
-                if (mapQuery == null) {
-                    mapQuery = randomMap();
+        handler.<Player>register("rtv", "[map/n...]", "RTV to a different map", (args, player) -> {
+            if (session == null) {
+                String map = randomMap();
+                if (args.length != 0) {
+                    Map mapObj = queryMap(args[0]);
+                    if (mapObj == null) {
+                        player.sendMessage(GameMsg.error("RTV", "Could not find map [orange]" + args[0]));
+                        return;
+                    }
+                    map = mapObj.name();
                 }
-            } else {
-                mapQuery = args[0];
-            }
 
-            boolean vote = true;
-            if (args.length > 1) {
-                if (args[1].equals("yes") || args[1].equals("y")) {
-                    vote = true;
-                } else if (args[1].equals("no") || args[1].equals("n")) {
-                    vote = false;
-                } else {
-                    player.sendMessage(GameMsg.error("RTV", "Vote must be [orange]yes[scarlet] or [orange]no"));
+                session = new Session(map);
+            } else {
+                if (args.length != 0 && !(args[0].equalsIgnoreCase("no") || args[0].equalsIgnoreCase("n") || args[0].equalsIgnoreCase("yes") || args[0].equalsIgnoreCase("y"))) {
+                    player.sendMessage(GameMsg.error("RTV", "Voting for map [orange]" + session.map + "[scarlet] has already begun"));
                     return;
                 }
             }
 
-            // configure voting
-            String map = setVote(player, mapQuery, vote);
-            if (map == null) {
-                player.sendMessage(GameMsg.error("RTV", "Map [orange]" + mapQuery + "[scarlet] not found."));
+            // set vote
+            boolean vote = !(args.length != 0 && (args[0].equalsIgnoreCase("no") || args[0].equalsIgnoreCase("n")));
+            if (vote) {
+                if (session.votes.contains(player.uuid())) {
+                    player.sendMessage(GameMsg.error("RTV", "You've already voted! Type [sky]/rtv n[scarlet] to redact your vote."));
+                    return;
+                }
+
+                session.votes.add(player.uuid());  
+            } else {
+                if (!session.votes.contains(player.uuid())) {
+                    player.sendMessage(GameMsg.error("RTV", "You haven't voted, so you can't redact your vote! Type [sky]/rtv[scarlet] to vote."));
+                    return;
+                }
+
+                session.votes.remove(player.uuid());
             }
 
-            removeInvalid();
+            // extend voting time
+            session.endTime += VOTE_TIME;
+            
+            session.removeInvalid();
 
             // send message
-            int votes = getVote(map);
-            Call.sendMessage(GameMsg.info("RTV", "Player [orange]" + player.name + "[lightgray] has " + (vote ? "voted" : "redacted their vote") + " to change the map to [orange]" + map + "[lightgray] " +
-                    "(" + votes + "/" + requiredVotes() + ")"));
-
+            int votes = session.votes.size;
+            Call.sendMessage(GameMsg.info("RTV", "Player [orange]" + player.name + "[lightgray] has " + (vote ? "voted" : "redacted their vote") + " to change the map to [orange]" + session.map + "[lightgray] " +
+                    "(" + votes + "/" + requiredVotes() + "). " + (vote ? "Type [sky]/rtv[lightgray] to vote." : "")));
+ 
             // check & change map
-            String passedMap = check();
-            if (passedMap != null) {
-                Call.sendMessage(GameMsg.success("RTV", "Changing map to [orange]" + passedMap));
+            boolean passed = votes > requiredVotes();
+            if (passed) {
+                Call.sendMessage(GameMsg.success("RTV", "Changing map to [orange]" + session.map));
 
-                Map mapObj = null;
-                for (Map map_ : Vars.maps.all()) {
-                    if (map_.name().equals(passedMap)) {
-                        mapObj = map_;
-                        break;
-                    }
-                }
+                Map mapObj = Vars.maps.all().find(x -> x.name().equals(session.map));
 
                 // WTF?
                 if (mapObj == null) {
-                    Call.sendMessage(GameMsg.error("RTV", "Map [orange]" + passedMap + "[scarlet] does not exist."));
+                    Call.sendMessage(GameMsg.error("RTV", "Map [orange]" + session.map + "[scarlet] does not exist."));
                     return;
                 }
 
@@ -219,15 +200,12 @@ public final class RTV implements MiniMod {
         });
 
         handler.<Player>register("rtvotes", "", "Show RTV votes", (args, player) -> {
-            removeInvalid();
-
-            if (votes.size == 0) {
+            if (session == null) {
                 player.sendMessage(GameMsg.info("RTV", "No votes have been cast."));
-            } else {
-                for (var entry : votes) {
-                    player.sendMessage(GameMsg.info("RTV", "Map [orange]" + entry.key + "[lightgray] has [orange]" + entry.value.size + "[lightgray] / " + requiredVotes() + " votes"));
-                }
             }
+            session.removeInvalid();
+
+            player.sendMessage(GameMsg.info("RTV", "[orange]" + session.map + "[lightgray] - [orange]" + session.votes.size + "[lightgray] votes"));
         });
     }
 }

@@ -5,6 +5,11 @@ import mindustry.content.Blocks;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
+import mindustry.plugin.ioMain;
+import mindustry.plugin.data.PersistentPlayerData;
+import mindustry.plugin.database.Database;
+import mindustry.plugin.utils.Rank;
+import mindustry.plugin.utils.Utils;
 import mindustry.world.Tile;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -14,6 +19,8 @@ import static mindustry.plugin.ioMain.CDT;
 import static mindustry.plugin.ioMain.CommandCooldowns;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 import static mindustry.plugin.utils.Utils.getTextChannel;
+
+import java.util.concurrent.ExecutionException;
 
 public class Discord implements MiniMod {
     @Override
@@ -40,6 +47,41 @@ public class Discord implements MiniMod {
                 bugReportChannel.sendMessage(eb);
                 Call.sendMessage("[sky]The bug is reported to discord.");
                 CommandCooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
+            }
+        });
+
+
+        handler.<Player>register("redeem", "<key>", "Verify the redeem command (Discord)", (arg, player) -> {
+            try {
+                PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(player.uuid(), null));
+                if (tdata.redeemKey != -1) {
+                    if (Integer.parseInt(arg[0]) == tdata.redeemKey) {
+                        StringBuilder roleList = new StringBuilder();
+                        Database.Player pd = Database.getPlayerData(player.uuid());
+                        for (var entry: Rank.roles) {
+                            long roleID = entry.key;
+                            assert pd != null;
+                            if (entry.value <= pd.rank) {
+                                System.out.println("add role: " + ioMain.api.getRoleById(roleID).get());
+                                roleList.append("<@").append(ioMain.api.getRoleById(roleID).get().getIdAsString()).append(">\n");
+                                ioMain.api.getUserById(tdata.redeem).get().addRole(ioMain.api.getRoleById(roleID).get());
+                            }
+                        }
+                        System.out.println(roleList);
+                        Utils.getTextChannel(ioMain.log_channel_id).sendMessage(new EmbedBuilder().setTitle("Updated roles!").addField("Discord Name", ioMain.api.getUserById(tdata.redeem).get().getName(), true).addField("In Game Name", tdata.origName, true).addField("In Game UUID", player.uuid(), true).addField("Added roles", roleList.toString(), true));
+                        player.sendMessage("Successfully redeem to account: [green]" + ioMain.api.getUserById(tdata.redeem).get().getName());
+                        tdata.task.cancel();
+                    } else {
+                        player.sendMessage("[scarlet]Wrong code!");
+                    }
+
+                    tdata.redeemKey = -1;
+                } else {
+                    player.sendMessage("Please use the redeem command on the discord server first");
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+                player.sendMessage("[scarlet]There was an error: " + e.getMessage());
             }
         });
     }
