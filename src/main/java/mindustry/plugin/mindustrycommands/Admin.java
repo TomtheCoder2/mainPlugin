@@ -54,8 +54,7 @@ public class Admin implements MiniMod {
         });
 
         handler.<Player>register("js", "<script...>", "Run arbitrary Javascript.", (arg, player) -> {
-            Database.Player pd = Database.getPlayerData(player.uuid());
-            if ((player.admin && Objects.requireNonNull(pd).rank >= 9) || enableJs) {
+            if (player.admin || enableJs) {
                 player.sendMessage(mods.getScripts().runConsole(arg[0]));
             } else {
                 player.sendMessage("[scarlet]This command is restricted to admins!");

@@ -148,7 +148,7 @@ class Translate {
 //        "translate.api.skitzen.com", does not work
         "libretranslate.pussthecat.org",
         "translate.fortytwo-it.com",
-        "translate.terraprint.co",
+//        "translate.terraprint.co", does not work.
         "lt.vern.cc"
     };
 
