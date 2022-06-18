@@ -37,6 +37,8 @@ public final class RTV implements MiniMod {
         public Session(String map) {
             this.map = map;
             this.endTime = System.currentTimeMillis() + endTime;
+
+            Timer.schedule(new Task(this), this.endTime);
         }
 
         /** Setes canceled to true and removes from the RTV */
