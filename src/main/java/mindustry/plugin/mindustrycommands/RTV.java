@@ -173,7 +173,7 @@ public final class RTV implements MiniMod {
             }
 
             // extend voting time
-            session.endTime += VOTE_TIME;
+            session.endTime = System.currentTimeMillis() + VOTE_TIME;
             
             session.removeInvalid();
 
