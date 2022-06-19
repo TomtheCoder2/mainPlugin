@@ -5,7 +5,10 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.core.entity.user.Member;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -15,6 +18,7 @@ import static mindustry.plugin.utils.Utils.Pals;
 
 /**
  * Represents the context in which a command was called
+ * Generalizes between slash commands and text commands [TODO]
  */
 public class Context {
     /**
@@ -61,7 +65,16 @@ public class Context {
     public void reply(String message) {
         MessageBuilder mb = new MessageBuilder();
         mb.append(message);
+        mb.replyTo(this.event.getMessage());
         mb.send(channel);
+    }
+
+    public User author() {
+        return this.event.getMessageAuthor().asUser().get();
+    }
+
+    public Server server() {
+        return this.event.getServer();
     }
 
 

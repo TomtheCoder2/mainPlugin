@@ -31,6 +31,7 @@ public abstract class Command {
      */
     public abstract void run(Context ctx);
 
+    /** Returns whether someone has permission to run the command */
     public boolean hasPermission(Context ctx) {
         return true;
     }

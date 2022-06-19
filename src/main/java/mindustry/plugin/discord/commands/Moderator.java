@@ -3,6 +3,7 @@ package mindustry.plugin.discord.commands;
 import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
+import arc.util.Strings;
 import arc.util.Structs;
 import arc.util.Timer;
 import com.google.gson.Gson;
@@ -89,12 +90,12 @@ public class Moderator {
 
     public void registerCommands(DiscordCommands handler) {
         if (data.has("moderator_roleid")) {
-            String banRole = data.getString("moderator_roleid");
+            long banRole = Strings.parseLong(data.getString("moderator_roleid"), 0);
 
             handler.registerCommand(new RoleRestrictedCommand("gc") {
                 {
                     help = "Trigger a garbage collection. Testing only.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                 }
 
@@ -114,7 +115,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("test") {
                 {
                     help = "Test the server stability.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                     usage = "<time>";
                     minArguments = 1;
@@ -156,7 +157,7 @@ public class Moderator {
                 {
                     help = "Ban a subnet. This simply rejects all connections with IPs starting with some string.";
                     usage = "[add/remove] [address]";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                 }
 
@@ -211,7 +212,7 @@ public class Moderator {
                 {
                     help = "Say something as the bot.";
                     usage = "<channel> <message>";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                     minArguments = 2;
                 }
@@ -281,7 +282,7 @@ public class Moderator {
                 {
                     help = "Modify the specified players weapon with the provided parameters";
                     usage = "<player> <bullet> [damage] [lifetime] [velocity]";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     minArguments = 1;
                 }
@@ -371,7 +372,7 @@ public class Moderator {
                 {
                     help = "Fill the core with items.";
                     usage = "[team]";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                 }
 
@@ -466,7 +467,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("changemap") {
                 {
                     help = "Change the current map to the one provided.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<mapname/mapid>";
                     category = management;
                     minArguments = 1;
@@ -503,7 +504,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("iplookup") {
                 {
                     help = "Make an ip lookup of an ip";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "ip";
                     category = moderation;
                     minArguments = 1;
@@ -563,7 +564,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("announce") {
                 {
                     help = "Announces a message to in-game chat.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<message>";
                     category = moderation;
                     minArguments = 1;
@@ -594,7 +595,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("event") {
                 {
                     help = "Changes the event command ip.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<ip/none>";
                     category = management;
                     minArguments = 1;
@@ -632,7 +633,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("admin") {
                 {
                     help = "Toggle the admin status on a player.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<playerid|ip|name|teamid>";
                     category = moderation;
                     minArguments = 1;
@@ -674,7 +675,7 @@ public class Moderator {
 //            handler.registerCommand(new RoleRestrictedCommand("admin") {
 //                {
 //                    help = "Toggle the admin status on a player.";
-//                    role = banRole;
+//                    roles = new long[] { banRole };
 //                    usage = "<add|remove> <playerid|ip|name|teamid>";
 //                    category = moderation;
 //                    minArguments = 1;
@@ -722,7 +723,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("gameover") {
                 {
                     help = "Force a game over.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                 }
 
@@ -743,7 +744,7 @@ public class Moderator {
                 {
                     help = "Ban the provided player with a specific reason.";
                     usage = "<player> <reason...>";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     minArguments = 2;
                 }
@@ -799,7 +800,7 @@ public class Moderator {
                 {
                     help = "Ban a player by the provided uuid.";
                     usage = "<uuid> [reason]";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     minArguments = 1;
                 }
@@ -832,7 +833,7 @@ public class Moderator {
                 {
                     help = "Ban the provided player for a specific duration with a specific reason.";
                     usage = "<player> <duration (minutes)> [reason..]";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     minArguments = 2;
                 }
@@ -880,7 +881,7 @@ public class Moderator {
                 {
                     help = "Kick the provided player with a specific reason.";
                     usage = "<player> [reason..]";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     minArguments = 2;
                     aliases.add("k");
@@ -914,7 +915,7 @@ public class Moderator {
                 {
                     help = "Unban the player by the provided uuid.";
                     usage = "<uuid>";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     minArguments = 1;
                 }
@@ -945,7 +946,7 @@ public class Moderator {
                 {
                     help = "Unban the player by the provided IP.";
                     usage = "<uuid>";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     minArguments = 1;
                 }
@@ -969,7 +970,7 @@ public class Moderator {
                 {
                     help = "Unvotekickban the specified player";
                     usage = "<uuid>";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     minArguments = 1;
                     hidden = true;
@@ -996,7 +997,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("bans") {
                 {
                     help = "Show all perm bans";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     aliases.add("banlist");
                 }
@@ -1047,7 +1048,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("playersinfo") {
                 {
                     help = "Check the information about all players on the server.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     aliases.add("pi");
                 }
@@ -1096,7 +1097,7 @@ public class Moderator {
                 {
                     help = "Check all information about the specified player.";
                     usage = "<player>";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = moderation;
                     minArguments = 1;
                     aliases.add("l");
@@ -1130,7 +1131,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("syncserver") {
                 {
                     help = "Tell everyone to resync.\nMay kick everyone you never know!";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                 }
 
@@ -1149,7 +1150,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("convert") {
                 {
                     help = "Change the provided player into a specific unit.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<playerid|ip|all|name|teamid> <unit> [team]";
                     category = management;
                     minArguments = 2;
@@ -1218,7 +1219,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("team") {
                 {
                     help = "Change the provided player's team into the provided one.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<playerid|ip|all|name|teamid> <team>";
                     category = management;
                     minArguments = 2;
@@ -1287,7 +1288,7 @@ public class Moderator {
 //            handler.registerCommand(new RoleRestrictedCommand("changeteamid") {
 //                {
 //                    help = "Change the provided player's team into a generated int.";
-//                    role = banRole;
+//                    roles = new long[] { banRole };
 //                    usage = "<playerid|ip|all|name> <team>";
 //                    category = management;
 //                    minArguments = 2;
@@ -1334,7 +1335,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("rename") {
                 {
                     help = "Rename the provided player";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<playerid|ip|name> <name>";
                     category = management;
                     minArguments = 2;
@@ -1364,7 +1365,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("motd") {
                 {
                     help = "Change / set a welcome message";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<newmessage>";
                     category = management;
                     minArguments = 1;
@@ -1391,7 +1392,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("screenmessage") {
                 {
                     help = "List, remove or add on-screen messages.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<list/remove/add> <message>";
                     category = moderation;
                     minArguments = 2;
@@ -1450,7 +1451,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("edit") {
                 {
                     help = "Change / set a message";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<stats|rule|info> <new message>";
                     category = management;
                     minArguments = 2;
@@ -1523,7 +1524,7 @@ public class Moderator {
 //            handler.registerCommand(new RoleRestrictedCommand("statmessage") {
 //                {
 //                    help = "Change / set a stat message";
-//                    role = banRole;
+//                    roles = new long[] { banRole };
 //                    usage = "<newmessage>";
 //                    category = management;
 //                }
@@ -1549,7 +1550,7 @@ public class Moderator {
 //            handler.registerCommand(new RoleRestrictedCommand("reqMessage") {
 //                {
 //                    help = "Change / set a requirement Message";
-//                    role = banRole;
+//                    roles = new long[] { banRole };
 //                    usage = "<newmessage>";
 //                    category = management;
 //                }
@@ -1575,7 +1576,7 @@ public class Moderator {
 //            handler.registerCommand(new RoleRestrictedCommand("rankMessage") {
 //                {
 //                    help = "Change / set a rank Message";
-//                    role = banRole;
+//                    roles = new long[] { banRole };
 //                    usage = "<newmessage>";
 //                    category = management;
 //                }
@@ -1601,7 +1602,7 @@ public class Moderator {
 //            handler.registerCommand(new RoleRestrictedCommand("rulemessage") {
 //                {
 //                    help = "Change server rules. Use approriate prefix";
-//                    role = banRole;
+//                    roles = new long[] { banRole };
 //                    category = management;
 //                }
 //
@@ -1629,7 +1630,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("spawn") {
                 {
                     help = "Spawn x units at the location of the specified player";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                     usage = "<playerid|ip|name> <unit> <amount>";
                     minArguments = 3;
@@ -1672,7 +1673,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("killunits") {
                 {
                     help = "Kills all units of the team of the specified player";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                     usage = "<playerid|ip|name> <unit>";
                     minArguments = 2;
@@ -1717,7 +1718,7 @@ public class Moderator {
             handler.registerCommand(new RoleRestrictedCommand("setblock") {
                 {
                     help = "Create a block at the player's current location and on the player's current team.";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     usage = "<playerid|ip|name> <block> [rotation]";
                     category = management;
                     minArguments = 2;
@@ -1781,7 +1782,7 @@ public class Moderator {
 //            handler.registerCommand(new RoleRestrictedCommand("weaponmod") { // OH NO
 //                {
 //                    help = "<playerid|ip|name|all(oh no)> <bullet-type> <lifetime-modifier> <velocity-modifier> Mod the current weapon of a player.";
-//                    role = banRole;
+//                    roles = new long[] { banRole };
 //                }
 //
 //                public void run(Context ctx) {
@@ -1853,7 +1854,7 @@ public class Moderator {
                 {
                     help = "Run a js command!";
                     usage = "<code>";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                     hidden = true;
                     minArguments = 1;
@@ -1875,7 +1876,7 @@ public class Moderator {
                 {
                     help = "Change the player's rank to the provided one.\nList of all ranks" + listRanks();
                     usage = "<playerid|ip|name> <rank>";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                     minArguments = 2;
                     aliases.add("sr");
@@ -1960,7 +1961,7 @@ public class Moderator {
                     help = "Ip tools";
                     usage = "<check|ban|unban> <ip> [reason]";
                     category = moderation;
-                    role = banRole;
+                    roles = new long[] { banRole };
                     minArguments = 2;
                 }
 
@@ -2012,7 +2013,7 @@ public class Moderator {
                 {
                     help = "Change the player's statistics to the provided one.";
                     usage = "<playerid|ip|name> <rank> <playTime> <buildingsBuilt> <gamesPlayed>";
-                    role = banRole;
+                    roles = new long[] { banRole };
                     category = management;
                     minArguments = 5;
                 }

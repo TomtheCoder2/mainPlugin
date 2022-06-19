@@ -1,14 +1,14 @@
 package mindustry.plugin.discord.discordcommands;
 
+import arc.struct.LongSeq;
 import arc.util.Log;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.permission.Role;
 
-import java.util.Optional;
+import java.util.Arrays;
 
 public abstract class RoleRestrictedCommand extends Command {
-    public String role = null;
-    public Role resolvedRole = null;
+    public long[] roles = new long[] {};
 
     public RoleRestrictedCommand(String name) {
         super(name);
@@ -19,23 +19,11 @@ public abstract class RoleRestrictedCommand extends Command {
      */
     @Override
     public boolean hasPermission(Context ctx) {
-        if (role == null) return false;
-        if (ctx.event.isPrivateMessage()) return false;
-        // memoize role resolution
-        if (resolvedRole == null) {
-            resolvedRole = getRole(ctx.event.getApi(), role);
-            if (resolvedRole == null) return false;
+        for (Role role: ctx.author().getRoles(ctx.server())) {
+            if (LongSeq.with(this.roles).contains(role.getId())) {
+                return true;
+            }
         }
-        // I am simply not going to touch this
-        return ctx.event.getMessageAuthor().asUser().get().getRoles(ctx.event.getServer().get()).contains(resolvedRole);
-    }
-
-    public Role getRole(DiscordApi api, String id) {
-        Optional<Role> r1 = api.getRoleById(id);
-        if (!r1.isPresent()) {
-            Log.err("Error: discord role " + id + " not found");
-            return null;
-        }
-        return r1.get();
+        return false;
     }
 }

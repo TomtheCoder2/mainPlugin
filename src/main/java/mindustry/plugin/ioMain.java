@@ -26,7 +26,6 @@ import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.data.TileInfo;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
-import mindustry.plugin.mapChange.MapChange;
 import mindustry.plugin.utils.ContentHandler;
 import mindustry.plugin.utils.Utils;
 import mindustry.plugin.utils.Rank;
@@ -104,7 +103,6 @@ public class ioMain extends Plugin {
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public static ObjectMap<String, Role> discRoles = new ObjectMap<>();
     public static NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
-    public static MapChange mapChange = new MapChange();
 
     protected MiniMod[] minimods = new MiniMod[]{
             new mindustry.plugin.mindustrycommands.RTV(),
@@ -114,6 +112,7 @@ public class ioMain extends Plugin {
             new mindustry.plugin.mindustrycommands.Info(),
             new mindustry.plugin.mindustrycommands.Ranks(),
             new mindustry.plugin.mindustrycommands.Moderation(),
+            new mindustry.plugin.mindustrycommands.Kick(),
             new mindustry.plugin.mindustrycommands.Rainbow(),
     };
 
@@ -211,17 +210,13 @@ public class ioMain extends Plugin {
                     assert player != null;
                     PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
                     assert tdata != null;
-                    if (!tdata.muted) {
-                        StringBuilder sb = new StringBuilder(event.message);
-                        for (int i = event.message.length() - 1; i >= 0; i--) {
-                            if (sb.charAt(i) >= 0xF80 && sb.charAt(i) <= 0x107F) {
-                                sb.deleteCharAt(i);
-                            }
+                    StringBuilder sb = new StringBuilder(event.message);
+                    for (int i = event.message.length() - 1; i >= 0; i--) {
+                        if (sb.charAt(i) >= 0xF80 && sb.charAt(i) <= 0x107F) {
+                            sb.deleteCharAt(i);
                         }
-                        finalTc.sendMessage("**" + escapeEverything(event.player.name) + "**: " + sb);
-                    } else {
-                        player.sendMessage("[cyan]You are muted!");
                     }
+                    finalTc.sendMessage("**" + escapeEverything(event.player.name) + "**: " + sb);
                 }
             });
         }
@@ -492,11 +487,6 @@ public class ioMain extends Plugin {
 
 
         // TODO: log dangerous actions from players
-
-//        Events.on(EventType.WorldLoadEvent.class, event -> {
-//            Timer.schedule(MapRules::run, 5); // idk
-//        });
-
         // TODO: remove this when MapRules is back in use
         Events.on(EventType.ServerLoadEvent.class, event -> {
             // action filter
@@ -531,25 +521,7 @@ public class ioMain extends Plugin {
                 }
                 return true;
             });
-            netServer.admins.addChatFilter((player, message) -> {
-                assert player != null;
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-                assert tdata != null;
-                if (tdata.muted) {
-                    return null;
-                }
-                return message;
-            });
-            netServer.admins.addActionFilter(action -> {
-                assert action.player != null;
-                Player player = action.player;
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-                assert tdata != null;
-                if (tdata.frozen) {
-                    player.sendMessage("[cyan]You are frozen!");
-                }
-                return !tdata.frozen;
-            });
+
             info("Registered all filters.");
         });
 
@@ -653,7 +625,6 @@ public class ioMain extends Plugin {
 
     @Override
     public void registerServerCommands(CommandHandler handler) {
-        mapChange.registerServerCommands(handler);
         handler.register("update", "Update the database with the new current data", arg -> {
             TextChannel log_channel = getTextChannel("882342315438526525");
             update(log_channel, api);

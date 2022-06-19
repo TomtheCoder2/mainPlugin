@@ -14,6 +14,8 @@ import mindustry.plugin.requests.GetMap;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
 
+import arc.util.Strings;
+
 import java.time.Instant;
 
 import static mindustry.Vars.netServer;
@@ -34,77 +36,12 @@ public class Apprentice {
 
     public void registerCommands(DiscordCommands handler) {
         if (data.has("apprentice_roleid")) {
-            String apprenticeRole = data.getString("apprentice_roleid");
-
-            handler.registerCommand(new RoleRestrictedCommand("mute") {
-                {
-                    help = "Mute a player. To unmute just use this command again.";
-                    usage = "<playerid|ip|name> [reason...]";
-                    minArguments = 1;
-                    category = moderation;
-                    role = apprenticeRole;
-                    apprenticeCommand = true;
-                    aliases.add("m");
-                }
-
-                @Override
-                public void run(Context ctx) {
-                    String target = ctx.args[1];
-                    Player player = findPlayer(target);
-                    EmbedBuilder eb = new EmbedBuilder();
-                    if (player != null) {
-                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-                        assert tdata != null;
-                        tdata.muted = !tdata.muted;
-                        eb.setTitle("Successfully " + (tdata.muted ? "muted" : "unmuted") + " " + escapeEverything(target));
-                        if (ctx.args.length > 2) {
-                            eb.addField("Reason", ctx.args[2]);
-                        }
-                        ctx.sendMessage(eb);
-                        Call.infoMessage(player.con, "[cyan]You got " + (tdata.muted ? "muted" : "unmuted") + " by a moderator. " + (ctx.args.length > 2 ? "Reason: " + ctx.message.split(" ", 2)[1] : ""));
-                    } else {
-                        playerNotFound(target, eb, ctx);
-                    }
-                }
-            });
-
-
-            handler.registerCommand(new RoleRestrictedCommand("freeze") {
-                {
-                    help = "Freeze a player. To unfreeze just use this command again.";
-                    usage = "<playerid|ip|name> [reason...]";
-                    minArguments = 1;
-                    category = moderation;
-                    role = apprenticeRole;
-                    apprenticeCommand = true;
-                    aliases.add("f");
-                }
-
-                @Override
-                public void run(Context ctx) {
-                    String target = ctx.args[1];
-                    Player player = findPlayer(target);
-                    EmbedBuilder eb = new EmbedBuilder();
-                    if (player != null) {
-                        PersistentPlayerData tdata = (playerDataGroup.getOrDefault(player.uuid(), null));
-                        assert tdata != null;
-                        tdata.frozen = !tdata.frozen;
-                        eb.setTitle("Successfully " + (tdata.frozen ? "froze" : "thawed") + " " + escapeEverything(target));
-                        if (ctx.args.length > 2) {
-                            eb.addField("Reason", ctx.args[2]);
-                        }
-                        ctx.sendMessage(eb);
-                        Call.infoMessage(player.con, "[cyan]You got " + (tdata.frozen ? "frozen" : "thawed") + " by a moderator. " + (ctx.args.length > 2 ? "Reason: " + ctx.message.split(" ", 2)[1] : ""));
-                    } else {
-                        playerNotFound(target, eb, ctx);
-                    }
-                }
-            });
+            long apprenticeRole = Strings.parseLong(data.getString("apprentice_roleid"), 0);
 
             handler.registerCommand(new RoleRestrictedCommand("banish") {
                 {
                     help = "Ban the provided player for a specific duration with a specific reason.";
-                    role = apprenticeRole;
+                    roles = new long[] { apprenticeRole };
                     usage = "<player> <duration (minutes)> <reason...>";
                     category = moderation;
                     apprenticeCommand = true;
@@ -167,7 +104,7 @@ public class Apprentice {
             handler.registerCommand(new RoleRestrictedCommand("alert") {
                 {
                     help = "Alerts a player(s) using on-screen messages.";
-                    role = apprenticeRole;
+                    roles = new long[] { apprenticeRole };
                     usage = "<playerid|ip|name|teamid> <message>";
                     category = moderation;
                     apprenticeCommand = true;
@@ -216,7 +153,7 @@ public class Apprentice {
                 {
                     help = "Get info about a specific player.";
                     usage = "<player>";
-                    role = apprenticeRole;
+                    roles = new long[] { apprenticeRole };
                     category = moderation;
                     apprenticeCommand = true;
                     minArguments = 1;
