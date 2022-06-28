@@ -8,7 +8,6 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.javacord.core.entity.user.Member;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -74,7 +73,7 @@ public class Context {
     }
 
     public Server server() {
-        return this.event.getServer();
+        return this.event.getServer().get();
     }
 
 
