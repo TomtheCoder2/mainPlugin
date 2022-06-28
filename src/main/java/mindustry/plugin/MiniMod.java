@@ -2,6 +2,7 @@ package mindustry.plugin;
 
 import arc.util.CommandHandler;
 import mindustry.plugin.discord.discordcommands.DiscordCommands;
+import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 
 /**
  * A mini-module implements a subset of the functionality of the plugin.
@@ -18,5 +19,5 @@ public interface MiniMod {
     /** Initialize event handlers + timers */
     default void registerEvents() {}
 
-    default void registerDiscordCommands(DiscordCommands handler) {}
+    default void registerDiscordCommands(DiscordRegistrar handler) {}
 }

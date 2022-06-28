@@ -673,23 +673,6 @@ public class Utils {
 //    }
 
     /**
-     * get a channel by id
-     */
-    public static TextChannel getTextChannel(String id) {
-        Optional<Channel> dc = api.getChannelById(id);
-        if (dc.isEmpty()) {
-            err("[ERR!] discordplugin: channel not found! " + id);
-            return null;
-        }
-        Optional<TextChannel> dtc = dc.get().asTextChannel();
-        if (dtc.isEmpty()) {
-            err("[ERR!] discordplugin: textchannel not found! " + id);
-            return null;
-        }
-        return dtc.get();
-    }
-
-    /**
      * Converts a {@link JsonObject} to {@link EmbedBuilder}.
      * Supported Fields: Title, Author, Description, Color, Fields, Thumbnail, Footer.
      *
@@ -967,14 +950,6 @@ public class Utils {
 //        }
 //        return null;
 //    }
-
-    // colors for errors, info, warning etc. messages
-    public static class Pals {
-        public static Color warning = (Color.getHSBColor(5, 85, 95));
-        public static Color info = (Color.getHSBColor(45, 85, 95));
-        public static Color error = (Color.getHSBColor(3, 78, 91));
-        public static Color success = (Color.getHSBColor(108, 80, 100));
-    }
 
     public static class Categories {
         public static final String moderation = "Moderation";

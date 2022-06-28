@@ -26,6 +26,7 @@ import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.data.TileInfo;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
+import mindustry.plugin.minimods.Discord;
 import mindustry.plugin.utils.ContentHandler;
 import mindustry.plugin.utils.Utils;
 import mindustry.plugin.utils.Rank;
@@ -47,10 +48,13 @@ import java.util.List;
 import java.util.Objects;
 
 import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.Channels;
+import mindustry.plugin.discord.DiscordVars;
+import mindustry.plugin.discord.Roles;
+import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
-import static mindustry.plugin.discord.discordcommands.DiscordCommands.error_log_channel;
 import static mindustry.plugin.effect.EffectHelper.getEffect;
 import static mindustry.plugin.utils.CustomLog.logConnections;
 import static mindustry.plugin.utils.Utils.*;
@@ -66,19 +70,8 @@ public class ioMain extends Plugin {
     public static final long CDT = 300L;
     public static final ObjectMap<Long, String> CommandCooldowns = new ObjectMap<>(); // uuid
     private static final String lennyFace = "( \u0361\u00B0 \u035C\u0296 \u0361\u00B0)";
-    public static DiscordApi api = null;
-    public static String prefix = ".";
-    public static String live_chat_channel_id = "";
-    public static String map_rating_channel_id = "";
-    public static String log_channel_id = "";
-    public static String bot_channel_id = null;
-    public static String apprentice_bot_channel_id = null;
-    public static String staff_bot_channel_id = null;
-    public static String admin_bot_channel_id = null;
-    public static String discordInviteLink = null;
-    public static String serverName = "<untitled>";
-    public static JSONObject data; //token, channel_id, role_id
     public static String apiKey = "";
+    public static String discordInviteLink;
     public static int effectId = 0; // effect id for the snowball
     public static ArrayList<String> joinedPlayers = new ArrayList<>();
     public static List<String> leftPlayers = new ArrayList<>();
@@ -95,25 +88,20 @@ public class ioMain extends Plugin {
     public static TextChannel log_channel;
     public static Boolean enableMapRatingPopups = true;
     //    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
-//    protected Interval timer = new Interval(1);
-    //cooldown between votes
-    // register commands that run on the server
-    // cool-downs per player
-    public static ObjectMap<String, Timekeeper> cooldowns = new ObjectMap<>();
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public static ObjectMap<String, Role> discRoles = new ObjectMap<>();
     public static NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
 
     protected MiniMod[] minimods = new MiniMod[]{
-            new mindustry.plugin.mindustrycommands.RTV(),
-            new mindustry.plugin.mindustrycommands.Admin(),
-            new mindustry.plugin.mindustrycommands.Communication(),
-            new mindustry.plugin.mindustrycommands.Discord(),
-            new mindustry.plugin.mindustrycommands.Info(),
-            new mindustry.plugin.mindustrycommands.Ranks(),
-            new mindustry.plugin.mindustrycommands.Moderation(),
-            new mindustry.plugin.mindustrycommands.Kick(),
-            new mindustry.plugin.mindustrycommands.Rainbow(),
+            new mindustry.plugin.minimods.RTV(),
+            new mindustry.plugin.minimods.Admin(),
+            new mindustry.plugin.minimods.Communication(),
+            new mindustry.plugin.minimods.Discord(),
+            new mindustry.plugin.minimods.Info(),
+            new mindustry.plugin.minimods.Ranks(),
+            new mindustry.plugin.minimods.Moderation(),
+            new mindustry.plugin.minimods.Kick(),
+            new mindustry.plugin.minimods.Rainbow(),
     };
 
     // register event handlers and create variables in the constructor
@@ -124,37 +112,43 @@ public class ioMain extends Plugin {
         setDebug(false);
         FallbackLoggerConfiguration.setDebug(false);
         FallbackLoggerConfiguration.setTrace(false);
-        JSONObject allData;
-        try { // read settings
+
+        DiscordApi api;
+        DiscordRegistrar registrar = null;
+        // read settings
+        try {
             String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
-            allData = new JSONObject(new JSONTokener(pureJson));
+            JSONObject data = new JSONObject(new JSONTokener(pureJson));
 
             // url to connect to the MindServ
-            maps_url = allData.getString("maps_url");
-            // for the live chat between the discord server and the mindustry server
-            live_chat_channel_id = allData.getString("live_chat_channel_id");
-            // log joins bans etc
-            log_channel_id = allData.getString("log_channel_id");
-            // channel to give feedback for maps
-            map_rating_channel_id = allData.getString("map_rating_channel_id");
+            maps_url = data.getString("maps_url");
+
+            JSONObject discordData = data.getJSONObject("discord");
+            discordInviteLink = discordData.getString("invite");
+            String discordToken = discordData.getString("token");
+            try {
+                api = new DiscordApiBuilder().setToken(discordToken).login().join();
+                Log.info("Logged in as: " + api.getYourself());
+            } catch (Exception e) {
+                Log.err("Couldn't log into discord.");
+            }
+            Channels.load(api, discordData.getJSONObject("channels"));
+            Roles.load(api, discordData.getJSONObject("roles"));
+            String discordPrefix = discordData.getString("prefix");
+            registrar = new DiscordRegistrar(discordPrefix);
+
             // iplookup api key
-            apapi_key = allData.getString("apapi_key");
-            // bot channels
-            bot_channel_id = allData.getString("bot_channel_id");
-            apprentice_bot_channel_id = allData.getString("apprentice_bot_channel");
-            staff_bot_channel_id = allData.getString("staff_bot_channel_id");
-            admin_bot_channel_id = allData.getString("admin_bot_channel_id");
-            // link to join our discord server
-            discordInviteLink = allData.getString("discordInviteLink");
-            previewSchem = allData.getBoolean("previewSchem");
-            if (allData.has("enableMapRatingPopups")) {
-                enableMapRatingPopups = allData.getBoolean("enableMapRatingPopups");
+            apapi_key = data.getString("ipapi_key");
+            previewSchem = data.getBoolean("previewSchem");
+            if (data.has("enableMapRatingPopups")) {
+                enableMapRatingPopups = data.getBoolean("enableMapRatingPopups");
             }
 
             // connect to database
-            String dbURL = allData.getString("url");
-            String dbUser = allData.getString("user");
-            String dbPwd = allData.getString("password");
+            JSONObject databaseData = data.getJSONObject("database");
+            String dbURL = databaseData.getString("url");
+            String dbUser = databaseData.getString("user");
+            String dbPwd = databaseData.getString("password");
             System.out.printf("url: %s, user: %s, password: %s%n\n", dbURL, dbUser, dbPwd);
 
             try { // test connection
@@ -165,82 +159,37 @@ public class ioMain extends Plugin {
             }
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
+            Log.err(e.toString());
             return;
         }
 
+        for (MiniMod mod : minimods) {
+            mod.registerDiscordCommands(registrar);
+        }
+        api.addMessageCreateListener(evt -> {
+            registrar.dispatchEvent(evt);
+        });
+        DiscordVars.api = api;
+
         Utils.init();
-        EffectHelper.init();
-
-        try {
-            String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
-            data = allData = new JSONObject(new JSONTokener(pureJson));
-        } catch (Exception e) {
-            Log.err("Couldn't read settings.json file.");
-        }
-        try {
-            api = new DiscordApiBuilder().setToken(allData.getString("token")).login().join();
-            Log.info("Logged in as: " + api.getYourself());
-        } catch (Exception e) {
-            Log.err("Couldn't log into discord.");
-        }
-        // start bot thread for handling commands and other messages
-        BotThread bt = new BotThread(api, Thread.currentThread(), allData);
-        bt.setDaemon(false);
-        bt.start();
-
+        EffectHelper.init();        
         FallbackLoggerConfiguration.setDebug(false);
         FallbackLoggerConfiguration.setTrace(false);
 
-        // set the channels
-        live_chat_channel = getTextChannel(live_chat_channel_id);
-        log_channel = getTextChannel(log_channel_id);
-
-        TextChannel tc = getTextChannel("881300954845179914");
-        if (!Objects.equals(live_chat_channel_id, "")) {
-            tc = getTextChannel(live_chat_channel_id);
-        } else {
-            System.err.println("couldn't find live_chat_channel_id!");
-        }
-        if (tc != null) {
-            // if there's a live channel create a chat filter to send all messages to Discord
-            TextChannel finalTc = tc;
-            Events.on(EventType.PlayerChatEvent.class, event -> {
-                if (event.message.charAt(0) != '/') {
-                    Player player = event.player;
-                    assert player != null;
-                    PersistentPlayerData tdata = playerDataGroup.get(player.uuid());
-                    assert tdata != null;
-                    StringBuilder sb = new StringBuilder(event.message);
-                    for (int i = event.message.length() - 1; i >= 0; i--) {
-                        if (sb.charAt(i) >= 0xF80 && sb.charAt(i) <= 0x107F) {
-                            sb.deleteCharAt(i);
-                        }
+        // Live Chat
+        Events.on(EventType.PlayerChatEvent.class, event -> {
+            if (event.message.charAt(0) != '/') {
+                Player player = event.player;
+                assert player != null;
+                StringBuilder sb = new StringBuilder(event.message);
+                for (int i = event.message.length() - 1; i >= 0; i--) {
+                    if (sb.charAt(i) >= 0xF80 && sb.charAt(i) <= 0x107F) {
+                        sb.deleteCharAt(i);
                     }
-                    finalTc.sendMessage("**" + escapeEverything(event.player.name) + "**: " + sb);
                 }
-            });
-        }
-
-        // setup prefix
-        if (data.has("prefix")) {
-            prefix = String.valueOf(data.getString("prefix").charAt(0));
-        } else {
-            Log.warn("Prefix not found, using default '.' prefix.");
-        }
-
-        // setup name
-        if (data.has("server_name")) {
-            serverName = String.valueOf(data.getString("server_name"));
-        } else {
-            Log.warn("No server name setting detected!");
-        }
-
-        if (data.has("api_key")) {
-            apiKey = data.getString("api_key");
-            Log.info("api_key set successfully");
-        } else {
-            warn("No api key for ip lookups (ipapi).");
-        }
+                Channels.CHAT.sendMessage("**" + Utils.escapeEverything(event.player.name) + "**: " + sb);
+            }
+        });
 
         // display on screen messages
         float duration = 10f;
@@ -561,6 +510,7 @@ public class ioMain extends Plugin {
         return true;
     }
 
+    // TODO: Needs to be called
     public static void update(TextChannel log_channel, DiscordApi api) {
         try {
             if ((logCount & 5) == 0) {
@@ -658,10 +608,8 @@ public class ioMain extends Plugin {
     //register commands that player can invoke in-game
     @Override
     public void registerClientCommands(CommandHandler handler) {
-        if (api != null) {
-            for (MiniMod minimod : minimods) {
-                minimod.registerCommands(handler);
-            }
+        for (MiniMod minimod : minimods) {
+            minimod.registerCommands(handler);
         }
     }
 }

@@ -1,6 +1,8 @@
 package mindustry.plugin.discord.discordcommands;
 
 import mindustry.plugin.utils.Utils;
+
+import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -8,16 +10,13 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.javacord.core.entity.user.Member;
 
-import java.awt.*;
-import java.util.HashMap;
+import arc.struct.StringMap;
 
-import static mindustry.plugin.discord.discordcommands.DiscordCommands.error_log_channel;
-import static mindustry.plugin.utils.Utils.Pals;
+import java.awt.Color;
 
 /**
- * Represents the context in which a command was called
+ * Represents a specific invocation of a command
  * Generalizes between slash commands and text commands [TODO]
  */
 public class Context {
@@ -28,24 +27,15 @@ public class Context {
     /**
      * Command arguments
      */
-    public String[] args;
-    /**
-     * Full message excluding command
-     */
-    public String message;
-    public TextChannel channel;
-    public MessageAuthor author;
+    public StringMap args;
+
 
     /**
-     * set the context of the message to execute the command
+     * Parse a message object
      */
-    public Context(MessageCreateEvent event, String[] args, String message) {
+    public Context(MessageCreateEvent event, StringMap args) {
         this.event = event;
         this.args = args;
-        this.message = message;
-        this.channel = event.getChannel();
-        this.author = event.getMessageAuthor();
-
     }
 
     /**
@@ -54,7 +44,7 @@ public class Context {
      * @param message reply with this message
      */
     public void reply(MessageBuilder message) {
-        message.send(channel);
+        message.send(channel());
     }
 
     /**
@@ -66,7 +56,7 @@ public class Context {
         MessageBuilder mb = new MessageBuilder();
         mb.append(message);
         mb.replyTo(this.event.getMessage());
-        mb.send(channel);
+        mb.send(channel());
     }
 
     public User author() {
@@ -74,109 +64,38 @@ public class Context {
     }
 
     public Server server() {
-        return this.event.getServer();
+        return this.event.getServer().get();
     }
 
+    public TextChannel channel() {
+        return event.getChannel();
+    }
 
     public void sendEmbed(EmbedBuilder eb) {
-        channel.sendMessage(eb);
+        channel().sendMessage(eb);
     }
 
-    public void sendEmbed(String title) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(title);
-        channel.sendMessage(eb);
+    public void sendEmbed(Color color, String title, String description) {
+        sendEmbed(
+            new EmbedBuilder()
+                .setTitle(title)
+                .setDescription(description)
+                .setColor(color)
+        );
     }
 
-    public void sendEmbed(boolean success, String title) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(title);
-        if (success) {
-            eb.setColor(Pals.success);
-        } else {
-            eb.setColor(Pals.error);
-        }
-        channel.sendMessage(eb);
+    public void success(String title, String description) {
+        sendEmbed(Colors.SUCCESS, title, description);
     }
 
-    public void sendEmbed(String title, String description) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(title);
-        eb.setDescription(description);
-        channel.sendMessage(eb);
+    public void error(String title, String description) {
+        sendEmbed(Colors.ERROR, title, description);
     }
 
-    public void sendEmbed(boolean success, String title, String description) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(title);
-        eb.setDescription(description);
-        if (success) {
-            eb.setColor(Utils.Pals.success);
-        } else {
-            eb.setColor(Pals.error);
-        }
-        channel.sendMessage(eb);
+    public class Colors {
+        public static Color WARN = (Color.getHSBColor(5, 85, 95));
+        public static Color INFO = (Color.getHSBColor(45, 85, 95));
+        public static Color ERROR = (Color.getHSBColor(3, 78, 91));
+        public static Color SUCCESS = (Color.getHSBColor(108, 80, 100));
     }
-
-    public void sendEmbed(boolean success, String title, String description, HashMap<String, String> fields, boolean inline) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(title);
-        eb.setDescription(description);
-        if (success) {
-            eb.setColor(Pals.success);
-        } else {
-            eb.setColor(Pals.error);
-        }
-        for (String name : fields.keySet()) {
-            String desc = fields.get(name);
-            eb.addField(name, desc, inline);
-        }
-        channel.sendMessage(eb);
-    }
-
-    public void sendEmbed(boolean success, String title, HashMap<String, String> fields, boolean inline) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(title);
-        if (success) {
-            eb.setColor(Pals.success);
-        } else {
-            eb.setColor(Pals.error);
-        }
-        for (String name : fields.keySet()) {
-            String desc = fields.get(name);
-            eb.addField(name, desc, inline);
-        }
-        channel.sendMessage(eb);
-    }
-
-    public void sendEmbed(String title, String description, HashMap<String, String> fields) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(title);
-        eb.setDescription(description);
-        for (String name : fields.keySet()) {
-            String desc = fields.get(name);
-            eb.addField(name, desc, false);
-        }
-        channel.sendMessage(eb);
-    }
-
-    public void sendMessage(EmbedBuilder eb) {
-        try {
-            channel.sendMessage(eb).get();
-        } catch (Exception e) {
-            e.printStackTrace();
-            EmbedBuilder errorEmbed = new EmbedBuilder()
-                    .setTitle("Error")
-                    .setColor(new Color(0xff0000))
-                    .setDescription("There was an error while sending the message: \n" + e.getMessage());
-            sendEmbed(errorEmbed);
-            if (error_log_channel != null)
-                error_log_channel.sendMessage(
-                        errorEmbed
-                                .setTimestampToNow()
-                                .addField("Link to command Message", String.valueOf(event.getMessageLink()))
-                );
-        }
-    }
-
 }
