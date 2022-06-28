@@ -138,14 +138,14 @@ public class ServerCommands {
             });
         }
         if (data.has("administrator_roleid")) {
-            String adminRole = data.getString("administrator_roleid");
+            Long adminRole = Long.valueOf(data.getString("administrator_roleid"));
             // TODO: make an update command to update the EI mod
 
             handler.registerCommand(new RoleRestrictedCommand("config") {
                 {
                     help = "Configure server settings.";
                     usage = "[name] [value...]";
-                    role = adminRole;
+                    roles = new long[] {adminRole};
                 }
 
                 @Override
@@ -204,7 +204,7 @@ public class ServerCommands {
             handler.registerCommand(new RoleRestrictedCommand("uploadmod") {
                 {
                     help = "Upload a new mod (Include a .zip file with command message)";
-                    role = adminRole;
+                    roles = new long[] {adminRole};
                     usage = "<.zip attachment>";
                     category = management;
                     aliases.add("umod");
@@ -261,7 +261,7 @@ public class ServerCommands {
             handler.registerCommand(new RoleRestrictedCommand("removemod") {
                 {
                     help = "Remove a mod from the folder";
-                    role = adminRole;
+                    roles = new long[] {adminRole};
                     usage = "<mapname/mapid>";
                     category = mapReviewer;
                     minArguments = 1;
@@ -308,7 +308,7 @@ public class ServerCommands {
             handler.registerCommand(new RoleRestrictedCommand("enableJs") {
                 {
                     help = "Enable/Disable js command for everyone.";
-                    role = adminRole;
+                    roles = new long[] {adminRole};
                     category = moderation;
                     usage = "<true|false>";
                 }
@@ -350,7 +350,7 @@ public class ServerCommands {
             handler.registerCommand(new RoleRestrictedCommand("start") {
                 {
                     help = "Restart the server. Will default to survival and a random map if not specified.";
-                    role = adminRole;
+                    roles = new long[] {adminRole};
                     category = management;
                     usage = "[mapname] [mode]";
                 }
@@ -424,7 +424,7 @@ public class ServerCommands {
             handler.registerCommand(new RoleRestrictedCommand("exit") {
                 {
                     help = "Close the server.";
-                    role = data.getString("exit_roleid");
+                    roles = new long[] {Long.parseLong(data.getString("exit_roleid"))};
                     category = management;
                 }
 
@@ -2559,11 +2559,11 @@ public class ServerCommands {
 
 
         if (data.has("mapSubmissions_roleid")) {
-            String reviewerRole = data.getString("mapSubmissions_roleid");
+            Long reviewerRole = Long.valueOf(data.getString("mapSubmissions_roleid"));
             handler.registerCommand(new RoleRestrictedCommand("uploadmap") {
                 {
                     help = "Upload a new map (Include a .msav file with command message)";
-                    role = reviewerRole;
+                    roles = new long[] {reviewerRole};
                     usage = "<.msav attachment>";
                     category = mapReviewer;
                     aliases.add("ul");
@@ -2629,7 +2629,7 @@ public class ServerCommands {
             handler.registerCommand(new RoleRestrictedCommand("removemap") {
                 {
                     help = "Remove a map from the playlist (use mapname/mapid retrieved from the %maps command)".replace("%", ioMain.prefix);
-                    role = reviewerRole;
+                    roles = new long[] {reviewerRole};
                     usage = "<mapname/mapid>";
                     category = mapReviewer;
                     minArguments = 1;

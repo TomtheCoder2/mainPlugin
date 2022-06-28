@@ -88,6 +88,7 @@ public class Utils {
     public static Seq<String> onScreenMessages = new Seq<>();
     public static String eventIp = "";
     public static int eventPort = 1001;
+    public static Pattern ipValidationPattern;
 
     public static void init() {
         bannedNames.add("IGGGAMES");
@@ -106,6 +107,24 @@ public class Utils {
         welcomeMessage = Core.settings.getString("welcomeMessage");
         ruleMessage = Core.settings.getString("ruleMessage");
         infoMessage = Core.settings.getString("infoMessage");
+
+        // setup regex for ip validation
+        // Regex for digit from 0 to 255.
+        String zeroTo255
+                = "(\\d{1,2}|(0|1)\\"
+                + "d{2}|2[0-4]\\d|25[0-5])";
+
+        // Regex for a digit from 0 to 255 and
+        // followed by a dot, repeat 4 times.
+        // this is the regex to validate an IP address.
+        String regex
+                = zeroTo255 + "\\."
+                + zeroTo255 + "\\."
+                + zeroTo255 + "\\."
+                + zeroTo255;
+
+        // Compile the ReGex
+        ipValidationPattern = Pattern.compile(regex);
     }
 
     // region string modifiers
@@ -148,24 +167,6 @@ public class Utils {
      * @implNote ik there are functions for that, but I like to do it with regex
      */
     public static boolean isValidIPAddress(String ip) {
-
-        // Regex for digit from 0 to 255.
-        String zeroTo255
-                = "(\\d{1,2}|(0|1)\\"
-                + "d{2}|2[0-4]\\d|25[0-5])";
-
-        // Regex for a digit from 0 to 255 and
-        // followed by a dot, repeat 4 times.
-        // this is the regex to validate an IP address.
-        String regex
-                = zeroTo255 + "\\."
-                + zeroTo255 + "\\."
-                + zeroTo255 + "\\."
-                + zeroTo255;
-
-        // Compile the ReGex
-        Pattern p = Pattern.compile(regex);
-
         // If the IP address is empty
         // return false
         if (ip == null) {
@@ -175,7 +176,7 @@ public class Utils {
         // Pattern class contains matcher() method
         // to find matching between given IP address
         // and regular expression.
-        Matcher m = p.matcher(ip);
+        Matcher m = ipValidationPattern.matcher(ip);
 
         // Return if the IP address
         // matched the ReGex
@@ -200,16 +201,16 @@ public class Utils {
      */
     public static String formatMessage(Player player, String message) {
         try {
-            message = message.replaceAll("%player%", escapeCharacters(player.name));
-            message = message.replaceAll("%map%", state.map.name());
-            message = message.replaceAll("%wave%", String.valueOf(state.wave));
+            message = message.replace("%player%", escapeCharacters(player.name));
+            message = message.replace("%map%", state.map.name());
+            message = message.replace("%wave%", String.valueOf(state.wave));
             Database.Player pd = Database.getPlayerData(player.uuid());
             if (pd != null) {
-                message = message.replaceAll("%playtime%", String.valueOf(pd.playTime));
-                message = message.replaceAll("%games%", String.valueOf(pd.gamesPlayed));
-                message = message.replaceAll("%buildings%", String.valueOf(pd.buildingsBuilt));
-                message = message.replaceAll("%rank%", Rank.all[pd.rank].tag + " " + escapeColorCodes(Rank.all[pd.rank].name));
-//                if(pd.discordLink.length() > 0){
+                message = message.replace("%playtime%", String.valueOf(pd.playTime));
+                message = message.replace("%games%", String.valueOf(pd.gamesPlayed));
+                message = message.replace("%buildings%", String.valueOf(pd.buildingsBuilt));
+                message = message.replace("%rank%", Rank.all[pd.rank].tag + " " + escapeColorCodes(Rank.all[pd.rank].name));
+//                if(pd.discordLink.lengt > 0){
 //                    User discordUser = api.getUserById(pd.discordLink).get(2, TimeUnit.SECONDS);
 //                    if(discordUser != null) {
 //                        message = message.replaceAll("%discord%", discordUser.getDiscriminatedName());
@@ -622,27 +623,6 @@ public class Utils {
         String gs = Integer.toHexString((int) (g * 256));
         String bs = Integer.toHexString((int) (b * 256));
         return rs + gs + bs;
-    }
-
-    /**
-     * copy a file to another
-     */
-    public static void copy(String path, Fi to) {
-        try {
-            final InputStream in = Utils.class.getClassLoader().getResourceAsStream(path);
-            final OutputStream out = to.write();
-
-            int data;
-            if (in == null) {
-                err("Could not find resource: " + path);
-                return;
-            }
-            while ((data = in.read()) != -1) {
-                out.write(data);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 

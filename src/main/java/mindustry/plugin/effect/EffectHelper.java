@@ -1,7 +1,7 @@
 package mindustry.plugin.effect;
 
 
-import arc.files.Fi;
+import arc.files.*;
 import arc.graphics.Color;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
@@ -14,8 +14,6 @@ import mindustry.gen.Player;
 import mindustry.plugin.ioMain;
 
 import java.lang.reflect.Field;
-
-import static mindustry.plugin.utils.Utils.copy;
 
 public class EffectHelper {
     public static Seq<EffectObject> effects;
@@ -30,7 +28,7 @@ public class EffectHelper {
         tasks = new Seq<>();
 
         final Fi effect = ioMain.pluginDir.child("effects.properties");
-        if (!effect.exists()) copy("effects.properties", effect);
+        if (!effect.exists()) effect.copyTo(new Fi("effects.properties"));
 
         properties = new ObjectMap<>();
         PropertiesUtils.load(

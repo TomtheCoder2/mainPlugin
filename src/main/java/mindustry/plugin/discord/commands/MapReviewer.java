@@ -4,6 +4,7 @@ import arc.Core;
 import arc.files.Fi;
 import arc.struct.Seq;
 import arc.struct.StringMap;
+import arc.util.Strings;
 import mindustry.io.SaveIO;
 import mindustry.maps.Map;
 import mindustry.plugin.discord.discordcommands.Command;
@@ -43,11 +44,11 @@ public class MapReviewer {
 
     public void registerCommands(DiscordCommands handler) {
         if (data.has("mapSubmissions_roleid")) {
-            String reviewerRole = data.getString("mapSubmissions_roleid");
+            Long reviewerRole = Strings.parseLong(data.getString("mapSubmissions_roleid"), 0);
             handler.registerCommand(new RoleRestrictedCommand("uploadmap") {
                 {
                     help = "Upload a new map (Include a .msav file with command message)";
-                    role = reviewerRole;
+                    roles = new long[] {reviewerRole};
                     usage = "<.msav attachment>";
                     category = mapReviewer;
                     aliases.add("ul");
@@ -113,7 +114,7 @@ public class MapReviewer {
             handler.registerCommand(new RoleRestrictedCommand("removemap") {
                 {
                     help = "Remove a map from the playlist (use mapname/mapid retrieved from the %maps command)".replace("%", ioMain.prefix);
-                    role = reviewerRole;
+                    roles = new long[] {reviewerRole};
                     usage = "<mapname/mapid>";
                     category = mapReviewer;
                     minArguments = 1;

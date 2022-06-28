@@ -4,6 +4,7 @@ import arc.Core;
 import arc.files.Fi;
 import arc.struct.Seq;
 import arc.util.Log;
+import arc.util.Strings;
 import arc.util.Time;
 import arc.util.Timer;
 import mindustry.core.GameState;
@@ -333,7 +334,7 @@ public class Admin {
             handler.registerCommand(new RoleRestrictedCommand("exit") {
                 {
                     help = "Close the server.";
-                    role = data.getString("exit_roleid");
+                    roles =new long[] { Strings.parseLong(data.getString("exit_roleid"), 0)};
                     category = management;
                 }
 
