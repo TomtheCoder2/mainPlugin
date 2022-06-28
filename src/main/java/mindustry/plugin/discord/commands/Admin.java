@@ -215,49 +215,6 @@ public class Admin {
             }
         });
 
-
-        handler.registerCommand(new RoleRestrictedCommand("enableJs") {
-            {
-                help = "Enable/Disable js command for everyone.";
-                roles = new long[] { adminRole };
-                category = moderation;
-                usage = "<true|false>";
-            }
-
-            @Override
-            public void run(Context ctx) {
-                EmbedBuilder eb = new EmbedBuilder();
-                switch (ctx.args[1]) {
-                    case "true", "t" -> {
-                        enableJs = true;
-                        if (enableJsTask != null) {
-                            enableJsTask.cancel();
-                        }
-                        enableJsTask = Timer.schedule(() -> {
-                            enableJs = false;
-                            Call.sendMessage("[accent]js command disabled for everyone!");
-                        }, 10 * 60);
-                        Call.sendMessage("[accent]Marshal " + ctx.author.getName() + "[accent] enabled the js command for everyone! Do [cyan]/js <script...>[accent] to use it.");
-                    }
-                    case "false", "f" -> {
-                        enableJs = false;
-                        Call.sendMessage("[accent]js command disabled for everyone!");
-                    }
-                    default -> {
-                        eb.setTitle("Error")
-                                .setColor(new Color(0xff0000))
-                                .setDescription("[scarlet]Second argument has to be true or false.");
-                        ctx.sendMessage(eb);
-                        return;
-                    }
-                }
-                eb.setTitle((enableJs ? "Enabled" : "Disabled") + " js")
-                        .setDescription((enableJs ? "Enabled" : "Disabled") + " js for everyone" + (enableJs ? " for 10 minutes." : "."))
-                        .setColor(new Color((enableJs ? 0x00ff00 : 0xff0000)));
-                ctx.sendMessage(eb);
-            }
-        });
-
         handler.registerCommand(new RoleRestrictedCommand("start") {
             {
                 help = "Restart the server. Will default to survival and a random map if not specified.";

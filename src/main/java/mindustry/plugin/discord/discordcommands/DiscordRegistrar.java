@@ -5,6 +5,7 @@ import mindustry.plugin.ioMain;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.permission.Role;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.core.util.handler.message.MessageCreateHandler;
 import org.json.JSONObject;
@@ -16,6 +17,8 @@ import java.util.stream.Collectors;
 
 import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.utils.Utils.*;
+
+import arc.struct.LongSeq;
 import arc.struct.ObjectMap;
 import arc.struct.StringMap;
 
@@ -154,6 +157,14 @@ public class DiscordRegistrar {
         String command = args[0].substring(prefix.length());
         CommandEntry entry = commands.get(command);
         if (entry == null) {
+            return;
+        }
+
+        List<Role> userRoles = event.getMessageAuthor().asUser().get().getRoles(event.getServer().get());
+        LongSeq cmdRoles = LongSeq.with(entry.data.roles);
+        if (entry.data.roles != null && !userRoles.stream().anyMatch(x -> cmdRoles.contains(x.getId()))) {
+            Context ctx = new Context(event, null);
+            ctx.error("Lack of permission", "Required to have one of the following roles: <@&" + cmdRoles.toString("><@&") + ">");
             return;
         }
 
