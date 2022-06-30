@@ -13,6 +13,7 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.net.Administration;
+import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.database.Database;
@@ -21,7 +22,9 @@ import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.ioMain;
+import mindustry.plugin.utils.DiscordLog;
 import mindustry.plugin.utils.GameMsg;
+import mindustry.plugin.utils.LogAction;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.world.Tile;
@@ -120,6 +123,49 @@ public class Moderation implements MiniMod {
                 Call.infoMessage(player.con, "[cyan]You got " + (isFrozen ? "frozen" : "thawed") + " by a moderator.\n" + 
                     "[lightgray]" + (ctx.args.containsKey("reason") ? "Reason: [accent]" + ctx.args.get("reason") : ""));
 
+            }
+        );
+
+        handler.register("ban", "<player> [duration:minutes] [reason...]",
+            data -> {
+                data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                data.help = "Ban a player";
+                data.category = "Moderation";
+                data.aliases = new String[] { "b", "banish" };
+            },
+            ctx -> {
+                Administration.PlayerInfo info = Utils.getPlayerInfo(ctx.args.get("player"));
+                if (info == null) {
+                    ctx.error("Error", "Player " + ctx.args.get("player") + " not found.");
+                    return;
+                }
+                String uuid = info.id;
+                String banID = uuid.substring(0, 4);
+                String reason = ctx.args.get("reason", "");
+
+                Database.Player pd = Database.getPlayerData(uuid);
+                if (pd == null) { 
+                    pd = new Database.Player(uuid, 0);
+                }
+                long duration = ctx.args.getLong("duration:minutes", 2 * 365 * 24 * 60) * 60;
+                pd.bannedUntil = Instant.now().getEpochSecond() + duration;
+                pd.banReason = reason + "\n\n[accent]Until: " + Utils.epochToString(pd.bannedUntil) + " [accent]Ban ID: " + banID;
+                Database.setPlayerData(pd);
+
+                ctx.sendEmbed(new EmbedBuilder()
+                    .setTitle("Banned " + info.lastName)
+                    .addField("Duration", duration / 60 + " minutes")
+                    .addField("Until", Utils.epochToString(pd.bannedUntil))
+                    .addField("Reason", reason)
+                    .setFooter("Ban ID: " +banID)
+                );
+
+                Player player = Groups.player.find(p -> p.uuid() == uuid);
+                if (player != null) {
+                    player.con.kick(Packets.KickReason.banned);
+                }
+
+                DiscordLog.logAction(LogAction.ban, info, ctx, reason);
             }
         );
     }

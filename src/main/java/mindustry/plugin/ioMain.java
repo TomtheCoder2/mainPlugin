@@ -56,7 +56,7 @@ import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
 import static mindustry.plugin.effect.EffectHelper.getEffect;
-import static mindustry.plugin.utils.CustomLog.logConnections;
+import static mindustry.plugin.utils.DiscordLog.logConnections;
 import static mindustry.plugin.utils.Utils.*;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setDebug;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setTrace;

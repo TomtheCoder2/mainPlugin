@@ -21,6 +21,7 @@ public final class Database {
 
         // banned
         public boolean banned = false;
+        /** In seconds. `Instant.now().getEpochSecond()` */
         public long bannedUntil = 0;
         public String banReason = "";
 

@@ -1,3 +1,4 @@
+/*
 package mindustry.plugin.discord.commands;
 
 import arc.Core;
@@ -314,3 +315,4 @@ public class Admin {
         }
     }
 }
+*/

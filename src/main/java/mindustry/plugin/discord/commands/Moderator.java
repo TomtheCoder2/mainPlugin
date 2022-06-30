@@ -58,7 +58,7 @@ import java.util.stream.IntStream;
 import static arc.util.Log.*;
 import static mindustry.Vars.*;import static mindustry.plugin.ioMain.*;
 import static mindustry.plugin.requests.IPLookup.readJsonFromUrl;
-import static mindustry.plugin.utils.CustomLog.logAction;
+import static mindustry.plugin.utils.DiscordLog.logAction;
 import static mindustry.plugin.utils.LogAction.*;
 import static mindustry.plugin.utils.Utils.Categories.management;
 import static mindustry.plugin.utils.Utils.Categories.moderation;

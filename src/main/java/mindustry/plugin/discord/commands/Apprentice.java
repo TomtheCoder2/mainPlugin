@@ -21,7 +21,7 @@ import java.time.Instant;
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.player;
 import static mindustry.plugin.ioMain.playerDataGroup;
-import static mindustry.plugin.utils.CustomLog.logAction;
+import static mindustry.plugin.utils.DiscordLog.logAction;
 import static mindustry.plugin.utils.LogAction.ban;
 import static mindustry.plugin.utils.Utils.Categories.moderation;
 import static mindustry.plugin.utils.Utils.*;
@@ -37,7 +37,7 @@ public class Apprentice {
     public void registerCommands(DiscordCommands handler) {
         if (data.has("apprentice_roleid")) {
             long apprenticeRole = Strings.parseLong(data.getString("apprentice_roleid"), 0);
-
+/*
             handler.registerCommand(new RoleRestrictedCommand("banish") {
                 {
                     help = "Ban the provided player for a specific duration with a specific reason.";
@@ -100,7 +100,7 @@ public class Apprentice {
                     }
                 }
             });
-
+*/
             handler.registerCommand(new RoleRestrictedCommand("alert") {
                 {
                     help = "Alerts a player(s) using on-screen messages.";

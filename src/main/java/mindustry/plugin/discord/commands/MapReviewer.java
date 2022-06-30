@@ -28,7 +28,7 @@ import java.util.zip.InflaterInputStream;
 
 import static arc.util.Log.debug;
 import static mindustry.Vars.maps;
-import static mindustry.plugin.utils.CustomLog.logAction;
+import static mindustry.plugin.utils.DiscordLog.logAction;
 import static mindustry.plugin.utils.LogAction.updateMap;
 import static mindustry.plugin.utils.LogAction.uploadMap;
 import static mindustry.plugin.utils.Utils.Categories.mapReviewer;
