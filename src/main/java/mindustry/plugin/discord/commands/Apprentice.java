@@ -101,6 +101,7 @@ public class Apprentice {
                 }
             });
 */
+/*
             handler.registerCommand(new RoleRestrictedCommand("alert") {
                 {
                     help = "Alerts a player(s) using on-screen messages.";
@@ -148,7 +149,7 @@ public class Apprentice {
                         ctx.sendMessage(eb);
                     }
                 }
-            });
+            });*/
             handler.registerCommand(new RoleRestrictedCommand("info") {
                 {
                     help = "Get info about a specific player.";
