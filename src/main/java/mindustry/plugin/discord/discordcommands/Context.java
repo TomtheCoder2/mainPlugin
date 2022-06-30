@@ -75,6 +75,10 @@ public class Context {
         channel().sendMessage(eb);
     }
 
+    public void sendMessage(MessageBuilder mb) {
+        mb.send(channel());
+    }
+
     public void sendEmbed(Color color, String title, String description) {
         sendEmbed(
             new EmbedBuilder()

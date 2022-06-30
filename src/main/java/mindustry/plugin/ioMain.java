@@ -21,12 +21,12 @@ import mindustry.graphics.Pal;
 import mindustry.maps.Map;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration;
-import mindustry.net.Administration.Config;
 import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.data.TileInfo;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
 import mindustry.plugin.minimods.Discord;
+import mindustry.plugin.utils.Config;
 import mindustry.plugin.utils.ContentHandler;
 import mindustry.plugin.utils.Utils;
 import mindustry.plugin.utils.Rank;
@@ -99,7 +99,7 @@ public class ioMain extends Plugin {
             new mindustry.plugin.minimods.Management(),
             new mindustry.plugin.minimods.Discord(),
             new mindustry.plugin.minimods.ServerInfo(),
-            new mindustry.plugin.minimods.PlayerInfo(),
+            new mindustry.plugin.minimods.GameInfo(),
             new mindustry.plugin.minimods.Ranks(),
             new mindustry.plugin.minimods.Moderation(),
             new mindustry.plugin.minimods.Kick(),
@@ -139,8 +139,9 @@ public class ioMain extends Plugin {
             String discordPrefix = discordData.getString("prefix");
             registrar = new DiscordRegistrar(discordPrefix);
 
-            // iplookup api key
-            apapi_key = data.getString("ipapi_key");
+            Config.serverName = data.getString("server_name");
+            Config.ipApiKey = data.getString("ipapi_key");
+
             previewSchem = data.getBoolean("previewSchem");
             if (data.has("enableMapRatingPopups")) {
                 enableMapRatingPopups = data.getBoolean("enableMapRatingPopups");
@@ -151,7 +152,7 @@ public class ioMain extends Plugin {
             String dbURL = databaseData.getString("url");
             String dbUser = databaseData.getString("user");
             String dbPwd = databaseData.getString("password");
-            System.out.printf("url: %s, user: %s, password: %s%n\n", dbURL, dbUser, dbPwd);
+            System.out.printf("database url: %s, user: %s, password: %s%n\n", dbURL, dbUser, dbPwd);
 
             try { // test connection
                 Database.connect(dbURL, dbUser, dbPwd);

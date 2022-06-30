@@ -288,7 +288,7 @@ public class ComCommands {
                         .setColor(new Color(0xff0000)));
             }
         });
-
+/*
         handler.registerCommand(new Command("status") {
             {
                 help = "Get basic server information.";
@@ -335,6 +335,7 @@ public class ComCommands {
                 }
             }
         });
+        
         handler.registerCommand(new Command("resinfo") {
             {
                 help = "Check the amount of resources in the core.";
@@ -376,7 +377,7 @@ public class ComCommands {
 
                 ctx.sendMessage(eb);
             }
-        });
+        });*/
 
         handler.registerCommand(new Command("help") {
             {

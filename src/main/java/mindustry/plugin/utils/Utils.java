@@ -66,14 +66,10 @@ import java.util.zip.InflaterInputStream;
 import static arc.util.Log.debug;
 import static arc.util.Log.err;
 import static mindustry.Vars.*;
-import static mindustry.plugin.discord.discordcommands.DiscordCommands.error_log_channel;
-import static mindustry.plugin.ioMain.api;
 import static mindustry.plugin.ioMain.contentHandler;
 //import java.sql.*;
 
 public class Utils {
-    public static String maps_url = null;
-    public static String apapi_key = null;
     public static int chatMessageMaxSize = 256;
     public static String welcomeMessage = "";
     public static String statMessage = "";
@@ -565,7 +561,7 @@ public class Utils {
             return false;
         }
     }
-
+/*
     public static void attachMapPng(Map found, EmbedBuilder embed, Context ctx) throws IOException {
         Fi mapFile = found.file;
         attachMapPng(mapFile, embed, ctx);
@@ -599,7 +595,7 @@ public class Utils {
             mb.addAttachment(mapFile.file());
             mb.send(channel).join();
         }
-    }
+    }*/
 
     /**
      * get metadata from a map saved as a file converted to an inputStream
