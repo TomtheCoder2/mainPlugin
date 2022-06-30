@@ -4,14 +4,13 @@ import arc.util.CommandHandler;
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.gen.Call;
-import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.utils.Utils;
 import mindustry.world.Tile;
 
 /** MiniMod providing commands relating to server information. */
-public class Info implements MiniMod {
+public class ServerInfo implements MiniMod {
     @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("info", "Display info about our server.", (args, player) -> {

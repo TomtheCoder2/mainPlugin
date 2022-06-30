@@ -150,6 +150,7 @@ public class Apprentice {
                     }
                 }
             });*/
+            /*
             handler.registerCommand(new RoleRestrictedCommand("info") {
                 {
                     help = "Get info about a specific player.";
@@ -184,7 +185,7 @@ public class Apprentice {
                     }
                     ctx.sendMessage(eb);
                 }
-            });
+            });*/
         }
     }
 }

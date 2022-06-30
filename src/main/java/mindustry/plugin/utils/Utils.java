@@ -812,57 +812,6 @@ public class Utils {
         builder.start();
         System.exit(0);
     }
-
-    public static StringBuilder lookup(EmbedBuilder eb, Administration.PlayerInfo info) {
-        eb.addField("Times kicked", String.valueOf(info.timesKicked));
-        StringBuilder s = new StringBuilder();
-        Database.Player pd = Database.getPlayerData(info.id);
-        if (pd != null) {
-            eb.addField("Rank", Rank.all[pd.rank].name, true);
-            eb.addField("Playtime", pd.playTime + " minutes", true);
-            eb.addField("Games", String.valueOf(pd.gamesPlayed), true);
-            eb.addField("Buildings built", String.valueOf(pd.buildingsBuilt), true);
-            eb.addField("Banned", String.valueOf(pd.banned), true);
-            if (pd.banned || pd.bannedUntil > Instant.now().getEpochSecond()) {
-                eb.addField("Ban Reason", escapeEverything(pd.banReason), true);
-                long now = Instant.now().getEpochSecond();
-                // convert seconds to days hours seconds etc
-                int n = (int) (pd.bannedUntil - now);
-                int day = n / (24 * 3600);
-
-                n = n % (24 * 3600);
-                int hour = n / 3600;
-
-                n %= 3600;
-                int minutes = n / 60;
-
-                n %= 60;
-                int seconds = n;
-
-
-                eb.addField("Remaining ban time", day + " " + "days " + hour
-                        + " " + "hours " + minutes + " "
-                        + "minutes " + seconds + " "
-                        + "seconds ", true);
-                eb.addField("Banned Until", new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(pd.bannedUntil * 1000)), true);
-            }
-
-//            CompletableFuture<User> user = ioMain.api.getUserById(pd.discordLink);
-//            user.thenAccept(user1 -> {
-//                eb.addField("Discord Link", user1.getDiscriminatedName());
-//            });
-
-
-        }
-        s.append("**All used names: **\n");
-        for (String name : info.names) {
-            s.append(escapeEverything(name.replaceAll(" ", "")).replaceAll("<.*?>", "").replaceAll("\\[.*?\\]", "")).append(" / ");
-        }
-        s.append("**\n\nCurrent Name with color codes: **\n");
-        s.append(info.lastName);
-        return s;
-    }
-
     public static String formatMapRanking(Database.MapRank[] ranks, String column) {
         StringBuilder sb = new StringBuilder("```\n");
         sb.append("   ").append(String.format("%9s ", column)).append("Name\n");

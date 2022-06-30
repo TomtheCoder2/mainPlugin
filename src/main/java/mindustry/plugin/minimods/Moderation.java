@@ -8,6 +8,7 @@ import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Timekeeper;
 import arc.util.Timer;
+import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -29,20 +30,13 @@ import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.world.Tile;
 
-import org.javacord.api.DiscordApi;
-import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
-import org.javacord.api.interaction.SlashCommand;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
-import static mindustry.Vars.netServer;
-import static mindustry.Vars.world;
 
 /** Manages mutes, freezes, bans, and other moderation-related commands */
 public class Moderation implements MiniMod {
@@ -52,14 +46,14 @@ public class Moderation implements MiniMod {
     @Override
     public void registerEvents() {
         Events.on(EventType.ServerLoadEvent.class, event -> {
-            netServer.admins.addChatFilter((player, message) -> {
+            Vars.netServer.admins.addChatFilter((player, message) -> {
                 assert player != null;
                 if (muted.contains(player.uuid())) {
                     return null;
                 }
                 return message;
             });
-            netServer.admins.addActionFilter(action -> {
+            Vars.netServer.admins.addActionFilter(action -> {
                 assert action.player != null;
                 boolean isFrozen = frozen.contains(action.player.uuid());
                 if (isFrozen) {
@@ -74,7 +68,7 @@ public class Moderation implements MiniMod {
     public void registerDiscordCommands(DiscordRegistrar handler) {
         handler.register("mute", "<player> [reason...]",
             data -> {
-                data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                data.roles = new long[] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
                 data.help = "Mute or unmute a player";
                 data.category = "Moderation";
             },
@@ -101,7 +95,7 @@ public class Moderation implements MiniMod {
 
         handler.register("freeze", "<player> [reason...]", 
             data -> {
-                data.roles = new long[] {Roles.ADMIN, Roles.MOD};
+                data.roles = new long[] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
                 data.help = "Freeze or thaw a player.";
                 data.category = "Moderation";
             },
@@ -128,7 +122,7 @@ public class Moderation implements MiniMod {
 
         handler.register("ban", "<player> [duration:minutes] [reason...]",
             data -> {
-                data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                data.roles = new long[] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
                 data.help = "Ban a player";
                 data.category = "Moderation";
                 data.aliases = new String[] { "b", "banish" };
@@ -172,7 +166,7 @@ public class Moderation implements MiniMod {
         handler.register("alert", "<player> <message...>", 
             data -> {
                 data.help = "Alerts a player(s) using on-screen messages.";
-                data.roles = new long[] { Roles.MOD, Roles.ADMIN };
+                data.roles = new long[] { Roles.MOD, Roles.ADMIN, Roles.APPRENTICE };
                 data.category = "Moderation";
                 data.aliases = new String[] { "a" };
             },
@@ -321,7 +315,7 @@ public class Moderation implements MiniMod {
                 float x = player.getX();
                 float y = player.getY();
 
-                Tile targetTile = world.tileWorld(x, y);
+                Tile targetTile = Vars.world.tileWorld(x, y);
                 Call.label(args[1], Float.parseFloat(args[0]), targetTile.worldx(), targetTile.worldy());
             } else {
                 player.sendMessage(Utils.noPermissionMessage);
@@ -332,11 +326,8 @@ public class Moderation implements MiniMod {
             if (player.admin) {
                 for (Player p : Groups.player) {
                     Database.Player pd = Database.getPlayerData(p.uuid());
-                    PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(p.uuid(), null));
-                    if (tdata == null) continue; // shouldn't happen, ever
-//                    tdata.doRainbow = false;
                     if (pd == null) continue;
-                    p.name = Rank.all[pd.rank].tag + netServer.admins.getInfo(p.uuid()).lastName;
+                    p.name = Rank.all[pd.rank].tag + Vars.netServer.admins.getInfo(p.uuid()).lastName;
                 }
                 player.sendMessage("[cyan]Reset names!");
             } else {

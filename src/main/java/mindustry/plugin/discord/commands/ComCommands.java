@@ -210,7 +210,7 @@ public class ComCommands {
                 ctx.sendMessage(eb);
             }
         });
-
+/*
         handler.registerCommand(new Command("players") {
             {
                 help = "Check who is online and their ids.";
@@ -244,7 +244,7 @@ public class ComCommands {
                         lijst.append(String.format("%-9s :` ", player.id));
                     }
                     lijst.append(escapeEverything(player.name)).append("\n");
-                }
+                }*/
 
                 new MessageBuilder()
                         .setEmbed(new EmbedBuilder()
