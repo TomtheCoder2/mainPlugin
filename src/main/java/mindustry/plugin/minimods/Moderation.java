@@ -16,11 +16,10 @@ import mindustry.net.Administration;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.Context;
-import mindustry.plugin.discord.discordcommands.DiscordCommands;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
-import mindustry.plugin.discord.discordcommands.RoleRestrictedCommand;
 import mindustry.plugin.ioMain;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
@@ -70,18 +69,9 @@ public class Moderation implements MiniMod {
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("mute", "<player> [reason...]", data -> {
-            data.help = "Mute or unmute a player";
-            data.aliases = new String[] { "m" };
-            data.category = "Moderation";
-            data.roles = new long[] { Roles.ADMIN, Roles.MODERATOR };
-        }, ctx -> {
-            ctx.args.get("player");
-        });
-
         handler.register("mute", "<player> [reason...]",
             data -> {
-                data.roles = new long[] { Roles.ADMIN, Roles.MODERATOR };
+                data.roles = new long[] { Roles.ADMIN, Roles.MOD };
                 data.help = "Mute or unmute a player";
                 data.category = "Moderation";
             },
@@ -101,23 +91,19 @@ public class Moderation implements MiniMod {
                 boolean isMuted = muted.contains(player.uuid());
                 ctx.reply("Successfully " + (isMuted ? "muted" : "unmuted") + " " + Utils.escapeEverything(target));
                 Call.infoMessage(player.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" + 
-                    "[lightgray]" + (ctx.args.length > 2 ? "Reason: [accent]" + ctx.message.split(" ", 2)[1] : ""));
+                    "[lightgray]" + (ctx.args.containsKey("reason") ? "Reason: [accent]" + ctx.args.get("reason") : ""));
                 
             }
         );
 
-        handler.registerCommand(new RoleRestrictedCommand("freeze") {
-            {
-                roles = new long[] {Roles.ADMIN, Roles.MODERATOR};
-                help = "Freeze or thaw a player.";
-                usage = "<player> [reason...]";
-                minArguments = 1;
-                category = "Moderation";
-            }
-
-            @Override
-            public void run(Context ctx) {
-                String target = ctx.args[1];
+        handler.register("freeze", "<player> [reason...]", 
+            data -> {
+                data.roles = new long[] {Roles.ADMIN, Roles.MOD};
+                data.help = "Freeze or thaw a player.";
+                data.category = "Moderation";
+            },
+            ctx -> {
+                String target = ctx.args.get("player");
                 Player player = Utils.findPlayer(target);
                 if (player == null) {
                     ctx.reply("Player " + target + " not found.");
@@ -132,9 +118,10 @@ public class Moderation implements MiniMod {
                 boolean isFrozen = frozen.contains(player.uuid());
                 ctx.reply("Successfully " + (isFrozen ? "frozen" : "thawed") + " " + Utils.escapeEverything(target));
                 Call.infoMessage(player.con, "[cyan]You got " + (isFrozen ? "frozen" : "thawed") + " by a moderator.\n" + 
-                    "[lightgray]" + (ctx.args.length > 2 ? "Reason: [accent]" + ctx.message.split(" ", 2)[1] : ""));
+                    "[lightgray]" + (ctx.args.containsKey("reason") ? "Reason: [accent]" + ctx.args.get("reason") : ""));
+
             }
-        });
+        );
     }
 
     @Override
@@ -191,7 +178,7 @@ public class Moderation implements MiniMod {
             Call.infoMessage(target.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" + 
                 "[lightgray]" + (args.length > 1 ? "Reason: [accent]" + args[1] : ""));
         });
-        TextChannel tc_c = Utils.getTextChannel("881300595875643452");
+        
         handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/gr' to get a list of ids)", (args, player) -> {
             //https://github.com/Anuken/Mindustry/blob/master/core/src/io/anuke/mindustry/core/NetServer.java#L300-L351
             for (Long key : ioMain.CommandCooldowns.keys()) {
@@ -237,16 +224,14 @@ public class Moderation implements MiniMod {
 //                                Role role = .getRoleById(661155250123702302L);
                             new MessageBuilder().setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
 //                                                .setDescription("<@&861523420076179457>")
-                                    .addField("name", Utils.escapeColorCodes(found.name)).addField("reason", args[1]).setColor(Color.RED).setFooter("Reported by " + player.name)).send(tc_c);
-                            assert tc_c != null;
-                            tc_c.sendMessage("<@&882340213551140935>");
+                                    .addField("name", Utils.escapeColorCodes(found.name)).addField("reason", args[1]).setColor(Color.RED).setFooter("Reported by " + player.name)).send(Channels.GR_REPORT);
+                            Channels.GR_REPORT.sendMessage("<@&882340213551140935>");
                         } else {
                             Role ro = ioMain.discRoles.get("861523420076179457");
                             new MessageBuilder().setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
 //                                                .setDescription("<@&861523420076179457>")
-                                    .addField("name", Utils.escapeColorCodes(found.name)).setColor(Color.RED).setFooter("Reported by " + player.name)).send(tc_c);
-                            assert tc_c != null;
-                            tc_c.sendMessage("<@&882340213551140935>");
+                                    .addField("name", Utils.escapeColorCodes(found.name)).setColor(Color.RED).setFooter("Reported by " + player.name)).send(Channels.GR_REPORT);
+                            Channels.GR_REPORT.sendMessage("<@&882340213551140935>");
                         }
                         Call.sendMessage(found.name + "[sky] is reported to discord.");
                         ioMain.CommandCooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());

@@ -8,9 +8,11 @@ public class Channels {
     /** Channel for live chat */
     public static TextChannel CHAT;
 
+
     public static TextChannel WARNINGS;
     public static TextChannel APPEAL;
     public static TextChannel BUG_REPORT;
+    public static TextChannel GR_REPORT;
 
     public static TextChannel MAP_SUBMISSIONS;
     public static TextChannel MAP_RATING;
@@ -31,7 +33,8 @@ public class Channels {
         CHAT = getChannel(api, obj.getString("chat"));
         WARNINGS = getChannel(api, obj.getString("warnings"));
         APPEAL = getChannel(api, obj.getString("appeal"));
-        BUG_REPORT = getChannel(api, obj.getString("bug_report"))
+        BUG_REPORT = getChannel(api, obj.getString("bug_report"));
+        GR_REPORT = getChannel(api, obj.getString("gr_report"));
         MAP_SUBMISSIONS = getChannel(api, obj.getString("map_submissions"));
         MAP_RATING = getChannel(api, obj.getString("map_rating"));
 
