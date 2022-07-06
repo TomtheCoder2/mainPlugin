@@ -266,7 +266,7 @@ class TranslateApi {
                 .POST(BodyPublishers.ofString("q=" + URLEncoder.encode(text, "utf-8")))
                 .uri(URI.create("https://" + server + "/detect"))
                 .setHeader("User-Agent", Config.serverName)
-                .setHeader("Content-Type", "application/json")
+                .setHeader("Content-Type", "application/x-www-form-urlencoded")
                 .build();
             HttpResponse<String> resp = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build().send(req, HttpResponse.BodyHandlers.ofString());
             Object respObj = new JSONTokener(resp.body()).nextValue();
