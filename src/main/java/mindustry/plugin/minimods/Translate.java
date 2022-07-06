@@ -49,6 +49,7 @@ public class Translate implements MiniMod {
 
         Events.on(EventType.PlayerChatEvent.class, event -> {
             if (event.player == null) return;
+            if (playerLangs.size == 0) return; // if no one wants to translate, dont waste people's resources
             final String message =event.message;
             thread.addDetect(message, lang -> {
                 if (lang == null) return;
@@ -66,6 +67,14 @@ public class Translate implements MiniMod {
                     });
                 }
             });
+        });
+
+        Events.on(EventType.PlayerLeave.class, event -> {
+            if (event.player == null) return;
+            
+            for (var uuids : playerLangs.values()) {
+                uuids.remove(event.player.uuid());
+            }
         });
     }
 
