@@ -82,11 +82,7 @@ public class ioMain extends Plugin {
     //    static Gson gson = new Gson();
     public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
     public static Boolean enableJs = false; // whether js is enabled for everyone
-    public static Timer.Task enableJsTask;
-    public static HashMap<Tile, TileInfo> tileInfoHashMap = new HashMap<>();
     public static int logCount = 0; // only log join/leaves every 5 minutes
-    public static TextChannel live_chat_channel;
-    public static TextChannel log_channel;
     public static Boolean enableMapRatingPopups = true;
     //    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
@@ -135,6 +131,8 @@ public class ioMain extends Plugin {
                 Log.info("Logged in as: " + api.getYourself());
             } catch (Exception e) {
                 Log.err("Couldn't log into discord.");
+                Core.app.exit();
+                return;
             }
             Channels.load(api, discordData.getJSONObject("channels"));
             Roles.load(api, discordData.getJSONObject("roles"));
@@ -331,69 +329,6 @@ public class ioMain extends Plugin {
             }
         });
 
-
-        // log all tile taps
-        Events.on(EventType.TapEvent.class, tapEvent -> {
-            if (tapEvent.tile != null) {
-                Player player = tapEvent.player;
-                PersistentPlayerData ppd = (playerDataGroup.getOrDefault(player.uuid(), null));
-
-                Tile t = tapEvent.tile;
-                if (ppd == null) return;
-                ppd.tapTile = t;
-                if (ppd.inspector) {
-                    player.sendMessage("\n");
-                    Call.effect(player.con, Fx.placeBlock, t.worldx(), t.worldy(), 0.75f, Pal.accent);
-                    player.sendMessage("[orange]--[] [accent]tile [](" + t.x + ", " + t.y + ")[accent] block:[] " + ((t.block() == null || t.block() == Blocks.air) ? "[#545454]none" : t.block().name) + " [orange]--[]");
-                    TileInfo info = tileInfoHashMap.getOrDefault(t, new TileInfo());
-                    if (info.placedBy != null) {
-                        String pBy = (player.admin() ? info.placedByUUID + " " + info.placedBy : info.placedBy);
-                        player.sendMessage("[accent]last placed by:[] " + escapeColorCodes(pBy));
-                    }
-                    if (info.destroyedBy != null) {
-                        String dBy = (player.admin() ? info.destroyedByUUID + " " + info.destroyedBy : info.destroyedBy);
-                        player.sendMessage("[accent]last [scarlet]deconstructed[] by:[] " + escapeColorCodes(dBy));
-                    }
-                    if (t.block() == Blocks.air && info.wasHere != null) {
-                        player.sendMessage("[accent]block that was here:[] " + info.wasHere);
-                    }
-                    if (info.configuredBy != null) {
-                        String cBy = (player.admin() ? info.configuredByUUID + " " + info.configuredBy : info.configuredBy);
-                        player.sendMessage("[accent]last configured by:[] " + escapeColorCodes(cBy));
-                    }
-                }
-            }
-        });
-
-        Events.on(EventType.BuildSelectEvent.class, event -> {
-            if (event.builder.isPlayer()) {
-                if (event.tile != null) {
-                    Player player = event.builder.getPlayer();
-                    TileInfo info = tileInfoHashMap.getOrDefault(event.tile, new TileInfo());
-                    if (!event.breaking) {
-                        info.placedBy = player.name;
-                        info.placedByUUID = player.uuid();
-                        info.wasHere = (event.tile.block() != Blocks.air ? event.tile.block().localizedName : "[#545454]none");
-                    } else {
-                        info.destroyedBy = player.name;
-                        info.destroyedByUUID = player.uuid();
-                    }
-                    tileInfoHashMap.put(event.tile, info);
-                }
-            }
-        });
-
-        Events.on(EventType.TapEvent.class, event -> {
-            if (event.tile != null & event.player != null) {
-                TileInfo info = tileInfoHashMap.getOrDefault(event.tile, new TileInfo());
-                Player player = event.player;
-                info.configuredBy = player.name;
-                info.configuredByUUID = player.uuid();
-                tileInfoHashMap.put(event.tile, info);
-            }
-        });
-
-
         Events.on(EventType.ServerLoadEvent.class, event -> {
             // action filter
             Vars.netServer.admins.addActionFilter(action -> {
@@ -435,22 +370,13 @@ public class ioMain extends Plugin {
             }
         });
 
-//        rateMapTask = Timer.schedule(this::rateMenu, 120); // for the rateMenu to appear after 2 minutes after start
+        // Log game over
         Events.on(EventType.GameOverEvent.class, event -> {
-            debug("Game over!");
-            update(log_channel, api);
-
-            // log the game over
-            assert log_channel != null;
             if (Groups.player.size() > 0) {
                 EmbedBuilder gameOverEmbed = new EmbedBuilder().setTitle("Game over!").setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves and " + Groups.player.size() + " players!").setColor(new Color(0x33FFEC));
-                log_channel.sendMessage(gameOverEmbed);
-                live_chat_channel.sendMessage(gameOverEmbed);
+                Channels.LOG.sendMessage(gameOverEmbed);
+                Channels.CHAT.sendMessage(gameOverEmbed);
             }
-
-//            // force map vote
-//            rateMapTask.cancel(); // cancel the task if gameover before 5 min
-//            rateMapTask = Timer.schedule(this::rateMenu, 120);
         });
 
 
@@ -538,13 +464,13 @@ public class ioMain extends Plugin {
     }
 
     // TODO: Needs to be called
-    public static void update(TextChannel log_channel, DiscordApi api) {
+    public static void update() {
         try {
             if ((logCount & 5) == 0) {
                 // log player joins
-                logConnections(log_channel, joinedPlayers, "join");
+                logConnections(Channels.LOG, joinedPlayers, "join");
 
-                logConnections(log_channel, leftPlayers, "leave");
+                logConnections(Channels.LOG, leftPlayers, "leave");
             }
             logCount++;
             debug("Updated database!");
@@ -556,12 +482,6 @@ public class ioMain extends Plugin {
 
     @Override
     public void registerServerCommands(CommandHandler handler) {
-        handler.register("update", "Update the database with the new current data", arg -> {
-            TextChannel log_channel = getTextChannel("882342315438526525");
-            update(log_channel, api);
-        });
-
-
         handler.register("logging", "<trace/debug> <true/false>", "Enable or disable logging for javacord.", args -> {
             if (!Objects.equals(args[1], "false") && !Objects.equals(args[1], "true")) {
                 err("Second argument has to be true or false!");

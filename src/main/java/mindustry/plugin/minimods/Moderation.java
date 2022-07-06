@@ -193,12 +193,6 @@ public class Moderation implements MiniMod {
 
     @Override
     public void registerCommands(CommandHandler handler) {
-        handler.<Player>register("inspector", "Toggle inspector.", (args, player) -> {
-            PersistentPlayerData pd = (ioMain.playerDataGroup.getOrDefault(player.uuid(), null));
-            pd.inspector = !pd.inspector;
-            player.sendMessage((pd.inspector ? "Enabled" : "Disabled") + " the inspector.");
-        });
-
         handler.<Player>register("freeze", "<player> [reason...]", "Freeze a player. To unfreeze just use this command again.", (args, player) -> {
             if (!player.admin()) {
                 player.sendMessage(Utils.noPermissionMessage);
