@@ -1,7 +1,6 @@
 package mindustry.plugin;
 
 import arc.util.CommandHandler;
-import mindustry.plugin.discord.discordcommands.DiscordCommands;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 
 /**
