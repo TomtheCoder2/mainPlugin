@@ -23,6 +23,7 @@ import mindustry.io.SaveIO;
 import mindustry.net.Administration;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
@@ -77,7 +78,7 @@ public class GameInfo implements MiniMod {
                     eb.addField("Current Name", info.lastName);
                     eb.addField("Current IP", info.lastIP);
                 }
-                eb.setColor(Context.Colors.INFO);
+                eb.setColor(DiscordPalette.INFO);
                 ctx.sendEmbed(eb);
             }
         );
@@ -100,7 +101,7 @@ public class GameInfo implements MiniMod {
                 }
                 desc += "```";
                 eb.setDescription(desc);
-                eb.setColor(Context.Colors.INFO);
+                eb.setColor(DiscordPalette.INFO);
                 ctx.sendEmbed(eb);
             }
         );
@@ -124,7 +125,7 @@ public class GameInfo implements MiniMod {
                     .addInlineField("FPS", Core.graphics.getFramesPerSecond() + "")
                     .addInlineField("TPS", Vars.state.serverTps + "")
                     .addInlineField("Next wave in", Math.round(Vars.state.wavetime / Vars.state.serverTps) + " seconds")
-                    .setColor(Context.Colors.INFO);
+                    .setColor(DiscordPalette.INFO);
 
                 Fi tempDir = new Fi("temp/");
                 Fi mapFile = tempDir.child(Config.serverName + "_" + Utils.escapeEverything(Vars.state.map.name()).replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msav");
@@ -174,7 +175,7 @@ public class GameInfo implements MiniMod {
                         }
                     }
                 }
-                eb.setColor(Context.Colors.INFO);
+                eb.setColor(DiscordPalette.INFO);
                 ctx.sendEmbed(eb);
             }
         );

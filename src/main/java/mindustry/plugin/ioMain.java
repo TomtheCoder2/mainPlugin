@@ -55,8 +55,8 @@ import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
+import static mindustry.plugin.discord.DiscordLog.logConnections;
 import static mindustry.plugin.effect.EffectHelper.getEffect;
-import static mindustry.plugin.utils.DiscordLog.logConnections;
 import static mindustry.plugin.utils.Utils.*;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setDebug;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setTrace;
@@ -123,7 +123,7 @@ public class ioMain extends Plugin {
             JSONObject data = new JSONObject(new JSONTokener(pureJson));
 
             // url to connect to the MindServ
-            maps_url = data.getString("maps_url");
+            Config.mapsURL = data.getString("maps_url");
 
             JSONObject discordData = data.getJSONObject("discord");
             discordInviteLink = discordData.getString("invite");

@@ -20,8 +20,8 @@ import java.time.Instant;
 
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.player;
+import static mindustry.plugin.discord.DiscordLog.logAction;
 import static mindustry.plugin.ioMain.playerDataGroup;
-import static mindustry.plugin.utils.DiscordLog.logAction;
 import static mindustry.plugin.utils.LogAction.ban;
 import static mindustry.plugin.utils.Utils.Categories.moderation;
 import static mindustry.plugin.utils.Utils.*;

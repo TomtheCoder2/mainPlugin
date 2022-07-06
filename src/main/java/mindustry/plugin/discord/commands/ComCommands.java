@@ -245,7 +245,7 @@ public class ComCommands {
                     }
                     lijst.append(escapeEverything(player.name)).append("\n");
                 }*/
-
+/*
                 new MessageBuilder()
                         .setEmbed(new EmbedBuilder()
                                 .setTitle("Players online: " + Groups.player.size())
@@ -256,8 +256,8 @@ public class ComCommands {
                                 .setColor(Color.ORANGE))
                         .send(ctx.channel);
             }
-        });
-
+        });*/
+/*
         handler.registerCommand(new Command("translate") {
             {
                 help = "Translate text and send it in the in game chat";
@@ -287,7 +287,7 @@ public class ComCommands {
                         .setDescription("Please use the <#" + live_chat_channel_id + "> channel!")
                         .setColor(new Color(0xff0000)));
             }
-        });
+        });*/
 /*
         handler.registerCommand(new Command("status") {
             {
