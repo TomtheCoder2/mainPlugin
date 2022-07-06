@@ -172,6 +172,16 @@ public class ioMain extends Plugin {
         for (MiniMod mod : minimods) {
             mod.registerDiscordCommands(registrar);
         }
+        registrar.register("help", "[cmd]", data -> {
+            data.help = "Display information about commands";
+            data.aliases = new String[] {"h"};
+        }, ctx -> {
+            if (ctx.args.containsKey("cmd")) {
+                ctx.sendEmbed(registrar.helpEmbed(ctx.args.get("cmd")));
+            } else {
+                ctx.sendEmbed(registrar.helpEmbed());
+            }
+        });
         api.addMessageCreateListener(evt -> {
             registrar.dispatchEvent(evt);
         });
