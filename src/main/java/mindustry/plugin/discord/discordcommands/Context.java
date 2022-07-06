@@ -1,5 +1,6 @@
 package mindustry.plugin.discord.discordcommands;
 
+import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.utils.Utils;
 
 import org.javacord.api.entity.channel.Channel;
