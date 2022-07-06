@@ -2,6 +2,8 @@ package mindustry.plugin.discord.discordcommands;
 
 import mindustry.gen.Call;
 import mindustry.plugin.ioMain;
+import mindustry.plugin.discord.DiscordPalette;
+import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -20,6 +22,7 @@ import static mindustry.plugin.utils.Utils.*;
 
 import arc.struct.LongSeq;
 import arc.struct.ObjectMap;
+import arc.struct.Seq;
 import arc.struct.StringMap;
 
 /**
@@ -146,6 +149,57 @@ public class DiscordRegistrar {
                     commands.put(alias, cmdEntry);
             }
         }
+    }
+
+    public EmbedBuilder helpEmbed() {
+        ObjectMap<String, Seq<String>> commandsByCategory = new ObjectMap<>();
+
+        for (var entry : commands) {
+            if (entry.key.equals(entry.value.data.name)) {
+                if (entry.value.data.hidden) continue;
+                String category = entry.value.data.category;
+                if (category == null) category = "General";
+                Seq<String> cmds = commandsByCategory.get(category, new Seq<>());
+                if (!cmds.contains(entry.key)) {
+                    cmds.add(entry.key);
+                }
+                commandsByCategory.put(category, cmds);
+            }
+        }
+        
+        for (var list : commandsByCategory.values()) {
+            list.sort();
+        }
+
+        EmbedBuilder eb = new EmbedBuilder()
+            .setTitle("Commands")
+            .setColor(DiscordPalette.INFO);
+        for (var entry : commandsByCategory) {
+            eb.addInlineField(entry.key, entry.value.toString("\n"));
+        }
+
+        return eb;
+    }
+
+    public EmbedBuilder helpEmbed(String command) {
+        CommandEntry entry = commands.get(command);
+        if (entry == null) return null;
+        Command data = entry.data;
+
+        EmbedBuilder eb = new EmbedBuilder()
+            .setTitle("Command: " + data.name)
+            .setDescription(data.help)
+            .addField("Usage", DiscordVars.prefix + data.name + " " + data.usage);
+        
+        if (data.category != null)
+            eb.addInlineField("Category", data.category);
+        
+        if (data.aliases != null && data.aliases.length != 0)
+            eb.addInlineField("Aliases", Seq.with(data.aliases).toString(", "));
+        
+        if (data.roles != null && data.roles.length != 0) 
+            eb.addField("Roles", "<@&" + LongSeq.with(data.roles).toString("> <@&") + ">");
+        return eb;
     }
 
     /** Parses command arguments */

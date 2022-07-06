@@ -139,6 +139,7 @@ public class ioMain extends Plugin {
             Channels.load(api, discordData.getJSONObject("channels"));
             Roles.load(api, discordData.getJSONObject("roles"));
             String discordPrefix = discordData.getString("prefix");
+            DiscordVars.prefix = discordPrefix;
             registrar = new DiscordRegistrar(discordPrefix);
 
             Config.serverName = data.getString("server_name");
