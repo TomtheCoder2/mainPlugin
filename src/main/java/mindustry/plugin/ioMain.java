@@ -33,6 +33,7 @@ import mindustry.plugin.utils.Rank;
 import mindustry.world.Tile;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
@@ -180,6 +181,11 @@ public class ioMain extends Plugin {
         FallbackLoggerConfiguration.setDebug(false);
         FallbackLoggerConfiguration.setTrace(false);
 
+        // Update discord status
+        Timer.schedule(() -> {
+            updateDiscordStatus();
+        }, 60, 60);
+
         // Live Chat
         Events.on(EventType.PlayerChatEvent.class, event -> {
             if (event.message.charAt(0) != '/') {
@@ -195,7 +201,7 @@ public class ioMain extends Plugin {
             }
         });
 
-        // display on screen messages
+        // Display on-screen messages
         float duration = 10f;
         int start = 450;
         int increment = 30;
@@ -228,8 +234,6 @@ public class ioMain extends Plugin {
         });
 
 
-        // player joined
-        TextChannel log_channel = getTextChannel("882342315438526525");
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;
             if (bannedNames.contains(player.name)) {
@@ -514,6 +518,14 @@ public class ioMain extends Plugin {
         return true;
     }
 
+    public void updateDiscordStatus() {
+        if (Vars.state.is(GameState.State.playing)) {
+            DiscordVars.api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
+        } else {
+            DiscordVars.api.updateActivity(ActivityType.CUSTOM, "Not currently hosting");
+        }
+    }
+
     // TODO: Needs to be called
     public static void update(TextChannel log_channel, DiscordApi api) {
         try {
@@ -524,52 +536,6 @@ public class ioMain extends Plugin {
                 logConnections(log_channel, leftPlayers, "leave");
             }
             logCount++;
-
-            if (state.is(GameState.State.playing)) {
-                if (Mathf.chance(0.01f)) {
-                    api.updateActivity(lennyFace);
-                    System.out.println(lennyFace);
-                } else {
-                    api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
-                }
-            } else {
-                api.updateActivity("Not hosting. Please Host a game. Ping an admin");
-                // restart the server:
-                Map result;
-                Gamemode preset = Gamemode.survival;
-                result = maps.getShuffleMode().next(preset, state.map);
-                info("Randomized next map to be @.", result.name());
-                world.loadMap(result, result.applyRules(preset));
-                state.rules = result.applyRules(preset);
-                logic.play();
-                assert error_log_channel != null;
-                error_log_channel.sendMessage(" <@770240444466069514> ");
-                error_log_channel.sendMessage(new EmbedBuilder().setColor(new Color(0xff0000)).setTitle("Server crashed. Restarting!"));
-                String command = "sh shellScripts/restart.sh";
-                return;
-//            try {
-////                execute(command);
-//                ProcessBuilder processBuilder = new ProcessBuilder("nohup", "sh", "./shellScripts/restart.sh");
-//                try {
-//                    System.out.println(processBuilder.command());
-//                    processBuilder.directory(new File(System.getProperty("user.dir")));
-//                    processBuilder.redirectErrorStream(false);
-////                    processBuilder.start();
-////                    net.dispose();
-////                    Core.app.exit();
-////                    System.exit(1);
-//                    restartApplication();
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            } catch (Exception e) {
-//                error_log_channel.sendMessage(new EmbedBuilder()
-//                        .setColor(new Color(0xff0000))
-//                        .setTitle("Failed to restart server!")
-//                        .setDescription(e.getMessage()));
-//            }
-            }
-
             debug("Updated database!");
         } catch (Exception e) {
             err("There was an error in the update loop: ");

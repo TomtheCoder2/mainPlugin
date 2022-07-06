@@ -15,6 +15,7 @@ public final class Database {
         public boolean verified = false;
 
         // stats
+        /** Represents play time, in minutes */
         public int playTime = 0;
         public int buildingsBuilt = 0;
         public int gamesPlayed = 0;
