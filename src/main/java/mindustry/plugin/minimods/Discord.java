@@ -41,40 +41,5 @@ public class Discord implements MiniMod {
                 Call.sendMessage("[sky]The bug is reported to discord.");
             }
         });
-
-
-        handler.<Player>register("redeem", "<key>", "Verify the redeem command (Discord)", (arg, player) -> {
-            try {
-                PersistentPlayerData tdata = (ioMain.playerDataGroup.getOrDefault(player.uuid(), null));
-                if (tdata.redeemKey != -1) {
-                    if (Integer.parseInt(arg[0]) == tdata.redeemKey) {
-                        StringBuilder roleList = new StringBuilder();
-                        Database.Player pd = Database.getPlayerData(player.uuid());
-                        for (var entry: Rank.roles) {
-                            long roleID = entry.key;
-                            assert pd != null;
-                            if (entry.value <= pd.rank) {
-                                System.out.println("add role: " + DiscordVars.api.getRoleById(roleID).get());
-                                roleList.append("<@").append(roleID).append(">\n");
-                                DiscordVars.api.getUserById(tdata.redeem).get().addRole(DiscordVars.api.getRoleById(roleID).get());
-                            }
-                        }
-                        System.out.println(roleList);
-                        Channels.LOG.sendMessage(new EmbedBuilder().setTitle("Updated roles!").addField("Discord Name", DiscordVars.api.getUserById(tdata.redeem).get().getName(), true).addField("In Game Name", tdata.origName, true).addField("In Game UUID", player.uuid(), true).addField("Added roles", roleList.toString(), true));
-                        player.sendMessage("Successfully redeem to account: [green]" + DiscordVars.api.getUserById(tdata.redeem).get().getName());
-                        tdata.task.cancel();
-                    } else {
-                        player.sendMessage("[scarlet]Wrong code!");
-                    }
-
-                    tdata.redeemKey = -1;
-                } else {
-                    player.sendMessage("Please use the redeem command on the discord server first");
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-                player.sendMessage("[scarlet]There was an error: " + e.getMessage());
-            }
-        });
     }
 }
