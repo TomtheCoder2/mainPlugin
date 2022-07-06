@@ -15,8 +15,6 @@ public class PersistentPlayerData implements Serializable {
     //    public Array<BaseUnit> draugPets = new Array<>();
     //    public boolean spawnedLichPet;
 //    public boolean spawnedPowerGen;
-    public String redeem = null;
-    public int redeemKey = -1;
     public Timer.Task task;
 
     public BulletType bt;
