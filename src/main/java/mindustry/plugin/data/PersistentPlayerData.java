@@ -15,10 +15,6 @@ public class PersistentPlayerData implements Serializable {
     //    public Array<BaseUnit> draugPets = new Array<>();
     //    public boolean spawnedLichPet;
 //    public boolean spawnedPowerGen;
-    public BulletType bt;
-    public float sclVelocity;
-    public float sclLifetime;
-    public float sclDamage;
 
     public boolean snowBall = false;
 

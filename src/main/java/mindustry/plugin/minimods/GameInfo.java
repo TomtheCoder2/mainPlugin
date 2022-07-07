@@ -13,6 +13,7 @@ import arc.util.CommandHandler;
 import arc.util.Log;
 import arc.util.Reflect;
 import mindustry.Vars;
+import mindustry.content.Bullets;
 import mindustry.content.Items;
 import mindustry.core.GameState;
 import mindustry.game.Team;

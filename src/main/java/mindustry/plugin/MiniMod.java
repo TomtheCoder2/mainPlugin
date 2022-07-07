@@ -10,7 +10,7 @@ import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
  */
 public interface MiniMod {
     /** Register client (game) commands */
-    void registerCommands(CommandHandler handler);
+    default void registerCommands(CommandHandler handler) {}
 
     /** Register server commands */
     default void registerServerCommands(CommandHandler handler) {}

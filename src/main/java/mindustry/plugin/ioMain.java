@@ -22,7 +22,6 @@ import mindustry.maps.Map;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration;
 import mindustry.plugin.data.PersistentPlayerData;
-import mindustry.plugin.data.TileInfo;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
 import mindustry.plugin.minimods.Discord;
@@ -90,18 +89,21 @@ public class ioMain extends Plugin {
     public static NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
 
     protected MiniMod[] minimods = new MiniMod[]{
-            new mindustry.plugin.minimods.RTV(),
-            new mindustry.plugin.minimods.Translate(),
-            new mindustry.plugin.minimods.JS(),
-            new mindustry.plugin.minimods.Communication(),
-            new mindustry.plugin.minimods.Management(),
-            new mindustry.plugin.minimods.Discord(),
-            new mindustry.plugin.minimods.ServerInfo(),
-            new mindustry.plugin.minimods.GameInfo(),
-            new mindustry.plugin.minimods.Ranks(),
-            new mindustry.plugin.minimods.Moderation(),
-            new mindustry.plugin.minimods.Kick(),
-            new mindustry.plugin.minimods.Rainbow(),
+        new mindustry.plugin.minimods.Communication(),
+        new mindustry.plugin.minimods.Discord(),
+        new mindustry.plugin.minimods.GameInfo(),
+        new mindustry.plugin.minimods.Inspector(),
+        new mindustry.plugin.minimods.JS(),
+        new mindustry.plugin.minimods.Kick(),
+        new mindustry.plugin.minimods.Management(),
+        new mindustry.plugin.minimods.Moderation(),
+        new mindustry.plugin.minimods.Rainbow(),
+        new mindustry.plugin.minimods.Ranks(),
+        new mindustry.plugin.minimods.Redeem(),
+        new mindustry.plugin.minimods.RTV(),
+        new mindustry.plugin.minimods.ServerInfo(),
+        new mindustry.plugin.minimods.Translate(),
+        new mindustry.plugin.minimods.Weapon(),
     };
 
     // register event handlers and create variables in the constructor
@@ -344,9 +346,6 @@ public class ioMain extends Plugin {
         Events.on(EventType.Trigger.update.getClass(), event -> {
             for (Player p : Groups.player) {
                 PersistentPlayerData tdata = (playerDataGroup.getOrDefault(p.uuid(), null));
-                if (tdata != null && tdata.bt != null && p.shooting()) {
-                    Call.createBullet(tdata.bt, p.team(), p.getX(), p.getY(), p.unit().rotation, tdata.sclDamage, tdata.sclVelocity, tdata.sclLifetime);
-                }
                 if (tdata != null && tdata.snowBall && p.shooting()) {
 //                    Effect.create(new Effect(), p.getX(), p.getY(), p.unit().rotation, new arc.graphics.Color(0xffffff), null);
 //                    EffectHelper.onMove(p);
