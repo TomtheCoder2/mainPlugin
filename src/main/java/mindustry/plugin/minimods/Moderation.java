@@ -20,6 +20,7 @@ import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
+import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
@@ -160,6 +161,45 @@ public class Moderation implements MiniMod {
                 }
 
                 DiscordLog.logAction(LogAction.ban, info, ctx, reason);
+            }
+        );
+
+        handler.register("ban-subnet", "[add/remove/list] [address]", 
+            data -> {
+                data.help = "Ban a subnet. A subnet ban rejects all IPs that begin with the given string.";
+                data.category = "Moderation";
+                data.roles = new long[] { Roles.MOD, Roles.ADMIN, Roles.APPRENTICE };
+                data.aliases = new String[] { "subnet-ban" };
+            },
+            ctx -> {
+                if (!ctx.args.containsKey("add/remove/list") || ctx.args.get("add/remove/list").equals("list")) {
+                    ctx.sendEmbed(DiscordPalette.INFO, "Subnet Bans",                 
+                        Vars.netServer.admins.subnetBans.isEmpty() ? 
+                            "None" :
+                            ("```\n" + Vars.netServer.admins.subnetBans.toString("\n") + "\n```")
+                    );
+                } else if (ctx.args.get("add/remove/list").equals("add")) {
+                    if (!ctx.args.containsKey("address")) {
+                        ctx.error("Invalid Usage", "Must specify a subnet address");
+                        return;
+                    }
+                    if (Vars.netServer.admins.subnetBans.contains(ctx.args.get("address"))) {
+                        ctx.sendEmbed(DiscordPalette.WARN, "Subnet Ban Already Exists", "Subnet " + ctx.args.get("address") + " was already in the ban list");
+                    }
+                    Vars.netServer.admins.subnetBans.add(ctx.args.get("address"));
+
+                    ctx.success("Added Subnet Ban", "Address: " + ctx.args.get("address"));
+                } else if (ctx.args.get("add/remove/list").equals("remove")) {
+                    if (!ctx.args.containsKey("address")) {
+                        ctx.error("Invalid Usage", "Must specify a subnet address");
+                        return;
+                    }
+                    Vars.netServer.admins.subnetBans.remove(ctx.args.get("address"));
+
+                    ctx.success("Removed Subnet Ban", "Address: " + ctx.args.get("address"));
+                } else {
+                    ctx.error("Invalid Usage", "First argument must be add/remove/list");
+                }
             }
         );
 
