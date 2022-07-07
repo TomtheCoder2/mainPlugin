@@ -93,26 +93,6 @@ public class Moderator {
         if (data.has("moderator_roleid")) {
             long banRole = Strings.parseLong(data.getString("moderator_roleid"), 0);
 
-            handler.registerCommand(new RoleRestrictedCommand("gc") {
-                {
-                    help = "Trigger a garbage collection. Testing only.";
-                    roles = new long[] { banRole };
-                    category = management;
-                }
-
-                @Override
-                public void run(Context ctx) {
-                    int pre = (int) (Core.app.getJavaHeap() / 1024 / 1024);
-                    System.gc();
-                    int post = (int) (Core.app.getJavaHeap() / 1024 / 1024);
-                    info("@ MB collected. Memory usage now at @ MB.", pre - post, post);
-                    ctx.sendMessage(new EmbedBuilder()
-                            .setTitle("Triggered a garbage collection!")
-                            .setColor(new Color(0x00ff00))
-                            .setDescription(pre - post + " MB collected. Memory usage now at " + post + " MB."));
-                }
-            });
-
             handler.registerCommand(new RoleRestrictedCommand("test") {
                 {
                     help = "Test the server stability.";

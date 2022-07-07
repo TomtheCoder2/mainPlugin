@@ -18,6 +18,7 @@ import mindustry.Vars;
 import mindustry.net.Administration;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
+import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Utils;
@@ -34,6 +35,27 @@ public class Management implements MiniMod {
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
+        handler.register("gc", "",
+            data -> {
+                data.help = "Trigger a garbage collection. Testing only.";
+                data.roles = new long[] { Roles.MOD, Roles.ADMIN };
+                data.category = "Management";
+            },
+            ctx -> {
+                double pre = (Core.app.getJavaHeap() / 1024.0 / 1024.0);
+                System.gc();
+                double post = (Core.app.getJavaHeap() / 1024.0 / 1024.0);
+
+                ctx.sendEmbed(new EmbedBuilder()
+                    .setColor(Color.YELLOW)
+                    .setTitle("Garbage Collected")
+                    .setDescription((post-pre) + " MB of garbage collected")
+                    .addInlineField("Pre-GC usage", pre + " MB")
+                    .addInlineField("Post-GC usage", post + " MB")
+                );
+            }
+        );
+
         handler.register("config", "[name] [value...]", d -> {
             d.help = "Configure server settings.";
             d.category = "Management";
@@ -69,7 +91,6 @@ public class Management implements MiniMod {
                 } else {
                     c.set(ctx.args.get("value").replace("\\n", "\n"));
                 }
-
                 
                 ctx.sendEmbed(Color.CYAN, "Configuration", c.name() + " is now set to <" + c.getClass().getName() + "> " + c.get() + "\n\nPrevious Value: " + previousValue);
             } catch(IllegalArgumentException e) {
@@ -205,7 +226,7 @@ public class Management implements MiniMod {
             Log.info("&ly--SERVER RESTARTING--");
             Vars.netServer.kickAll(Packets.KickReason.serverRestarting);
             Time.runTask(5f, () -> {
-                System.exit(2);
+                Core.app.exit();
             });
         });
     }
