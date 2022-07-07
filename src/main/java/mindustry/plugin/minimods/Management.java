@@ -1,11 +1,13 @@
 package mindustry.plugin.minimods;
 
 import org.javacord.api.entity.message.MessageAttachment;
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import mindustry.net.Packets;
 import arc.Core;
 import arc.files.Fi;
+import arc.struct.IntSeq;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Log;
@@ -24,17 +26,112 @@ import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Utils;
 
 import java.awt.Color;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class Management implements MiniMod {
     @Override
     public void registerCommands(CommandHandler handler) {}
 
+    private static class TestData {
+        public IntSeq tpsMeasurements;
+
+        public TestData() {
+            tpsMeasurements = new IntSeq();
+        }
+
+        public int min() {
+            if (tpsMeasurements.size == 0) return 0;
+
+            int min = Integer.MAX_VALUE;
+            for (int tps: tpsMeasurements.items) {
+                if (tps < min) min = tps;
+            }
+            return min;
+        }
+
+        public int max() {
+            int max = 0;
+            for (int tps : tpsMeasurements.items) {
+                if (tps > max) max = tps;
+            }
+            return max;
+        }
+
+        public double avg() {
+            if (tpsMeasurements.size == 0) return 0;
+
+            return (double)tpsMeasurements.sum() / (double)tpsMeasurements.size;
+        }
+
+        /** Returns the median TPS */
+        public int med() {
+            if (tpsMeasurements.size == 0) return 0;
+
+            IntSeq s = new IntSeq(tpsMeasurements);
+            s.sort();
+            return s.get(s.size / 2);
+        }
+
+        /** Returns the data as a CSV string */
+        public String csv() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Iteration,TPS");
+            int iter = 1;
+            for (int tps : tpsMeasurements.items) {
+                sb.append(iter);
+                sb.append(",");
+                sb.append(tps);
+
+                iter++;
+            }
+            return sb.toString();
+        }
+    }
+
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
+        handler.register("test", "[time]", 
+            data -> {
+                data.help = "Test server TPS stability";
+                data.category = "Management";
+            },
+            ctx -> {
+                long time = ctx.args.getLong("time", 1000);
+
+                TestData data = new TestData();
+                final Runnable[] scanTPS = new Runnable[0];
+                final long endTime = System.currentTimeMillis() + time;
+                scanTPS[0] = () -> {
+                    if (System.currentTimeMillis() > endTime) {
+                        ctx.reply(new MessageBuilder()
+                            .addEmbed(
+                                new EmbedBuilder()
+                                .setColor(Color.YELLOW)
+                                .setTitle("Stability Test Results")
+                                .setDescription(
+                                    "Min TPS: " + data.min() + "\n" +
+                                    "Max TPS: " + data.max() + "\n" + 
+                                    "Avg TPS: " + data.avg() + "\n" +
+                                    "Median TPS: " + data.med() + "\n"
+                                ))
+                            .addAttachment(data.csv().getBytes(), "data.csv")
+                        );
+                    } else {
+                        data.tpsMeasurements.add(Core.graphics.getFramesPerSecond());
+                        Core.app.post(scanTPS[0]);
+                    }
+                };
+
+                ctx.success("Stability Test Started", "Results will come out in " + time + "ms");
+            }
+        );
+
         handler.register("gc", "",
             data -> {
                 data.help = "Trigger a garbage collection. Testing only.";
@@ -63,11 +160,8 @@ public class Management implements MiniMod {
         }, ctx -> {
             if (!ctx.args.containsKey("name")) {
                 EmbedBuilder eb = new EmbedBuilder();
-                eb.setTitle("All config values:");
+                eb.setTitle("All Config Values");
                 for (Administration.Config c : Administration.Config.all) {
-//                            info("&lk| @: @", c.name(), "&lc&fi" + c.get());
-//                            info("&lk| | &lw" + c.description);
-//                            info("&lk|");
                     eb.addField(c.name() + ": " + c.get(), c.description, true);
                 }
                 eb.setColor(Color.CYAN);

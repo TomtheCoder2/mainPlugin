@@ -122,8 +122,7 @@ public class GameInfo implements MiniMod {
                     .addInlineField("Players", Groups.player.size() + "")
                     .addInlineField("Map", Vars.state.map.name())
                     .addInlineField("Wave", Vars.state.wave + "")
-                    .addInlineField("FPS", Core.graphics.getFramesPerSecond() + "")
-                    .addInlineField("TPS", Vars.state.serverTps + "")
+                    .addInlineField("TPS", Core.graphics.getFramesPerSecond() + "")
                     .addInlineField("Next wave in", Math.round(Vars.state.wavetime / Vars.state.serverTps) + " seconds")
                     .setColor(DiscordPalette.INFO);
 
