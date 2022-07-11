@@ -1,20 +1,15 @@
 package mindustry.plugin.discord.discordcommands;
 
+import arc.struct.StringMap;
 import mindustry.plugin.discord.DiscordPalette;
-import mindustry.plugin.utils.Utils;
-
-import org.javacord.api.entity.channel.Channel;
 import org.javacord.api.entity.channel.TextChannel;
-import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
-import arc.struct.StringMap;
-
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * Represents a specific invocation of a command

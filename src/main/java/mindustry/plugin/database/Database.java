@@ -1,66 +1,19 @@
 package mindustry.plugin.database;
-import java.sql.*;
 
 import arc.struct.Seq;
 import mindustry.plugin.utils.Utils;
+//import mindustry.plugin.utils.Utils;
+
+import java.sql.*;
 
 import static arc.util.Log.debug;
 
 public final class Database {
-    public static class Player implements Cloneable {
-        public String uuid;
-        public int rank;
-
-        /** For VPN-checking */
-        public boolean verified = false;
-
-        // stats
-        /** Represents play time, in minutes */
-        public int playTime = 0;
-        public int buildingsBuilt = 0;
-        public int gamesPlayed = 0;
-
-        // banned
-        public boolean banned = false;
-        /** In seconds. `Instant.now().getEpochSecond()` */
-        public long bannedUntil = 0;
-        public String banReason = "";
-
-        /** The ID of the corresponding discord user */
-        public long discord;
-
-        public Player(String uuid, int rank) {
-            this.uuid = uuid;
-            this.rank = rank;
-        }
-
-        public Object clone() throws CloneNotSupportedException {
-            return super.clone();
-        }
-
-        public static Player fromSQL(ResultSet rs) throws SQLException {
-            String uuid = rs.getString("uuid");
-            int rank = rs.getInt("rank");
-            Player pd = new Player(uuid, rank);
-
-            pd.verified = rs.getBoolean("verified");
-
-            pd.playTime = rs.getInt("playTime");
-            pd.buildingsBuilt = rs.getInt("buildingsBuilt");
-            pd.gamesPlayed = rs.getInt("gamesPlayed");
-
-            pd.banned = rs.getBoolean("banned");
-            pd.bannedUntil = rs.getLong("bannedUntil");
-            pd.banReason = rs.getString("banReason");
-
-            pd.discord = rs.getLong("discordLink");
-
-            return pd;
-        }
-    }
-
-    /** SQL connection. Should never be null after initialization. */
+    /**
+     * SQL connection. Should never be null after initialization.
+     */
     private static Connection conn;
+
     /**
      * Connect to the PostgreSQL Server
      */
@@ -70,6 +23,7 @@ public final class Database {
 
     /**
      * Retrieves data for a given mindustry player, or null if not found.
+     *
      * @param uuid the mindustry UUID of the player
      */
     public static Player getPlayerData(String uuid) {
@@ -78,6 +32,7 @@ public final class Database {
                 + "FROM playerdata "
                 + "WHERE uuid = ?";
         try {
+            debug("get player data of @, conn: @", uuid, conn.isClosed());
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, uuid);
 
@@ -95,8 +50,9 @@ public final class Database {
         return null;
     }
 
-    /** 
+    /**
      * Retrieves the player data for a given discord user, or null if not found.
+     *
      * @param id the discord ID of the player
      */
     public static Player getDiscordData(long id) {
@@ -124,7 +80,7 @@ public final class Database {
     /**
      * Set player data
      *
-     * @param pd   player Data
+     * @param pd player Data
      */
     public static void setPlayerData(Player pd) {
         if (getPlayerData(pd.uuid) == null) {
@@ -185,18 +141,6 @@ public final class Database {
         }
     }
 
-    /** Value returned by `Database::rankPlayers` */
-    public static class PlayerRank {
-        public String uuid;
-        /** playTime, buildingsBuilt, or gamesPlayed */
-        public int stat;
-
-        public PlayerRank(String uuid, int stat) {
-            this.uuid = uuid;
-            this.stat = stat;
-        }
-    }
-
     /**
      * Return a player ranking from the database.
      *
@@ -229,19 +173,6 @@ public final class Database {
         return null;
     }
 
-    /** Value returned by `Database::rankMaps` */
-    public static class MapRank {
-        /** Map name */
-        public String name;
-        /** Either positiveRating or negativeRating */
-        public int stat;
-
-        public MapRank(String name, int stat) {
-            this.name = name;
-            this.stat  = stat;
-        }
-    }
-
     /**
      * Retrieve a ranking of maps.
      *
@@ -260,7 +191,7 @@ public final class Database {
             pstmt.setInt(4, offset);
 
             ResultSet rs = pstmt.executeQuery();
-            Seq<MapRank> ranking =  new Seq<>();
+            Seq<MapRank> ranking = new Seq<>();
             while (rs.next()) {
                 String name = rs.getString("name");
                 int stat = rs.getInt(column);
@@ -273,46 +204,9 @@ public final class Database {
         return null;
     }
 
-    /** Information relating to maps stored in the database */
-    public static class Map implements Cloneable {
-        /**
-        * name varchar,
-        * positiveRating int,
-        * negativeRating int,
-        * highscore     bigint,
-        * playtime      bigint
-        */
-
-        /** Name of the map */
-        public String name;
-        public int positiveRating = 0;
-        public int negativeRating = 0;
-        public long highscoreTime = 0;
-        public long highscoreWaves = 0;
-        public long shortestGame = 0;
-        public long playTime = 0;
-
-        public Map(String name) {
-            this.name = name;
-        }
-
-        public Object clone() throws CloneNotSupportedException {
-            return super.clone();
-        }
-
-        public static Map fromSQL(ResultSet rs) throws SQLException {
-            Map md = new Map(rs.getString("name"));
-            md.positiveRating = rs.getInt("positiverating");
-            md.negativeRating = rs.getInt("negativerating");
-            md.highscoreTime = rs.getLong("highscoreTime");
-            md.highscoreWaves = rs.getLong("highscoreWaves");
-            md.playTime = rs.getLong("playtime");
-            md.shortestGame = rs.getLong("shortestGame");
-            return md;
-        }
-    }
-
-    /** Retrieves map data for a given map */
+    /**
+     * Retrieves map data for a given map
+     */
     public static Map getMapData(String name) {
         name = Utils.escapeEverything(name).replaceAll("\\W", "");
         String sql = "SELECT name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame "
@@ -334,7 +228,9 @@ public final class Database {
         return null;
     }
 
-    /** Sets map data for a given map */
+    /**
+     * Sets map data for a given map
+     */
     public static void setMapData(Map md) {
         String name = Utils.escapeEverything(md.name).replaceAll("\\W", "");
 
@@ -377,6 +273,144 @@ public final class Database {
             } catch (SQLException ex) {
                 debug(ex.getMessage());
             }
+        }
+    }
+
+    public static class Player implements Cloneable {
+        public String uuid;
+        public int rank;
+
+        /**
+         * For VPN-checking
+         */
+        public boolean verified = false;
+
+        // stats
+        /**
+         * Represents play time, in minutes
+         */
+        public int playTime = 0;
+        public int buildingsBuilt = 0;
+        public int gamesPlayed = 0;
+
+        // banned
+        public boolean banned = false;
+        /**
+         * In seconds. `Instant.now().getEpochSecond()`
+         */
+        public long bannedUntil = 0;
+        public String banReason = "";
+
+        /**
+         * The ID of the corresponding discord user
+         */
+        public long discord;
+
+        public Player(String uuid, int rank) {
+            this.uuid = uuid;
+            this.rank = rank;
+        }
+
+        public static Player fromSQL(ResultSet rs) throws SQLException {
+            String uuid = rs.getString("uuid");
+            int rank = rs.getInt("rank");
+            Player pd = new Player(uuid, rank);
+
+            pd.verified = rs.getBoolean("verified");
+
+            pd.playTime = rs.getInt("playTime");
+            pd.buildingsBuilt = rs.getInt("buildingsBuilt");
+            pd.gamesPlayed = rs.getInt("gamesPlayed");
+
+            pd.banned = rs.getBoolean("banned");
+            pd.bannedUntil = rs.getLong("bannedUntil");
+            pd.banReason = rs.getString("banReason");
+
+            pd.discord = rs.getLong("discordLink");
+
+            return pd;
+        }
+
+        public Object clone() throws CloneNotSupportedException {
+            return super.clone();
+        }
+    }
+
+    /**
+     * Value returned by `Database::rankPlayers`
+     */
+    public static class PlayerRank {
+        public String uuid;
+        /**
+         * playTime, buildingsBuilt, or gamesPlayed
+         */
+        public int stat;
+
+        public PlayerRank(String uuid, int stat) {
+            this.uuid = uuid;
+            this.stat = stat;
+        }
+    }
+
+    /**
+     * Value returned by `Database::rankMaps`
+     */
+    public static class MapRank {
+        /**
+         * Map name
+         */
+        public String name;
+        /**
+         * Either positiveRating or negativeRating
+         */
+        public int stat;
+
+        public MapRank(String name, int stat) {
+            this.name = name;
+            this.stat = stat;
+        }
+    }
+
+    /**
+     * Information relating to maps stored in the database
+     */
+    public static class Map implements Cloneable {
+        /**
+         * name varchar,
+         * positiveRating int,
+         * negativeRating int,
+         * highscore     bigint,
+         * playtime      bigint
+         */
+
+        /**
+         * Name of the map
+         */
+        public String name;
+        public int positiveRating = 0;
+        public int negativeRating = 0;
+        public long highscoreTime = 0;
+        public long highscoreWaves = 0;
+        public long shortestGame = 0;
+        public long playTime = 0;
+
+        public Map(String name) {
+            this.name = name;
+        }
+
+        public static Map fromSQL(ResultSet rs) throws SQLException {
+            Map md = new Map(rs.getString("name"));
+            md.positiveRating = rs.getInt("positiverating");
+            md.negativeRating = rs.getInt("negativerating");
+            md.highscoreTime = rs.getLong("highscoreTime");
+            md.highscoreWaves = rs.getLong("highscoreWaves");
+            md.playTime = rs.getLong("playtime");
+            md.shortestGame = rs.getLong("shortestGame");
+            return md;
+        }
+
+        public Object clone() throws CloneNotSupportedException {
+            return super.clone();
         }
     }
 }

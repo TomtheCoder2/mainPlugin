@@ -3,37 +3,36 @@ package mindustry.plugin;
 import arc.Core;
 import arc.Events;
 import arc.files.Fi;
-import arc.math.Mathf;
 import arc.struct.ObjectMap;
-import arc.util.*;
+import arc.util.CommandHandler;
+import arc.util.Log;
+import arc.util.Time;
+import arc.util.Timer;
 import mindustry.Vars;
-import mindustry.content.Blocks;
-import mindustry.content.Fx;
 import mindustry.core.GameState;
 import mindustry.core.NetServer;
 import mindustry.entities.Effect;
 import mindustry.game.EventType;
-import mindustry.game.Gamemode;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
-import mindustry.graphics.Pal;
-import mindustry.maps.Map;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration;
 import mindustry.plugin.data.PersistentPlayerData;
+import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.Channels;
+import mindustry.plugin.discord.DiscordVars;
+import mindustry.plugin.discord.Roles;
+import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
-import mindustry.plugin.minimods.Discord;
 import mindustry.plugin.utils.Config;
 import mindustry.plugin.utils.ContentHandler;
-import mindustry.plugin.utils.Utils;
 import mindustry.plugin.utils.Rank;
-import mindustry.world.Tile;
+import mindustry.plugin.utils.Utils;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
-import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.util.logging.FallbackLoggerConfiguration;
@@ -46,12 +45,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-
-import mindustry.plugin.database.Database;
-import mindustry.plugin.discord.Channels;
-import mindustry.plugin.discord.DiscordVars;
-import mindustry.plugin.discord.Roles;
-import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
@@ -89,21 +82,21 @@ public class ioMain extends Plugin {
     public static NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
 
     protected MiniMod[] minimods = new MiniMod[]{
-        new mindustry.plugin.minimods.Communication(),
-        new mindustry.plugin.minimods.Discord(),
-        new mindustry.plugin.minimods.GameInfo(),
-        new mindustry.plugin.minimods.Inspector(),
-        new mindustry.plugin.minimods.JS(),
-        new mindustry.plugin.minimods.Kick(),
-        new mindustry.plugin.minimods.Management(),
-        new mindustry.plugin.minimods.Moderation(),
-        new mindustry.plugin.minimods.Rainbow(),
-        new mindustry.plugin.minimods.Ranks(),
-        new mindustry.plugin.minimods.Redeem(),
-        new mindustry.plugin.minimods.RTV(),
-        new mindustry.plugin.minimods.ServerInfo(),
-        new mindustry.plugin.minimods.Translate(),
-        new mindustry.plugin.minimods.Weapon(),
+            new mindustry.plugin.minimods.Communication(),
+            new mindustry.plugin.minimods.Discord(),
+            new mindustry.plugin.minimods.GameInfo(),
+            new mindustry.plugin.minimods.Inspector(),
+            new mindustry.plugin.minimods.JS(),
+            new mindustry.plugin.minimods.Kick(),
+            new mindustry.plugin.minimods.Management(),
+            new mindustry.plugin.minimods.Moderation(),
+            new mindustry.plugin.minimods.Rainbow(),
+            new mindustry.plugin.minimods.Ranks(),
+            new mindustry.plugin.minimods.Redeem(),
+            new mindustry.plugin.minimods.RTV(),
+            new mindustry.plugin.minimods.ServerInfo(),
+            new mindustry.plugin.minimods.Translate(),
+            new mindustry.plugin.minimods.Weapon(),
     };
 
     // register event handlers and create variables in the constructor
@@ -155,7 +148,7 @@ public class ioMain extends Plugin {
             String dbURL = databaseData.getString("url");
             String dbUser = databaseData.getString("user");
             String dbPwd = databaseData.getString("password");
-            System.out.printf("database url: %s, user: %s, password: %s%n\n", dbURL, dbUser, dbPwd);
+            System.out.printf("database url: %s, user: %s%n\n", dbURL, dbUser);
 
             try { // test connection
                 Database.connect(dbURL, dbUser, dbPwd);
@@ -172,30 +165,27 @@ public class ioMain extends Plugin {
         for (MiniMod mod : minimods) {
             mod.registerDiscordCommands(registrar);
         }
+        DiscordRegistrar finalRegistrar = registrar;
         registrar.register("help", "[cmd]", data -> {
             data.help = "Display information about commands";
-            data.aliases = new String[] {"h"};
+            data.aliases = new String[]{"h"};
         }, ctx -> {
             if (ctx.args.containsKey("cmd")) {
-                ctx.sendEmbed(registrar.helpEmbed(ctx.args.get("cmd")));
+                ctx.sendEmbed(finalRegistrar.helpEmbed(ctx.args.get("cmd")));
             } else {
-                ctx.sendEmbed(registrar.helpEmbed());
+                ctx.sendEmbed(finalRegistrar.helpEmbed());
             }
         });
-        api.addMessageCreateListener(evt -> {
-            registrar.dispatchEvent(evt);
-        });
+        api.addMessageCreateListener(registrar::dispatchEvent);
         DiscordVars.api = api;
 
         Utils.init();
-        EffectHelper.init();        
+        EffectHelper.init();
         FallbackLoggerConfiguration.setDebug(false);
         FallbackLoggerConfiguration.setTrace(false);
 
         // Update discord status
-        Timer.schedule(() -> {
-            updateDiscordStatus();
-        }, 60, 60);
+        Timer.schedule(this::updateDiscordStatus, 60, 60);
 
         // Live Chat
         Events.on(EventType.PlayerChatEvent.class, event -> {
@@ -426,15 +416,15 @@ public class ioMain extends Plugin {
     public static boolean checkChatRatelimit(String message, Player player) {
         // copied almost exactly from mindustry core, will probably need updating
         // will also update the user's global chat ratelimits
-        long resetTime = Config.messageRateLimit.num() * 1000L;
-        if (Config.antiSpam.bool() && !player.isLocal() && !player.admin) {
+        long resetTime = Administration.Config.messageRateLimit.num() * 1000L;
+        if (Administration.Config.antiSpam.bool() && !player.isLocal() && !player.admin) {
             //prevent people from spamming messages quickly
             if (resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime) {
                 //supress message
-                player.sendMessage("[scarlet]You may only send messages every " + Config.messageRateLimit.num() + " seconds.");
+                player.sendMessage("[scarlet]You may only send messages every " + Administration.Config.messageRateLimit.num() + " seconds.");
                 player.getInfo().messageInfractions++;
                 //kick player for spamming and prevent connection if they've done this several times
-                if (player.getInfo().messageInfractions >= Config.messageSpamKick.num() && Config.messageSpamKick.num() != 0) {
+                if (player.getInfo().messageInfractions >= Administration.Config.messageSpamKick.num() && Administration.Config.messageSpamKick.num() != 0) {
                     player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
                 }
                 return false;
@@ -454,14 +444,6 @@ public class ioMain extends Plugin {
         return true;
     }
 
-    public void updateDiscordStatus() {
-        if (Vars.state.is(GameState.State.playing)) {
-            DiscordVars.api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
-        } else {
-            DiscordVars.api.updateActivity(ActivityType.CUSTOM, "Not currently hosting");
-        }
-    }
-
     // TODO: Needs to be called
     public static void update() {
         try {
@@ -476,6 +458,14 @@ public class ioMain extends Plugin {
         } catch (Exception e) {
             err("There was an error in the update loop: ");
             e.printStackTrace();
+        }
+    }
+
+    public void updateDiscordStatus() {
+        if (Vars.state.is(GameState.State.playing)) {
+            DiscordVars.api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
+        } else {
+            DiscordVars.api.updateActivity(ActivityType.CUSTOM, "Not currently hosting");
         }
     }
 

@@ -4,6 +4,7 @@ import arc.files.Fi
 import arc.util.Http
 import arc.util.Log
 import arc.util.serialization.Base64Coder
+import mindustry.plugin.utils.Config
 import mindustry.plugin.utils.Utils
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -27,7 +28,7 @@ class GetMap {
         try {
             val client = HttpClient.newBuilder().build()
             val request = HttpRequest.newBuilder()
-                .uri(URI.create(Utils.maps_url + "/map"))
+                .uri(URI.create(Config.mapsURL + "/map"))
                 .POST(HttpRequest.BodyPublishers.ofFile(Paths.get(file.absolutePath())))
                 .build()
             val response = client.send(request, HttpResponse.BodyHandlers.ofByteArray())
@@ -59,7 +60,7 @@ class GetMap {
 
     fun getMap2(file: Fi): BufferedImage? {
         val stream: ByteArrayInputStream = file.readByteStream()
-        val request: Http.HttpRequest = Http.post(Utils.maps_url + "/map").content(stream, stream.available().toLong())
+        val request: Http.HttpRequest = Http.post(Config.mapsURL + "/map").content(stream, stream.available().toLong())
         var image: BufferedImage? = null
         request.submit { httpResponse: Http.HttpResponse ->
             val bytes: ByteArray = httpResponse.result

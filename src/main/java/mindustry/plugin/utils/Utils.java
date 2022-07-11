@@ -16,12 +16,10 @@ import com.github.kevinsawicki.http.HttpRequest;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import mindustry.content.Blocks;
 import mindustry.game.EventType;
 import mindustry.game.Schematic;
 import mindustry.game.Schematics;
 import mindustry.game.Team;
-import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.io.SaveIO;
@@ -31,15 +29,10 @@ import mindustry.maps.Maps;
 import mindustry.mod.Mods;
 import mindustry.net.Administration;
 import mindustry.plugin.database.Database;
-import mindustry.plugin.discord.discordcommands.Command;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.ioMain;
 import mindustry.type.ItemSeq;
 import mindustry.type.ItemStack;
-import mindustry.ui.Menus;
-import mindustry.world.Block;
-import org.javacord.api.entity.channel.Channel;
-import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -55,8 +48,10 @@ import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,7 +59,6 @@ import java.util.stream.Collectors;
 import java.util.zip.InflaterInputStream;
 
 import static arc.util.Log.debug;
-import static arc.util.Log.err;
 import static mindustry.Vars.*;
 import static mindustry.plugin.ioMain.contentHandler;
 //import java.sql.*;
@@ -346,54 +340,56 @@ public class Utils {
 
     // region discord
 
+//    /**
+//     * Send a schematic to channel of the ctx
+//     */
+//    public static void sendSchem(Schematic schem, Context ctx) {
+//        ItemSeq req = schem.requirements();
+//        EmbedBuilder eb = new EmbedBuilder()
+//                .setColor(new Color(0x00ffff))
+//                .setAuthor(ctx.author)
+//                .setTitle(schem.name());
+//        StringBuilder sb = new StringBuilder();
+//        for (ItemStack item : req) {
+//            Collection<KnownCustomEmoji> emojis = api.getCustomEmojisByNameIgnoreCase(item.item.name.replaceAll("-", ""));
+////            eb.addField(emoijs.iterator().next().getMentionTag(), String.valueOf(item.amount), true);
+//            sb.append(emojis.iterator().next().getMentionTag()).append(item.amount).append("    ");
+//        }
+//        eb.setDescription(schem.description());
+//        eb.addField("**Requirements:**", sb.toString());
+//        // power emojis
+//        String powerPos = api.getCustomEmojisByNameIgnoreCase("power_pos").iterator().next().getMentionTag();
+//        String powerNeg = api.getCustomEmojisByNameIgnoreCase("power_neg").iterator().next().getMentionTag();
+//        eb.addField("**Power:**", powerPos + "+" + schem.powerProduction() + "    " +
+//                powerNeg + "-" + schem.powerConsumption() + "     \n" +
+//                powerPos + "-" + powerNeg + (schem.powerProduction() - schem.powerConsumption()));
+//
+//        // preview schem
+//        BufferedImage visualSchem;
+//        File imageFile;
+//        Fi schemFile;
+//        try {
+//            visualSchem = contentHandler.previewSchematic(schem);
+//            imageFile = new File("temp/" + "image_" + schem.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".png");
+//            ImageIO.write(visualSchem, "png", imageFile);
+//            // crate the .msch file
+//            schemFile = new Fi("temp/" + "file_" + schem.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msch");
+//            Schematics.write(schem, schemFile);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return;
+//        }
+//        eb.setImage("attachment://" + imageFile.getName());
+//        MessageBuilder mb = new MessageBuilder();
+//        mb.addEmbed(eb);
+//        mb.addFile(imageFile);
+//        mb.addAttachment(schemFile.file());
+//        mb.send(ctx.channel);
+//    }
+
     /**
-     * Send a schematic to channel of the ctx
+     * Format a number, adding "K" to the end if > 1000
      */
-    public static void sendSchem(Schematic schem, Context ctx) {
-        ItemSeq req = schem.requirements();
-        EmbedBuilder eb = new EmbedBuilder()
-                .setColor(new Color(0x00ffff))
-                .setAuthor(ctx.author)
-                .setTitle(schem.name());
-        StringBuilder sb = new StringBuilder();
-        for (ItemStack item : req) {
-            Collection<KnownCustomEmoji> emojis = api.getCustomEmojisByNameIgnoreCase(item.item.name.replaceAll("-", ""));
-//            eb.addField(emoijs.iterator().next().getMentionTag(), String.valueOf(item.amount), true);
-            sb.append(emojis.iterator().next().getMentionTag()).append(item.amount).append("    ");
-        }
-        eb.setDescription(schem.description());
-        eb.addField("**Requirements:**", sb.toString());
-        // power emojis
-        String powerPos = api.getCustomEmojisByNameIgnoreCase("power_pos").iterator().next().getMentionTag();
-        String powerNeg = api.getCustomEmojisByNameIgnoreCase("power_neg").iterator().next().getMentionTag();
-        eb.addField("**Power:**", powerPos + "+" + schem.powerProduction() + "    " +
-                powerNeg + "-" + schem.powerConsumption() + "     \n" +
-                powerPos + "-" + powerNeg + (schem.powerProduction() - schem.powerConsumption()));
-
-        // preview schem
-        BufferedImage visualSchem;
-        File imageFile;
-        Fi schemFile;
-        try {
-            visualSchem = contentHandler.previewSchematic(schem);
-            imageFile = new File("temp/" + "image_" + schem.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".png");
-            ImageIO.write(visualSchem, "png", imageFile);
-            // crate the .msch file
-            schemFile = new Fi("temp/" + "file_" + schem.name().replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msch");
-            Schematics.write(schem, schemFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-        eb.setImage("attachment://" + imageFile.getName());
-        MessageBuilder mb = new MessageBuilder();
-        mb.addEmbed(eb);
-        mb.addFile(imageFile);
-        mb.addAttachment(schemFile.file());
-        mb.send(ctx.channel);
-    }
-
-    /** Format a number, adding "K" to the end if > 1000 */
     public static String formatInt(int n) {
         if (n > 1000) {
             return String.format("%.1fK", n / 1000.0);
@@ -402,66 +398,66 @@ public class Utils {
         }
     }
 
-    /**
-     * check if the message starts with the schematic prefix
-     */
-    public static boolean checkIfSchem(MessageCreateEvent event) {
-        // check if it's a schem encoded in base64
-        String message = event.getMessageContent();
-        if (event.getMessageContent().startsWith("bXNjaA")) {
-            try {
-                debug("send schem");
-                sendSchem(contentHandler.parseSchematic(message), new Context(event, null, null));
-                event.deleteMessage();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        // ========= check if it's a schem file ============
-        // download all files
-        Seq<MessageAttachment> ml = new Seq<>();
-        Seq<MessageAttachment> txtData = new Seq<>();
-        for (MessageAttachment ma : event.getMessageAttachments()) {
-            if ((ma.getFileName().split("\\.", 2)[1].trim().equals("msch")) && !event.getMessageAuthor().isBotUser()) { // check if its a .msch file
-                ml.add(ma);
-            }
-            if ((ma.getFileName().split("\\.", 2)[1].trim().equals("txt")) && !event.getMessageAuthor().isBotUser()) { // check if its a .msch file
-                txtData.add(ma);
-            }
-        }
-
-        if (ml.size > 0) {
-            CompletableFuture<byte[]> cf = ml.get(0).downloadAsByteArray();
-            try {
-                byte[] data = cf.get();
-                Schematic schem = Schematics.read(new ByteArrayInputStream(data));
-                sendSchem(schem, new Context(event, null, null));
-                return true;
-            } catch (Exception e) {
-                assert error_log_channel != null;
-                error_log_channel.sendMessage(new EmbedBuilder().setTitle(e.getMessage()).setColor(new Color(0xff0000)));
-                e.printStackTrace();
-            }
-        }
-
-        if (txtData.size > 0) {
-            CompletableFuture<byte[]> cf = txtData.get(0).downloadAsByteArray();
-            try {
-                byte[] data = cf.get();
-                String base64Encoded = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data)))
-                        .lines().parallel().collect(Collectors.joining("\n"));
-                Schematic schem = contentHandler.parseSchematic(base64Encoded);
-                sendSchem(schem, new Context(event, null, null));
-                event.deleteMessage();
-                return true;
-            } catch (Exception e) {
-                assert error_log_channel != null;
-                error_log_channel.sendMessage(new EmbedBuilder().setTitle(e.getMessage()).setColor(new Color(0xff0000)));
-                e.printStackTrace();
-            }
-        }
-        return false;
-    }
+//    /**
+//     * check if the message starts with the schematic prefix
+//     */
+//    public static boolean checkIfSchem(MessageCreateEvent event) {
+//        // check if it's a schem encoded in base64
+//        String message = event.getMessageContent();
+//        if (event.getMessageContent().startsWith("bXNjaA")) {
+//            try {
+//                debug("send schem");
+//                sendSchem(contentHandler.parseSchematic(message), new Context(event, null, null));
+//                event.deleteMessage();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        // ========= check if it's a schem file ============
+//        // download all files
+//        Seq<MessageAttachment> ml = new Seq<>();
+//        Seq<MessageAttachment> txtData = new Seq<>();
+//        for (MessageAttachment ma : event.getMessageAttachments()) {
+//            if ((ma.getFileName().split("\\.", 2)[1].trim().equals("msch")) && !event.getMessageAuthor().isBotUser()) { // check if its a .msch file
+//                ml.add(ma);
+//            }
+//            if ((ma.getFileName().split("\\.", 2)[1].trim().equals("txt")) && !event.getMessageAuthor().isBotUser()) { // check if its a .msch file
+//                txtData.add(ma);
+//            }
+//        }
+//
+//        if (ml.size > 0) {
+//            CompletableFuture<byte[]> cf = ml.get(0).downloadAsByteArray();
+//            try {
+//                byte[] data = cf.get();
+//                Schematic schem = Schematics.read(new ByteArrayInputStream(data));
+//                sendSchem(schem, new Context(event, null, null));
+//                return true;
+//            } catch (Exception e) {
+//                assert error_log_channel != null;
+//                error_log_channel.sendMessage(new EmbedBuilder().setTitle(e.getMessage()).setColor(new Color(0xff0000)));
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        if (txtData.size > 0) {
+//            CompletableFuture<byte[]> cf = txtData.get(0).downloadAsByteArray();
+//            try {
+//                byte[] data = cf.get();
+//                String base64Encoded = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data)))
+//                        .lines().parallel().collect(Collectors.joining("\n"));
+//                Schematic schem = contentHandler.parseSchematic(base64Encoded);
+//                sendSchem(schem, new Context(event, null, null));
+//                event.deleteMessage();
+//                return true;
+//            } catch (Exception e) {
+//                assert error_log_channel != null;
+//                error_log_channel.sendMessage(new EmbedBuilder().setTitle(e.getMessage()).setColor(new Color(0xff0000)));
+//                e.printStackTrace();
+//            }
+//        }
+//        return false;
+//    }
 
 
     /**
@@ -477,16 +473,16 @@ public class Utils {
         return format.format(date) + " UTC";
     }
 
-    /**
-     * if there are too few arguments for the command
-     */
-    public static void tooFewArguments(Context ctx, Command command) {
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle("Too few arguments!")
-                .setDescription("Usage: " + ioMain.prefix + command.name + " " + command.usage)
-                .setColor(Pals.error);
-        ctx.sendMessage(eb);
-    }
+//    /**
+//     * if there are too few arguments for the command
+//     */
+//    public static void tooFewArguments(Context ctx, Command command) {
+//        EmbedBuilder eb = new EmbedBuilder();
+//        eb.setTitle("Too few arguments!")
+//                .setDescription("Usage: " + ioMain.prefix + command.name + " " + command.usage)
+//                .setColor(Pals.error);
+//        ctx.sendMessage(eb);
+//    }
 
     /**
      * send the player not found message for discord commands
@@ -494,8 +490,8 @@ public class Utils {
     public static void playerNotFound(String name, EmbedBuilder eb, Context ctx) {
         eb.setTitle("Command terminated");
         eb.setDescription("Player `" + escapeEverything(name) + "` not found.");
-        eb.setColor(Pals.error);
-        ctx.sendMessage(eb);
+        eb.setColor(new Color(0xff0000));
+        ctx.channel().sendMessage(eb);
     }
 
     public static String hsvToRgb(double hue, float saturation, float value) {
@@ -517,50 +513,50 @@ public class Utils {
         };
     }
 
-    /**
-     * Get a png from map (InputStream)
-     *
-     * @param imageFileName the name of the image where you want to save it
-     */
-    public static void mapToPng(InputStream stream, String imageFileName) throws IOException {
-        debug("start function mapToPng");
-        Http.post(maps_url + "/map").content(stream, stream.available()).block(res -> {
-            debug(res.getStatus());
-            debug("received data (mapToPng)");
-            var pix = new Pixmap(res.getResultAsStream().readAllBytes());
-            PixmapIO.writePng(new Fi("temp/" + "image_" + imageFileName), pix); // Write to a file
-            debug("image height: @", pix.height);
-            debug("image width: @", pix.height);
-        });
-    }
+//    /**
+//     * Get a png from map (InputStream)
+//     *
+//     * @param imageFileName the name of the image where you want to save it
+//     */
+//    public static void mapToPng(InputStream stream, String imageFileName) throws IOException {
+//        debug("start function mapToPng");
+//        Http.post(maps_url + "/map").content(stream, stream.available()).block(res -> {
+//            debug(res.getStatus());
+//            debug("received data (mapToPng)");
+//            var pix = new Pixmap(res.getResultAsStream().readAllBytes());
+//            PixmapIO.writePng(new Fi("temp/" + "image_" + imageFileName), pix); // Write to a file
+//            debug("image height: @", pix.height);
+//            debug("image width: @", pix.height);
+//        });
+//    }
 
-    /**
-     * Send a map to the mindServ to get a png
-     *
-     * @param map        map File
-     * @param outputFile where the png should be saved
-     * @return whether it was successfully
-     */
-    public static boolean getMapImage(File map, File outputFile) {
-        try {
-            HttpRequest req = HttpRequest.post(maps_url + "/map");
-            req.contentType("application/octet-stream");
-            req.send(map);
-
-            if (req.ok()) {
-                req.receive(outputFile);
-                return true;
-            }
-            Log.warn("@:@", req.code(), req.body());
-            return false;
-        } catch (HttpRequest.HttpRequestException e) {
-            Log.err("Content Server is not running.\n", e);
-            return false;
-        } catch (Exception e) {
-            Log.err(e);
-            return false;
-        }
-    }
+//    /**
+//     * Send a map to the mindServ to get a png
+//     *
+//     * @param map        map File
+//     * @param outputFile where the png should be saved
+//     * @return whether it was successfully
+//     */
+//    public static boolean getMapImage(File map, File outputFile) {
+//        try {
+//            HttpRequest req = HttpRequest.post(maps_url + "/map");
+//            req.contentType("application/octet-stream");
+//            req.send(map);
+//
+//            if (req.ok()) {
+//                req.receive(outputFile);
+//                return true;
+//            }
+//            Log.warn("@:@", req.code(), req.body());
+//            return false;
+//        } catch (HttpRequest.HttpRequestException e) {
+//            Log.err("Content Server is not running.\n", e);
+//            return false;
+//        } catch (Exception e) {
+//            Log.err(e);
+//            return false;
+//        }
+//    }
 /*
     public static void attachMapPng(Map found, EmbedBuilder embed, Context ctx) throws IOException {
         Fi mapFile = found.file;
@@ -808,12 +804,13 @@ public class Utils {
         builder.start();
         System.exit(0);
     }
+
     public static String formatMapRanking(Database.MapRank[] ranks, String column) {
         StringBuilder sb = new StringBuilder("```\n");
         sb.append("   ").append(String.format("%9s ", column)).append("Name\n");
 
-        for (int i = 0 ; i < ranks.length; i++) {
-            sb.append(String.format("%2d ", i+1));
+        for (int i = 0; i < ranks.length; i++) {
+            sb.append(String.format("%2d ", i + 1));
             sb.append(String.format("%9d ", ranks[i].stat));
             sb.append(ranks[i].name);
             sb.append("\n");
@@ -829,14 +826,14 @@ public class Utils {
             sb.append("UUID ");
         }
         sb.append("Name\n");
-        for (int i = 0 ; i < ranks.length; i++) {
-            sb.append(String.format("%2d ", i+1));
+        for (int i = 0; i < ranks.length; i++) {
+            sb.append(String.format("%2d ", i + 1));
             sb.append(String.format("%9d ", ranks[i].stat));
 
             if (showUUID) {
-                sb.append(ranks[i].uuid).append( " ");
+                sb.append(ranks[i].uuid).append(" ");
             }
-            
+
             final String uuid = ranks[i].uuid;
             Player p = Groups.player.find(x -> x.uuid() == uuid);
             if (p != null) {
