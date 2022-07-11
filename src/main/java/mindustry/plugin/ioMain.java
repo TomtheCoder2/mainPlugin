@@ -237,7 +237,7 @@ public class ioMain extends Plugin {
 
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;
-            if (bannedNames.contains(player.name)) {
+            if (bannedNames.contains(escapeEverything(player.name))) {
                 player.con.kick("[scarlet]Please change your name.");
                 return;
             }

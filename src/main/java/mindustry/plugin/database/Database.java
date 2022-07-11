@@ -28,7 +28,7 @@ public final class Database {
      */
     public static Player getPlayerData(String uuid) {
         // search for the uuid
-        String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink"
+        String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink "
                 + "FROM playerdata "
                 + "WHERE uuid = ?";
         try {
