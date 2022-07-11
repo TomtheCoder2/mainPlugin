@@ -41,6 +41,7 @@ import org.json.JSONTokener;
 
 import java.awt.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +62,7 @@ public class ioMain extends Plugin {
 //    public GetMap map = new GetMap();
     public static final Fi pluginDir = new Fi("./config/mods/");
     public static final long CDT = 300L;
+    public static final LocalDateTime startTime = LocalDateTime.now();
     public static final ObjectMap<Long, String> CommandCooldowns = new ObjectMap<>(); // uuid
     private static final String lennyFace = "( \u0361\u00B0 \u035C\u0296 \u0361\u00B0)";
     public static String apiKey = "";

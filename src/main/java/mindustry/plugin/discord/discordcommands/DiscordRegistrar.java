@@ -10,10 +10,11 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.event.message.MessageCreateEvent;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Optional;
+
+import static mindustry.plugin.discord.DiscordVars.api;
 
 /**
  * Represents a registry of commands
@@ -162,33 +163,25 @@ public class DiscordRegistrar {
             return;
         }
 
-        List<Role> userRoles = event.getMessageAuthor().asUser().get().getRoles(event.getServer().get());
-        LongSeq cmdRoles = LongSeq.with(entry.data.roles);
-        if (entry.data.roles != null && !userRoles.stream().anyMatch(x -> cmdRoles.contains(x.getId()))) {
-            Context ctx = new Context(event, null);
-            ctx.error("Lack of permission", "Required to have one of the following roles: <@&" + cmdRoles.toString("><@&") + ">");
-            return;
+        if (entry.data.roles != null) { // only check if the command has a restriction
+            List<Role> userRoles = event.getMessageAuthor().asUser().get().getRoles(event.getServer().get());
+            LongSeq cmdRoles = LongSeq.with(entry.data.roles);
+            if (entry.data.roles != null && userRoles.stream().noneMatch(x -> cmdRoles.contains(x.getId()))) {
+                Context ctx = new Context(event, null);
+                ctx.error("Lack of permission", "Required to have one of the following roles: <@&" + cmdRoles.toString("><@&") + ">");
+                return;
+            }
         }
 
-        int i = 1;
         String error = null;
         StringMap argValues = new StringMap();
         for (Command.Arg arg : entry.data.args) {
-            if (args.length >= i) {
+            if (arg != null) {
                 if (!arg.optional) {
                     error = "Missing required argument " + arg.name;
                 }
                 break;
             }
-
-            String argStr = args[i];
-            if (arg.ellipses) {
-                argStr = Arrays.stream(args).skip(i).collect(Collectors.joining(" "));
-            }
-
-            argValues.put(arg.name, argStr);
-
-            i++;
         }
 
         Context ctx = new Context(event, argValues);
@@ -197,6 +190,15 @@ public class DiscordRegistrar {
             return;
         }
         entry.handler.run(ctx);
+    }
+
+    public Role getRole(String id) {
+        Optional<Role> r1 = api.getRoleById(id);
+        if (r1.isEmpty()) {
+            System.out.println("Error: discord role " + id + " not found");
+            return null;
+        }
+        return r1.get();
     }
 
     @FunctionalInterface
