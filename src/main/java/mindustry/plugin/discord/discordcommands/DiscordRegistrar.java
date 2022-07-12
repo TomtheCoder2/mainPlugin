@@ -10,9 +10,11 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.event.message.MessageCreateEvent;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static mindustry.plugin.discord.DiscordVars.api;
 
@@ -173,15 +175,25 @@ public class DiscordRegistrar {
             }
         }
 
+        int i = 1;
         String error = null;
         StringMap argValues = new StringMap();
         for (Command.Arg arg : entry.data.args) {
-            if (arg != null) {
+            if (args.length >= i) {
                 if (!arg.optional) {
                     error = "Missing required argument " + arg.name;
                 }
                 break;
             }
+
+            String argStr = args[i];
+            if (arg.ellipses) {
+                argStr = Arrays.stream(args).skip(i).collect(Collectors.joining(" "));
+            }
+
+            argValues.put(arg.name, argStr);
+
+            i++;
         }
 
         Context ctx = new Context(event, argValues);
