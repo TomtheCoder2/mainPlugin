@@ -1,10 +1,5 @@
 package mindustry.plugin.minimods;
 
-import java.awt.Color;
-import java.time.Instant;
-
-import org.javacord.api.entity.message.embed.EmbedBuilder;
-
 import arc.Events;
 import arc.struct.ObjectMap;
 import arc.util.CommandHandler;
@@ -21,126 +16,44 @@ import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Utils;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
-/** Manages vote kicking */
+import java.awt.*;
+import java.time.Instant;
+
+/**
+ * Manages vote kicking
+ */
 public class Kick implements MiniMod {
-    /** Duration to increase voting time by */
+    /**
+     * Duration to increase voting time by
+     */
     private static final long VOTE_TIME = 30 * 1000;
-    /** Time before repeated votes, in milliseconds */
+    /**
+     * Time before repeated votes, in milliseconds
+     */
     private static final long VOTE_COOLDOWN = 120 * 1000;
 
-    /** Kick duration in seconds */
+    /**
+     * Kick duration in seconds
+     */
     private static final long KICK_DURATION = 60 * 60;
 
     /* Outline of votekicking:
-        *  - Votekicks can be started with the /votekick command.
-        *  - Timer starts with 30 seconds. Every 'yes' vote extends the timer by an additional 30 seconds.
-        *  - When the timer runs out (30s after last kick), if sufficient votes the player is kicked and banned for 60 minutes.
-        *  - If a player leaves while being voted, they are banned for 60 minutes.
-        */
-
-    /** Represents a vote kick session
+     *  - Votekicks can be started with the /votekick command.
+     *  - Timer starts with 30 seconds. Every 'yes' vote extends the timer by an additional 30 seconds.
+     *  - When the timer runs out (30s after last kick), if sufficient votes the player is kicked and banned for 60 minutes.
+     *  - If a player leaves while being voted, they are banned for 60 minutes.
      */
-    private class VoteSession {
-        /** UUID of player to be kicked */
-        public String target;
-
-        /** UUID of player who started votekick */
-        public String plaintiff = null;
-
-        /** Time in which votekick ends*/
-        public long endTime = -1;
-
-        public boolean canceled = false;
-
-        /** -1 for no and +1 for yes */
-        public ObjectMap<String, Integer> votes = new ObjectMap<>(); 
-
-        public VoteSession(String target) {
-            this.target = target;
-        }
-
-        public int requiredVotes() {
-            if (Groups.player.size() <= 3) {
-                return 2;
-            } else {
-                return 3;
-            }
-        }
-
-        public void addVote(String uuid, int vote) {
-            if (vote == 1) {
-                this.endTime = System.currentTimeMillis() + VOTE_TIME;
-            }
-            votes.put(uuid, vote);
-        }
-
-        public int countVotes() {
-            int votes = 0;
-            for (var entry : this.votes) {
-                votes += entry.value;
-            }
-            return votes;
-        }
-
-        /** Cancels the task and removes it from the Kick */
-        public void clear() {
-            canceled = true;
-            if (Kick.this.session == this)
-                Kick.this.session = null;
-        }
-
-        public static class Task extends Timer.Task {
-            private VoteSession session;
-            public Task(VoteSession session) {
-                this.session = session;
-            }
-
-            @Override
-            public void run() {
-                if (session.canceled) {
-                    this.log();
-                    return;
-                }
-
-                if (session.endTime > System.currentTimeMillis()) {
-                    Timer.schedule(new Task(session), session.endTime - System.currentTimeMillis());
-                    return;
-                }
-
-                Player target = Groups.player.find(x -> x.uuid().equals(session.target));
-                if (session.countVotes() >= session.requiredVotes()) {
-                    Call.sendMessage(GameMsg.info("Kick", "Vote passed. Defendant [orange]" + target.name + "[lightgray] will be banned for 60 minutes."));
-                    kick(session);
-                    session.clear();
-                } else {
-                    Call.sendMessage(GameMsg.info("Kick", "Vote for [orange]" + target.name + "[lightgray] failed."));
-                    session.clear();
-                }
-
-                this.log();
-            }
-
-            /** Log votekick result to discord */
-            public void log() {
-                boolean success = session.countVotes() >= session.requiredVotes();
-                Player target = Groups.player.find(x -> x.uuid().equals(session.target));
-                Player plaintiff = Groups.player.find(x -> x.uuid().equals(session.plaintiff));
-                EmbedBuilder eb = new EmbedBuilder()
-                    .setTitle("Votekick " + (session.canceled ? "canceled": (success ? "succeeded" : "failed")) + "!")
-                    .addField("Target:", Utils.escapeEverything(target != null ? target.name + "\n" : "") + session.target)
-                    .setColor(session.canceled ? new Color(0x0000ff) : (success ? new Color(0xff0000) : new Color(0xFFff00)))
-                    .addField("Plaintiff:", Utils.escapeEverything(plaintiff != null ? plaintiff.name + "\n" : "") + session.plaintiff);
-                Channels.LOG.sendMessage(eb);
-            }
-        }
-    }
-
-    /** Timestamp of end of previous vote, in milliseconds */
+    /**
+     * Timestamp of end of previous vote, in milliseconds
+     */
     private long previousVoteTime = 0;
     private VoteSession session;
-    
-    /** Kick and ban a player. */
+
+    /**
+     * Kick and ban a player.
+     */
     private static void kick(VoteSession session) {
         Player target = Groups.player.find(x -> x.uuid().equals(session.target));
         Player plaintiff = Groups.player.find(x -> x.uuid().equals(session.plaintiff));
@@ -148,7 +61,7 @@ public class Kick implements MiniMod {
             target.con.kick("Votekicked by " + plaintiff.name);
         }
         String plaintiffName = "#" + session.plaintiff.substring(0, 4);
-        if (plaintiff != null ){
+        if (plaintiff != null) {
             plaintiffName = plaintiff.name;
         }
 
@@ -230,7 +143,7 @@ public class Kick implements MiniMod {
                 });
                 player.sendMessage(builder.toString());
                 return;
-            } 
+            }
 
             Player found = Utils.findPlayer(args[0]);
             if (found == null) {
@@ -264,8 +177,8 @@ public class Kick implements MiniMod {
             }
 
             if (System.currentTimeMillis() - previousVoteTime < VOTE_COOLDOWN) {
-                player.sendMessage(GameMsg.error("Kick", "You must wait " + 
-                    (System.currentTimeMillis() - previousVoteTime - VOTE_COOLDOWN)/1000 + " seconds until the next votekick."));
+                player.sendMessage(GameMsg.error("Kick", "You must wait " +
+                        (System.currentTimeMillis() - previousVoteTime - VOTE_COOLDOWN) / 1000 + " seconds until the next votekick."));
             }
 
             session = new VoteSession(found.uuid());
@@ -275,15 +188,15 @@ public class Kick implements MiniMod {
             Timer.schedule(new VoteSession.Task(session), VOTE_TIME);
 
             Call.sendMessage(GameMsg.info("Kick", "Plaintiff [orange]" + player.name + "[lightgray] has voted to kick defendent [orange]" + found.name + "[lightgray] " +
-                "(1/" + session.requiredVotes() + "). " + 
-                "Type [sky]/kick y[lightgray] to agree and [sky]/kick n[lightgray] to disagree."));
+                    "(1/" + session.requiredVotes() + "). " +
+                    "Type [sky]/kick y[lightgray] to agree and [sky]/kick n[lightgray] to disagree."));
         });
 
         handler.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Or cancel the current kick.", (arg, player) -> {
             if (session == null) {
                 player.sendMessage("[scarlet]Nobody is being voted on.");
                 return;
-            } 
+            }
 
             Player target = Groups.player.find(x -> x.uuid().equals(session.target));
             if (target == null) {
@@ -324,11 +237,122 @@ public class Kick implements MiniMod {
             }
 
             Call.sendMessage(GameMsg.info("Kick", "Player [orange]" + player.name + "[lightgray] has voted to kick [orange]" + target.name + "[lightgray] " +
-                "(" + session.countVotes() + "/" + session.requiredVotes() + "). " + 
-                "Type [sky]/kick y[lightgray] to agree and [sky]/kick n[lightgray] to disagree."));
+                    "(" + session.countVotes() + "/" + session.requiredVotes() + "). " +
+                    "Type [sky]/kick y[lightgray] to agree and [sky]/kick n[lightgray] to disagree."));
 
             session.addVote(player.uuid(), sign);
         });
-            
+
+    }
+
+    /**
+     * Represents a vote kick session
+     */
+    private class VoteSession {
+        /**
+         * UUID of player to be kicked
+         */
+        public String target;
+
+        /**
+         * UUID of player who started votekick
+         */
+        public String plaintiff = null;
+
+        /**
+         * Time in which votekick ends
+         */
+        public long endTime = -1;
+
+        public boolean canceled = false;
+
+        /**
+         * -1 for no and +1 for yes
+         */
+        public ObjectMap<String, Integer> votes = new ObjectMap<>();
+
+        public VoteSession(String target) {
+            this.target = target;
+        }
+
+        public int requiredVotes() {
+            if (Groups.player.size() <= 3) {
+                return 2;
+            } else {
+                return 3;
+            }
+        }
+
+        public void addVote(String uuid, int vote) {
+            if (vote == 1) {
+                this.endTime = System.currentTimeMillis() + VOTE_TIME;
+            }
+            votes.put(uuid, vote);
+        }
+
+        public int countVotes() {
+            int votes = 0;
+            for (var entry : this.votes) {
+                votes += entry.value;
+            }
+            return votes;
+        }
+
+        /**
+         * Cancels the task and removes it from the Kick
+         */
+        public void clear() {
+            canceled = true;
+            if (Kick.this.session == this)
+                Kick.this.session = null;
+        }
+
+        public static class Task extends Timer.Task {
+            private VoteSession session;
+
+            public Task(VoteSession session) {
+                this.session = session;
+            }
+
+            @Override
+            public void run() {
+                if (session.canceled) {
+                    this.log();
+                    return;
+                }
+
+                if (session.endTime > System.currentTimeMillis()) {
+                    Timer.schedule(new Task(session), session.endTime - System.currentTimeMillis());
+                    return;
+                }
+
+                Player target = Groups.player.find(x -> x.uuid().equals(session.target));
+                if (session.countVotes() >= session.requiredVotes()) {
+                    Call.sendMessage(GameMsg.info("Kick", "Vote passed. Defendant [orange]" + target.name + "[lightgray] will be banned for 60 minutes."));
+                    kick(session);
+                    session.clear();
+                } else {
+                    Call.sendMessage(GameMsg.info("Kick", "Vote for [orange]" + target.name + "[lightgray] failed."));
+                    session.clear();
+                }
+
+                this.log();
+            }
+
+            /**
+             * Log votekick result to discord
+             */
+            public void log() {
+                boolean success = session.countVotes() >= session.requiredVotes();
+                Player target = Groups.player.find(x -> x.uuid().equals(session.target));
+                Player plaintiff = Groups.player.find(x -> x.uuid().equals(session.plaintiff));
+                EmbedBuilder eb = new EmbedBuilder()
+                        .setTitle("Votekick " + (session.canceled ? "canceled" : (success ? "succeeded" : "failed")) + "!")
+                        .addField("Target:", Utils.escapeEverything(target != null ? target.name + "\n" : "") + session.target)
+                        .setColor(session.canceled ? new Color(0x0000ff) : (success ? new Color(0xff0000) : new Color(0xFFff00)))
+                        .addField("Plaintiff:", Utils.escapeEverything(plaintiff != null ? plaintiff.name + "\n" : "") + session.plaintiff);
+                Channels.LOG.sendMessage(eb);
+            }
+        }
     }
 }

@@ -9,7 +9,9 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.utils.Utils;
 import mindustry.world.Tile;
 
-/** MiniMod providing commands relating to server information. */
+/**
+ * MiniMod providing commands relating to server information.
+ */
 public class ServerInfo implements MiniMod {
     @Override
     public void registerCommands(CommandHandler handler) {

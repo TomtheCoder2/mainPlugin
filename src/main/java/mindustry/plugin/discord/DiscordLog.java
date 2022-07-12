@@ -1,17 +1,15 @@
 package mindustry.plugin.discord;
 
+import arc.struct.StringMap;
 import mindustry.net.Administration;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.utils.LogAction;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
-
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-
-import arc.struct.StringMap;
 
 import java.awt.*;
 import java.time.Instant;
@@ -19,15 +17,17 @@ import java.util.List;
 import java.util.Objects;
 
 public class DiscordLog {
-    /** Log an error. 
+    /**
+     * Log an error.
+     *
      * @param fields List of fields. May be null.
      */
     public static void error(String title, String description, StringMap fields) {
         EmbedBuilder eb = new EmbedBuilder()
-            .setTitle(title)
-            .setDescription(description)
-            .setColor(DiscordPalette.ERROR)
-            .setTimestamp(Instant.now());
+                .setTitle(title)
+                .setDescription(description)
+                .setColor(DiscordPalette.ERROR)
+                .setTimestamp(Instant.now());
 
         if (fields != null)
             for (var entry : fields) {
@@ -96,7 +96,7 @@ public class DiscordLog {
                         .addField(action + " by", "<@" + ctx.author().getIdAsString() + ">", true)
                         .addField("Reason", reasonNotNull, true);
             }
-            case uploadMap, updateMap-> {
+            case uploadMap, updateMap -> {
                 eb.setTitle(action.getName() + " " + Utils.escapeEverything(mapFile.getFileName()))
                         .addField("Uploaded by ", "<@" + ctx.author().getIdAsString() + ">", true);
             }

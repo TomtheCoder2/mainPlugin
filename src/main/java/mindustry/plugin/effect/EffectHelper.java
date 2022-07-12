@@ -1,7 +1,7 @@
 package mindustry.plugin.effect;
 
 
-import arc.files.*;
+import arc.files.Fi;
 import arc.graphics.Color;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;

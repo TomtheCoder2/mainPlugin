@@ -1,6 +1,6 @@
 package mindustry.plugin.discord;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class DiscordPalette {
     public static Color WARN = (Color.getHSBColor(5, 85, 95));

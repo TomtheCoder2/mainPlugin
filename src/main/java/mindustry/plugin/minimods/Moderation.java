@@ -1,13 +1,9 @@
 package mindustry.plugin.minimods;
 
 import arc.Events;
-import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.util.CommandHandler;
-import arc.util.Log;
 import arc.util.Strings;
-import arc.util.Timekeeper;
-import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
@@ -16,13 +12,11 @@ import mindustry.gen.Player;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
-import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
-import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.ioMain;
 import mindustry.plugin.utils.GameMsg;
@@ -30,7 +24,6 @@ import mindustry.plugin.utils.LogAction;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.world.Tile;
-
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
@@ -39,7 +32,9 @@ import java.awt.*;
 import java.time.Instant;
 
 
-/** Manages mutes, freezes, bans, and other moderation-related commands */
+/**
+ * Manages mutes, freezes, bans, and other moderation-related commands
+ */
 public class Moderation implements MiniMod {
     private ObjectSet<String> frozen = new ObjectSet<>();
     private ObjectSet<String> muted = new ObjectSet<>();
@@ -68,166 +63,166 @@ public class Moderation implements MiniMod {
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
         handler.register("mute", "<player> [reason...]",
-            data -> {
-                data.roles = new long[] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
-                data.help = "Mute or unmute a player";
-                data.category = "Moderation";
-            },
-            ctx -> {
-                String target = ctx.args.get("player");
-                Player player = Utils.findPlayer(target);
-                if (player == null) {
-                    ctx.reply("Player " + target + " not found.");
-                    return;
-                }
+                data -> {
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                    data.help = "Mute or unmute a player";
+                    data.category = "Moderation";
+                },
+                ctx -> {
+                    String target = ctx.args.get("player");
+                    Player player = Utils.findPlayer(target);
+                    if (player == null) {
+                        ctx.reply("Player " + target + " not found.");
+                        return;
+                    }
 
-                if (!muted.contains(player.uuid())) {
-                    muted.add(player.uuid());
-                } else {
-                    muted.remove(player.uuid());
+                    if (!muted.contains(player.uuid())) {
+                        muted.add(player.uuid());
+                    } else {
+                        muted.remove(player.uuid());
+                    }
+                    boolean isMuted = muted.contains(player.uuid());
+                    ctx.reply("Successfully " + (isMuted ? "muted" : "unmuted") + " " + Utils.escapeEverything(target));
+                    Call.infoMessage(player.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" +
+                            "[lightgray]" + (ctx.args.containsKey("reason") ? "Reason: [accent]" + ctx.args.get("reason") : ""));
+
                 }
-                boolean isMuted = muted.contains(player.uuid());
-                ctx.reply("Successfully " + (isMuted ? "muted" : "unmuted") + " " + Utils.escapeEverything(target));
-                Call.infoMessage(player.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" + 
-                    "[lightgray]" + (ctx.args.containsKey("reason") ? "Reason: [accent]" + ctx.args.get("reason") : ""));
-                
-            }
         );
 
-        handler.register("freeze", "<player> [reason...]", 
-            data -> {
-                data.roles = new long[] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
-                data.help = "Freeze or thaw a player.";
-                data.category = "Moderation";
-            },
-            ctx -> {
-                String target = ctx.args.get("player");
-                Player player = Utils.findPlayer(target);
-                if (player == null) {
-                    ctx.reply("Player " + target + " not found.");
-                    return;
-                }
+        handler.register("freeze", "<player> [reason...]",
+                data -> {
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                    data.help = "Freeze or thaw a player.";
+                    data.category = "Moderation";
+                },
+                ctx -> {
+                    String target = ctx.args.get("player");
+                    Player player = Utils.findPlayer(target);
+                    if (player == null) {
+                        ctx.reply("Player " + target + " not found.");
+                        return;
+                    }
 
-                if (!frozen.contains(player.uuid())) {
-                    frozen.add(player.uuid());
-                } else {
-                    frozen.remove(player.uuid());
-                }
-                boolean isFrozen = frozen.contains(player.uuid());
-                ctx.reply("Successfully " + (isFrozen ? "frozen" : "thawed") + " " + Utils.escapeEverything(target));
-                Call.infoMessage(player.con, "[cyan]You got " + (isFrozen ? "frozen" : "thawed") + " by a moderator.\n" + 
-                    "[lightgray]" + (ctx.args.containsKey("reason") ? "Reason: [accent]" + ctx.args.get("reason") : ""));
+                    if (!frozen.contains(player.uuid())) {
+                        frozen.add(player.uuid());
+                    } else {
+                        frozen.remove(player.uuid());
+                    }
+                    boolean isFrozen = frozen.contains(player.uuid());
+                    ctx.reply("Successfully " + (isFrozen ? "frozen" : "thawed") + " " + Utils.escapeEverything(target));
+                    Call.infoMessage(player.con, "[cyan]You got " + (isFrozen ? "frozen" : "thawed") + " by a moderator.\n" +
+                            "[lightgray]" + (ctx.args.containsKey("reason") ? "Reason: [accent]" + ctx.args.get("reason") : ""));
 
-            }
+                }
         );
 
         handler.register("ban", "<player> [duration:minutes] [reason...]",
-            data -> {
-                data.roles = new long[] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
-                data.help = "Ban a player";
-                data.category = "Moderation";
-                data.aliases = new String[] { "b", "banish" };
-            },
-            ctx -> {
-                Administration.PlayerInfo info = Utils.getPlayerInfo(ctx.args.get("player"));
-                if (info == null) {
-                    ctx.error("Error", "Player " + ctx.args.get("player") + " not found.");
-                    return;
-                }
-                String uuid = info.id;
-                String banID = uuid.substring(0, 4);
-                String reason = ctx.args.get("reason", "");
+                data -> {
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                    data.help = "Ban a player";
+                    data.category = "Moderation";
+                    data.aliases = new String[]{"b", "banish"};
+                },
+                ctx -> {
+                    Administration.PlayerInfo info = Utils.getPlayerInfo(ctx.args.get("player"));
+                    if (info == null) {
+                        ctx.error("Error", "Player " + ctx.args.get("player") + " not found.");
+                        return;
+                    }
+                    String uuid = info.id;
+                    String banID = uuid.substring(0, 4);
+                    String reason = ctx.args.get("reason", "");
 
-                Database.Player pd = Database.getPlayerData(uuid);
-                if (pd == null) { 
-                    pd = new Database.Player(uuid, 0);
-                }
-                long duration = ctx.args.getLong("duration:minutes", 2 * 365 * 24 * 60) * 60;
-                pd.bannedUntil = Instant.now().getEpochSecond() + duration;
-                pd.banReason = reason + "\n\n[accent]Until: " + Utils.epochToString(pd.bannedUntil) + " [accent]Ban ID: " + banID;
-                Database.setPlayerData(pd);
+                    Database.Player pd = Database.getPlayerData(uuid);
+                    if (pd == null) {
+                        pd = new Database.Player(uuid, 0);
+                    }
+                    long duration = ctx.args.getLong("duration:minutes", 2 * 365 * 24 * 60) * 60;
+                    pd.bannedUntil = Instant.now().getEpochSecond() + duration;
+                    pd.banReason = reason + "\n\n[accent]Until: " + Utils.epochToString(pd.bannedUntil) + " [accent]Ban ID: " + banID;
+                    Database.setPlayerData(pd);
 
-                ctx.sendEmbed(new EmbedBuilder()
-                    .setTitle("Banned " + info.lastName)
-                    .addField("Duration", duration / 60 + " minutes")
-                    .addField("Until", Utils.epochToString(pd.bannedUntil))
-                    .addField("Reason", reason)
-                    .setFooter("Ban ID: " +banID)
-                );
-
-                Player player = Groups.player.find(p -> p.uuid() == uuid);
-                if (player != null) {
-                    player.con.kick(Packets.KickReason.banned);
-                }
-
-                DiscordLog.logAction(LogAction.ban, info, ctx, reason);
-            }
-        );
-
-        handler.register("ban-subnet", "[add/remove/list] [address]", 
-            data -> {
-                data.help = "Ban a subnet. A subnet ban rejects all IPs that begin with the given string.";
-                data.category = "Moderation";
-                data.roles = new long[] { Roles.MOD, Roles.ADMIN, Roles.APPRENTICE };
-                data.aliases = new String[] { "subnet-ban" };
-            },
-            ctx -> {
-                if (!ctx.args.containsKey("add/remove/list") || ctx.args.get("add/remove/list").equals("list")) {
-                    ctx.sendEmbed(DiscordPalette.INFO, "Subnet Bans",                 
-                        Vars.netServer.admins.subnetBans.isEmpty() ? 
-                            "None" :
-                            ("```\n" + Vars.netServer.admins.subnetBans.toString("\n") + "\n```")
+                    ctx.sendEmbed(new EmbedBuilder()
+                            .setTitle("Banned " + info.lastName)
+                            .addField("Duration", duration / 60 + " minutes")
+                            .addField("Until", Utils.epochToString(pd.bannedUntil))
+                            .addField("Reason", reason)
+                            .setFooter("Ban ID: " + banID)
                     );
-                } else if (ctx.args.get("add/remove/list").equals("add")) {
-                    if (!ctx.args.containsKey("address")) {
-                        ctx.error("Invalid Usage", "Must specify a subnet address");
-                        return;
-                    }
-                    if (Vars.netServer.admins.subnetBans.contains(ctx.args.get("address"))) {
-                        ctx.sendEmbed(DiscordPalette.WARN, "Subnet Ban Already Exists", "Subnet " + ctx.args.get("address") + " was already in the ban list");
-                    }
-                    Vars.netServer.admins.subnetBans.add(ctx.args.get("address"));
 
-                    ctx.success("Added Subnet Ban", "Address: " + ctx.args.get("address"));
-                } else if (ctx.args.get("add/remove/list").equals("remove")) {
-                    if (!ctx.args.containsKey("address")) {
-                        ctx.error("Invalid Usage", "Must specify a subnet address");
-                        return;
+                    Player player = Groups.player.find(p -> p.uuid() == uuid);
+                    if (player != null) {
+                        player.con.kick(Packets.KickReason.banned);
                     }
-                    Vars.netServer.admins.subnetBans.remove(ctx.args.get("address"));
 
-                    ctx.success("Removed Subnet Ban", "Address: " + ctx.args.get("address"));
-                } else {
-                    ctx.error("Invalid Usage", "First argument must be add/remove/list");
+                    DiscordLog.logAction(LogAction.ban, info, ctx, reason);
                 }
-            }
         );
 
-        handler.register("alert", "<player> <message...>", 
-            data -> {
-                data.help = "Alerts a player(s) using on-screen messages.";
-                data.roles = new long[] { Roles.MOD, Roles.ADMIN, Roles.APPRENTICE };
-                data.category = "Moderation";
-                data.aliases = new String[] { "a" };
-            },
-            ctx -> {
-                String target = ctx.args.get("player").toLowerCase();
-                if (target.equals("all")) {
-                    Call.infoMessage(ctx.args.get("message"));
+        handler.register("ban-subnet", "[add/remove/list] [address]",
+                data -> {
+                    data.help = "Ban a subnet. A subnet ban rejects all IPs that begin with the given string.";
+                    data.category = "Moderation";
+                    data.roles = new long[]{Roles.MOD, Roles.ADMIN, Roles.APPRENTICE};
+                    data.aliases = new String[]{"subnet-ban"};
+                },
+                ctx -> {
+                    if (!ctx.args.containsKey("add/remove/list") || ctx.args.get("add/remove/list").equals("list")) {
+                        ctx.sendEmbed(DiscordPalette.INFO, "Subnet Bans",
+                                Vars.netServer.admins.subnetBans.isEmpty() ?
+                                        "None" :
+                                        ("```\n" + Vars.netServer.admins.subnetBans.toString("\n") + "\n```")
+                        );
+                    } else if (ctx.args.get("add/remove/list").equals("add")) {
+                        if (!ctx.args.containsKey("address")) {
+                            ctx.error("Invalid Usage", "Must specify a subnet address");
+                            return;
+                        }
+                        if (Vars.netServer.admins.subnetBans.contains(ctx.args.get("address"))) {
+                            ctx.sendEmbed(DiscordPalette.WARN, "Subnet Ban Already Exists", "Subnet " + ctx.args.get("address") + " was already in the ban list");
+                        }
+                        Vars.netServer.admins.subnetBans.add(ctx.args.get("address"));
 
-                    ctx.success("Alerted", "Alerted " + Groups.player.size() + " players.");
-                    return;
+                        ctx.success("Added Subnet Ban", "Address: " + ctx.args.get("address"));
+                    } else if (ctx.args.get("add/remove/list").equals("remove")) {
+                        if (!ctx.args.containsKey("address")) {
+                            ctx.error("Invalid Usage", "Must specify a subnet address");
+                            return;
+                        }
+                        Vars.netServer.admins.subnetBans.remove(ctx.args.get("address"));
+
+                        ctx.success("Removed Subnet Ban", "Address: " + ctx.args.get("address"));
+                    } else {
+                        ctx.error("Invalid Usage", "First argument must be add/remove/list");
+                    }
                 }
+        );
 
-                Player p = Utils.findPlayer(target);
-                if (p == null) {
-                    ctx.error("Error", "Player '" + target + "' not found");
-                    return;
+        handler.register("alert", "<player> <message...>",
+                data -> {
+                    data.help = "Alerts a player(s) using on-screen messages.";
+                    data.roles = new long[]{Roles.MOD, Roles.ADMIN, Roles.APPRENTICE};
+                    data.category = "Moderation";
+                    data.aliases = new String[]{"a"};
+                },
+                ctx -> {
+                    String target = ctx.args.get("player").toLowerCase();
+                    if (target.equals("all")) {
+                        Call.infoMessage(ctx.args.get("message"));
+
+                        ctx.success("Alerted", "Alerted " + Groups.player.size() + " players.");
+                        return;
+                    }
+
+                    Player p = Utils.findPlayer(target);
+                    if (p == null) {
+                        ctx.error("Error", "Player '" + target + "' not found");
+                        return;
+                    }
+
+                    Call.infoMessage(p.con, ctx.args.get("message"));
+                    ctx.success("Alerted", "Alerted " + Utils.escapeEverything(p) + ".");
                 }
-
-                Call.infoMessage(p.con, ctx.args.get("message"));
-                ctx.success("Alerted", "Alerted " + Utils.escapeEverything(p) + ".");
-            }
         );
     }
 
@@ -252,8 +247,8 @@ public class Moderation implements MiniMod {
             }
             boolean isFrozen = frozen.contains(target.uuid());
             player.sendMessage(
-                GameMsg.custom("Mod", "cyan", "[cyan]Successfully " + (isFrozen ? "froze" : "thawed") + " " + Utils.escapeEverything(target)));
-            Call.infoMessage(target.con, "[cyan]You got " + (isFrozen ? "frozen" : "thawed") + " by a moderator. \n" 
+                    GameMsg.custom("Mod", "cyan", "[cyan]Successfully " + (isFrozen ? "froze" : "thawed") + " " + Utils.escapeEverything(target)));
+            Call.infoMessage(target.con, "[cyan]You got " + (isFrozen ? "frozen" : "thawed") + " by a moderator. \n"
                     + "[lightgray]" + (args.length > 1 ? "Reason: [accent]" + args[1] : ""));
         });
 
@@ -276,10 +271,10 @@ public class Moderation implements MiniMod {
             }
             boolean isMuted = muted.contains(target.uuid());
             player.sendMessage(GameMsg.custom("Mod", "cyan", "Successfully " + (isMuted ? "muted" : "unmuted") + " " + Utils.escapeEverything(target)));
-            Call.infoMessage(target.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" + 
-                "[lightgray]" + (args.length > 1 ? "Reason: [accent]" + args[1] : ""));
+            Call.infoMessage(target.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" +
+                    "[lightgray]" + (args.length > 1 ? "Reason: [accent]" + args[1] : ""));
         });
-        
+
         handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/gr' to get a list of ids)", (args, player) -> {
             //https://github.com/Anuken/Mindustry/blob/master/core/src/io/anuke/mindustry/core/NetServer.java#L300-L351
             for (Long key : ioMain.CommandCooldowns.keys()) {

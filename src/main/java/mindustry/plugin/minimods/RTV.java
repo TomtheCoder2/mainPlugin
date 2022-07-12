@@ -3,7 +3,6 @@ package mindustry.plugin.minimods;
 import arc.ApplicationListener;
 import arc.Core;
 import arc.Events;
-import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.util.CommandHandler;
 import arc.util.Reflect;
@@ -21,73 +20,17 @@ import mindustry.server.ServerControl;
 
 public final class RTV implements MiniMod {
     public static long VOTE_TIME = 60 * 1000;
-    private class Session {
-        /** UUIDs of people who vote  */
-        public ObjectSet<String> votes = new ObjectSet<>();
+    private Session session;
 
-        /** Name of map */
-        public String map;
-
-        /** Time at which the RTV session ends */
-        public long endTime;
-
-        /** Whether the Task should stop itself */
-        public boolean canceled;
-
-        public Session(String map) {
-            this.map = map;
-            this.endTime = System.currentTimeMillis() + endTime;
-
-            Timer.schedule(new Task(this), this.endTime);
-        }
-
-        /** Setes canceled to true and removes from the RTV */
-        public void clear() {
-            canceled = true;
-            if (RTV.this.session == Session.this)
-                RTV.this.session = null;
-        }
-
-        /** This task is responsible for ending the session if the time has expired */
-        public static class Task extends Timer.Task {
-            Session session;
-            public Task(Session session) {
-                this.session = session;
-            }
-
-            @Override
-            public void run() {
-                if (session.canceled) {
-                    return;
-                }
-
-                if (System.currentTimeMillis() < session.endTime) {
-                    Timer.schedule(new Task(session), session.endTime - System.currentTimeMillis());
-                    return;
-                }
-
-                // vote failed if not canceled
-                Call.sendMessage(GameMsg.error("RTV", "Vote for [orange]" + session.map + "[scarlet] has failed."));
-                session.clear();
-            }
-        }
-
-        /** Removes UUIDs of players that are no longer in Gruops.players */
-        public void removeInvalid() {
-            ObjectSet<String> invalids = new ObjectSet<>();
-            for (String uuid : votes) {
-                Player player = Groups.player.find(x -> x.uuid().equals(uuid));
-                if (player == null) {
-                    invalids.add(uuid);
-                }
-            }
-            for (String invalid : invalids) {
-                votes.remove(invalid);
+    private static void changeMap(Map map) {
+        for (ApplicationListener listener : Core.app.getListeners()) {
+            if (listener instanceof ServerControl) {
+                Reflect.set(listener, "nextMapOverride", map);
+                Events.fire(new EventType.GameOverEvent(Team.crux));
+                return;
             }
         }
     }
-
-    private Session session;
 
     private String randomMap() {
         int idx = (int) (Math.random() * (double) Vars.maps.customMaps().size);
@@ -107,16 +50,6 @@ public final class RTV implements MiniMod {
         return null;
     }
 
-    private static void changeMap(Map map) {
-        for (ApplicationListener listener : Core.app.getListeners()) {
-            if (listener instanceof ServerControl) {
-                Reflect.set(listener, "nextMapOverride", map);
-                Events.fire(new EventType.GameOverEvent(Team.crux));
-                return;
-            }
-        }
-    }
-
     /**
      * Returns the number of required votes for a map to pass, which is a simple majority.
      */
@@ -128,7 +61,7 @@ public final class RTV implements MiniMod {
     public void registerEvents() {
         // Clear votes when a new game occurs.
         Events.on(EventType.GameOverEvent.class, event -> {
-            if (session != null)  {
+            if (session != null) {
                 session.clear();
             }
         });
@@ -164,7 +97,7 @@ public final class RTV implements MiniMod {
                     return;
                 }
 
-                session.votes.add(player.uuid());  
+                session.votes.add(player.uuid());
             } else {
                 if (!session.votes.contains(player.uuid())) {
                     player.sendMessage(GameMsg.error("RTV", "You haven't voted, so you can't redact your vote! Type [sky]/rtv[scarlet] to vote."));
@@ -176,14 +109,14 @@ public final class RTV implements MiniMod {
 
             // extend voting time
             session.endTime = System.currentTimeMillis() + VOTE_TIME;
-            
+
             session.removeInvalid();
 
             // send message
             int votes = session.votes.size;
             Call.sendMessage(GameMsg.info("RTV", "Player [orange]" + player.name + "[lightgray] has " + (vote ? "voted" : "redacted their vote") + " to change the map to [orange]" + session.map + "[lightgray] " +
                     "(" + votes + "/" + requiredVotes() + "). " + (vote ? "Type [sky]/rtv[lightgray] to vote." : "")));
- 
+
             // check & change map
             boolean passed = votes >= requiredVotes();
             if (passed) {
@@ -209,5 +142,86 @@ public final class RTV implements MiniMod {
 
             player.sendMessage(GameMsg.info("RTV", "[orange]" + session.map + "[lightgray] - [orange]" + session.votes.size + "[lightgray] / " + requiredVotes() + " votes"));
         });
+    }
+
+    private class Session {
+        /**
+         * UUIDs of people who vote
+         */
+        public ObjectSet<String> votes = new ObjectSet<>();
+
+        /**
+         * Name of map
+         */
+        public String map;
+
+        /**
+         * Time at which the RTV session ends
+         */
+        public long endTime;
+
+        /**
+         * Whether the Task should stop itself
+         */
+        public boolean canceled;
+
+        public Session(String map) {
+            this.map = map;
+            this.endTime = System.currentTimeMillis() + endTime;
+
+            Timer.schedule(new Task(this), this.endTime);
+        }
+
+        /**
+         * Setes canceled to true and removes from the RTV
+         */
+        public void clear() {
+            canceled = true;
+            if (RTV.this.session == Session.this)
+                RTV.this.session = null;
+        }
+
+        /**
+         * Removes UUIDs of players that are no longer in Gruops.players
+         */
+        public void removeInvalid() {
+            ObjectSet<String> invalids = new ObjectSet<>();
+            for (String uuid : votes) {
+                Player player = Groups.player.find(x -> x.uuid().equals(uuid));
+                if (player == null) {
+                    invalids.add(uuid);
+                }
+            }
+            for (String invalid : invalids) {
+                votes.remove(invalid);
+            }
+        }
+
+        /**
+         * This task is responsible for ending the session if the time has expired
+         */
+        public static class Task extends Timer.Task {
+            Session session;
+
+            public Task(Session session) {
+                this.session = session;
+            }
+
+            @Override
+            public void run() {
+                if (session.canceled) {
+                    return;
+                }
+
+                if (System.currentTimeMillis() < session.endTime) {
+                    Timer.schedule(new Task(session), session.endTime - System.currentTimeMillis());
+                    return;
+                }
+
+                // vote failed if not canceled
+                Call.sendMessage(GameMsg.error("RTV", "Vote for [orange]" + session.map + "[scarlet] has failed."));
+                session.clear();
+            }
+        }
     }
 }

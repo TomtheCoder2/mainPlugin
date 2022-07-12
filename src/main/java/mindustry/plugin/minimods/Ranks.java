@@ -1,13 +1,10 @@
 package mindustry.plugin.minimods;
 
-import java.util.Arrays;
-
 import arc.Events;
 import arc.struct.ObjectMap;
 import arc.util.CommandHandler;
 import arc.util.Log;
 import arc.util.Timer;
-
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.game.EventType;
@@ -15,34 +12,40 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
+import mindustry.plugin.database.Database;
+import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.ui.Menus;
 import mindustry.world.Block;
-import mindustry.plugin.database.Database;
-import mindustry.plugin.utils.Rank;
 
-/** Manages player ranks and other player information. */
+import java.util.Arrays;
+
+/**
+ * Manages player ranks and other player information.
+ */
 public class Ranks implements MiniMod {
     private final static String promotionMessage = """
-[sky]%player%, you have been promoted to [sky]<%rank%>[]!
-[#4287f5]You reached a playtime of - %playtime% minutes!
-[#f54263]You played a total of %games% games!
-[#9342f5]You built a total of %buildings% buildings!
-[sky]Enjoy your time on the [white][#ff2400]P[#ff4900]H[#ff6d00]O[#ff9200]E[#ffb600]N[#ffdb00]I[#ffff00]X [white]Servers[sky]!""";
-
-    /** Number of buildings built that have not been stored to the database. */
-    private ObjectMap<String, Integer> buildingsBuiltCache = new ObjectMap<>();
-    /** Blocks that do not count towards the stats for a player */
-    private final static Block[] excludedBlocks = new Block[] {
-        Blocks.conveyor,
-        Blocks.titaniumConveyor,
-        Blocks.plastaniumConveyor,
-        Blocks.junction,
-        Blocks.router,
-        Blocks.underflowGate,
-        Blocks.overflowGate
+            [sky]%player%, you have been promoted to [sky]<%rank%>[]!
+            [#4287f5]You reached a playtime of - %playtime% minutes!
+            [#f54263]You played a total of %games% games!
+            [#9342f5]You built a total of %buildings% buildings!
+            [sky]Enjoy your time on the [white][#ff2400]P[#ff4900]H[#ff6d00]O[#ff9200]E[#ffb600]N[#ffdb00]I[#ffff00]X [white]Servers[sky]!""";
+    /**
+     * Blocks that do not count towards the stats for a player
+     */
+    private final static Block[] excludedBlocks = new Block[]{
+            Blocks.conveyor,
+            Blocks.titaniumConveyor,
+            Blocks.plastaniumConveyor,
+            Blocks.junction,
+            Blocks.router,
+            Blocks.underflowGate,
+            Blocks.overflowGate
     };
-
+    /**
+     * Number of buildings built that have not been stored to the database.
+     */
+    private ObjectMap<String, Integer> buildingsBuiltCache = new ObjectMap<>();
     private long mapStartTime = System.currentTimeMillis();
 
     @Override
@@ -58,7 +61,7 @@ public class Ranks implements MiniMod {
                 public void run() {
                     rateMenu(null);
                 }
-            }, 10*60*1000);
+            }, 10 * 60 * 1000);
         });
 
         Events.on(EventType.GameOverEvent.class, event -> {
@@ -113,13 +116,13 @@ public class Ranks implements MiniMod {
             }
         });
 
-        Timer.schedule(new Timer.Task(){
+        Timer.schedule(new Timer.Task() {
             long timeStart = System.currentTimeMillis();
 
             @Override
             public void run() {
-                int elapsedTimeMin = (int)Math.round((System.currentTimeMillis() - timeStart) / 1000) / 60;
-                
+                int elapsedTimeMin = (int) Math.round((System.currentTimeMillis() - timeStart) / 1000) / 60;
+
                 for (Player player : Groups.player) {
                     Database.Player pd = Database.getPlayerData(player.uuid());
                     if (pd == null) {
@@ -132,10 +135,12 @@ public class Ranks implements MiniMod {
 
                 timeStart = System.currentTimeMillis();
             }
-        }, 120*1000, 120*1000);
+        }, 120 * 1000, 120 * 1000);
     }
 
-    /** Popup a rate menu for the given player, or all player
+    /**
+     * Popup a rate menu for the given player, or all player
+     *
      * @param p The player to popup, or null for all players
      */
     private void rateMenu(Player p) {
@@ -156,26 +161,28 @@ public class Ranks implements MiniMod {
         });
         if (p == null) {
             Call.menu(id,
-                "Rate this map! [pink]" + mapName,
-                "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
-                new String[][]{
-                        new String[]{"[green]Yes", "[scarlet]No"},
-                        new String[]{"Close"}
-                }
+                    "Rate this map! [pink]" + mapName,
+                    "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
+                    new String[][]{
+                            new String[]{"[green]Yes", "[scarlet]No"},
+                            new String[]{"Close"}
+                    }
             );
         } else {
             Call.menu(p.con, id,
-                "Rate this map! [pink]" + mapName,
-                "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
-                new String[][]{
-                        new String[]{"[green]Yes", "[scarlet]No"},
-                        new String[]{"Close"}
-                }
+                    "Rate this map! [pink]" + mapName,
+                    "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
+                    new String[][]{
+                            new String[]{"[green]Yes", "[scarlet]No"},
+                            new String[]{"Close"}
+                    }
             );
         }
     }
 
-    /** Check if anyone deserves to be promoted, and promote accordingly */
+    /**
+     * Check if anyone deserves to be promoted, and promote accordingly
+     */
     private void promoteRanks() {
         // check if someone gets promoted
         for (Player player : Groups.player) {
@@ -219,11 +226,11 @@ public class Ranks implements MiniMod {
             for (int i = 0; i < Rank.all.length; i++) {
                 Rank rank = Rank.all[i];
                 sb.append(rank.tag)
-                    .append(" [#")
-                    .append(rank.color.toString().substring(0, 6))
-                    .append("]")
-                    .append(rank.name)
-                    .append("\n");
+                        .append(" [#")
+                        .append(rank.color.toString().substring(0, 6))
+                        .append("]")
+                        .append(rank.name)
+                        .append("\n");
             }
             sb.append("\n[green]Type [sky]/req [green]to see the requirements for the ranks");
             Call.infoMessage(player.con, sb.toString());
@@ -233,19 +240,19 @@ public class Ranks implements MiniMod {
             for (int i = 0; i < Rank.all.length; i++) {
                 Rank rank = Rank.all[i];
                 sb.append("[#").append(rank.color.toString().substring(0, 6)).append("]")
-                    .append(rank.name).append(" ");
+                        .append(rank.name).append(" ");
                 if (rank.requirements != null) {
                     sb.append("[] : [orange]").append(rank.requirements).append("\n");
                 } else if (Rank.reqs.get(i) != null) {
                     Rank.Req req = Rank.reqs.get(i);
                     sb
-                        .append("[] : [red]")
-                        .append(Utils.formatInt(req.playTime))
-                        .append(" mins[white] / [orange]")
-                        .append(req.gamesPlayed)
-                        .append(" games[white] / [yellow]")
-                        .append(Utils.formatInt(req.buildingsBuilt))
-                        .append(" built\n");
+                            .append("[] : [red]")
+                            .append(Utils.formatInt(req.playTime))
+                            .append(" mins[white] / [orange]")
+                            .append(req.gamesPlayed)
+                            .append(" games[white] / [yellow]")
+                            .append(Utils.formatInt(req.buildingsBuilt))
+                            .append(" built\n");
                 }
             }
 

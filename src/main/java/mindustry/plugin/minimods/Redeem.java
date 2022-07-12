@@ -1,9 +1,5 @@
 package mindustry.plugin.minimods;
 
-import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
-
 import arc.struct.ObjectMap;
 import arc.util.CommandHandler;
 import mindustry.gen.Player;
@@ -14,9 +10,14 @@ import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.javacord.api.entity.server.Server;
+import org.javacord.api.entity.user.User;
 
 public class Redeem implements MiniMod {
-    /** Map of key => discord ID */
+    /**
+     * Map of key => discord ID
+     */
     private ObjectMap<String, Long> keys;
 
     @Override
@@ -28,7 +29,7 @@ public class Redeem implements MiniMod {
             }
             long discordId = keys.get(key).longValue();
             keys.remove(key);
-            
+
             // update database
             Database.Player pd = Database.getPlayerData(player.uuid());
             if (pd == null) {
@@ -53,24 +54,24 @@ public class Redeem implements MiniMod {
             }
             updater.update().join();
         });
-    }    
+    }
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("redeem", "", 
-            data -> {
-                data.help = "Redeem a key";
-            },
-            ctx -> {
-                String key = Long.toString((long)(Math.random() * 0xffffffffffL), 36).substring(0, 4);
-                keys.put(key, ctx.author().getId());
-                ctx.success("Redeem", "Check your DMs for next steps.");
-                ctx.author().sendMessage(new EmbedBuilder() 
-                    .setTitle("Redeem")
-                    .setDescription("Redeem Key: " + key + "\n\nType `/redeem " + key + "` on the Mindustry server.")
-                    .setColor(DiscordPalette.INFO)
-                );
-            }
+        handler.register("redeem", "",
+                data -> {
+                    data.help = "Redeem a key";
+                },
+                ctx -> {
+                    String key = Long.toString((long) (Math.random() * 0xffffffffffL), 36).substring(0, 4);
+                    keys.put(key, ctx.author().getId());
+                    ctx.success("Redeem", "Check your DMs for next steps.");
+                    ctx.author().sendMessage(new EmbedBuilder()
+                            .setTitle("Redeem")
+                            .setDescription("Redeem Key: " + key + "\n\nType `/redeem " + key + "` on the Mindustry server.")
+                            .setColor(DiscordPalette.INFO)
+                    );
+                }
         );
     }
 }

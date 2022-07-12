@@ -4,7 +4,6 @@ import arc.util.CommandHandler;
 import arc.util.Timer;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
-
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Roles;
@@ -21,19 +20,19 @@ public class JS implements MiniMod {
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
         handler.register("enablejs", "<true/false> [minutes]", d -> {
-            d.roles = new long[] { Roles.ADMIN };
+            d.roles = new long[]{Roles.ADMIN};
             d.category = "Moderation";
             d.help = "Enable/Disable JS command for everyone";
         }, ctx -> {
             String nickname = ctx.author().getDisplayName(ctx.server());
-            switch(ctx.args.get("true/false")) {
+            switch (ctx.args.get("true/false")) {
                 case "true":
                 case "t":
                     long minutes = 10;
                     if (ctx.args.containsKey("minutes")) {
                         minutes = ctx.args.getLong("minutes", 10);
                     }
-                    enableJS(minutes*60, nickname);
+                    enableJS(minutes * 60, nickname);
                     ctx.success("Enabled JS", "Enabled /js command for " + minutes + " minutes.");
                     break;
                 case "false":
@@ -59,7 +58,7 @@ public class JS implements MiniMod {
             enableJS = false;
             Call.sendMessage("[cyan]/js[accent] command disabled for everyone!");
         }, sec);
-        Call.sendMessage("[accent]Marshal " + name + "[accent] enabled the js command for everyone for " + (sec/60) + " minutes! Do [cyan]/js <script...>[accent] to use it.");
+        Call.sendMessage("[accent]Marshal " + name + "[accent] enabled the js command for everyone for " + (sec / 60) + " minutes! Do [cyan]/js <script...>[accent] to use it.");
     }
 
     private void disableJS(String name) {

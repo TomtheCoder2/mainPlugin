@@ -25,7 +25,7 @@ public class Rainbow implements MiniMod {
     @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("rainbow", "[speed]", "Give your username a rainbow animation", (args, player) -> {
-            synchronized(data) {
+            synchronized (data) {
                 RainbowData rainbowData = data.get(player.uuid());
                 if (rainbowData == null || args.length != 0) { // toggle on
                     rainbowData = new RainbowData();
@@ -91,7 +91,7 @@ public class Rainbow implements MiniMod {
                         rainbowData.hue += rainbowData.speed;
                         rainbowData.hue = rainbowData.hue % 360;
                         String hex = "#" + Color.HSVtoRGB(rainbowData.hue, 100, 100).toString();
-                        
+
                         hex = hex.substring(0, hex.length() - 2);
                         if (rank < Rank.all.length && rank >= 0) { // this should never be false
                             player.name = "[" + hex + "]"
