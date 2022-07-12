@@ -121,6 +121,7 @@ public class Translate implements MiniMod {
             ObjectSet<String> uuids = playerLangs.get(lang);
             if (uuids == null) {
                 uuids = new ObjectSet<>();
+                playerLangs.put(lang, uuids);
             }
             uuids.add(player.uuid());
 

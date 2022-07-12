@@ -38,7 +38,7 @@ public class Inspector implements MiniMod {
         }
     }
 
-    private ObjectMap<Pos, TileInfo> tileInfos;
+    private ObjectMap<Pos, TileInfo> tileInfos = new ObjectMap<>();
 
     private static class TileInfo {
         public String placedBy;
