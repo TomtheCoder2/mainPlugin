@@ -7,4 +7,6 @@ public class Config {
     public static String serverName;
     public static String ipApiKey;
     public static String mapsURL;
+    public static boolean previewSchem;
+    public static boolean mapRating;
 }

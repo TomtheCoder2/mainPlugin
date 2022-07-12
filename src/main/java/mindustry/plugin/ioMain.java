@@ -72,12 +72,10 @@ public class ioMain extends Plugin {
     public static List<String> leftPlayers = new ArrayList<>();
     //    public Timer.Task rateMapTask; // popup to force map rating
     public static ContentHandler contentHandler; // map and schem handler
-    public static boolean previewSchem = false; // preview schem or not
     //    static Gson gson = new Gson();
     public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
     public static Boolean enableJs = false; // whether js is enabled for everyone
     public static int logCount = 0; // only log join/leaves every 5 minutes
-    public static Boolean enableMapRatingPopups = true;
     //    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
     public static ObjectMap<String, Role> discRoles = new ObjectMap<>();
@@ -140,9 +138,10 @@ public class ioMain extends Plugin {
             Config.serverName = data.getString("server_name");
             Config.ipApiKey = data.getString("ipapi_key");
 
-            previewSchem = data.getBoolean("previewSchem");
-            if (data.has("enableMapRatingPopups")) {
-                enableMapRatingPopups = data.getBoolean("enableMapRatingPopups");
+            JSONObject configData = data.getJSONObject("config");
+            Config.previewSchem = configData.getBoolean("preview_schem");
+            if (configData.has("map_rating")) {
+                Config.mapRating = configData.getBoolean("map_rating");
             }
 
             // connect to database
