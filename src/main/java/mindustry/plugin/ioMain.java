@@ -52,8 +52,6 @@ import static arc.util.Log.*;
 import static mindustry.Vars.*;
 import static mindustry.plugin.effect.EffectHelper.getEffect;
 import static mindustry.plugin.utils.Utils.*;
-import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setDebug;
-import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setTrace;
 
 public class ioMain extends Plugin {
     //    public static final File prefsFile = new File("prefs.properties");
@@ -79,6 +77,7 @@ public class ioMain extends Plugin {
             new mindustry.plugin.minimods.Kick(),
             new mindustry.plugin.minimods.Logs(),
             new mindustry.plugin.minimods.Management(),
+            new mindustry.plugin.minimods.Maps(),
             new mindustry.plugin.minimods.Moderation(),
             new mindustry.plugin.minimods.Rainbow(),
             new mindustry.plugin.minimods.Ranks(),
@@ -94,7 +93,6 @@ public class ioMain extends Plugin {
         info("Starting Discord Plugin...");
         info(lennyFace);
         // disable debug logs from javacord (doesnt work tho, idk why)
-        setDebug(false);
         FallbackLoggerConfiguration.setDebug(false);
         FallbackLoggerConfiguration.setTrace(false);
 
@@ -153,8 +151,13 @@ public class ioMain extends Plugin {
             return;
         }
 
-        for (MiniMod mod : minimods) {
-            mod.registerDiscordCommands(registrar);
+        try {
+            for (MiniMod mod : minimods) {
+                mod.registerDiscordCommands(registrar);
+            }
+        } catch(Exception e) {
+            Log.err(e);
+            Core.app.exit();
         }
 
         DiscordRegistrar finalRegistrar = registrar;
@@ -180,7 +183,7 @@ public class ioMain extends Plugin {
         FallbackLoggerConfiguration.setTrace(false);
 
         // Update discord status
-        Timer.schedule((Runnable)this::updateDiscordStatus, 60, 60);
+        Timer.schedule((Runnable)this::updateDiscordStatus, 0, 60);
 
         // Display on-screen messages
         float duration = 10f;
@@ -379,11 +382,11 @@ public class ioMain extends Plugin {
             }
             switch (args[0]) {
                 case "trace", "t" -> {
-                    setTrace(Objects.equals(args[1], "true"));
+                    FallbackLoggerConfiguration.setTrace(Objects.equals(args[1], "true"));
                     info("Set trace logging to " + args[1]);
                 }
                 case "debug", "d" -> {
-                    setDebug(Objects.equals(args[1], "true"));
+                    FallbackLoggerConfiguration.setDebug(Objects.equals(args[1], "true"));
                     info("Set debug to " + args[1]);
                 }
                 default -> {

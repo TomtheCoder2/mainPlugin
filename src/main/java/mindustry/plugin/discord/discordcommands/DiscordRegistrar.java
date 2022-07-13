@@ -4,6 +4,7 @@ import arc.struct.LongSeq;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.struct.StringMap;
+import arc.util.Log;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.DiscordVars;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -43,9 +44,10 @@ public class DiscordRegistrar {
 
         // Parse arguments
         String[] argList = args.split("\\s+");
-        Command.Arg[] argObjs = new Command.Arg[argList.length];
-        boolean hasOptional = false;
+        Command.Arg[] argObjs = new Command.Arg[0];
         if (!Objects.equals(argList[0], "")) {
+            argObjs = new Command.Arg[argList.length];
+            boolean hasOptional = false;   
             for (int i = 0; i < argList.length; i++) {
                 String argStr = argList[i];
                 boolean optional;
@@ -138,6 +140,7 @@ public class DiscordRegistrar {
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Command: " + data.name)
                 .setDescription(data.help)
+                .setColor(DiscordPalette.INFO)
                 .addField("Usage", DiscordVars.prefix + data.name + " " + data.usage);
 
         if (data.category != null)
@@ -179,7 +182,7 @@ public class DiscordRegistrar {
         String error = null;
         StringMap argValues = new StringMap();
         for (Command.Arg arg : entry.data.args) {
-            if (args.length >= i) {
+            if (args.length <= i) {
                 if (!arg.optional) {
                     error = "Missing required argument " + arg.name;
                 }
@@ -195,6 +198,10 @@ public class DiscordRegistrar {
 
             i++;
         }
+        
+//        Log.info("user args: " + Seq.with(args).toString(" | "));
+//        Log.info("expected args: " + Seq.with(entry.data.args).toString(" | "));
+//        Log.info("args", argValues);
 
         Context ctx = new Context(event, argValues);
         if (error != null) {
@@ -267,7 +274,7 @@ public class DiscordRegistrar {
         /**
          * Category
          */
-        public String category = "public";
+        public String category = "Public";
         public boolean hidden = false;
 
         public Command(String name) {
@@ -278,6 +285,10 @@ public class DiscordRegistrar {
             public String name;
             public boolean optional;
             public boolean ellipses;
+
+            public String toString() {
+                return name + (optional ? "?" : "") + (ellipses ? "..." : "");
+            }
         }
     }
 }

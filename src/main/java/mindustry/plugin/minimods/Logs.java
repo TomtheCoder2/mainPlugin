@@ -47,6 +47,8 @@ public class Logs implements MiniMod {
         });
 
         Timer.schedule(() -> {
+            if (joinPlayers.size == 0 && leftPlayers.size == 0) return;
+
             EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Player Join & Leave Log")
                 .setColor(DiscordPalette.SUCCESS); 
