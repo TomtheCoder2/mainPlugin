@@ -283,18 +283,6 @@ public class ioMain extends Plugin {
 
         });
 
-        Events.on(EventType.ServerLoadEvent.class, event -> {
-            // action filter
-            Vars.netServer.admins.addActionFilter(action -> {
-                Player player = action.player;
-                if (player == null) return true;
-
-                if (player.admin) return true;
-
-                return action.type != Administration.ActionType.rotate;
-            });
-        });
-
         // Log game over
         Events.on(EventType.GameOverEvent.class, event -> {
             if (Groups.player.size() > 0) {
@@ -331,6 +319,13 @@ public class ioMain extends Plugin {
                     }
                 }
                 return true;
+            });
+
+            Vars.netServer.admins.addChatFilter((player, message) -> {
+                if (!checkChatRatelimit(message, player)) {
+                    return null;
+                }
+                return message;
             });
 
             info("Registered all filters.");
