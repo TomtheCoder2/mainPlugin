@@ -320,10 +320,20 @@ public class ioMain extends Plugin {
                 return true;
             });
 
+            final ObjectMap<String, String> lastMessages = new ObjectMap<>();
+            Cooldowns.instance.set("t", 1);
             Vars.netServer.admins.addChatFilter((player, message) -> {
-                if (!checkChatRatelimit(message, player)) {
+                if (!Cooldowns.instance.canRun("t", player.uuid())) {
+                    player.sendMessage(GameMsg.error("Comms", "Exceeded rate limit of 1 second."));
                     return null;
                 }
+
+                if (lastMessages.get(player.uuid(), "").equalsIgnoreCase(message)) {
+                    player.sendMessage(GameMsg.error("Comms", "Sending the same message twice is not allowed."));
+                    return null;
+                }
+                lastMessages.put(player.uuid(), message);
+                
                 return message;
             });
 
@@ -333,37 +343,6 @@ public class ioMain extends Plugin {
         for (MiniMod minimod : minimods) {
             minimod.registerEvents();
         }
-    }
-
-    public static boolean checkChatRatelimit(String message, Player player) {
-        // copied almost exactly from mindustry core, will probably need updating
-        // will also update the user's global chat ratelimits
-        long resetTime = Administration.Config.messageRateLimit.num() * 1000L;
-        if (Administration.Config.antiSpam.bool() && !player.isLocal() && !player.admin) {
-            //prevent people from spamming messages quickly
-            if (resetTime > 0 && Time.timeSinceMillis(player.getInfo().lastMessageTime) < resetTime) {
-                //supress message
-                player.sendMessage("[scarlet]You may only send messages every " + Administration.Config.messageRateLimit.num() + " seconds.");
-                player.getInfo().messageInfractions++;
-                //kick player for spamming and prevent connection if they've done this several times
-                if (player.getInfo().messageInfractions >= Administration.Config.messageSpamKick.num() && Administration.Config.messageSpamKick.num() != 0) {
-                    player.con.kick("You have been kicked for spamming.", 1000 * 60 * 2);
-                }
-                return false;
-            } else {
-                player.getInfo().messageInfractions = 0;
-            }
-
-            // prevent players from sending the same message twice in the span of 50 seconds
-            if (message.equals(player.getInfo().lastSentMessage) && Time.timeSinceMillis(player.getInfo().lastMessageTime) < 1000 * 50) {
-                player.sendMessage("[scarlet]You may not send the same message twice.");
-                return false;
-            }
-
-            player.getInfo().lastSentMessage = message;
-            player.getInfo().lastMessageTime = Time.millis();
-        }
-        return true;
     }
 
     public void updateDiscordStatus() {

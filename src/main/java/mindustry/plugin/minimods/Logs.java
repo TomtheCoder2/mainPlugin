@@ -51,7 +51,7 @@ public class Logs implements MiniMod {
 
             EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Player Join & Leave Log")
-                .setColor(DiscordPalette.SUCCESS); 
+                .setColor(DiscordPalette.INFO); 
 
             if (joinPlayers.size != 0) {
                 StringBuilder sb = new StringBuilder();
