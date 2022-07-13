@@ -54,7 +54,6 @@ public class Utils {
     public static String reqMessage = "";
     public static String rankMessage = "";
     public static String ruleMessage = "";
-    public static String noPermissionMessage = "You don't have the required rank for this command. Learn more about ranks [pink]/info[]";
     // whether ip verification is in place (detect VPNs, disallow their build rights)
     public static Boolean verification = false;
     public static Seq<String> bannedNames = new Seq<>();
