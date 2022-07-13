@@ -22,8 +22,8 @@ public class Logs implements MiniMod {
         String ip;
     }
 
-    Seq<JoinPlayerInfo> leftPlayers;
-    Seq<JoinPlayerInfo> joinPlayers;
+    Seq<JoinPlayerInfo> leftPlayers = new Seq<>();
+    Seq<JoinPlayerInfo> joinPlayers = new Seq<>();
 
     public void registerEvents() {
         Events.on(EventType.PlayerLeave.class, event -> {
