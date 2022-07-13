@@ -168,6 +168,10 @@ public class GameInfo implements MiniMod {
                         }
                     }
                     TeamData data = Vars.state.teams.get(team);
+                    if (data.core() == null) {
+                        ctx.error("Error", "Team " + team.name + " does not have any cores!");
+                        return;
+                    }
                     ItemModule items = data.core().items;
                     EmbedBuilder eb = new EmbedBuilder().setTitle("Team: " + team.name);
                     for (Field field : Items.class.getDeclaredFields()) {
