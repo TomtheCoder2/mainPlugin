@@ -58,7 +58,7 @@ public class Translate implements MiniMod {
                             for (String uuid : uuids) {
                                 Player p = Groups.player.find(x -> x.uuid().equals(uuid));
                                 if (p == null) continue;
-                                p.sendMessage(GameMsg.custom("TR", "white", "[coral][" + event.player.name + "[coral]]:[white] " + resp.text));
+                                p.sendMessage(GameMsg.custom("TR", "white", "[coral][[[white]" + event.player.name + "[coral]]:[white] " + resp.text));
                             }
                         }
                     });
