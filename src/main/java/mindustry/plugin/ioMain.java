@@ -64,9 +64,6 @@ public class ioMain extends Plugin {
     public static final long CDT = 300L;
     public static final LocalDateTime startTime = LocalDateTime.now();
     private static final String lennyFace = "( \u0361\u00B0 \u035C\u0296 \u0361\u00B0)";
-    public static String apiKey = "";
-    public static String discordInviteLink;
-    public static int effectId = 0; // effect id for the snowball
     public static ContentHandler contentHandler; // map and schem handler
     //    static Gson gson = new Gson();
     public static int logCount = 0; // only log join/leaves every 5 minutes
@@ -113,7 +110,7 @@ public class ioMain extends Plugin {
             Config.mapsURL = data.getString("maps_url");
 
             JSONObject discordData = data.getJSONObject("discord");
-            discordInviteLink = discordData.getString("invite");
+            DiscordVars.invite = discordData.getString("invite");
             String discordToken = discordData.getString("token");
             try {
                 api = new DiscordApiBuilder().setToken(discordToken).login().join();
@@ -232,7 +229,7 @@ public class ioMain extends Plugin {
             // check for ban & give name
             if (pd != null) {
                 if (pd.banned || pd.bannedUntil > Instant.now().getEpochSecond()) {
-                    player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason + "\n[white] If you what to appeal join our discord server: [cyan]" + discordInviteLink);
+                    player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason + "\n[white] If you what to appeal join our discord server: [cyan]" + DiscordVars.invite);
                     return;
                 }
 

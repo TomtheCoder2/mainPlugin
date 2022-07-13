@@ -5,4 +5,5 @@ import org.javacord.api.DiscordApi;
 public class DiscordVars {
     public static DiscordApi api;
     public static String prefix;
+    public static String invite;
 }
