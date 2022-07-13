@@ -56,17 +56,20 @@ public class Logs implements MiniMod {
             if (joinPlayers.size != 0) {
                 StringBuilder sb = new StringBuilder();
                 for (JoinPlayerInfo player : joinPlayers) {
-                    sb.append("`" + player.uuid + "` | `" + player.id + "` | `" + player.ip + ": " + Utils.escapeColorCodes(player.name));
+                    sb.append("`" + player.uuid + "` | `" + player.id + "` | `" + player.ip + "`: " + Utils.escapeColorCodes(player.name));
                 }
                 eb.addField("Joined", sb.toString());
             }
             if (leftPlayers.size != 0) {
                 StringBuilder sb = new StringBuilder();
                 for (JoinPlayerInfo player : leftPlayers) {
-                    sb.append("`" + player.uuid + "` | `" + player.id + "` | `" + player.ip + ": " + Utils.escapeColorCodes(player.name));
+                    sb.append("`" + player.uuid + "` | `" + player.id + "` | `" + player.ip + "`: " + Utils.escapeColorCodes(player.name));
                 }
                 eb.addField("Left", sb.toString());
             }
+            
+            joinPlayers.clear();
+            leftPlayers.clear();
 
             Channels.LOG.sendMessage(eb);
         }, 30, 30);

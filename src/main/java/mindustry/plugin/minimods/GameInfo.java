@@ -1,6 +1,7 @@
 package mindustry.plugin.minimods;
 
 import arc.Core;
+import arc.Graphics;
 import arc.files.Fi;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
@@ -148,8 +149,8 @@ public class GameInfo implements MiniMod {
                             .addInlineField("Players", Groups.player.size() + "")
                             .addInlineField("Map", Vars.state.map.name())
                             .addInlineField("Wave", Vars.state.wave + "")
-                            .addInlineField("TPS", Vars.state.serverTps + "")
-                            .addInlineField("Next wave in", Math.round(Vars.state.wavetime / Vars.state.serverTps) + " seconds")
+                            .addInlineField("TPS", Core.graphics.getFramesPerSecond() + "")
+                            .addInlineField("Next wave in", Math.round(Vars.state.wavetime / (double)Core.graphics.getFramesPerSecond()) + " seconds")
                             .addInlineField("Waves lasted", String.valueOf(Vars.state.stats.wavesLasted))
                             .addInlineField("Units Created", String.valueOf(Vars.state.stats.unitsCreated))
                             .addInlineField("Server Uptime", uptimeSb.toString())
