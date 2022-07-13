@@ -69,7 +69,6 @@ public class ioMain extends Plugin {
     public static int logCount = 0; // only log join/leaves every 5 minutes
     //    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
-    public static NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
 
     protected MiniMod[] minimods = new MiniMod[]{
             new mindustry.plugin.minimods.Communication(),
