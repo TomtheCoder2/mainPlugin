@@ -28,6 +28,7 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
@@ -35,8 +36,9 @@ import java.time.format.DateTimeFormatter;
  * Provides information relating to the current game.
  */
 public class GameInfo implements MiniMod {
-    @Override
-    public void registerCommands(CommandHandler h) {
+    private static long serverStartTime;
+    static {
+        serverStartTime = System.currentTimeMillis();
     }
 
     @Override
@@ -107,8 +109,6 @@ public class GameInfo implements MiniMod {
                 }
         );
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-
         handler.register("status", "",
                 data -> {
                     data.help = "Show current status of the server";
@@ -120,6 +120,29 @@ public class GameInfo implements MiniMod {
                         return;
                     }
 
+                    long serverUptime = System.currentTimeMillis() - serverStartTime;
+                    long serverUptimeSecs = serverUptime / 1000;
+                    long serverUptimeMins = serverUptimeSecs / 60;
+                    serverUptimeSecs -= serverUptimeMins * 60;
+                    long serverUptimeHours = serverUptimeMins / 60;
+                    serverUptimeMins -= serverUptimeHours * 60;
+                    long serverUptimeDays = serverUptimeHours / 24;
+                    serverUptimeHours -= serverUptimeDays * 24; 
+
+                    StringBuilder uptimeSb = new StringBuilder();
+                    if (serverUptimeDays != 0) {
+                        uptimeSb.append(serverUptimeDays).append("d");
+                    }
+                    if (serverUptimeHours != 0) {
+                        uptimeSb.append(serverUptimeHours).append("h");
+                    }
+                    if (serverUptimeMins != 0) {
+                        uptimeSb.append(serverUptimeMins).append("m");
+                    }
+                    if (serverUptimeSecs != 0) {
+                        uptimeSb.append(serverUptimeSecs).append("s");
+                    }
+
                     EmbedBuilder eb = new EmbedBuilder()
                             .setTitle(Config.serverName)
                             .addInlineField("Players", Groups.player.size() + "")
@@ -129,7 +152,7 @@ public class GameInfo implements MiniMod {
                             .addInlineField("Next wave in", Math.round(Vars.state.wavetime / Vars.state.serverTps) + " seconds")
                             .addInlineField("Waves lasted", String.valueOf(Vars.state.stats.wavesLasted))
                             .addInlineField("Units Created", String.valueOf(Vars.state.stats.unitsCreated))
-//                            .addInlineField("Server Uptime:", String.valueOf(dtf.parse(String.valueOf(Duration.between(LocalDateTime.now(),startTime).abs().getSeconds())))) TODO: Fix this
+                            .addInlineField("Server Uptime", uptimeSb.toString())
                             .setColor(DiscordPalette.INFO);
 
                     Fi tempDir = new Fi("temp/");
@@ -173,7 +196,7 @@ public class GameInfo implements MiniMod {
                         return;
                     }
                     ItemModule items = data.core().items;
-                    EmbedBuilder eb = new EmbedBuilder().setTitle("Team: " + team.name);
+                    EmbedBuilder eb = new EmbedBuilder().setTitle("Core: " + team.name);
                     for (Field field : Items.class.getDeclaredFields()) {
                         if (field.getType().equals(Item.class)) {
                             try {
