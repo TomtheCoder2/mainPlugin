@@ -49,15 +49,16 @@ public class Translate implements MiniMod {
             final String message = event.message;
             thread.addDetect(message, lang -> {
                 if (lang == null) return;
-
+                
                 for (final var entry : playerLangs) {
+                    if (lang.equals(entry.key)) continue; // skip messages in same language
                     final ObjectSet<String> uuids = entry.value;
                     thread.addTranslate(message, lang, entry.key, resp -> {
                         if (resp.error == null) {
                             for (String uuid : uuids) {
                                 Player p = Groups.player.find(x -> x.uuid().equals(uuid));
                                 if (p == null) continue;
-                                p.sendMessage(GameMsg.custom("TR", "white", "[orange][[white]" + event.player.name + "[orange]]: " + resp.text));
+                                p.sendMessage(GameMsg.custom("TR", "white", "[coral][" + event.player.name + "[coral]]:[white] " + resp.text));
                             }
                         }
                     });
