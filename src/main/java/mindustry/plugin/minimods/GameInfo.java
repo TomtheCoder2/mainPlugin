@@ -178,7 +178,7 @@ public class GameInfo implements MiniMod {
                         if (field.getType().equals(Item.class)) {
                             try {
                                 Item item = (Item) field.get(null);
-                                eb.addInlineField(item.name, items.get(item) + "");
+                                eb.addInlineField(item.localizedName, items.get(item) + "");
                             } catch (IllegalAccessException e) {
                                 Log.err(e);
                             }
