@@ -31,10 +31,6 @@ import java.util.concurrent.CompletableFuture;
 
 public class Management implements MiniMod {
     @Override
-    public void registerCommands(CommandHandler handler) {
-    }
-
-    @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
         handler.register("test", "[time]",
                 data -> {
