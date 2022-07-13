@@ -1,13 +1,39 @@
 package mindustry.plugin.minimods;
 
+import arc.Events;
 import arc.util.CommandHandler;
 import arc.util.Strings;
+import mindustry.game.EventType;
+import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
+import mindustry.plugin.discord.Channels;
 import mindustry.plugin.utils.Utils;
 
 public class Communication implements MiniMod {
+    @Override
+    public void registerEvents() {
+        Events.on(EventType.PlayerChatEvent.class, event -> {
+            if (event.message.charAt(0) != '/') {
+                Player player = event.player;
+                assert player != null;
+                StringBuilder sb = new StringBuilder(event.message);
+                for (int i = event.message.length() - 1; i >= 0; i--) {
+                    if (sb.charAt(i) >= 0xF80 && sb.charAt(i) <= 0x107F) {
+                        sb.deleteCharAt(i);
+                    }
+                }
+                Channels.CHAT.sendMessage("**" + Utils.escapeEverything(event.player.name) + "**: " + sb);
+            }
+        });
+
+        Channels.CHAT.addMessageCreateListener(event -> {
+            Call.sendMessage("[sky]" + (event.getMessageAuthor().getDiscriminatedName()) + ":[white] " + event.getMessageContent());
+        });
+        
+    }
+
     @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("w", "<player> <text...>", "Whisper text to another player.", (args, player) -> {

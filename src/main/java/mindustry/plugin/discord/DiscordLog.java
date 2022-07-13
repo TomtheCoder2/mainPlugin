@@ -36,37 +36,6 @@ public class DiscordLog {
         Channels.ERROR_LOG.sendMessage(eb);
     }
 
-    /**
-     * log a list of connections in the discord log channel
-     *
-     * @param connection whether they joined or left
-     */
-    public static void logConnections(TextChannel log_channel, List<String> leftPlayers, String connection) {
-        if (leftPlayers.size() > 0) {
-            EmbedBuilder eb = new EmbedBuilder();
-            eb.setTitle("Player " + connection + " log");
-            StringBuilder desc = new StringBuilder();
-            for (String uuid : leftPlayers) {
-//                if (player == null) continue;
-                try {
-                    Administration.PlayerInfo info = Utils.getPlayerInfo(uuid);
-                    desc.append(String.format("`%s` : `%s `:%s\n", uuid, info.lastIP, Utils.escapeEverything(info.lastName)));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            if (Objects.equals(connection, "leave")) {
-                eb.setColor(new Color(0xff0000));
-            } else {
-                eb.setColor(new Color(0x00ff00));
-            }
-            eb.setDescription(desc.toString());
-            assert log_channel != null;
-            log_channel.sendMessage(eb);
-        }
-        leftPlayers.clear();
-    }
-
     public static void logAction(LogAction action, Administration.PlayerInfo info, Context ctx, String reason) {
         logAction(action, info, ctx, reason, null, null);
     }

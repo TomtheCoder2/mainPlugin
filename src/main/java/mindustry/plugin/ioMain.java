@@ -88,6 +88,7 @@ public class ioMain extends Plugin {
             new mindustry.plugin.minimods.Inspector(),
             new mindustry.plugin.minimods.JS(),
             new mindustry.plugin.minimods.Kick(),
+            new mindustry.plugin.minimods.Logs(),
             new mindustry.plugin.minimods.Management(),
             new mindustry.plugin.minimods.Moderation(),
             new mindustry.plugin.minimods.Rainbow(),
@@ -166,6 +167,7 @@ public class ioMain extends Plugin {
         for (MiniMod mod : minimods) {
             mod.registerDiscordCommands(registrar);
         }
+
         DiscordRegistrar finalRegistrar = registrar;
         registrar.register("help", "[cmd]", data -> {
             data.help = "Display information about commands";
@@ -177,7 +179,10 @@ public class ioMain extends Plugin {
                 ctx.sendEmbed(finalRegistrar.helpEmbed());
             }
         });
-        api.addMessageCreateListener(registrar::dispatchEvent);
+
+        Channels.BOT.addMessageCreateListener(registrar::dispatchEvent);
+        Channels.ADMIN_BOT.addMessageCreateListener(registrar::dispatchEvent);
+        Channels.STAFF_BOT.addMessageCreateListener(registrar::dispatchEvent);
         DiscordVars.api = api;
 
         Utils.init();
@@ -187,21 +192,6 @@ public class ioMain extends Plugin {
 
         // Update discord status
         Timer.schedule(this::updateDiscordStatus, 60, 60);
-
-        // Live Chat
-        Events.on(EventType.PlayerChatEvent.class, event -> {
-            if (event.message.charAt(0) != '/') {
-                Player player = event.player;
-                assert player != null;
-                StringBuilder sb = new StringBuilder(event.message);
-                for (int i = event.message.length() - 1; i >= 0; i--) {
-                    if (sb.charAt(i) >= 0xF80 && sb.charAt(i) <= 0x107F) {
-                        sb.deleteCharAt(i);
-                    }
-                }
-                Channels.CHAT.sendMessage("**" + Utils.escapeEverything(event.player.name) + "**: " + sb);
-            }
-        });
 
         // Display on-screen messages
         float duration = 10f;
@@ -219,20 +209,6 @@ public class ioMain extends Plugin {
         Events.on(EventType.ServerLoadEvent.class, event -> {
 //            contentHandler = new ContentHandler();
             Log.info("Everything's loaded !");
-        });
-
-        // update every tick
-        // player disconnected
-        Events.on(EventType.PlayerLeave.class, event -> {
-            String uuid = event.player.uuid();
-            // free ram
-            if (playerDataGroup.get(uuid) != null) {
-                playerDataGroup.remove(uuid);
-            }
-
-            if (!leftPlayers.contains(uuid)) {
-                leftPlayers.add(uuid);
-            }
         });
 
 
@@ -288,6 +264,9 @@ public class ioMain extends Plugin {
                 Rank rank = Rank.all[0];
                 Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
             }
+
+            Call.infoMessage(player.con, welcomeMessage);
+            
 //
 //            CompletableFuture.runAsync(() -> {
 //                if(verification) {
@@ -315,11 +294,6 @@ public class ioMain extends Plugin {
 //            });
 //            player.sendMessage(welcomeMessage);
 
-            Call.infoMessage(player.con, welcomeMessage);
-
-            if (!joinedPlayers.contains(player.uuid())) {
-                joinedPlayers.add(player.uuid());
-            }
         });
 
         Events.on(EventType.ServerLoadEvent.class, event -> {
@@ -443,23 +417,6 @@ public class ioMain extends Plugin {
             player.getInfo().lastMessageTime = Time.millis();
         }
         return true;
-    }
-
-    // TODO: Needs to be called
-    public static void update() {
-        try {
-            if ((logCount & 5) == 0) {
-                // log player joins
-                logConnections(Channels.LOG, joinedPlayers, "join");
-
-                logConnections(Channels.LOG, leftPlayers, "leave");
-            }
-            logCount++;
-            debug("Updated database!");
-        } catch (Exception e) {
-            err("There was an error in the update loop: ");
-            e.printStackTrace();
-        }
     }
 
     public void updateDiscordStatus() {
