@@ -238,6 +238,7 @@ class TranslateApi {
      */
     public static Resp translate(String text, String fromLang, String toLang) {
         String server = getServer();
+        String response = null;
         try {
             JSONObject reqObj = new JSONObject()
                 .put("q", text)
@@ -252,6 +253,7 @@ class TranslateApi {
     
                 .build();
             HttpResponse<String> resp = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build().send(req, HttpResponse.BodyHandlers.ofString());
+            response = resp.body();
             JSONObject respObj = new JSONObject(new JSONTokener(resp.body()));
             if (respObj.has("error")) {
                 DiscordLog.error("Translate: Translate Server Error", respObj.getString("error"), StringMap.of("Host", getHost(server)));
@@ -261,7 +263,8 @@ class TranslateApi {
         } catch(Exception e) {
             Log.err("Translate error for server: " +server);
             e.printStackTrace();
-            DiscordLog.error("Translate: Translate Internal Error", e.getMessage(), StringMap.of("Host", getHost(server)));
+            DiscordLog.error("Translate: Translate Internal Error", e.getMessage(), 
+                StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
             return new Resp(e.toString(), getHost(server), false);
         }
     }
@@ -271,6 +274,7 @@ class TranslateApi {
      */
     public static String detect(String text) {
         String server = getServer();
+        String response = null;
         try {
             HttpRequest req = HttpRequest.newBuilder()
                 .POST(BodyPublishers.ofString("q=" + URLEncoder.encode(text, "utf-8")))
@@ -279,7 +283,8 @@ class TranslateApi {
                 .setHeader("Content-Type", "application/x-www-form-urlencoded")
                 .build();
             HttpResponse<String> resp = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build().send(req, HttpResponse.BodyHandlers.ofString());
-            Object respObj = new JSONTokener(resp.body()).nextValue();
+            response = resp.body();
+            Object respObj = new JSONTokener(response).nextValue();
             if (respObj instanceof JSONObject) {
                 String error = ((JSONObject)respObj).getString("error");
                 Log.err("Translate error: " + error);
@@ -289,7 +294,8 @@ class TranslateApi {
             JSONArray array = (JSONArray)respObj;
             return array.getJSONObject(0).getString("language");
         } catch(Exception error) {
-            DiscordLog.error("Translate: Detect Internal Error", error.getMessage(), StringMap.of("Host", getHost(server)));
+            DiscordLog.error("Translate: Detect Internal Error", error.getMessage(),
+                StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
             return null;
         }
     }

@@ -33,7 +33,7 @@ public class DiscordLog {
             for (var entry : fields) {
                 eb.addField(entry.key, entry.value);
             }
-        Channels.LOG.sendMessage(eb);
+        Channels.ERROR_LOG.sendMessage(eb);
     }
 
     /**
