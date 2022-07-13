@@ -77,10 +77,10 @@ public class Context {
 
     public void sendEmbed(Color color, String title, String description) {
         sendEmbed(
-            new EmbedBuilder()
-                .setTitle(title)
-                .setDescription(description)
-                .setColor(color)
+                new EmbedBuilder()
+                        .setTitle(title)
+                        .setDescription(description)
+                        .setColor(color)
         );
     }
 

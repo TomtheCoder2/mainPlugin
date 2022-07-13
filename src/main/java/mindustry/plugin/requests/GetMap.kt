@@ -5,7 +5,6 @@ import arc.util.Http
 import arc.util.Log
 import arc.util.serialization.Base64Coder
 import mindustry.plugin.utils.Config
-import mindustry.plugin.utils.Utils
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.File

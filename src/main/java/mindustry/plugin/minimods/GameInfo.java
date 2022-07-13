@@ -28,13 +28,8 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.lang.reflect.Field;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-
-import static mindustry.plugin.ioMain.startTime;
 
 /**
  * Provides information relating to the current game.

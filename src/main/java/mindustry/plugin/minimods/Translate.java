@@ -1,31 +1,12 @@
 package mindustry.plugin.minimods;
 
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpRequest.BodyPublishers;
-import java.time.Duration;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
 import arc.Core;
 import arc.Events;
 import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
-import arc.struct.Seq;
 import arc.struct.StringMap;
 import arc.util.CommandHandler;
 import arc.util.Log;
-import arc.util.serialization.JsonValue;
 import mindustry.game.EventType;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
@@ -35,10 +16,25 @@ import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
 import mindustry.plugin.utils.GameMsg;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 
 public class Translate implements MiniMod {
-    private ObjectSet<String> langs = ObjectSet.with("en","ar","az","zh","cs","da","nl","eo","fi","fr","de","el","he","hi","hu","id","ga","it","ja","ko","fa","pl","pt","ru","sk","es","sv","tr","uk","vi");
-    private ObjectMap<String, ObjectSet<String>> playerLangs = new ObjectMap<>(); 
+    private ObjectSet<String> langs = ObjectSet.with("en", "ar", "az", "zh", "cs", "da", "nl", "eo", "fi", "fr", "de", "el", "he", "hi", "hu", "id", "ga", "it", "ja", "ko", "fa", "pl", "pt", "ru", "sk", "es", "sv", "tr", "uk", "vi");
+    private ObjectMap<String, ObjectSet<String>> playerLangs = new ObjectMap<>();
 
     private TranslateThread thread;
 
@@ -50,7 +46,7 @@ public class Translate implements MiniMod {
         Events.on(EventType.PlayerChatEvent.class, event -> {
             if (event.player == null) return;
             if (playerLangs.size == 0) return; // if no one wants to translate, dont waste people's resources
-            final String message =event.message;
+            final String message = event.message;
             thread.addDetect(message, lang -> {
                 if (lang == null) return;
 
@@ -61,7 +57,7 @@ public class Translate implements MiniMod {
                             for (String uuid : uuids) {
                                 Player p = Groups.player.find(x -> x.uuid().equals(uuid));
                                 if (p == null) continue;
-                                p.sendMessage(GameMsg.custom("TR", "white", "[orange][[white]" + event.player.name + "[orange]]: "+  resp.text));
+                                p.sendMessage(GameMsg.custom("TR", "white", "[orange][[white]" + event.player.name + "[orange]]: " + resp.text));
                             }
                         }
                     });
@@ -71,7 +67,7 @@ public class Translate implements MiniMod {
 
         Events.on(EventType.PlayerLeave.class, event -> {
             if (event.player == null) return;
-            
+
             for (var uuids : playerLangs.values()) {
                 uuids.remove(event.player.uuid());
             }
@@ -80,27 +76,27 @@ public class Translate implements MiniMod {
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("translate", "<lang> <text...>", 
-            data -> {
-                data.help = "Translate a message";
-                data.category = "Communication";
-            },
-            ctx -> {
-                if (!thread.addTranslate(ctx.args.get("text"), "auto", ctx.args.get("lang"), resp -> {
-                    if (resp.error != null) {
-                        ctx.error("Translate Error", resp.error);
-                        return;
+        handler.register("translate", "<lang> <text...>",
+                data -> {
+                    data.help = "Translate a message";
+                    data.category = "Communication";
+                },
+                ctx -> {
+                    if (!thread.addTranslate(ctx.args.get("text"), "auto", ctx.args.get("lang"), resp -> {
+                        if (resp.error != null) {
+                            ctx.error("Translate Error", resp.error);
+                            return;
+                        }
+                        ctx.sendEmbed(new EmbedBuilder()
+                                .setTitle("Translate")
+                                .setColor(DiscordPalette.INFO)
+                                .setDescription(resp.text)
+                                .setFooter("Host: " + resp.host));
+
+                    })) {
+                        ctx.error("Translate Error", "Queue is full.");
                     }
-                    ctx.sendEmbed(new EmbedBuilder()
-                        .setTitle("Translate")
-                        .setColor(DiscordPalette.INFO)
-                        .setDescription(resp.text)
-                        .setFooter("Host: " + resp.host));
-                        
-                })) {
-                    ctx.error("Translate Error", "Queue is full.");
                 }
-            }
         );
     }
 
@@ -130,20 +126,15 @@ public class Translate implements MiniMod {
     }
 }
 
-/** Runs the translations & sends messages to discord and chat */
+/**
+ * Runs the translations & sends messages to discord and chat
+ */
 class TranslateThread extends Thread {
-    private static class Req {
-        Consumer<TranslateApi.Resp> translateHandler;
-        Consumer<String> detectHandler;
-
-        String text;
-        String fromLang;
-        String toLang;
-    }
-
     protected BlockingQueue<Req> queue = new LinkedBlockingQueue<>(64);
 
-    /** Returns false if there are too many requests */
+    /**
+     * Returns false if there are too many requests
+     */
     public boolean addTranslate(String text, String from, String to, Consumer<TranslateApi.Resp> handler) {
         Req req = new Req();
         req.translateHandler = handler;
@@ -153,7 +144,9 @@ class TranslateThread extends Thread {
         return this.queue.offer(req);
     }
 
-    /** Returns false if there are too many requests. */
+    /**
+     * Returns false if there are too many requests.
+     */
     public boolean addDetect(String text, Consumer<String> handler) {
         Req req = new Req();
         req.detectHandler = handler;
@@ -167,13 +160,13 @@ class TranslateThread extends Thread {
             final Req req;
             try {
                 req = queue.take();
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
                 Log.err(e);
                 continue;
             }
 
             if (req.translateHandler != null) {
-                final TranslateApi.Resp resp = TranslateApi.translate(req.text, req.fromLang, req.toLang);            
+                final TranslateApi.Resp resp = TranslateApi.translate(req.text, req.fromLang, req.toLang);
                 Core.app.post(() -> {
                     req.translateHandler.accept(resp);
                 });
@@ -185,20 +178,29 @@ class TranslateThread extends Thread {
             }
         }
     }
+
+    private static class Req {
+        Consumer<TranslateApi.Resp> translateHandler;
+        Consumer<String> detectHandler;
+
+        String text;
+        String fromLang;
+        String toLang;
+    }
 }
 
 class TranslateApi {
     // Randomly cycle through servers to use translate.
     // That way we decrease the load on any single server. 
     // https://github.com/LibreTranslate/LibreTranslate#mirrors
-    private final static String[] SERVERS = new String[] {
-        "libretranslate.de",
-        "translate.argosopentech.com",
+    private final static String[] SERVERS = new String[]{
+            "libretranslate.de",
+            "translate.argosopentech.com",
 //        "translate.api.skitzen.com", does not work
-        "libretranslate.pussthecat.org",
-        "translate.fortytwo-it.com",
+            "libretranslate.pussthecat.org",
+            "translate.fortytwo-it.com",
 //        "translate.terraprint.co", does not work.
-        "lt.vern.cc"
+            "lt.vern.cc"
     };
 
     private static int serverIdx = 0;
@@ -208,7 +210,7 @@ class TranslateApi {
         if (parts.length <= 1) {
             return server;
         } else {
-            return parts[parts.length-2] + "." + parts[parts.length-1];
+            return parts[parts.length - 2] + "." + parts[parts.length - 1];
         }
     }
 
@@ -218,40 +220,25 @@ class TranslateApi {
         return server;
     }
 
-    public static class Resp {
-        public String text;
-        public String error;
-        public String host;
-
-        public Resp(String error, String host, boolean eeek) {
-            this.error = error;
-            this.host = host;
-        }
-
-        public Resp(String text, String host) {
-            this.text = text;
-            this.host = host;
-        }
-    }
-
-    /** Translates a piece of text
+    /**
+     * Translates a piece of text
      */
     public static Resp translate(String text, String fromLang, String toLang) {
         String server = getServer();
         String response = null;
         try {
             JSONObject reqObj = new JSONObject()
-                .put("q", text)
-                .put("source", fromLang)
-                .put("target", toLang);
+                    .put("q", text)
+                    .put("source", fromLang)
+                    .put("target", toLang);
 
             HttpRequest req = HttpRequest.newBuilder()
-                .POST(HttpRequest.BodyPublishers.ofString(reqObj.toString()))
-                .uri(URI.create("https://" + server + "/translate"))
-                .setHeader("User-Agent", Config.serverName)
-                .setHeader("Content-Type", "application/json")
-    
-                .build();
+                    .POST(HttpRequest.BodyPublishers.ofString(reqObj.toString()))
+                    .uri(URI.create("https://" + server + "/translate"))
+                    .setHeader("User-Agent", Config.serverName)
+                    .setHeader("Content-Type", "application/json")
+
+                    .build();
             HttpResponse<String> resp = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build().send(req, HttpResponse.BodyHandlers.ofString());
             response = resp.body();
             JSONObject respObj = new JSONObject(new JSONTokener(resp.body()));
@@ -259,9 +246,9 @@ class TranslateApi {
                 DiscordLog.error("Translate: Translate Server Error", respObj.getString("error"), StringMap.of("Host", getHost(server)));
                 return new Resp(respObj.getString("error"), getHost(server), false);
             }
-            return new Resp (respObj.getString("translatedText"), getHost(server));
-        } catch(Exception e) {
-            Log.err("Translate error for server: " +server);
+            return new Resp(respObj.getString("translatedText"), getHost(server));
+        } catch (Exception e) {
+            Log.err("Translate error for server: " + server);
             e.printStackTrace();
             DiscordLog.error("Translate: Translate Internal Error", e.getMessage(), 
                 StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
@@ -277,26 +264,42 @@ class TranslateApi {
         String response = null;
         try {
             HttpRequest req = HttpRequest.newBuilder()
-                .POST(BodyPublishers.ofString("q=" + URLEncoder.encode(text, "utf-8")))
-                .uri(URI.create("https://" + server + "/detect"))
-                .setHeader("User-Agent", Config.serverName)
-                .setHeader("Content-Type", "application/x-www-form-urlencoded")
-                .build();
+                    .POST(BodyPublishers.ofString("q=" + URLEncoder.encode(text, "utf-8")))
+                    .uri(URI.create("https://" + server + "/detect"))
+                    .setHeader("User-Agent", Config.serverName)
+                    .setHeader("Content-Type", "application/x-www-form-urlencoded")
+                    .build();
             HttpResponse<String> resp = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build().send(req, HttpResponse.BodyHandlers.ofString());
             response = resp.body();
             Object respObj = new JSONTokener(response).nextValue();
             if (respObj instanceof JSONObject) {
-                String error = ((JSONObject)respObj).getString("error");
+                String error = ((JSONObject) respObj).getString("error");
                 Log.err("Translate error: " + error);
                 DiscordLog.error("Translate: Detect Server Error", error, StringMap.of("Host", getHost(server)));
                 return null;
             }
-            JSONArray array = (JSONArray)respObj;
+            JSONArray array = (JSONArray) respObj;
             return array.getJSONObject(0).getString("language");
         } catch(Exception error) {
             DiscordLog.error("Translate: Detect Internal Error", error.getMessage(),
                 StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
             return null;
+        }
+    }
+
+    public static class Resp {
+        public String text;
+        public String error;
+        public String host;
+
+        public Resp(String error, String host, boolean eeek) {
+            this.error = error;
+            this.host = host;
+        }
+
+        public Resp(String text, String host) {
+            this.text = text;
+            this.host = host;
         }
     }
 }

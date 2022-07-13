@@ -9,7 +9,7 @@ public class Utils {
     public static String listRanks() {
         StringBuilder list = new StringBuilder();
         list.append("```\n");
-        for (int i =0 ; i < Rank.all.length; i++) {
+        for (int i = 0; i < Rank.all.length; i++) {
             Rank rank = Rank.all[i];
             list.append(i).append(": ").append(rank.name).append("\n");
         }

@@ -26,7 +26,7 @@ public class Communication implements MiniMod {
             other.sendMessage("[orange][[[gray]whisper from [#ffd37f]" + Strings.stripColors(player.name) + "[orange]]: [gray]" + args[1]);
             player.sendMessage("[orange][[[gray]whisper to [#ffd37f]" + Strings.stripColors(other.name) + "[orange]]: [gray]" + args[1]);
         });
-        
+
         handler.removeCommand("t");
         handler.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
             String message = args[0];

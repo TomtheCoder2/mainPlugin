@@ -5,7 +5,9 @@ import org.javacord.api.entity.channel.TextChannel;
 import org.json.JSONObject;
 
 public class Channels {
-    /** Channel for live chat */
+    /**
+     * Channel for live chat
+     */
     public static TextChannel CHAT;
 
 
@@ -23,10 +25,12 @@ public class Channels {
     public static TextChannel BOT;
     public static TextChannel STAFF_BOT;
     public static TextChannel ADMIN_BOT;
-    
-    /** Retrieves a text channel. Panics if it does not exist. */
+
+    /**
+     * Retrieves a text channel. Panics if it does not exist.
+     */
     private static TextChannel getChannel(DiscordApi api, String id) {
-        return api.getTextChannelById(id).get();        
+        return api.getTextChannelById(id).get();
     }
 
     public static void load(DiscordApi api, JSONObject obj) {
@@ -40,7 +44,7 @@ public class Channels {
 
         LOG = getChannel(api, obj.getString("log"));
         ERROR_LOG = getChannel(api, obj.getString("error_log"));
-        
+
         BOT = getChannel(api, obj.getString("bot"));
         STAFF_BOT = getChannel(api, obj.getString("staff_bot"));
         ADMIN_BOT = getChannel(api, obj.getString("admin_bot"));

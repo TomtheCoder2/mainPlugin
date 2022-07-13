@@ -1,10 +1,5 @@
 package mindustry.plugin.minimods;
 
-import org.javacord.api.entity.message.MessageAttachment;
-import org.javacord.api.entity.message.MessageBuilder;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
-
-import mindustry.net.Packets;
 import arc.Core;
 import arc.files.Fi;
 import arc.struct.IntSeq;
@@ -12,151 +7,96 @@ import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Log;
 import arc.util.Time;
+import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.game.Gamemode;
 import mindustry.maps.Map;
 import mindustry.maps.MapException;
-import mindustry.Vars;
 import mindustry.net.Administration;
+import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
-import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Utils;
+import org.javacord.api.entity.message.MessageAttachment;
+import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
-import java.awt.Color;
-import java.nio.charset.Charset;
+import java.awt.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 public class Management implements MiniMod {
     @Override
-    public void registerCommands(CommandHandler handler) {}
-
-    private static class TestData {
-        public IntSeq tpsMeasurements;
-
-        public TestData() {
-            tpsMeasurements = new IntSeq();
-        }
-
-        public int min() {
-            if (tpsMeasurements.size == 0) return 0;
-
-            int min = Integer.MAX_VALUE;
-            for (int tps: tpsMeasurements.items) {
-                if (tps < min) min = tps;
-            }
-            return min;
-        }
-
-        public int max() {
-            int max = 0;
-            for (int tps : tpsMeasurements.items) {
-                if (tps > max) max = tps;
-            }
-            return max;
-        }
-
-        public double avg() {
-            if (tpsMeasurements.size == 0) return 0;
-
-            return (double)tpsMeasurements.sum() / (double)tpsMeasurements.size;
-        }
-
-        /** Returns the median TPS */
-        public int med() {
-            if (tpsMeasurements.size == 0) return 0;
-
-            IntSeq s = new IntSeq(tpsMeasurements);
-            s.sort();
-            return s.get(s.size / 2);
-        }
-
-        /** Returns the data as a CSV string */
-        public String csv() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Iteration,TPS");
-            int iter = 1;
-            for (int tps : tpsMeasurements.items) {
-                sb.append(iter);
-                sb.append(",");
-                sb.append(tps);
-
-                iter++;
-            }
-            return sb.toString();
-        }
+    public void registerCommands(CommandHandler handler) {
     }
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("test", "[time]", 
-            data -> {
-                data.help = "Test server TPS stability";
-                data.category = "Management";
-            },
-            ctx -> {
-                long time = ctx.args.getLong("time", 1000);
+        handler.register("test", "[time]",
+                data -> {
+                    data.help = "Test server TPS stability";
+                    data.category = "Management";
+                },
+                ctx -> {
+                    long time = ctx.args.getLong("time", 1000);
 
-                TestData data = new TestData();
-                final Runnable[] scanTPS = new Runnable[0];
-                final long endTime = System.currentTimeMillis() + time;
-                scanTPS[0] = () -> {
-                    if (System.currentTimeMillis() > endTime) {
-                        ctx.reply(new MessageBuilder()
-                            .addEmbed(
-                                new EmbedBuilder()
-                                .setColor(Color.YELLOW)
-                                .setTitle("Stability Test Results")
-                                .setDescription(
-                                    "Min TPS: " + data.min() + "\n" +
-                                    "Max TPS: " + data.max() + "\n" + 
-                                    "Avg TPS: " + data.avg() + "\n" +
-                                    "Median TPS: " + data.med() + "\n"
-                                ))
-                            .addAttachment(data.csv().getBytes(), "data.csv")
-                        );
-                    } else {
-                        data.tpsMeasurements.add(Core.graphics.getFramesPerSecond());
-                        Core.app.post(scanTPS[0]);
-                    }
-                };
+                    TestData data = new TestData();
+                    final Runnable[] scanTPS = new Runnable[0];
+                    final long endTime = System.currentTimeMillis() + time;
+                    scanTPS[0] = () -> {
+                        if (System.currentTimeMillis() > endTime) {
+                            ctx.reply(new MessageBuilder()
+                                    .addEmbed(
+                                            new EmbedBuilder()
+                                                    .setColor(Color.YELLOW)
+                                                    .setTitle("Stability Test Results")
+                                                    .setDescription(
+                                                            "Min TPS: " + data.min() + "\n" +
+                                                                    "Max TPS: " + data.max() + "\n" +
+                                                                    "Avg TPS: " + data.avg() + "\n" +
+                                                                    "Median TPS: " + data.med() + "\n"
+                                                    ))
+                                    .addAttachment(data.csv().getBytes(), "data.csv")
+                            );
+                        } else {
+                            data.tpsMeasurements.add(Core.graphics.getFramesPerSecond());
+                            Core.app.post(scanTPS[0]);
+                        }
+                    };
 
-                ctx.success("Stability Test Started", "Results will come out in " + time + "ms");
-            }
+                    ctx.success("Stability Test Started", "Results will come out in " + time + "ms");
+                }
         );
 
         handler.register("gc", "",
-            data -> {
-                data.help = "Trigger a garbage collection. Testing only.";
-                data.roles = new long[] { Roles.MOD, Roles.ADMIN };
-                data.category = "Management";
-            },
-            ctx -> {
-                double pre = (Core.app.getJavaHeap() / 1024.0 / 1024.0);
-                System.gc();
-                double post = (Core.app.getJavaHeap() / 1024.0 / 1024.0);
+                data -> {
+                    data.help = "Trigger a garbage collection. Testing only.";
+                    data.roles = new long[]{Roles.MOD, Roles.ADMIN};
+                    data.category = "Management";
+                },
+                ctx -> {
+                    double pre = (Core.app.getJavaHeap() / 1024.0 / 1024.0);
+                    System.gc();
+                    double post = (Core.app.getJavaHeap() / 1024.0 / 1024.0);
 
-                ctx.sendEmbed(new EmbedBuilder()
-                    .setColor(Color.YELLOW)
-                    .setTitle("Garbage Collected")
-                    .setDescription((post-pre) + " MB of garbage collected")
-                    .addInlineField("Pre-GC usage", pre + " MB")
-                    .addInlineField("Post-GC usage", post + " MB")
-                );
-            }
+                    ctx.sendEmbed(new EmbedBuilder()
+                            .setColor(Color.YELLOW)
+                            .setTitle("Garbage Collected")
+                            .setDescription((post - pre) + " MB of garbage collected")
+                            .addInlineField("Pre-GC usage", pre + " MB")
+                            .addInlineField("Post-GC usage", post + " MB")
+                    );
+                }
         );
 
         handler.register("config", "[name] [value...]", d -> {
             d.help = "Configure server settings.";
             d.category = "Management";
-            d.roles =  new long[] { Roles.ADMIN };
+            d.roles = new long[]{Roles.ADMIN};
         }, ctx -> {
             if (!ctx.args.containsKey("name")) {
                 EmbedBuilder eb = new EmbedBuilder();
@@ -185,9 +125,9 @@ public class Management implements MiniMod {
                 } else {
                     c.set(ctx.args.get("value").replace("\\n", "\n"));
                 }
-                
+
                 ctx.sendEmbed(Color.CYAN, "Configuration", c.name() + " is now set to <" + c.getClass().getName() + "> " + c.get() + "\n\nPrevious Value: " + previousValue);
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 ctx.error("Unknown Configuration", e.getMessage());
             }
         });
@@ -195,8 +135,8 @@ public class Management implements MiniMod {
         handler.register("uploadmod", "[.zip]", d -> {
             d.help = "Upload mod (include .zip file in message)";
             d.category = "Management";
-            d.roles = new long[] { Roles.ADMIN };
-            d.aliases = new String[] { "umod" };
+            d.roles = new long[]{Roles.ADMIN};
+            d.aliases = new String[]{"umod"};
         }, ctx -> {
             Seq<MessageAttachment> ml = new Seq<>();
             for (MessageAttachment ma : ctx.event.getMessageAttachments()) {
@@ -239,9 +179,9 @@ public class Management implements MiniMod {
 
         handler.register("removemod", "<modname/id>", d -> {
             d.help = "Remove a mod from the folder";
-            d.roles = new long[] { Roles.ADMIN };
+            d.roles = new long[]{Roles.ADMIN};
             d.category = "Management";
-            d.aliases = new String[] { "rmod" };
+            d.aliases = new String[]{"rmod"};
         }, ctx -> {
             var mod = Utils.getMod(ctx.args.get("modname/id"));
             if (mod == null) {
@@ -252,10 +192,10 @@ public class Management implements MiniMod {
             Path path = Paths.get(mod.file.file().getAbsoluteFile().getAbsolutePath());
             String name = mod.name;
             mod.dispose();
-            
-            try { 
+
+            try {
                 Files.delete(path);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 ctx.error("Unknown error", e.getMessage());
                 return;
@@ -270,9 +210,9 @@ public class Management implements MiniMod {
 
         handler.register("start", "[map] [mode]", d -> {
             d.help = "Restart the server";
-            d.roles = new long[] { Roles.ADMIN };
+            d.roles = new long[]{Roles.ADMIN};
             d.category = "Management";
-            d.aliases = new String[] { "restart" };
+            d.aliases = new String[]{"restart"};
         }, ctx -> {
             Vars.net.closeServer();
             Vars.state.set(GameState.State.menu);
@@ -281,7 +221,7 @@ public class Management implements MiniMod {
             if (ctx.args.containsKey("mode")) {
                 try {
                     mode = Gamemode.valueOf(ctx.args.get("mode"));
-                } catch(IllegalArgumentException e) {
+                } catch (IllegalArgumentException e) {
                     ctx.error("Invalid Gamemode", "'" + ctx.args.get("mode") + "' is not a valid game mode.");
                     return;
                 }
@@ -290,7 +230,7 @@ public class Management implements MiniMod {
             Map map = Vars.maps.getShuffleMode().next(mode, Vars.state.map);
             if (ctx.args.containsKey("map")) {
                 map = Utils.getMapBySelector(ctx.args.get("map"));
-                if (map == null) { 
+                if (map == null) {
                     ctx.error("Invalid Map", "Map '" + ctx.args.get("map") + "' does not exist");
                 }
             }
@@ -309,12 +249,12 @@ public class Management implements MiniMod {
 
         handler.register("exit", "", d -> {
             d.help = "Close the server.";
-            d.roles = new long[] { Roles.ADMIN };
+            d.roles = new long[]{Roles.ADMIN};
             d.category = "Management";
         }, ctx -> {
             Channels.LOG.sendMessage(new EmbedBuilder()
-                .setTitle(ctx.author().getDisplayName(ctx.server()) + " closed the server!")
-                .setColor(new Color(0xff0000))).join();
+                    .setTitle(ctx.author().getDisplayName(ctx.server()) + " closed the server!")
+                    .setColor(new Color(0xff0000))).join();
             ctx.success("Success", "Closed the server");
 
             Log.info("&ly--SERVER RESTARTING--");
@@ -323,5 +263,65 @@ public class Management implements MiniMod {
                 Core.app.exit();
             });
         });
+    }
+
+    private static class TestData {
+        public IntSeq tpsMeasurements;
+
+        public TestData() {
+            tpsMeasurements = new IntSeq();
+        }
+
+        public int min() {
+            if (tpsMeasurements.size == 0) return 0;
+
+            int min = Integer.MAX_VALUE;
+            for (int tps : tpsMeasurements.items) {
+                if (tps < min) min = tps;
+            }
+            return min;
+        }
+
+        public int max() {
+            int max = 0;
+            for (int tps : tpsMeasurements.items) {
+                if (tps > max) max = tps;
+            }
+            return max;
+        }
+
+        public double avg() {
+            if (tpsMeasurements.size == 0) return 0;
+
+            return (double) tpsMeasurements.sum() / (double) tpsMeasurements.size;
+        }
+
+        /**
+         * Returns the median TPS
+         */
+        public int med() {
+            if (tpsMeasurements.size == 0) return 0;
+
+            IntSeq s = new IntSeq(tpsMeasurements);
+            s.sort();
+            return s.get(s.size / 2);
+        }
+
+        /**
+         * Returns the data as a CSV string
+         */
+        public String csv() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Iteration,TPS");
+            int iter = 1;
+            for (int tps : tpsMeasurements.items) {
+                sb.append(iter);
+                sb.append(",");
+                sb.append(tps);
+
+                iter++;
+            }
+            return sb.toString();
+        }
     }
 }
