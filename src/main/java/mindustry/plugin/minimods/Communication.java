@@ -29,6 +29,9 @@ public class Communication implements MiniMod {
         });
 
         Channels.CHAT.addMessageCreateListener(event -> {
+            if (event.getMessageAuthor().isBotUser()) {
+                return;
+            }
             Call.sendMessage("[sky]" + (event.getMessageAuthor().getDiscriminatedName()) + ":[white] " + event.getMessageContent());
         });
         
