@@ -11,6 +11,7 @@ import mindustry.game.EventType;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
+import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
@@ -47,7 +48,7 @@ public class Translate implements MiniMod {
             if (event.player == null) return;
             if (playerLangs.size == 0) return; // if no one wants to translate, dont waste people's resources
             final String message = event.message;
-            thread.addDetect(message, lang -> {
+            boolean success = thread.addDetect(message, lang -> {
                 if (lang == null) return;
                 
                 for (final var entry : playerLangs) {
@@ -64,6 +65,10 @@ public class Translate implements MiniMod {
                     });
                 }
             });
+
+            if (!success) { 
+                DiscordLog.error("Translate Thread Full", ":(", null);
+            }
         });
 
         Events.on(EventType.PlayerLeave.class, event -> {
