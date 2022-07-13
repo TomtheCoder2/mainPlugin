@@ -253,7 +253,7 @@ class TranslateApi {
             e.printStackTrace();
             DiscordLog.error("Translate: Translate Internal Error", e.getMessage(), 
                 StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
-            return new Resp(e.toString(), getHost(server), false);
+            return translate(text, fromLang, toLang);
         }
     }
 
@@ -284,7 +284,7 @@ class TranslateApi {
         } catch(Exception error) {
             DiscordLog.error("Translate: Detect Internal Error", error.getMessage(),
                 StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
-            return null;
+            return detect(text);
         }
     }
 
