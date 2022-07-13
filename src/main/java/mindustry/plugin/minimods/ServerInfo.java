@@ -23,14 +23,6 @@ public class ServerInfo implements MiniMod {
             Call.infoMessage(player.con, Utils.ruleMessage);
         });
 
-        handler.<Player>register("event", "Join an ongoing event (if there is one)", (args, player) -> {
-            if (Utils.eventIp.length() > 0) {
-                Call.connect(player.con, Utils.eventIp, Utils.eventPort);
-            } else {
-                player.sendMessage("[scarlet]There is no ongoing event at this time.");
-            }
-        });
-
         handler.<Player>register("discord", "Place a message block below a player with links for our discord server.", (args, player) -> {
             float x = player.getX();
             float y = player.getY();

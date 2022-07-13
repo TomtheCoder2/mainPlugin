@@ -58,8 +58,6 @@ public class Utils {
     public static Boolean verification = false;
     public static Seq<String> bannedNames = new Seq<>();
     public static Seq<String> onScreenMessages = new Seq<>();
-    public static String eventIp = "";
-    public static int eventPort = 1001;
     public static Pattern ipValidationPattern;
 
     public static void init() {

@@ -317,44 +317,6 @@
 //                }
 //            });
 //
-//            handler.registerCommand(new RoleRestrictedCommand("event") {
-//                {
-//                    help = "Changes the event command ip.";
-//                    roles = new long[] { banRole };
-//                    usage = "<ip/none>";
-//                    category = management;
-//                    minArguments = 1;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//
-//                    if (ctx.message.length() <= 0) {
-//                        eb.setTitle("Command terminated");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("No message given");
-//                        ctx.sendMessage(eb);
-//                        return;
-//                    }
-//
-//                    if (ctx.message.toLowerCase().contains("none")) {
-//                        eventIp = "";
-//                        eb.setTitle("Command executed");
-//                        eb.setDescription("Event command is now disabled.");
-//                        ctx.sendMessage(eb);
-//                        return;
-//                    }
-//
-//                    String[] m = ctx.message.split(":");
-//                    eventIp = m[0];
-//                    eventPort = Integer.parseInt(m[1]);
-//
-//                    eb.setTitle("Command executed");
-//                    eb.setDescription("Event ip was changed to " + ctx.message);
-//                    ctx.sendMessage(eb);
-//                }
-//            });
-//
 //            handler.registerCommand(new RoleRestrictedCommand("admin") {
 //                {
 //                    help = "Toggle the admin status on a player.";

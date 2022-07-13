@@ -71,6 +71,7 @@ public class ioMain extends Plugin {
     protected MiniMod[] minimods = new MiniMod[]{
             new mindustry.plugin.minimods.Communication(),
             new mindustry.plugin.minimods.Discord(),
+            new mindustry.plugin.minimods.Events(),
             new mindustry.plugin.minimods.GameInfo(),
             new mindustry.plugin.minimods.Inspector(),
             new mindustry.plugin.minimods.JS(),
