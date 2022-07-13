@@ -4,6 +4,10 @@ package mindustry.plugin.utils;
  * Utility package for formatting in-game messages.
  */
 public class GameMsg {
+    public static String ratelimit(String category, String command) {
+        return "[scarlet]<[blue]" + category + "[scarlet]>: You've exceeded the rate limit for [pink]/" + command + "[scarlet]. Wait a while before using it again.";
+    }
+
     public static String noPerms(String category) {
         return "[scarlet]<[blue]" + category + "[scarlet]>: You don't have the required rank for this command. Learn more about ranks with [pink]/info[scarlet]";
     }

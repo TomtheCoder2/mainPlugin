@@ -19,6 +19,7 @@ import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.ioMain;
+import mindustry.plugin.utils.Cooldowns;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.LogAction;
 import mindustry.plugin.utils.Rank;
@@ -275,16 +276,12 @@ public class Moderation implements MiniMod {
                     "[lightgray]" + (args.length > 1 ? "Reason: [accent]" + args[1] : ""));
         });
 
+        Cooldowns.instance.set("gr", 5*60);
         handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/gr' to get a list of ids)", (args, player) -> {
-            //https://github.com/Anuken/Mindustry/blob/master/core/src/io/anuke/mindustry/core/NetServer.java#L300-L351
-            for (Long key : ioMain.CommandCooldowns.keys()) {
-                if (key + ioMain.CDT < System.currentTimeMillis() / 1000L) {
-                    ioMain.CommandCooldowns.remove(key);
-                } else if (player.uuid().equals(ioMain.CommandCooldowns.get(key))) {
-                    player.sendMessage("[scarlet]This command is on a 5 minute cooldown!");
-                    return;
-                }
+            if (!Cooldowns.instance.canRun("gr", player.uuid())) {
+                GameMsg.ratelimit("Mod", "gr");
             }
+            Cooldowns.instance.run("gr", player.uuid());
 
             if (args.length == 0) {
                 StringBuilder builder = new StringBuilder();
@@ -308,32 +305,32 @@ public class Moderation implements MiniMod {
                 } else {
                     found = Utils.findPlayer(args[0]);
                 }
-                if (found != null) {
-                    if (found.admin()) {
-                        player.sendMessage("[scarlet]Did you really expect to be able to report an admin?");
-                    } else if (found.team() != player.team()) {
-                        player.sendMessage("[scarlet]Only players on your team can be reported.");
-                    } else {
-                        //send message
-                        if (args.length > 1) {
-                            Role ro = ioMain.discRoles.get("861523420076179457");
-//                                Role role = .getRoleById(661155250123702302L);
-                            new MessageBuilder().setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
-//                                                .setDescription("<@&861523420076179457>")
-                                    .addField("name", Utils.escapeColorCodes(found.name)).addField("reason", args[1]).setColor(Color.RED).setFooter("Reported by " + player.name)).send(Channels.GR_REPORT);
-                            Channels.GR_REPORT.sendMessage("<@&882340213551140935>");
-                        } else {
-                            Role ro = ioMain.discRoles.get("861523420076179457");
-                            new MessageBuilder().setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
-//                                                .setDescription("<@&861523420076179457>")
-                                    .addField("name", Utils.escapeColorCodes(found.name)).setColor(Color.RED).setFooter("Reported by " + player.name)).send(Channels.GR_REPORT);
-                            Channels.GR_REPORT.sendMessage("<@&882340213551140935>");
-                        }
-                        Call.sendMessage(found.name + "[sky] is reported to discord.");
-                        ioMain.CommandCooldowns.put(System.currentTimeMillis() / 1000L, player.uuid());
-                    }
-                } else {
+
+                if (found == null) {
                     player.sendMessage("[scarlet]No player[orange] '" + args[0] + "'[scarlet] found.");
+                }
+
+                if (found.admin()) {
+                    player.sendMessage("[scarlet]Did you really expect to be able to report an admin?");
+                } else if (found.team() != player.team()) {
+                    player.sendMessage("[scarlet]Only players on your team can be reported.");
+                } else {
+                    //send message
+                    if (args.length > 1) {
+                        new MessageBuilder()
+                            .setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
+                                .addField("name", Utils.escapeColorCodes(found.name)).addField("reason", args[1]).setColor(Color.RED).setFooter("Reported by " + player.name))
+                            .setContent("<@&" + Roles.MOD + ">")    
+                            .send(Channels.GR_REPORT);
+                    } else {
+                        new MessageBuilder()
+                            .setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
+                                .addField("name", Utils.escapeColorCodes(found.name)).setColor(Color.RED).setFooter("Reported by " + player.name))
+                            .setContent("<@&" + Roles.MOD + ">")                                        
+                            .send(Channels.GR_REPORT);
+                        Channels.GR_REPORT.sendMessage("<@&" + + Roles.MOD + ">");
+                    }
+                    Call.sendMessage(found.name + "[sky] is reported to discord.");
                 }
             }
         });

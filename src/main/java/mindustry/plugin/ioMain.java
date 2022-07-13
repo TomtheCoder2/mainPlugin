@@ -18,7 +18,6 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 import mindustry.net.Administration;
-import mindustry.plugin.data.PersistentPlayerData;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordVars;
@@ -27,6 +26,8 @@ import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.effect.EffectObject;
 import mindustry.plugin.utils.Config;
+import mindustry.plugin.utils.Cooldowns;
+import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.ContentHandler;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
@@ -49,7 +50,6 @@ import java.util.Objects;
 
 import static arc.util.Log.*;
 import static mindustry.Vars.*;
-import static mindustry.plugin.discord.DiscordLog.logConnections;
 import static mindustry.plugin.effect.EffectHelper.getEffect;
 import static mindustry.plugin.utils.Utils.*;
 import static org.javacord.api.util.logging.FallbackLoggerConfiguration.setDebug;
@@ -63,22 +63,15 @@ public class ioMain extends Plugin {
     public static final Fi pluginDir = new Fi("./config/mods/");
     public static final long CDT = 300L;
     public static final LocalDateTime startTime = LocalDateTime.now();
-    public static final ObjectMap<Long, String> CommandCooldowns = new ObjectMap<>(); // uuid
     private static final String lennyFace = "( \u0361\u00B0 \u035C\u0296 \u0361\u00B0)";
     public static String apiKey = "";
     public static String discordInviteLink;
     public static int effectId = 0; // effect id for the snowball
-    public static ArrayList<String> joinedPlayers = new ArrayList<>();
-    public static List<String> leftPlayers = new ArrayList<>();
-    //    public Timer.Task rateMapTask; // popup to force map rating
     public static ContentHandler contentHandler; // map and schem handler
     //    static Gson gson = new Gson();
-    public static HashMap<String, PersistentPlayerData> playerDataGroup = new HashMap<>(); // uuid(), data
-    public static Boolean enableJs = false; // whether js is enabled for everyone
     public static int logCount = 0; // only log join/leaves every 5 minutes
     //    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
     //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
-    public static ObjectMap<String, Role> discRoles = new ObjectMap<>();
     public static NetServer.ChatFormatter chatFormatter = (player, message) -> player == null ? message : "[coral][[" + player.coloredName() + "[coral]]:[white] " + message;
 
     protected MiniMod[] minimods = new MiniMod[]{
@@ -191,7 +184,7 @@ public class ioMain extends Plugin {
         FallbackLoggerConfiguration.setTrace(false);
 
         // Update discord status
-        Timer.schedule(this::updateDiscordStatus, 60, 60);
+        Timer.schedule((Runnable)this::updateDiscordStatus, 60, 60);
 
         // Display on-screen messages
         float duration = 10f;
@@ -221,12 +214,6 @@ public class ioMain extends Plugin {
 
             // check if the player is already in the database
             Database.Player pd = Database.getPlayerData(player.uuid());
-
-            // put the player in the playerDataGroup, which saves player data while the player is online
-            if (!playerDataGroup.containsKey(player.uuid())) {
-                PersistentPlayerData data = new PersistentPlayerData();
-                playerDataGroup.put(player.uuid(), data);
-            }
 
             // check if he's impersonating a rank
             // remove all color codes, so it's not possible to just change the color of the rank symbol
@@ -308,32 +295,6 @@ public class ioMain extends Plugin {
             });
         });
 
-        Events.on(EventType.Trigger.update.getClass(), event -> {
-            for (Player p : Groups.player) {
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(p.uuid(), null));
-                if (tdata != null && tdata.snowBall && p.shooting()) {
-//                    Effect.create(new Effect(), p.getX(), p.getY(), p.unit().rotation, new arc.graphics.Color(0xffffff), null);
-//                    EffectHelper.onMove(p);
-
-                    String key = "snowball";
-
-                    final String name = EffectHelper.properties.get(key + ".name", "none");
-                    if (name.equals("none")) {
-                        debug("cant find effect " + key);
-                        return;
-                    }
-
-                    final String color = EffectHelper.properties.get(key + ".color", "#ffffff");
-                    final int rotation = Integer.parseInt(EffectHelper.properties.get(key + ".rotation", "0"));
-
-                    final Effect eff = getEffect(name);
-                    final EffectObject place = new EffectObject(eff, p.getX(), p.getY(), rotation, arc.graphics.Color.valueOf(color));
-
-                    EffectHelper.on(key, player, (p.x / 8) + "," + (p.y / 8));
-                }
-            }
-        });
-
         // Log game over
         Events.on(EventType.GameOverEvent.class, event -> {
             if (Groups.player.size() > 0) {
@@ -343,38 +304,30 @@ public class ioMain extends Plugin {
             }
         });
 
-
-        // TODO: log dangerous actions from players
         // TODO: remove this when MapRules is back in use
+        Cooldowns.instance.set("rotate", 0);
+        Cooldowns.instance.set("configure", 1);
         Events.on(EventType.ServerLoadEvent.class, event -> {
-            // action filter
             Vars.netServer.admins.addActionFilter(action -> {
                 Player player = action.player;
                 if (player == null) return true;
-
-                // disable checks for admins
                 if (player.admin) return true;
-
-                PersistentPlayerData tdata = (playerDataGroup.getOrDefault(action.player.uuid(), null));
-                if (tdata == null) { // should never happen
-                    player.sendMessage("[scarlet]You may not build right now due to a server error, please tell an administrator");
-                    return false;
-                }
 
                 switch (action.type) {
                     case rotate -> {
-                        boolean hit = tdata.rotateRatelimit.get();
-                        if (hit) {
-                            player.sendMessage("[scarlet]Rotate ratelimit exceeded, please rotate slower");
+                        if (!Cooldowns.instance.canRun("rotate", player.uuid())) {
+                            player.sendMessage(GameMsg.error("Mod", "Rotate ratelimit exceeded, please rotate slower"));
                             return false;
                         }
                     }
                     case configure -> {
-                        boolean hit = tdata.configureRatelimit.get();
-                        if (hit) {
-                            player.sendMessage("[scarlet]Configure ratelimit exceeded, please configure slower");
+                        if (!Cooldowns.instance.canRun("configure", player.uuid())) {
+                            player.sendMessage(GameMsg.error("Mod", "Configure ratelimit exceeded, please configure slower"));
                             return false;
                         }
+                    }
+                    default -> {
+                        return true;
                     }
                 }
                 return true;

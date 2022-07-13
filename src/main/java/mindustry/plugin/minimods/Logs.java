@@ -13,7 +13,7 @@ import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.utils.Utils;
 
-/** Logs player actions, such as player join & leave */
+/** Logs player actions, such as player join & leave and suspicious activity */
 public class Logs implements MiniMod {
     private static class JoinPlayerInfo {
         String name;
