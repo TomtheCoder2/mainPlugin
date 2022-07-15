@@ -22,22 +22,6 @@
 //    }
 //
 //    public void registerCommands(DiscordCommands handler) {
-//        handler.registerCommand(new Command("maps") {
-//            {
-//                help = "Check a list of available maps and their ids.";
-//            }
-//
-//            public void run(Context ctx) {
-//                EmbedBuilder eb = new EmbedBuilder();
-//                eb.setTitle("**All available maps in the playlist:**");
-//                Seq<Map> mapList = maps.customMaps();
-//                for (int i = 0; i < mapList.size; i++) {
-//                    Map m = mapList.get(i);
-//                    eb.addField(escapeEverything(m.name()), m.width + " x " + m.height, true);
-//                }
-//                ctx.sendMessage(eb);
-//            }
-//        });
 //        if (data.has("appeal_roleid") && data.has("appeal_channel_id")) {
 //            String appealRole = data.getString("appeal_roleid");
 //            TextChannel appeal_channel = getTextChannel(data.getString("appeal_channel_id"));

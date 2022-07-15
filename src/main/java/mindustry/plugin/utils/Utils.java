@@ -573,23 +573,6 @@ public class Utils {
         }
     }*/
 
-    /**
-     * get metadata from a map saved as a file converted to an inputStream
-     */
-    public static StringMap getMeta(InputStream is) throws IOException {
-        InputStream ifs = new InflaterInputStream(is);
-        CounterInputStream counter = new CounterInputStream(ifs);
-        DataInputStream stream = new DataInputStream(counter);
-
-        SaveIO.readHeader(stream);
-        int version = stream.readInt();
-        SaveVersion ver = SaveIO.getSaveWriter(version);
-        StringMap[] metaOut = {null};
-        ver.region("meta", stream, counter, in -> metaOut[0] = ver.readStringMap(in));
-
-        return metaOut[0];
-    }
-
     public static String rgbToString(float r, float g, float b) {
         String rs = Integer.toHexString((int) (r * 256));
         String gs = Integer.toHexString((int) (g * 256));
