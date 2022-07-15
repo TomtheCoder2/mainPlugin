@@ -5,8 +5,11 @@ import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.struct.StringMap;
 import arc.util.Log;
+import mindustry.plugin.utils.Config;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.DiscordVars;
+import mindustry.plugin.discord.Roles;
+
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -171,7 +174,10 @@ public class DiscordRegistrar {
         if (entry.data.roles != null) { // only check if the command has a restriction
             List<Role> userRoles = event.getMessageAuthor().asUser().get().getRoles(event.getServer().get());
             LongSeq cmdRoles = LongSeq.with(entry.data.roles);
-            if (entry.data.roles != null && userRoles.stream().noneMatch(x -> cmdRoles.contains(x.getId()))) {
+            if (
+                (entry.data.roles != null && userRoles.stream().noneMatch(x -> cmdRoles.contains(x.getId()))) ||
+                (userRoles.stream().anyMatch(x -> x.getId() == Roles.DEV) && Config.serverName.contains("Beta"))
+                ) {
                 Context ctx = new Context(event, null);
                 ctx.error("Lack of permission", "Required to have one of the following roles: <@&" + cmdRoles.toString("><@&") + ">");
                 return;

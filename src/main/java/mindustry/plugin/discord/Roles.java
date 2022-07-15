@@ -12,6 +12,7 @@ public class Roles {
     public static long APPEAL;
     public static long DONATOR;
     public static long ACTIVE_PLAYER;
+    public static long DEV;
     public static long MVP;
 
     public static void load(DiscordApi api, JSONObject data) {
@@ -23,5 +24,6 @@ public class Roles {
         DONATOR = Long.parseLong(data.getString("donator"));
         ACTIVE_PLAYER = Long.parseLong(data.getString("active_player"));
         MVP = Long.parseLong(data.getString("mvp"));
+        DEV = Long.parseLong(data.getString("dev"));
     }
 }
