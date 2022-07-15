@@ -146,8 +146,8 @@ public class Maps implements MiniMod {
                 EmbedBuilder eb = new EmbedBuilder();
                 eb.setTitle("Maps");
                 eb.setColor(DiscordPalette.INFO);
-                for (Map map : Vars.maps.all()) {
-                    eb.addInlineField(Utils.escapeColorCodes(map.name()), map.rules().modeName + "\n" + map.width + "x" + map.height);
+                for (Map map : Vars.maps.customMaps()) {
+                    eb.addInlineField(Utils.escapeColorCodes(map.name()), map.rules().mode().name() + "\n" + map.width + "x" + map.height);
                 }
                 ctx.sendEmbed(eb);
             }
