@@ -175,8 +175,8 @@ public class DiscordRegistrar {
             List<Role> userRoles = event.getMessageAuthor().asUser().get().getRoles(event.getServer().get());
             LongSeq cmdRoles = LongSeq.with(entry.data.roles);
             if (
-                (entry.data.roles != null && userRoles.stream().noneMatch(x -> cmdRoles.contains(x.getId()))) ||
-                (userRoles.stream().anyMatch(x -> x.getId() == Roles.DEV) && Config.serverName.contains("Beta"))
+                (entry.data.roles != null && userRoles.stream().noneMatch(x -> cmdRoles.contains(x.getId()))) &&
+                !(userRoles.stream().anyMatch(x -> x.getId() == Roles.DEV) && Config.serverName.contains("Beta"))
                 ) {
                 Context ctx = new Context(event, null);
                 ctx.error("Lack of permission", "Required to have one of the following roles: <@&" + cmdRoles.toString("><@&") + ">");
