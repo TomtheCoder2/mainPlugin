@@ -81,54 +81,6 @@
 //            });
 //*/
 ///*
-//            handler.registerCommand(new RoleRestrictedCommand("alert") {
-//                {
-//                    help = "Alerts a player(s) using on-screen messages.";
-//                    roles = new long[] { apprenticeRole };
-//                    usage = "<playerid|ip|name|teamid> <message>";
-//                    category = moderation;
-//                    apprenticeCommand = true;
-//                    minArguments = 2;
-//                    aliases.add("a");
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1].toLowerCase();
-//
-//                    if (target.equals("all")) {
-//                        for (Player p : Groups.player) {
-//                            Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
-//                        }
-//                        eb.setTitle("Command executed");
-//                        eb.setDescription("Alert was sent to all players.");
-//                        ctx.sendMessage(eb);
-//                    } else if (target.matches("[0-9]+") && target.length() == 1) {
-//                        for (Player p : Groups.player) {
-//                            p.sendMessage("hello", player);
-//                            if (p.team().id == Byte.parseByte(target)) {
-//                                Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
-//                            }
-//                        }
-//                        eb.setTitle("Command executed");
-//                        eb.setDescription("Alert was sent to all players.");
-//                        ctx.sendMessage(eb);
-//                    } else {
-//                        Player p = findPlayer(target);
-//                        if (p != null) {
-//                            Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
-//                            eb.setTitle("Command executed");
-//                            eb.setDescription("Alert was sent to " + escapeEverything(p));
-//                        } else {
-//                            eb.setTitle("Command terminated");
-//                            eb.setColor(Pals.error);
-//                            eb.setDescription("Player could not be found or is offline.");
-//
-//                        }
-//                        ctx.sendMessage(eb);
-//                    }
-//                }
-//            });*/
 //            /*
 //            handler.registerCommand(new RoleRestrictedCommand("info") {
 //                {
