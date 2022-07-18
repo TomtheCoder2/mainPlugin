@@ -82,9 +82,11 @@ public class PheonixMain extends Plugin {
     public PheonixMain() {
         info("Starting Discord Plugin...");
         info(lennyFace);
+
         // disable debug logs from javacord (doesnt work tho, idk why)
         FallbackLoggerConfiguration.setDebug(false);
         FallbackLoggerConfiguration.setTrace(false);
+        Log.level = Log.LogLevel.debug;
 
         DiscordApi api;
         DiscordRegistrar registrar = null;

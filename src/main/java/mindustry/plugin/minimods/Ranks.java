@@ -90,15 +90,18 @@ public class Ranks implements MiniMod {
 
         // -- PLAYER SECTION -- //
         Events.on(EventType.GameOverEvent.class, event -> {
+            Log.info("+1 message");
+
             // +1 games to everyone
             // updates player's gamesPlayed
             for (Player p : Groups.player) {
                 Database.Player pd = Database.getPlayerData(p.uuid());
-                if (pd != null) {
-                    pd.gamesPlayed++;
-                    Call.infoMessage(p.con, "[accent]+1 games played");
-                    Database.setPlayerData(pd);
+                if (pd == null) {
+                    pd = new Database.Player(p.uuid(), 0);
                 }
+                pd.gamesPlayed++;
+                Call.infoMessage(p.con, "[accent]+1 games played");
+                Database.setPlayerData(pd);
             }
 
             promoteRanks();

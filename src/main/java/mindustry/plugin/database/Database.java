@@ -74,7 +74,7 @@ public final class Database {
             }
             rs.close();
         } catch (SQLException ex) {
-            Log.debug(ex.getMessage());
+            Log.err(ex.getMessage());
         }
 
         return null;
@@ -106,9 +106,9 @@ public final class Database {
 
                 // send the data
                 int affectedRows = pstmt.executeUpdate();
-//                Log.debug("affected rows: " + affectedrows);
+//                Log.info("player insert affected rows: " + affectedRows);
             } catch (SQLException ex) {
-                Log.debug(ex.getMessage());
+                Log.err(ex.getMessage());
             }
         } else {
             String sql = "UPDATE playerdata "
@@ -137,9 +137,9 @@ public final class Database {
                 pstmt.setString(10, pd.uuid);
 
                 int affectedrows = pstmt.executeUpdate();
-//                Log.debug("affected rows: " + affectedrows);
+//                Log.info("player update affected rows: " + affectedrows);
             } catch (SQLException ex) {
-                Log.debug(ex.getMessage());
+                Log.err(ex.getMessage());
             }
         }
     }
