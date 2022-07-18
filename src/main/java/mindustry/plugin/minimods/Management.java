@@ -14,6 +14,7 @@ import mindustry.maps.Map;
 import mindustry.maps.MapException;
 import mindustry.mod.Mod;
 import mindustry.mod.Mods;
+import mindustry.mod.Plugin;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
@@ -66,6 +67,7 @@ public class Management implements MiniMod {
                             Core.app.post(scanTPS[0]);
                         }
                     };
+                    Core.app.post(scanTPS[0]);
 
                     ctx.success("Stability Test Started", "Results will come out in " + time + "ms");
                 }
@@ -245,8 +247,13 @@ public class Management implements MiniMod {
                     .addInlineField("Internal Name", mod.name)
                     .addInlineField("Version", mod.meta.version)
                     .addInlineField("Author", mod.meta.author)
-                    .addInlineField("Description", mod.meta.description)
-                    .addInlineField("Repo", mod.getRepo());
+                    .addField("Description", mod.meta.description)
+                    .addInlineField("Type", (mod.main != null && mod.main instanceof Plugin ? "Plugin": "Mod"))
+                    .addInlineField("Enabled", mod.enabled()+"");
+
+                if (mod.getRepo() != null) {
+                    eb.addInlineField("Repo", mod.getRepo());
+                }
                 
                 if (mod.dependencies.size != 0) {
                     eb.addField("Loaded Dependencies", mod.dependencies.toString("\n", x -> x.meta.name));
@@ -333,7 +340,8 @@ public class Management implements MiniMod {
             if (tpsMeasurements.size == 0) return 0;
 
             int min = Integer.MAX_VALUE;
-            for (int tps : tpsMeasurements.items) {
+            for (int i = 0; i < tpsMeasurements.size; i++) {
+                int tps = tpsMeasurements.get(i);
                 if (tps < min) min = tps;
             }
             return min;
@@ -341,7 +349,8 @@ public class Management implements MiniMod {
 
         public int max() {
             int max = 0;
-            for (int tps : tpsMeasurements.items) {
+            for (int i = 0; i < tpsMeasurements.size; i++) {
+                int tps = tpsMeasurements.get(i);
                 if (tps > max) max = tps;
             }
             return max;
@@ -369,12 +378,14 @@ public class Management implements MiniMod {
          */
         public String csv() {
             StringBuilder sb = new StringBuilder();
-            sb.append("Iteration,TPS");
+            sb.append("Iteration,TPS\n");
             int iter = 1;
-            for (int tps : tpsMeasurements.items) {
+            for (int i = 0; i < tpsMeasurements.size; i++) {
+                int tps = tpsMeasurements.get(i);
                 sb.append(iter);
                 sb.append(",");
                 sb.append(tps);
+                sb.append("\n");
 
                 iter++;
             }
