@@ -4,12 +4,10 @@ import arc.struct.LongSeq;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.struct.StringMap;
-import arc.util.Log;
-import mindustry.plugin.utils.Config;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
-
+import mindustry.plugin.utils.Config;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.event.message.MessageCreateEvent;
@@ -50,7 +48,7 @@ public class DiscordRegistrar {
         Command.Arg[] argObjs = new Command.Arg[0];
         if (!Objects.equals(argList[0], "")) {
             argObjs = new Command.Arg[argList.length];
-            boolean hasOptional = false;   
+            boolean hasOptional = false;
             for (int i = 0; i < argList.length; i++) {
                 String argStr = argList[i];
                 boolean optional;
@@ -175,9 +173,9 @@ public class DiscordRegistrar {
             List<Role> userRoles = event.getMessageAuthor().asUser().get().getRoles(event.getServer().get());
             LongSeq cmdRoles = LongSeq.with(entry.data.roles);
             if (
-                (entry.data.roles != null && userRoles.stream().noneMatch(x -> cmdRoles.contains(x.getId()))) &&
-                !(userRoles.stream().anyMatch(x -> x.getId() == Roles.DEV) && Config.serverName.contains("Beta"))
-                ) {
+                    (entry.data.roles != null && userRoles.stream().noneMatch(x -> cmdRoles.contains(x.getId()))) &&
+                            !(userRoles.stream().anyMatch(x -> x.getId() == Roles.DEV) && Config.serverName.contains("Beta"))
+            ) {
                 Context ctx = new Context(event, null);
                 ctx.error("Lack of permission", "Required to have one of the following roles: <@&" + cmdRoles.toString("><@&") + ">");
                 return;
@@ -204,7 +202,7 @@ public class DiscordRegistrar {
 
             i++;
         }
-        
+
 //        Log.info("user args: " + Seq.with(args).toString(" | "));
 //        Log.info("expected args: " + Seq.with(entry.data.args).toString(" | "));
 //        Log.info("args", argValues);

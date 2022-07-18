@@ -18,11 +18,7 @@ import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
-import mindustry.plugin.utils.Cooldowns;
-import mindustry.plugin.utils.GameMsg;
-import mindustry.plugin.utils.LogAction;
-import mindustry.plugin.utils.Rank;
-import mindustry.plugin.utils.Utils;
+import mindustry.plugin.utils.*;
 import mindustry.world.Tile;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -247,7 +243,7 @@ public class Moderation implements MiniMod {
                     "[lightgray]" + (args.length > 1 ? "Reason: [accent]" + args[1] : ""));
         });
 
-        Cooldowns.instance.set("gr", 5*60);
+        Cooldowns.instance.set("gr", 5 * 60);
         handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/gr' to get a list of ids)", (args, player) -> {
             if (!Cooldowns.instance.canRun("gr", player.uuid())) {
                 GameMsg.ratelimit("Mod", "gr");
@@ -289,17 +285,17 @@ public class Moderation implements MiniMod {
                     //send message
                     if (args.length > 1) {
                         new MessageBuilder()
-                            .setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
-                                .addField("name", Utils.escapeColorCodes(found.name)).addField("reason", args[1]).setColor(Color.RED).setFooter("Reported by " + player.name))
-                            .setContent("<@&" + Roles.MOD + ">")    
-                            .send(Channels.GR_REPORT);
+                                .setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
+                                        .addField("name", Utils.escapeColorCodes(found.name)).addField("reason", args[1]).setColor(Color.RED).setFooter("Reported by " + player.name))
+                                .setContent("<@&" + Roles.MOD + ">")
+                                .send(Channels.GR_REPORT);
                     } else {
                         new MessageBuilder()
-                            .setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
-                                .addField("name", Utils.escapeColorCodes(found.name)).setColor(Color.RED).setFooter("Reported by " + player.name))
-                            .setContent("<@&" + Roles.MOD + ">")                                        
-                            .send(Channels.GR_REPORT);
-                        Channels.GR_REPORT.sendMessage("<@&" + + Roles.MOD + ">");
+                                .setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
+                                        .addField("name", Utils.escapeColorCodes(found.name)).setColor(Color.RED).setFooter("Reported by " + player.name))
+                                .setContent("<@&" + Roles.MOD + ">")
+                                .send(Channels.GR_REPORT);
+                        Channels.GR_REPORT.sendMessage("<@&" + +Roles.MOD + ">");
                     }
                     Call.sendMessage(found.name + "[sky] is reported to discord.");
                 }

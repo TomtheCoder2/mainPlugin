@@ -1,10 +1,8 @@
 package mindustry.plugin.minimods;
 
 import arc.Core;
-import arc.Graphics;
 import arc.files.Fi;
 import arc.struct.Seq;
-import arc.util.CommandHandler;
 import arc.util.Log;
 import mindustry.Vars;
 import mindustry.content.Items;
@@ -32,15 +30,14 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import arc.Events;
 
 import java.lang.reflect.Field;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Provides information relating to the current game.
  */
 public class GameInfo implements MiniMod {
     private static long serverStartTime;
+
     static {
         serverStartTime = System.currentTimeMillis();
     }
@@ -71,13 +68,13 @@ public class GameInfo implements MiniMod {
                     eb.addField("Times Kicked", info.timesKicked + "");
                     eb.addField("Current Name", info.lastName);
                     eb.addField("Current IP", info.lastIP);
-    
+
                     String names = "";
                     for (String name : info.names) {
                         names += name + "\n";
                     }
                     eb.addField("Names", names);
-    
+
                     Database.Player pd = Database.getPlayerData(info.id);
                     if (pd != null) {
                         eb.addField("Rank", Rank.all[pd.rank].name);
@@ -139,7 +136,7 @@ public class GameInfo implements MiniMod {
                     long serverUptimeHours = serverUptimeMins / 60;
                     serverUptimeMins -= serverUptimeHours * 60;
                     long serverUptimeDays = serverUptimeHours / 24;
-                    serverUptimeHours -= serverUptimeDays * 24; 
+                    serverUptimeHours -= serverUptimeDays * 24;
 
                     StringBuilder uptimeSb = new StringBuilder();
                     if (serverUptimeDays != 0) {
@@ -161,7 +158,7 @@ public class GameInfo implements MiniMod {
                             .addInlineField("Map", Vars.state.map.name())
                             .addInlineField("Wave", Vars.state.wave + "")
                             .addInlineField("TPS", Core.graphics.getFramesPerSecond() + "")
-                            .addInlineField("Next wave in", Math.round(Vars.state.wavetime / (double)Core.graphics.getFramesPerSecond()) + " seconds")
+                            .addInlineField("Next wave in", Math.round(Vars.state.wavetime / (double) Core.graphics.getFramesPerSecond()) + " seconds")
                             .addInlineField("Server Uptime", uptimeSb.toString())
                             .setColor(DiscordPalette.INFO);
 

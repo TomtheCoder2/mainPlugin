@@ -1,63 +1,68 @@
 package mindustry.plugin.minimods;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.CompletableFuture;
-
-import org.javacord.api.entity.message.MessageAttachment;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
-
 import arc.Core;
 import arc.files.Fi;
 import arc.struct.Seq;
 import arc.util.Log;
 import mindustry.Vars;
-import mindustry.mod.Plugin;
 import mindustry.mod.Mods.LoadedMod;
+import mindustry.mod.Plugin;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Utils;
+import org.javacord.api.entity.message.MessageAttachment;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.concurrent.CompletableFuture;
 
 public class Mods implements MiniMod {
+    private static LoadedMod findModByName(String name) {
+        return Vars.mods.list().find(m ->
+                Utils.escapeColorCodes(m.meta.displayName).equalsIgnoreCase(name) ||
+                        Utils.escapeColorCodes(m.meta.name).equalsIgnoreCase(name));
+    }
+
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("mod", "<mod...>", 
-            data -> {
-                data.help = "Get information about a specific mod";
-            },
-            ctx -> {
-                var mod = findModByName(ctx.args.get("mod"));
-                if (mod == null) {
-                    ctx.error("No such mod", "Mod '" + ctx.args.get("mod") + "' is not loaded on the server");
-                    return;
-                }
+        handler.register("mod", "<mod...>",
+                data -> {
+                    data.help = "Get information about a specific mod";
+                },
+                ctx -> {
+                    var mod = findModByName(ctx.args.get("mod"));
+                    if (mod == null) {
+                        ctx.error("No such mod", "Mod '" + ctx.args.get("mod") + "' is not loaded on the server");
+                        return;
+                    }
 
-                EmbedBuilder eb = new EmbedBuilder()
-                    .setTitle(mod.meta.displayName)
-                    .setColor(DiscordPalette.INFO)
-                    .addInlineField("Internal Name", mod.name)
-                    .addInlineField("Version", mod.meta.version)
-                    .addInlineField("Author", mod.meta.author)
-                    .addField("Description", mod.meta.description)
-                    .addInlineField("Type", (mod.main != null && mod.main instanceof Plugin ? "Plugin": "Mod"))
-                    .addInlineField("Enabled", mod.enabled()+"");
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle(mod.meta.displayName)
+                            .setColor(DiscordPalette.INFO)
+                            .addInlineField("Internal Name", mod.name)
+                            .addInlineField("Version", mod.meta.version)
+                            .addInlineField("Author", mod.meta.author)
+                            .addField("Description", mod.meta.description)
+                            .addInlineField("Type", (mod.main != null && mod.main instanceof Plugin ? "Plugin" : "Mod"))
+                            .addInlineField("Enabled", mod.enabled() + "");
 
-                if (mod.getRepo() != null) {
-                    eb.addInlineField("Repo", mod.getRepo());
-                }
-                
-                if (mod.dependencies.size != 0) {
-                    eb.addField("Loaded Dependencies", mod.dependencies.toString("\n", x -> x.meta.name));
-                }
-                if (mod.missingDependencies.size != 0) {
-                    eb.addField("Unmet Dependencies", mod.missingDependencies.toString("\n"));
-                }
+                    if (mod.getRepo() != null) {
+                        eb.addInlineField("Repo", mod.getRepo());
+                    }
 
-                ctx.sendEmbed(eb);
-            }  
+                    if (mod.dependencies.size != 0) {
+                        eb.addField("Loaded Dependencies", mod.dependencies.toString("\n", x -> x.meta.name));
+                    }
+                    if (mod.missingDependencies.size != 0) {
+                        eb.addField("Unmet Dependencies", mod.missingDependencies.toString("\n"));
+                    }
+
+                    ctx.sendEmbed(eb);
+                }
         );
 
 
@@ -137,32 +142,25 @@ public class Mods implements MiniMod {
             }
         });
 
-        handler.register("mods", "", 
-            data -> {
-                data.help = "List mods & versions";
-                data.aliases = new String [] { "version" } ;
-                data.category = "Management";
-            },
-            ctx -> {
-                EmbedBuilder eb = new EmbedBuilder()
-                    .setTitle("Mods")
-                    .setColor(DiscordPalette.INFO);
-                if (Vars.mods.list().isEmpty()) {
-                    eb.setDescription("None");
-                } else {
-                    for (var mod : Vars.mods.list()) {
-                        eb.addInlineField(mod.meta.displayName(), mod.meta.version);
+        handler.register("mods", "",
+                data -> {
+                    data.help = "List mods & versions";
+                    data.aliases = new String[]{"version"};
+                    data.category = "Management";
+                },
+                ctx -> {
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("Mods")
+                            .setColor(DiscordPalette.INFO);
+                    if (Vars.mods.list().isEmpty()) {
+                        eb.setDescription("None");
+                    } else {
+                        for (var mod : Vars.mods.list()) {
+                            eb.addInlineField(mod.meta.displayName(), mod.meta.version);
+                        }
                     }
+                    ctx.sendEmbed(eb);
                 }
-                ctx.sendEmbed(eb);
-            }
         );
-    }
-
-
-    private static LoadedMod findModByName(String name) {
-        return Vars.mods.list().find(m -> 
-            Utils.escapeColorCodes(m.meta.displayName).equalsIgnoreCase(name) || 
-            Utils.escapeColorCodes(m.meta.name).equalsIgnoreCase(name));
     }
 }

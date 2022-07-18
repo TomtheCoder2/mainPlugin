@@ -11,7 +11,6 @@ import mindustry.game.EventType;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
-import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
@@ -50,7 +49,7 @@ public class Translate implements MiniMod {
             final String message = event.message;
             boolean success = thread.addDetect(message, lang -> {
                 if (lang == null) return;
-                
+
                 for (final var entry : playerLangs) {
                     if (lang.equals(entry.key)) continue; // skip messages in same language
                     final ObjectSet<String> uuids = entry.value;
@@ -66,7 +65,7 @@ public class Translate implements MiniMod {
                 }
             });
 
-            if (!success) { 
+            if (!success) {
                 DiscordLog.error("Translate Thread Full", ":(", null);
             }
         });
@@ -256,8 +255,8 @@ class TranslateApi {
         } catch (Exception e) {
             Log.err("Translate error for server: " + server);
             e.printStackTrace();
-            DiscordLog.error("Translate: Translate Internal Error", e.getMessage(), 
-                StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
+            DiscordLog.error("Translate: Translate Internal Error", e.getMessage(),
+                    StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
             return translate(text, fromLang, toLang);
         }
     }
@@ -286,9 +285,9 @@ class TranslateApi {
             }
             JSONArray array = (JSONArray) respObj;
             return array.getJSONObject(0).getString("language");
-        } catch(Exception error) {
+        } catch (Exception error) {
             DiscordLog.error("Translate: Detect Internal Error", error.getMessage(),
-                StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
+                    StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
             return detect(text);
         }
     }

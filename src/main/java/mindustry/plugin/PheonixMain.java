@@ -6,36 +6,25 @@ import arc.files.Fi;
 import arc.struct.ObjectMap;
 import arc.util.CommandHandler;
 import arc.util.Log;
-import arc.util.Time;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.core.GameState;
-import mindustry.core.NetServer;
-import mindustry.entities.Effect;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.mod.Plugin;
-import mindustry.net.Administration;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.effect.EffectHelper;
-import mindustry.plugin.effect.EffectObject;
-import mindustry.plugin.utils.Config;
-import mindustry.plugin.utils.Cooldowns;
-import mindustry.plugin.utils.GameMsg;
-import mindustry.plugin.utils.ContentHandler;
-import mindustry.plugin.utils.Rank;
-import mindustry.plugin.utils.Utils;
+import mindustry.plugin.utils.*;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.entity.permission.Role;
 import org.javacord.api.util.logging.FallbackLoggerConfiguration;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -43,14 +32,12 @@ import org.json.JSONTokener;
 import java.awt.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
-import static arc.util.Log.*;
-import static mindustry.Vars.*;
-import static mindustry.plugin.effect.EffectHelper.getEffect;
+import static arc.util.Log.err;
+import static arc.util.Log.info;
+import static mindustry.Vars.netServer;
+import static mindustry.Vars.state;
 import static mindustry.plugin.utils.Utils.*;
 
 public class PheonixMain extends Plugin {
@@ -157,7 +144,7 @@ public class PheonixMain extends Plugin {
             for (MiniMod mod : minimods) {
                 mod.registerDiscordCommands(registrar);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.err(e);
             Core.app.exit();
         }
@@ -241,7 +228,7 @@ public class PheonixMain extends Plugin {
             }
 
             Call.infoMessage(player.con, welcomeMessage);
-            
+
 //
 //            CompletableFuture.runAsync(() -> {
 //                if(verification) {
@@ -322,7 +309,7 @@ public class PheonixMain extends Plugin {
                     return null;
                 }
                 lastMessages.put(player.uuid(), message);
-                
+
                 return message;
             });
 

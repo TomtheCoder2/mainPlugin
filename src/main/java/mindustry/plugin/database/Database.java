@@ -1,8 +1,9 @@
 package mindustry.plugin.database;
 
 import arc.struct.Seq;
-import mindustry.plugin.utils.Utils;
 import arc.util.Log;
+import mindustry.plugin.utils.Utils;
+
 import java.sql.*;
 
 public final class Database {
@@ -15,6 +16,11 @@ public final class Database {
      * Connect to the PostgreSQL Server
      */
     public static void connect(String url, String user, String password) throws SQLException {
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         conn = DriverManager.getConnection(url, user, password);
     }
 
@@ -54,7 +60,7 @@ public final class Database {
      */
     public static Player getDiscordData(long id) {
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink"
-                + "FROM playerdata "
+                + " FROM playerdata "
                 + "WHERE discordLink = ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -114,7 +120,7 @@ public final class Database {
                     + "banned = ?, "
                     + "bannedUntil = ?, "
                     + "banReason = ?, "
-                    + "discordLink = ?, "
+                    + "discordLink = ? "
                     + "WHERE uuid = ?";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {

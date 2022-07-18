@@ -1,10 +1,7 @@
 package mindustry.plugin.minimods;
 
 import arc.Core;
-import arc.files.Fi;
 import arc.struct.IntSeq;
-import arc.struct.Seq;
-import arc.util.CommandHandler;
 import arc.util.Log;
 import arc.util.Time;
 import mindustry.Vars;
@@ -12,26 +9,17 @@ import mindustry.core.GameState;
 import mindustry.game.Gamemode;
 import mindustry.maps.Map;
 import mindustry.maps.MapException;
-import mindustry.mod.Mod;
-import mindustry.mod.Mods;
-import mindustry.mod.Plugin;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
-import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Utils;
-import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.CompletableFuture;
 
 public class Management implements MiniMod {
     @Override

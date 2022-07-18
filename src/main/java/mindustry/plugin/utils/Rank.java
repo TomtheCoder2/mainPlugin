@@ -63,6 +63,7 @@ public class Rank {
      */
     public String requirements = null;
     public Color color;
+
     public Rank(String tag, String name, Color color, String desc, String req) {
         this.tag = tag;
         this.name = name;

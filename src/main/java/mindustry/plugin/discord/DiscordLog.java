@@ -7,13 +7,11 @@ import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.utils.LogAction;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
-import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.List;
 import java.util.Objects;
 
 public class DiscordLog {

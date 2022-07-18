@@ -1,10 +1,6 @@
 package mindustry.plugin.minimods;
 
-import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.springframework.beans.factory.Aware;
-
 import arc.Events;
-import arc.struct.ObjectSet;
 import arc.struct.Seq;
 import arc.util.Timer;
 import mindustry.game.EventType;
@@ -13,16 +9,12 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.utils.Utils;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
-/** Logs player actions, such as player join & leave and suspicious activity */
+/**
+ * Logs player actions, such as player join & leave and suspicious activity
+ */
 public class Logs implements MiniMod {
-    private static class JoinPlayerInfo {
-        String name;
-        String uuid;
-        int id;
-        String ip;
-    }
-
     Seq<JoinPlayerInfo> leftPlayers = new Seq<>();
     Seq<JoinPlayerInfo> joinPlayers = new Seq<>();
 
@@ -32,7 +24,7 @@ public class Logs implements MiniMod {
             data.name = event.player.name;
             data.uuid = event.player.uuid();
             data.id = event.player.id;
-            data.ip =event.player.ip();
+            data.ip = event.player.ip();
 
             leftPlayers.add(data);
         });
@@ -42,7 +34,7 @@ public class Logs implements MiniMod {
             data.name = event.player.name;
             data.uuid = event.player.uuid();
             data.id = event.player.id;
-            data.ip =event.player.ip();
+            data.ip = event.player.ip();
 
             joinPlayers.add(data);
         });
@@ -51,8 +43,8 @@ public class Logs implements MiniMod {
             if (joinPlayers.size == 0 && leftPlayers.size == 0) return;
 
             EmbedBuilder eb = new EmbedBuilder()
-                .setTitle("Player Join & Leave Log")
-                .setColor(DiscordPalette.INFO); 
+                    .setTitle("Player Join & Leave Log")
+                    .setColor(DiscordPalette.INFO);
 
             if (joinPlayers.size != 0) {
                 StringBuilder sb = new StringBuilder();
@@ -68,7 +60,7 @@ public class Logs implements MiniMod {
                 }
                 eb.addField("Left", sb.toString());
             }
-            
+
             joinPlayers.clear();
             leftPlayers.clear();
 
@@ -102,5 +94,12 @@ public class Logs implements MiniMod {
                 .addField("Message", event.message)
             );
         });
+    }
+
+    private static class JoinPlayerInfo {
+        String name;
+        String uuid;
+        int id;
+        String ip;
     }
 }
