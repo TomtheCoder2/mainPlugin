@@ -1,10 +1,7 @@
 package mindustry.plugin.minimods;
 
-import java.lang.reflect.Field;
-
 import arc.Events;
 import arc.util.CommandHandler;
-import arc.util.Reflect;
 import arc.util.Strings;
 import mindustry.game.EventType;
 import mindustry.game.Team;
@@ -16,6 +13,8 @@ import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Utils;
+
+import java.lang.reflect.Field;
 
 public class Communication implements MiniMod {
     @Override
@@ -40,46 +39,46 @@ public class Communication implements MiniMod {
             }
             Call.sendMessage("[sky]" + (event.getMessageAuthor().getDiscriminatedName()) + ":[white] " + event.getMessageContent());
         });
-        
+
     }
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("alert", "<player|all|team> <message...>", 
-            data -> { 
-                data.roles = new long[] { Roles.APPRENTICE, Roles.MOD, Roles.ADMIN };
-                data.help = "Alert player(s) using on-screen message";
-                data.aliases = new String[] { "a" };
-                data.category = "Communication";
-            },
-            ctx -> {
-                String target = ctx.args.get("player|all|team");
-                String message = ctx.args.get("message");
-                if (target.equals("all")) {
-                    Call.infoMessage(message);
-                    ctx.success("Sent Message", "Sent message to all players");
-                } else {
-                    try {
-                        Field f = Team.class.getDeclaredField(target);
-                        Team team = (Team)f.get(null);
+        handler.register("alert", "<player|all|team> <message...>",
+                data -> {
+                    data.roles = new long[]{Roles.APPRENTICE, Roles.MOD, Roles.ADMIN};
+                    data.help = "Alert player(s) using on-screen message";
+                    data.aliases = new String[]{"a"};
+                    data.category = "Communication";
+                },
+                ctx -> {
+                    String target = ctx.args.get("player|all|team");
+                    String message = ctx.args.get("message");
+                    if (target.equals("all")) {
+                        Call.infoMessage(message);
+                        ctx.success("Sent Message", "Sent message to all players");
+                    } else {
+                        try {
+                            Field f = Team.class.getDeclaredField(target);
+                            Team team = (Team) f.get(null);
 
-                        for (Player player : Groups.player) {
-                            if (player.team().equals(team)) {
-                                Call.infoMessage(player.con, message);
+                            for (Player player : Groups.player) {
+                                if (player.team().equals(team)) {
+                                    Call.infoMessage(player.con, message);
+                                }
                             }
-                        }
 
-                        ctx.success("Sent Message", "Sent message to all members of team " + team.name);
-                    } catch(NoSuchFieldException | IllegalAccessException e) {
-                        Player p = Utils.findPlayer(target);
-                        if (p == null) {
-                            ctx.error("No such player", "'" + target + "' is not a player or a team");
+                            ctx.success("Sent Message", "Sent message to all members of team " + team.name);
+                        } catch (NoSuchFieldException | IllegalAccessException e) {
+                            Player p = Utils.findPlayer(target);
+                            if (p == null) {
+                                ctx.error("No such player", "'" + target + "' is not a player or a team");
+                            }
+                            Call.infoMessage(p.con, message);
+                            ctx.success("Sent Message", "Sent message to player " + Utils.escapeEverything(p.name()));
                         }
-                        Call.infoMessage(p.con, message);
-                        ctx.success("Sent Message", "Sent message to player " + Utils.escapeEverything(p.name()));
                     }
                 }
-            }
         );
     }
 
