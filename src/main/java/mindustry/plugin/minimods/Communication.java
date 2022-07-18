@@ -138,6 +138,10 @@ public class Communication implements MiniMod {
                 }
 
                 String stuff = ctx.args.get("stuff");
+                if (stuff == null) {
+                    ctx.error("Message Body Required", "Cannot have screen message without message body");
+                    return;
+                }
                 
                 Seq<ScreenMessage.Button> buttons = new Seq<>();
                 int bracketDepth = 0;
