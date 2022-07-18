@@ -151,7 +151,7 @@ public final class Database {
      * @return the ranking, or null if no players are found
      */
     public static PlayerRank[] rankPlayers(int limit, String column, int offset) {
-        String sql = "SELECT uuid, rank, ? " +
+        String sql = "SELECT uuid, ? " +
                 "FROM playerdata " +
                 "ORDER BY ? DESC LIMIT ? OFFSET ?";
         try {
@@ -168,9 +168,10 @@ public final class Database {
                 int stat = rs.getInt(column);
                 rankings.add(new PlayerRank(uuid, stat));
             }
+            Log.info("ranking: " + rankings.size);
             return rankings.toArray(PlayerRank.class);
         } catch (SQLException ex) {
-            Log.debug(ex.getMessage());
+            Log.err(ex.getMessage());
         }
 
         return null;
