@@ -11,14 +11,19 @@ import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.net.Administration;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.DiscordPalette;
+import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.ui.Menus;
 import mindustry.world.Block;
 
 import java.util.Arrays;
+
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 /**
  * Manages player ranks and other player information.
@@ -273,5 +278,41 @@ public class Ranks implements MiniMod {
                 Call.infoMessage(player.con, Utils.formatMessage(player, Utils.statMessage));
             }
         });
+    }
+
+    @Override
+    public void registerDiscordCommands(DiscordRegistrar handler) {
+        handler.register("ranking", "<playtime|games|buildings> [offset]", 
+            data -> {
+                data.help = "Returns a ranking of players.";
+            },
+            ctx -> {
+                String column = ctx.args.get("playtime|games|buildings");
+                int offset = ctx.args.getInt("offset", 0);
+                Database.PlayerRank[] ranking = Database.rankPlayers(10, column, offset);
+                if (ranking == null || ranking.length == 0) {
+                    ctx.error("No players found", "Make sure the stat is valid.");
+                    return;
+                }
+
+                String table = "```\n";
+                table += String.format("%3s %20s %10s\n", "", "Player", column);
+                for (int i = 0; i < ranking.length; i++) {
+                    var info = Vars.netServer.admins.getInfoOptional(ranking[i].uuid);
+                    String name = "<unknown>";
+                    if (info != null) {
+                        name = Utils.escapeEverything(info.lastName);
+                    }
+                    table += String.format("%3s %20s %10s\n", offset+i+1, ranking[i].stat, name);
+                }
+                table += "```";
+
+                ctx.sendEmbed(new EmbedBuilder()
+                    .setColor(DiscordPalette.INFO)
+                    .setTitle("Player Ranking")
+                    .setDescription(table)
+                );
+            }
+        );
     }
 }

@@ -27,6 +27,7 @@ public class Management implements MiniMod {
         handler.register("test", "[time]",
                 data -> {
                     data.help = "Test server TPS stability";
+                    data.roles = new long[]{Roles.APPRENTICE, Roles.MOD, Roles.ADMIN};
                     data.category = "Management";
                 },
                 ctx -> {
@@ -64,7 +65,7 @@ public class Management implements MiniMod {
         handler.register("gc", "",
                 data -> {
                     data.help = "Trigger a garbage collection. Testing only.";
-                    data.roles = new long[]{Roles.MOD, Roles.ADMIN};
+                    data.roles = new long[]{Roles.APPRENTICE, Roles.MOD, Roles.ADMIN};
                     data.category = "Management";
                 },
                 ctx -> {
