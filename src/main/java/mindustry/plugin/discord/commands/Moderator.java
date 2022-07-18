@@ -92,56 +92,6 @@
 //    public void registerCommands(DiscordCommands handler) {
 //        if (data.has("moderator_roleid")) {
 //            long banRole = Strings.parseLong(data.getString("moderator_roleid"), 0);
-//
-//            handler.registerCommand(new RoleRestrictedCommand("fillitems") {
-//                {
-//                    help = "Fill the core with items.";
-//                    usage = "[team]";
-//                    roles = new long[] { banRole };
-//                    category = management;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    if (!state.is(GameState.State.playing)) {
-//                        err("Not playing. Host first.");
-//                        eb.setTitle("Command terminated.");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("Not playing. Host first.");
-//                        ctx.sendMessage(eb);
-//                        return;
-//                    }
-//
-//                    Team team = ctx.args.length == 1 ? Team.sharded : Structs.find(Team.all, t -> t.name.equals(ctx.args[1]));
-//
-//                    if (team == null) {
-//                        err("No team with that name found.");
-//                        eb.setTitle("Command terminated.");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("No team with that name found.");
-//                        ctx.sendMessage(eb);
-//                        return;
-//                    }
-//
-//                    if (state.teams.cores(team).isEmpty()) {
-//                        err("That team has no cores.");
-//                        eb.setTitle("Command terminated.");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("That team has no cores.");
-//                        ctx.sendMessage(eb);
-//                        return;
-//                    }
-//
-//                    for (Item item : content.items()) {
-//                        state.teams.cores(team).first().items.set(item, state.teams.cores(team).first().storageCapacity);
-//                    }
-//
-//                    eb.setTitle("Core filled.");
-//                    eb.setColor(Pals.success);
-//                    ctx.sendMessage(eb);
-//                }
-//            });
-//
 //            handler.registerCommand(new Command("ranking") {
 //                {
 //                    help = "Get a ranking list.";

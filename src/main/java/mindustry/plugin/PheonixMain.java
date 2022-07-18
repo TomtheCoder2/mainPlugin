@@ -57,6 +57,7 @@ public class PheonixMain extends Plugin {
 
     protected MiniMod[] minimods = new MiniMod[]{
             new mindustry.plugin.minimods.Communication(),
+            new mindustry.plugin.minimods.Cheats(),
             new mindustry.plugin.minimods.Discord(),
             new mindustry.plugin.minimods.Events(),
             new mindustry.plugin.minimods.GameInfo(),
