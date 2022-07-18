@@ -23,6 +23,7 @@ import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Utils;
 import mindustry.ui.Menus;
 
@@ -90,7 +91,9 @@ public class Communication implements MiniMod {
             }
 
             if (action.equals("event")) {
-                mindustry.plugin.minimods.Events.join(player);
+                if (!mindustry.plugin.minimods.Events.join(player)) {
+                    player.sendMessage(GameMsg.error("Events", "There is no ongoing event at this time."));
+                }
             }
         });
 

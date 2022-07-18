@@ -6,6 +6,7 @@ import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.GameMsg;
 
 /**
  * Events functionality
@@ -66,7 +67,7 @@ public class Events implements MiniMod {
             if (eventIP != null) {
                 Call.connect(player.con, eventIP, eventPort);
             } else {
-                player.sendMessage("[scarlet]There is no ongoing event at this time.");
+                player.sendMessage(GameMsg.error("Events", "There is no ongoing event at this time."));
             }
         });
     }
