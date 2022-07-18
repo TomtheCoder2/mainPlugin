@@ -53,7 +53,7 @@ import static mindustry.Vars.*;
 import static mindustry.plugin.effect.EffectHelper.getEffect;
 import static mindustry.plugin.utils.Utils.*;
 
-public class ioMain extends Plugin {
+public class PheonixMain extends Plugin {
     //    public static final File prefsFile = new File("prefs.properties");
 //    public static Net net = new Net();
 //    public static Prefs prefs = new Prefs(prefsFile);
@@ -80,6 +80,7 @@ public class ioMain extends Plugin {
             new mindustry.plugin.minimods.Management(),
             new mindustry.plugin.minimods.Maps(),
             new mindustry.plugin.minimods.Moderation(),
+            new mindustry.plugin.minimods.Mods(),
             new mindustry.plugin.minimods.Rainbow(),
             new mindustry.plugin.minimods.Ranks(),
             new mindustry.plugin.minimods.Redeem(),
@@ -90,7 +91,7 @@ public class ioMain extends Plugin {
     };
 
     // register event handlers and create variables in the constructor
-    public ioMain() {
+    public PheonixMain() {
         info("Starting Discord Plugin...");
         info(lennyFace);
         // disable debug logs from javacord (doesnt work tho, idk why)

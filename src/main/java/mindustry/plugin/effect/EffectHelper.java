@@ -11,7 +11,7 @@ import arc.util.io.PropertiesUtils;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.gen.Player;
-import mindustry.plugin.ioMain;
+import mindustry.plugin.PheonixMain;
 
 import java.lang.reflect.Field;
 
@@ -27,12 +27,12 @@ public class EffectHelper {
         tasks.forEach(Timer.Task::cancel);
         tasks = new Seq<>();
 
-        final Fi effect = ioMain.pluginDir.child("effects.properties");
+        final Fi effect = PheonixMain.pluginDir.child("effects.properties");
         if (!effect.exists()) effect.copyTo(new Fi("effects.properties"));
 
         properties = new ObjectMap<>();
         PropertiesUtils.load(
-                properties, ioMain.pluginDir.child("effects.properties").reader()
+                properties, PheonixMain.pluginDir.child("effects.properties").reader()
         );
 
 
