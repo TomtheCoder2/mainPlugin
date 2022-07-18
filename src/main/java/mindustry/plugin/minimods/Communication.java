@@ -1,11 +1,19 @@
 package mindustry.plugin.minimods;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import arc.Events;
+import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Reflect;
 import arc.util.Strings;
+import arc.util.Timer;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Call;
@@ -13,11 +21,34 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
+import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Utils;
+import mindustry.ui.Menus;
 
 public class Communication implements MiniMod {
+    public static class ScreenMessage {
+        String title;
+        String message;
+        Button[] buttons;
+
+        public static class Button {
+            String text;
+            String action;
+        }
+
+        public EmbedBuilder embed() {
+            return new EmbedBuilder()
+                        .setColor(DiscordPalette.INFO)
+                        .setTitle("Screen Message")
+                        .addField("Title", this.title)
+                        .addField("Message", this.message)
+                        .addField("Buttons", "[" + Arrays.stream(this.buttons).map(b -> b.action + ":" + b.text).collect(Collectors.joining("] [")) + "]");
+        }
+    }
+    private ScreenMessage message;
+
     @Override
     public void registerEvents() {
         Events.on(EventType.PlayerChatEvent.class, event -> {
@@ -41,10 +72,127 @@ public class Communication implements MiniMod {
             Call.sendMessage("[sky]" + (event.getMessageAuthor().getDiscriminatedName()) + ":[white] " + event.getMessageContent());
         });
         
+        Events.on(EventType.PlayerJoin.class, event -> {
+            Timer.schedule(() -> {
+                if (!event.player.con.isConnected()) return;
+                if (this.message != null)
+                    showScreenMessage(this.message, event.player);
+            }, 30);
+        });
+    }
+
+    private static void showScreenMessage(ScreenMessage msg, Player target) {
+        int id = Menus.registerMenu((player, selection) -> {
+            String action = msg.buttons[selection].action;
+            if (action == null) {
+                return;
+            }
+
+            if (action.equals("event")) {
+                mindustry.plugin.minimods.Events.join(player);
+            }
+        });
+
+        String[][] buttons = new String[][] {
+            Arrays.stream(msg.buttons).map(b -> b.text).toArray(String[]::new)
+            new String[] {},
+        };
+
+        if (target != null) {
+            Call.menu(id, msg.title, msg.message, buttons);
+        } else {
+            Call.menu(target.con, id, msg.title, msg.message, buttons);
+        }
     }
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
+        handler.register("screenmessage", "[title] [stuff...]", 
+            data -> {
+                data.usage = "<title> <buttons...> <message...> OR [clear]";
+                data.help = "Send an on-screen message. Button syntax is [action:Some text] or [Some text]. Possible actions are 'event'.";
+            },
+            ctx -> {
+                String title = ctx.args.get("title");
+                if (title == null) {
+                    if (this.message == null) {
+                        ctx.sendEmbed(DiscordPalette.INFO, "No Screen Message", "There is no active screen message.");
+                        return;
+                    }
+
+                    ctx.sendEmbed(message.embed().setTitle("Active Screen Message"));
+                    return;
+                }
+                if (title.equals("clear")) {
+                    if (this.message == null) {
+                        ctx.error("No Screen Message", "There is no active screen message to clear.");
+                        return;
+                    }
+
+                    ctx.sendEmbed(message.embed().setTitle("Removed Message").setColor(DiscordPalette.SUCCESS));
+                    return;
+                }
+
+                String stuff = ctx.args.get("stuff");
+                
+                Seq<ScreenMessage.Button> buttons = new Seq<>();
+                int bracketDepth = 0;
+                String buttonData = null;
+                int messageStart = 0;
+                for (int i = 0; i < stuff.length(); i++) {
+                    char c = stuff.charAt(0);
+                    if (c == '[') {
+                        if (bracketDepth == 0) {
+                            buttonData = "";
+                        }
+                        bracketDepth += 1;
+                    }
+
+                    if (c == ']') {
+                        bracketDepth -= 1;
+                        if (bracketDepth < 0) {
+                            ctx.error("Error", "Unmatched ]");
+                            return;
+                        }
+                        if (bracketDepth == 0) {
+                            messageStart = i + 1;
+
+                            var button = new ScreenMessage.Button();
+                            String[] parts = buttonData.split(":");
+                            if (parts.length == 1) {
+                                button.action = null;
+                                button.text = buttonData;
+                            } else {
+                                button.action = parts[0];
+                                button.text = Arrays.stream(parts).skip(1).collect(Collectors.joining(":"));
+                            }
+                            buttons.add(button);
+                        }
+                    }
+
+                    if (buttonData != null) {
+                        buttonData += c;
+                    }
+                }
+                if (bracketDepth != 0) {
+                    ctx.error("Error", "Unmatched [");
+                    return;
+                }
+
+                String message = stuff.substring(messageStart);
+                
+                ScreenMessage msg = new ScreenMessage();
+                msg.title = title;
+                msg.message = message;
+                msg.buttons = buttons.toArray(ScreenMessage.Button.class);
+                this.message = msg;
+
+                showScreenMessage(msg, null);
+
+                ctx.sendEmbed(msg.embed());
+            }
+        );
+
         handler.register("alert", "<player|all|team> <message...>", 
             data -> { 
                 data.roles = new long[] { Roles.APPRENTICE, Roles.MOD, Roles.ADMIN };

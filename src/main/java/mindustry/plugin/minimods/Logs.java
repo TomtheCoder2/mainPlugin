@@ -80,7 +80,7 @@ public class Logs implements MiniMod {
             "cracker",
             "nigger",
             "kike",
-            "faggot",
+            "faggot", "fag",
             "dyke",
             "tranny", "trannie"
         };
