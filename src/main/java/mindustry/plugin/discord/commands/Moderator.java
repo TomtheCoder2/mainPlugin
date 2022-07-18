@@ -1076,65 +1076,6 @@
 //
 //            });
 //
-//            handler.registerCommand(new RoleRestrictedCommand("screenmessage") {
-//                {
-//                    help = "List, remove or add on-screen messages.";
-//                    roles = new long[] { banRole };
-//                    usage = "<list/remove/add> <message>";
-//                    category = moderation;
-//                    minArguments = 2;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1].toLowerCase();
-//                    String message = "";
-//                    if (!target.equals("list")) {
-//                        message = ctx.message.split(" ", 2)[1];
-//                    }
-//
-//                    switch (target) {
-//                        case "list" -> {
-//                            eb.setTitle("All on-screen messages:");
-//                            for (String msg : onScreenMessages) {
-//                                eb.addField(String.valueOf(onScreenMessages.indexOf(msg)), msg);
-//                            }
-//                            ctx.sendMessage(eb);
-//                        }
-//                        case "remove" -> {
-//                            if (onScreenMessages.get(Integer.parseInt(message.trim())) != null) {
-//                                onScreenMessages.remove(Integer.parseInt(message.trim()));
-//                                eb.setTitle("Command executed");
-//                                eb.setDescription("Removed provided on-screen message.");
-//                            } else {
-//                                eb.setTitle("Command terminated");
-//                                eb.setDescription("That on-screen message does not exist.");
-//                                eb.setColor(Pals.error);
-//                            }
-//                            ctx.sendMessage(eb);
-//                        }
-//                        case "add" -> {
-//                            if (message.length() > 0) {
-//                                onScreenMessages.add(message);
-//                                eb.setTitle("Command executed");
-//                                eb.setDescription("Added on-screen message `" + message + "`.");
-//                            } else {
-//                                eb.setTitle("Command terminated");
-//                                eb.setDescription("On-screen messages must be longer than 0 characters.");
-//                                eb.setColor(Pals.error);
-//                            }
-//                            ctx.sendMessage(eb);
-//                        }
-//                        default -> {
-//                            eb.setTitle("Command terminated");
-//                            eb.setDescription("Invalid arguments provided.");
-//                            eb.setColor(Pals.error);
-//                            ctx.sendMessage(eb);
-//                        }
-//                    }
-//                }
-//            });
-//
 //            handler.registerCommand(new RoleRestrictedCommand("edit") {
 //                {
 //                    help = "Change / set a message";

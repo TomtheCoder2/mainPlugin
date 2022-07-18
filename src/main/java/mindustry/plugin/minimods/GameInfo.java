@@ -9,6 +9,7 @@ import arc.util.Log;
 import mindustry.Vars;
 import mindustry.content.Items;
 import mindustry.core.GameState;
+import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.game.Teams.TeamData;
 import mindustry.gen.Groups;
@@ -28,6 +29,8 @@ import mindustry.world.modules.ItemModule;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
+import arc.Events;
+
 import java.lang.reflect.Field;
 import java.time.Duration;
 import java.time.Instant;
@@ -40,6 +43,13 @@ public class GameInfo implements MiniMod {
     private static long serverStartTime;
     static {
         serverStartTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void registerEvents() {
+        Events.on(EventType.ServerLoadEvent.class, event -> {
+            serverStartTime = System.currentTimeMillis();
+        });
     }
 
     @Override

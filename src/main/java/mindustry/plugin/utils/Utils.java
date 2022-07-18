@@ -57,7 +57,6 @@ public class Utils {
     // whether ip verification is in place (detect VPNs, disallow their build rights)
     public static Boolean verification = false;
     public static Seq<String> bannedNames = new Seq<>();
-    public static Seq<String> onScreenMessages = new Seq<>();
     public static Pattern ipValidationPattern;
 
     public static void init() {

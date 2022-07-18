@@ -186,20 +186,7 @@ public class PheonixMain extends Plugin {
 
         // Update discord status
         Timer.schedule((Runnable)this::updateDiscordStatus, 0, 60);
-
-        // Display on-screen messages
-        float duration = 10f;
-        int start = 450;
-        int increment = 30;
-
-        Timer.schedule(() -> {
-            int currentInc = 0;
-            for (String msg : onScreenMessages) {
-                Call.infoPopup(msg, duration, 20, 50, 20, start + currentInc, 0);
-                currentInc = currentInc + increment;
-            }
-        }, 0, 10);
-
+        
         Events.on(EventType.ServerLoadEvent.class, event -> {
 //            contentHandler = new ContentHandler();
             Log.info("Everything's loaded !");
