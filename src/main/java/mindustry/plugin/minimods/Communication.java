@@ -1,6 +1,5 @@
 package mindustry.plugin.minimods;
 
-<<<<<<< HEAD
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.stream.Collector;
@@ -9,8 +8,6 @@ import java.util.stream.Stream;
 
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
-=======
->>>>>>> 0d98abcc094bde8462b57886a33a97785dd55e36
 import arc.Events;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
@@ -75,7 +72,6 @@ public class Communication implements MiniMod {
             }
             Call.sendMessage("[sky]" + (event.getMessageAuthor().getDiscriminatedName()) + ":[white] " + event.getMessageContent());
         });
-<<<<<<< HEAD
         
         Events.on(EventType.PlayerJoin.class, event -> {
             Timer.schedule(() -> {
@@ -99,23 +95,19 @@ public class Communication implements MiniMod {
         });
 
         String[][] buttons = new String[][] {
-            Arrays.stream(msg.buttons).map(b -> b.text).toArray(String[]::new)
+            Arrays.stream(msg.buttons).map(b -> b.text).toArray(String[]::new),
             new String[] {},
         };
 
-        if (target != null) {
+        if (target == null) {
             Call.menu(id, msg.title, msg.message, buttons);
         } else {
             Call.menu(target.con, id, msg.title, msg.message, buttons);
         }
-=======
-
->>>>>>> 0d98abcc094bde8462b57886a33a97785dd55e36
     }
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-<<<<<<< HEAD
         handler.register("screenmessage", "[title] [stuff...]", 
             data -> {
                 data.usage = "<title> <buttons...> <message...> OR [clear]";
@@ -219,25 +211,6 @@ public class Communication implements MiniMod {
                     try {
                         Field f = Team.class.getDeclaredField(target);
                         Team team = (Team)f.get(null);
-=======
-        handler.register("alert", "<player|all|team> <message...>",
-                data -> {
-                    data.roles = new long[]{Roles.APPRENTICE, Roles.MOD, Roles.ADMIN};
-                    data.help = "Alert player(s) using on-screen message";
-                    data.aliases = new String[]{"a"};
-                    data.category = "Communication";
-                },
-                ctx -> {
-                    String target = ctx.args.get("player|all|team");
-                    String message = ctx.args.get("message");
-                    if (target.equals("all")) {
-                        Call.infoMessage(message);
-                        ctx.success("Sent Message", "Sent message to all players");
-                    } else {
-                        try {
-                            Field f = Team.class.getDeclaredField(target);
-                            Team team = (Team) f.get(null);
->>>>>>> 0d98abcc094bde8462b57886a33a97785dd55e36
 
                             for (Player player : Groups.player) {
                                 if (player.team().equals(team)) {
