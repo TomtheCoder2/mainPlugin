@@ -44,7 +44,7 @@ public class Management implements MiniMod {
                     long time = ctx.args.getLong("time", 1000);
 
                     TestData data = new TestData();
-                    final Runnable[] scanTPS = new Runnable[0];
+                    final Runnable[] scanTPS = new Runnable[1];
                     final long endTime = System.currentTimeMillis() + time;
                     scanTPS[0] = () -> {
                         if (System.currentTimeMillis() > endTime) {
@@ -182,7 +182,7 @@ public class Management implements MiniMod {
             d.category = "Management";
             d.aliases = new String[]{"rmod"};
         }, ctx -> {
-            var mod = Utils.getMod(ctx.args.get("modname/id"));
+            var mod = findModByName(ctx.args.get("modname/id"));
             if (mod == null) {
                 ctx.error("Error", "Mod '" + ctx.args.get("modname/id") + "' not found");
                 return;
@@ -233,9 +233,11 @@ public class Management implements MiniMod {
                 data.help = "Get information about a specific mod";
             },
             ctx -> {
-                Mods.LoadedMod mod = Vars.mods.list().find(m -> 
-                    Utils.escapeColorCodes(m.meta.displayName).equalsIgnoreCase(ctx.args.get("mod")) || 
-                    Utils.escapeColorCodes(m.meta.name).equalsIgnoreCase(ctx.args.get("mod")));
+                Mods.LoadedMod mod = findModByName(ctx.args.get("mod"));
+                if (mod == null) {
+                    ctx.error("No such mod", "Mod '" + ctx.args.get("mod") + "' is not loaded on the server");
+                    return;
+                }
 
                 EmbedBuilder eb = new EmbedBuilder()
                     .setTitle(mod.meta.displayName)
@@ -312,6 +314,12 @@ public class Management implements MiniMod {
                 Core.app.exit();
             });
         });
+    }
+
+    private static Mods.LoadedMod findModByName(String name) {
+        return Vars.mods.list().find(m -> 
+            Utils.escapeColorCodes(m.meta.displayName).equalsIgnoreCase(name) || 
+            Utils.escapeColorCodes(m.meta.name).equalsIgnoreCase(name));
     }
 
     private static class TestData {
