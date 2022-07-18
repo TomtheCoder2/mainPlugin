@@ -21,6 +21,7 @@ import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordPalette;
+import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
@@ -79,7 +80,7 @@ public class Communication implements MiniMod {
                 if (!event.player.con.isConnected()) return;
                 if (this.message != null)
                     showScreenMessage(this.message, event.player);
-            }, 30);
+            }, 15);
         });
     }
 
@@ -98,8 +99,7 @@ public class Communication implements MiniMod {
         });
 
         String[][] buttons = new String[][] {
-            Arrays.stream(msg.buttons).map(b -> b.text).toArray(String[]::new),
-            new String[] {},
+            Arrays.stream(msg.buttons).map(b -> b.text).toArray(String[]::new)
         };
 
         if (target == null) {
@@ -113,7 +113,7 @@ public class Communication implements MiniMod {
     public void registerDiscordCommands(DiscordRegistrar handler) {
         handler.register("screenmessage", "[title] [stuff...]", 
             data -> {
-                data.usage = "<title> <buttons...> <message...> OR [clear]";
+                data.usage = "<title...> <buttons...> <message...> OR [clear]";
                 data.help = "Send an on-screen message. Button syntax is [action:Some text] or [Some text]. Possible actions are 'event'.";
             },
             ctx -> {
@@ -138,20 +138,34 @@ public class Communication implements MiniMod {
                 }
 
                 String stuff = ctx.args.get("stuff");
+                if (this.message != null) {
+                    ctx.error("Screen Message Already Exists", "Use `" + DiscordVars.prefix + "screenmessage clear` to delete the screen message");
+                    return;
+                }
                 if (stuff == null) {
                     ctx.error("Message Body Required", "Cannot have screen message without message body");
                     return;
                 }
-                
+                if (!stuff.contains("[")) {
+                    ctx.error("Buttons Required", "Cannot have screen message without buttons");
+                }
+
+                // title = the title
+                // stuff = buttons + message
+                stuff = title + " " + stuff;
+                int firstBracket = stuff.indexOf("[");
+                title = stuff.substring(0, firstBracket);
+                stuff = stuff.substring(firstBracket);
+
                 Seq<ScreenMessage.Button> buttons = new Seq<>();
                 int bracketDepth = 0;
-                String buttonData = null;
+                int buttonStart = -1;
                 int messageStart = 0;
                 for (int i = 0; i < stuff.length(); i++) {
-                    char c = stuff.charAt(0);
+                    char c = stuff.charAt(i);
                     if (c == '[') {
                         if (bracketDepth == 0) {
-                            buttonData = "";
+                            buttonStart = i;
                         }
                         bracketDepth += 1;
                     }
@@ -165,6 +179,9 @@ public class Communication implements MiniMod {
                         if (bracketDepth == 0) {
                             messageStart = i + 1;
 
+                            String buttonData = stuff.substring(buttonStart+1, i);
+                            buttonStart = -1;
+
                             var button = new ScreenMessage.Button();
                             String[] parts = buttonData.split(":");
                             if (parts.length == 1) {
@@ -177,13 +194,9 @@ public class Communication implements MiniMod {
                             buttons.add(button);
                         }
                     }
-
-                    if (buttonData != null) {
-                        buttonData += c;
-                    }
                 }
                 if (bracketDepth != 0) {
-                    ctx.error("Error", "Unmatched [");
+                    ctx.error("Error", "Unmatched [\nBracket depth: " + bracketDepth);
                     return;
                 }
 
