@@ -25,6 +25,8 @@ import java.util.Arrays;
 
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
+import static mindustry.plugin.utils.Utils.escapeEverything;
+
 /**
  * Manages player ranks and other player information.
  */
@@ -71,7 +73,7 @@ public class Ranks implements MiniMod {
 
         Events.on(EventType.GameOverEvent.class, event -> {
             // update time-based map stats
-            String mapName = Vars.state.map.name();
+            String mapName = escapeEverything(Vars.state.map.name());
             Database.Map md = Database.getMapData(mapName);
             if (md == null) {
                 md = new Database.Map(mapName);
@@ -150,7 +152,7 @@ public class Ranks implements MiniMod {
      * @param p The player to popup, or null for all players
      */
     private void rateMenu(Player p) {
-        String mapName = Vars.state.map.name();
+        String mapName = escapeEverything(Vars.state.map.name());
         int id = Menus.registerMenu((player, selection) -> {
             Database.Map md = Database.getMapData(mapName);
             if (md == null) {
@@ -203,7 +205,7 @@ public class Ranks implements MiniMod {
                         && pd.buildingsBuilt >= req.buildingsBuilt && pd.gamesPlayed >= req.gamesPlayed) {
                     Call.infoMessage(player.con, Utils.formatMessage(player, promotionMessage));
                     pd.rank = entry.key;
-                    Log.info(Utils.escapeEverything(player.name) + " got promoted to " + Rank.all[pd.rank].name + "!");
+                    Log.info(escapeEverything(player.name) + " got promoted to " + Rank.all[pd.rank].name + "!");
                 }
             }
 
@@ -302,7 +304,7 @@ public class Ranks implements MiniMod {
                     var info = Vars.netServer.admins.getInfoOptional(ranking[i].uuid);
                     String name = "<unknown>";
                     if (info != null) {
-                        name = Utils.escapeEverything(info.lastName);
+                        name = escapeEverything(info.lastName);
                     }
                     table += String.format("%3s %20s %10s\n", offset+i+1, ranking[i].stat, name);
                 }

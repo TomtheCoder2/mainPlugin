@@ -236,7 +236,7 @@ public final class Database {
      * Sets map data for a given map
      */
     public static void setMapData(Map md) {
-        String name = Utils.escapeEverything(md.name).replaceAll("\\W", "");
+        String name = Utils.escapeEverything(md.name).replaceAll("\\W", "_");
         Log.info("setting map data for " + name);
         if (getMapData(name) == null) {
             String sql = "INSERT INTO mapdata(name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame) "
