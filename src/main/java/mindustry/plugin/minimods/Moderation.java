@@ -198,33 +198,6 @@ public class Moderation implements MiniMod {
                     }
                 }
         );
-
-        handler.register("alert", "<player> <message...>",
-                data -> {
-                    data.help = "Alerts a player(s) using on-screen messages.";
-                    data.roles = new long[]{Roles.MOD, Roles.ADMIN, Roles.APPRENTICE};
-                    data.category = "Moderation";
-                    data.aliases = new String[]{"a"};
-                },
-                ctx -> {
-                    String target = ctx.args.get("player").toLowerCase();
-                    if (target.equals("all")) {
-                        Call.infoMessage(ctx.args.get("message"));
-
-                        ctx.success("Alerted", "Alerted " + Groups.player.size() + " players.");
-                        return;
-                    }
-
-                    Player p = Utils.findPlayer(target);
-                    if (p == null) {
-                        ctx.error("Error", "Player '" + target + "' not found");
-                        return;
-                    }
-
-                    Call.infoMessage(p.con, ctx.args.get("message"));
-                    ctx.success("Alerted", "Alerted " + Utils.escapeEverything(p) + ".");
-                }
-        );
     }
 
     @Override
