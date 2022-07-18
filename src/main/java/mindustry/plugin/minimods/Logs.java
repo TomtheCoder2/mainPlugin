@@ -8,6 +8,7 @@ import arc.struct.ObjectSet;
 import arc.struct.Seq;
 import arc.util.Timer;
 import mindustry.game.EventType;
+import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordPalette;
@@ -73,5 +74,33 @@ public class Logs implements MiniMod {
 
             Channels.LOG.sendMessage(eb);
         }, 30, 30);
+
+        String[] slurs = new String[] { 
+            "chink",
+            "cracker",
+            "nigger",
+            "kike",
+            "faggot",
+            "dyke",
+            "tranny", "trannie"
+        };
+        Events.on(EventType.PlayerChatEvent.class, event -> {
+            if (event.player == null) return;
+            
+            Seq<String> usedSlurs = new Seq<>();
+            for (String slur : slurs) {
+                if (event.message.toLowerCase().contains(slur)) {
+                    usedSlurs.add(slur);
+                }
+            }
+            
+            Channels.LOG.sendMessage(new EmbedBuilder()
+                .setColor(DiscordPalette.WARN)
+                .setTitle("Slur usage")
+                .addInlineField("Player", Utils.escapeEverything(event.player.name) + "\n`" + event.player.uuid() + "`")
+                .addInlineField("Slurs", usedSlurs.toString(", "))
+                .addField("Message", event.message)
+            );
+        });
     }
 }
