@@ -59,6 +59,15 @@ public class GameInfo implements MiniMod {
                         return;
                     }
                     eb.addField("Times Kicked", info.timesKicked + "");
+                    eb.addField("Current Name", info.lastName);
+                    eb.addField("Current IP", info.lastIP);
+    
+                    String names = "";
+                    for (String name : info.names) {
+                        names += name + "\n";
+                    }
+                    eb.addField("Names", names);
+    
                     Database.Player pd = Database.getPlayerData(info.id);
                     if (pd != null) {
                         eb.addField("Rank", Rank.all[pd.rank].name);
@@ -73,14 +82,6 @@ public class GameInfo implements MiniMod {
                         if (pd.banReason != null && !pd.banReason.equals("")) {
                             eb.addField("Ban Reason", pd.banReason);
                         }
-
-                        String names = "";
-                        for (String name : info.names) {
-                            names += name + "\n";
-                        }
-                        eb.addField("Names", names);
-                        eb.addField("Current Name", info.lastName);
-                        eb.addField("Current IP", info.lastIP);
                     }
                     eb.setColor(DiscordPalette.INFO);
                     ctx.sendEmbed(eb);

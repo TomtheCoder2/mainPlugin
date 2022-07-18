@@ -12,10 +12,13 @@ import mindustry.core.GameState;
 import mindustry.game.Gamemode;
 import mindustry.maps.Map;
 import mindustry.maps.MapException;
+import mindustry.mod.Mod;
+import mindustry.mod.Mods;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
+import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Utils;
@@ -203,6 +206,56 @@ public class Management implements MiniMod {
                 ctx.error("Error", "Unable to delete mod? (The mod may still be deleted, not sure why the code deletes thrice).");
             }
         });
+
+        handler.register("mods", "", 
+            data -> {
+                data.help = "List mods & versions";
+                data.aliases = new String [] { "version" } ;
+                data.category = "Management";
+            },
+            ctx -> {
+                EmbedBuilder eb = new EmbedBuilder()
+                    .setTitle("Mods")
+                    .setColor(DiscordPalette.INFO);
+                if (Vars.mods.list().isEmpty()) {
+                    eb.setDescription("None");
+                } else {
+                    for (Mods.LoadedMod mod : Vars.mods.list()) {
+                        eb.addInlineField(mod.meta.displayName(), mod.meta.version);
+                    }
+                }
+                ctx.sendEmbed(eb);
+            }
+        );
+
+        handler.register("mod", "<mod>", 
+            data -> {
+                data.help = "Get information about a specific mod";
+            },
+            ctx -> {
+                Mods.LoadedMod mod = Vars.mods.list().find(m -> 
+                    Utils.escapeColorCodes(m.meta.displayName).equalsIgnoreCase(ctx.args.get("mod")) || 
+                    Utils.escapeColorCodes(m.meta.name).equalsIgnoreCase(ctx.args.get("mod")));
+
+                EmbedBuilder eb = new EmbedBuilder()
+                    .setTitle(mod.meta.displayName)
+                    .setColor(DiscordPalette.INFO)
+                    .addInlineField("Internal Name", mod.name)
+                    .addInlineField("Version", mod.meta.version)
+                    .addInlineField("Author", mod.meta.author)
+                    .addInlineField("Description", mod.meta.description)
+                    .addInlineField("Repo", mod.getRepo());
+                
+                if (mod.dependencies.size != 0) {
+                    eb.addField("Loaded Dependencies", mod.dependencies.toString("\n", x -> x.meta.name));
+                }
+                if (mod.missingDependencies.size != 0) {
+                    eb.addField("Unmet Dependencies", mod.missingDependencies.toString("\n"));
+                }
+
+                ctx.sendEmbed(eb);
+            }  
+        );
 
         handler.register("start", "[map] [mode]", d -> {
             d.help = "Restart the server";

@@ -258,13 +258,6 @@ public class Utils {
         return info;
     }
 
-    /**
-     * Get mod by name
-     */
-    public static Mods.LoadedMod getMod(String name) {
-        return mods.list().find(p -> escapeColorCodes(p.meta.name).equalsIgnoreCase(name) || escapeColorCodes(p.meta.displayName).equalsIgnoreCase(name));
-    }
-
     @Deprecated
     public static boolean isInt(String str) {
         try {
