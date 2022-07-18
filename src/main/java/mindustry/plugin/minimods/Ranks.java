@@ -66,7 +66,7 @@ public class Ranks implements MiniMod {
                 public void run() {
                     rateMenu(null);
                 }
-            }, 10 * 60 * 1000);
+            }, 10 * 60);
         });
 
         Events.on(EventType.GameOverEvent.class, event -> {
