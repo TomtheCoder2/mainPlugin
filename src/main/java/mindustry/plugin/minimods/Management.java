@@ -176,7 +176,7 @@ public class Management implements MiniMod {
             ctx.sendEmbed(eb);
         });
 
-        handler.register("removemod", "<modname/id>", d -> {
+        handler.register("removemod", "<modname/id...>", d -> {
             d.help = "Remove a mod from the folder";
             d.roles = new long[]{Roles.ADMIN};
             d.category = "Management";
@@ -228,7 +228,7 @@ public class Management implements MiniMod {
             }
         );
 
-        handler.register("mod", "<mod>", 
+        handler.register("mod", "<mod...>", 
             data -> {
                 data.help = "Get information about a specific mod";
             },
