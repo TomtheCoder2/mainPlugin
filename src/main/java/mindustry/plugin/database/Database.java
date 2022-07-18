@@ -151,15 +151,14 @@ public final class Database {
      * @return the ranking, or null if no players are found
      */
     public static PlayerRank[] rankPlayers(int limit, String column, int offset) {
-        String sql = "SELECT uuid, ? " +
+        if (!column.matches("[A-Za-z0-9]+")) return null;
+        String sql = "SELECT uuid, " + column + " " +
                 "FROM playerdata " +
-                "ORDER BY ? DESC LIMIT ? OFFSET ?";
+                "ORDER BY " + column + " DESC LIMIT ? OFFSET ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, column);
-            pstmt.setString(2, column);
-            pstmt.setInt(3, limit);
-            pstmt.setInt(4, offset);
+            pstmt.setInt(1, limit);
+            pstmt.setInt(2, offset);
 
             ResultSet rs = pstmt.executeQuery();
             Seq<PlayerRank> rankings = new Seq<>();
@@ -184,15 +183,14 @@ public final class Database {
      * @return the ranking, or null if none are found
      */
     public static MapRank[] rankMaps(int limit, String column, int offset) {
-        String sql = "SELECT name, ? " +
+        if (!column.matches("[A-Za-z0-9]+")) return null;
+        String sql = "SELECT name, " + column + " " +
                 "FROM mapdata " +
-                "ORDER BY ? DESC LIMIT ? OFFSET ?";
+                "ORDER BY " + column + " DESC LIMIT ? OFFSET ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, column);
-            pstmt.setString(2, column);
-            pstmt.setInt(3, limit);
-            pstmt.setInt(4, offset);
+            pstmt.setInt(1, limit);
+            pstmt.setInt(2, offset);
 
             ResultSet rs = pstmt.executeQuery();
             Seq<MapRank> ranking = new Seq<>();
@@ -213,7 +211,7 @@ public final class Database {
      */
     public static Map getMapData(String name) {
         name = Utils.escapeEverything(name).replaceAll("\\W", "");
-        String sql = "SELECT name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame "
+        String sql = "SELECT name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame"
                 + "FROM mapdata "
                 + "WHERE name = ?";
         try {
