@@ -2,9 +2,13 @@ package mindustry.plugin.database;
 
 import arc.struct.Seq;
 import arc.util.Log;
+import mindustry.gen.Player;
 import mindustry.plugin.utils.Utils;
 
 import java.sql.*;
+import java.util.*;
+
+import static mindustry.plugin.database.Database.Map.fromSQL;
 
 public final class Database {
     /**
@@ -175,6 +179,28 @@ public final class Database {
 
         return null;
     }
+    public static List<Map> rankMaps2() {
+        HashMap<Pair, Map> maps = new HashMap<>();
+        String sql = "SELECT * FROM mapdata;";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("name");
+                Pair stats = new Pair(rs.getInt("positiveRating"), rs.getInt("negativeRating"));
+                if (stats.a != 0 || stats.b != 0) {
+                    maps.put(stats, fromSQL(rs));
+                }
+            }
+            List<Map> sorted = new ArrayList<>(maps.values());
+            sorted.sort(Comparator.comparing(Map::diff));
+            Collections.reverse(sorted);
+            return sorted;
+        } catch (SQLException ex) {
+            Log.err(ex.getMessage());
+        }
+        return null;
+    }
 
     /**
      * Retrieve a ranking of maps.
@@ -211,7 +237,7 @@ public final class Database {
      */
     public static Map getMapData(String name) {
         name = Utils.escapeEverything(name).replaceAll("\\W", "");
-        String sql = "SELECT name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame"
+        String sql = "SELECT name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame "
                 + "FROM mapdata "
                 + "WHERE name = ?";
         try {
@@ -220,7 +246,7 @@ public final class Database {
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return Map.fromSQL(rs);
+                return fromSQL(rs);
             } else {
                 return null;
             }
@@ -357,7 +383,7 @@ public final class Database {
     }
 
     /**
-     * Value returned by `Database::rankMaps`
+     * Value returned by {@link #rankMaps(int, String, int) rankMaps()}
      */
     public static class MapRank {
         /**
@@ -402,6 +428,10 @@ public final class Database {
             this.name = name;
         }
 
+        public int diff() {
+            return positiveRating - negativeRating;
+        }
+
         public static Map fromSQL(ResultSet rs) throws SQLException {
             Map md = new Map(rs.getString("name"));
             md.positiveRating = rs.getInt("positiverating");
@@ -415,6 +445,20 @@ public final class Database {
 
         public Object clone() throws CloneNotSupportedException {
             return super.clone();
+        }
+    }
+
+    static class Pair {
+        int a;
+        int b;
+
+        public Pair(int a, int b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        public int diff() {
+            return a - b;
         }
     }
 }

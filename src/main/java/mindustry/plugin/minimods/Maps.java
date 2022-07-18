@@ -23,7 +23,11 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.InflaterInputStream;
+
+import static mindustry.plugin.utils.Utils.escapeEverything;
 
 /**
  * Implements commands relating to map management
@@ -102,7 +106,7 @@ public class Maps implements MiniMod {
 
                     ctx.sendEmbed(
                             new EmbedBuilder()
-                                    .setTitle(Utils.escapeEverything(meta.get("name")))
+                                    .setTitle(escapeEverything(meta.get("name")))
                                     .setDescription(meta.get("description"))
                                     .setAuthor(ctx.author().getDisplayName(ctx.server()), ctx.author().getAvatar().getUrl().toString(), ctx.author().getAvatar().getUrl().toString())
                                     .setColor(DiscordPalette.WARN)
@@ -130,7 +134,7 @@ public class Maps implements MiniMod {
                     Vars.maps.removeMap(found);
                     Vars.maps.reload();
 
-                    ctx.success("Removed Map", "Map '" + Utils.escapeEverything(name) + "' was removed from the playlist");
+                    ctx.success("Removed Map", "Map '" + escapeEverything(name) + "' was removed from the playlist");
                 }
         );
 
@@ -143,9 +147,22 @@ public class Maps implements MiniMod {
                     EmbedBuilder eb = new EmbedBuilder();
                     eb.setTitle("Maps");
                     eb.setColor(DiscordPalette.INFO);
+                    List<String> mapNames = new ArrayList<>();
                     for (Map map : Vars.maps.customMaps()) {
                         eb.addInlineField(Utils.escapeColorCodes(map.name()), map.rules().mode().name() + "\n" + map.width + "x" + map.height);
+                        mapNames.add(escapeEverything(map.name()));
                     }
+                    ctx.sendEmbed(eb);
+                    eb = new EmbedBuilder().setTitle("Ranking");
+                    StringBuilder sb = new StringBuilder();
+                    List<Database.Map> maps = Database.rankMaps2();
+                    int c = 1;
+                    for (Database.Map m : maps) {
+                        if (!mapNames.contains(escapeEverything(m.name))) continue;
+                        sb.append(String.format("%-2d | %-4d | %-4d | %-4d %s\n", c, m.positiveRating, m.negativeRating, m.positiveRating - m.negativeRating, m.name));
+                        c++;
+                    }
+                    eb.setDescription("```" + sb + "```");
                     ctx.sendEmbed(eb);
                 }
         );
