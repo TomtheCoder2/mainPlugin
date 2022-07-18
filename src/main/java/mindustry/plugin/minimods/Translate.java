@@ -45,7 +45,20 @@ public class Translate implements MiniMod {
 
         Events.on(EventType.PlayerChatEvent.class, event -> {
             if (event.player == null) return;
+
+            // remove unnecessary language entries
+            ObjectSet<String> langsToRemove = new ObjectSet<>();
+            for (var entry : playerLangs) {
+                if (entry.value.size == 0) {
+                    langsToRemove.add(entry.key);
+                }
+            }
+            for (var lang : langsToRemove) {
+                playerLangs.remove(lang);
+            }
+
             if (playerLangs.size == 0) return; // if no one wants to translate, dont waste people's resources
+
             final String message = event.message;
             boolean success = thread.addDetect(message, lang -> {
                 if (lang == null) return;
