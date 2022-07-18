@@ -283,12 +283,12 @@ public class Ranks implements MiniMod {
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("ranking", "<playtime|games|buildings> [offset]", 
+        handler.register("ranking", "<playtime|gamesplayed|buildingsbuilt> [offset]", 
             data -> {
                 data.help = "Returns a ranking of players.";
             },
             ctx -> {
-                String column = ctx.args.get("playtime|games|buildings");
+                String column = ctx.args.get("playtime|gamesplayed|buildingsbuilt");
                 int offset = ctx.args.getInt("offset", 0);
                 Database.PlayerRank[] ranking = Database.rankPlayers(10, column, offset);
                 if (ranking == null || ranking.length == 0) {
@@ -297,14 +297,14 @@ public class Ranks implements MiniMod {
                 }
 
                 String table = "```\n";
-                table += String.format("%3s %20s %10s\n", "", "Player", column);
+                table += String.format("%3s %-20s %-10s\n", "", "Player", column);
                 for (int i = 0; i < ranking.length; i++) {
                     var info = Vars.netServer.admins.getInfoOptional(ranking[i].uuid);
                     String name = "<unknown>";
                     if (info != null) {
                         name = Utils.escapeEverything(info.lastName);
                     }
-                    table += String.format("%3s %20s %10s\n", offset+i+1, ranking[i].stat, name);
+                    table += String.format("%3s %-20s %-10s\n", offset+i+1, name, ranking[i].stat);
                 }
                 table += "```";
 
@@ -315,5 +315,34 @@ public class Ranks implements MiniMod {
                 );
             }
         );
+
+        handler.register("mapranking", "<positiverating|negativerating|highscorewaves|playtime> [offset]", 
+            data -> {
+                data.help = "Returns a ranking of maps";
+            },
+            ctx -> {
+                String column = ctx.args.get("positiverating|negativerating|highscorewaves|playtime");
+                int offset = ctx.args.getInt("offset", 0);
+                Database.MapRank[] ranking = Database.rankMaps(10, column, offset);
+                if (ranking == null || ranking.length == 0) {
+                    ctx.error("No maps found", "Make sure the stat is valid.");
+                    return;
+                }
+
+                String table = "```\n";
+                table += String.format("%3s %-30s %-10s\n", "", "Map", column);
+                for (int i = 0; i < ranking.length; i++) {
+                    table += String.format("%3s %-30s %-10s\n", offset+i+1, Utils.escapeColorCodes(ranking[i].name), ranking[i].stat);
+                }
+                table += "```";
+
+                ctx.sendEmbed(new EmbedBuilder()
+                    .setColor(DiscordPalette.INFO)
+                    .setTitle("Map Ranking")
+                    .setDescription(table)
+                );
+            }
+        );
+
     }
 }
