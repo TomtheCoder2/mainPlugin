@@ -115,6 +115,7 @@ public class Communication implements MiniMod {
             data -> {
                 data.usage = "<title...> <buttons...> <message...> OR [clear]";
                 data.help = "Send an on-screen message. Button syntax is [action:Some text] or [Some text]. Possible actions are 'event'.";
+                data.roles = new long[] { Roles.APPRENTICE, Roles.MOD, Roles.ADMIN };
             },
             ctx -> {
                 String title = ctx.args.get("title");
