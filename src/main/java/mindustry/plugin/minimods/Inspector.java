@@ -73,13 +73,14 @@ public class Inspector implements MiniMod {
             TileInfo info = tileInfos.get(new Pos(event.tile));
             if (info != null) {
                 if (info.configuredByName != null) {
-                    s += "\n - Last configured by: [white]" + info.configuredByName + "[pink]";
+                    s += "\n - Last configured by: [white]" + info.configuredByName + "[pink]" + (event.player.admin ? " [orange]" + info.configuredBy : "");
                 }
                 if (info.placedByName != null) {
-                    s += "\n - Last placed by: [white]" + info.placedByName + "[pink]";
+                    s += "\n - Last placed by: [white]" + info.placedByName + "[pink]"  + (event.player.admin ? " [orange]" + info.placedBy : "");
                 }
                 if (info.destroyedByName != null) {
-                    s += "\n - Last destroyed " + (info.previousBlock == null ? "" : " from [accent]" + info.previousBlock.name) + "[pink] by: [white]" + info.destroyedByName + "[pink]";
+                    s += "\n - Last destroyed " + (info.previousBlock == null ? "" : " from [accent]" + info.previousBlock.name) + "[pink] by: [white]" + info.destroyedByName + "[pink]" 
+                        + (event.player.admin ? " [orange]" + info.destroyedBy : "");
                 }
             }
 

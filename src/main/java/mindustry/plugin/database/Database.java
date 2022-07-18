@@ -2,10 +2,8 @@ package mindustry.plugin.database;
 
 import arc.struct.Seq;
 import mindustry.plugin.utils.Utils;
-
+import arc.util.Log;
 import java.sql.*;
-
-import static arc.util.Log.debug;
 
 public final class Database {
     /**
@@ -31,7 +29,7 @@ public final class Database {
                 + "FROM playerdata "
                 + "WHERE uuid = ?";
         try {
-            debug("get player data of @, conn: @", uuid, conn.isClosed());
+            Log.debug("get player data of @, conn: @", uuid, conn.isClosed());
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, uuid);
 
@@ -43,7 +41,7 @@ public final class Database {
             }
             rs.close();
         } catch (SQLException ex) {
-            debug(ex.getMessage());
+            Log.debug(ex.getMessage());
         }
 
         return null;
@@ -70,7 +68,7 @@ public final class Database {
             }
             rs.close();
         } catch (SQLException ex) {
-            debug(ex.getMessage());
+            Log.debug(ex.getMessage());
         }
 
         return null;
@@ -102,9 +100,9 @@ public final class Database {
 
                 // send the data
                 int affectedRows = pstmt.executeUpdate();
-//                debug("affected rows: " + affectedrows);
+//                Log.debug("affected rows: " + affectedrows);
             } catch (SQLException ex) {
-                debug(ex.getMessage());
+                Log.debug(ex.getMessage());
             }
         } else {
             String sql = "UPDATE playerdata "
@@ -133,9 +131,9 @@ public final class Database {
                 pstmt.setString(10, pd.uuid);
 
                 int affectedrows = pstmt.executeUpdate();
-//                debug("affected rows: " + affectedrows);
+//                Log.debug("affected rows: " + affectedrows);
             } catch (SQLException ex) {
-                debug(ex.getMessage());
+                Log.debug(ex.getMessage());
             }
         }
     }
@@ -166,7 +164,7 @@ public final class Database {
             }
             return rankings.toArray(PlayerRank.class);
         } catch (SQLException ex) {
-            debug(ex.getMessage());
+            Log.debug(ex.getMessage());
         }
 
         return null;
@@ -198,7 +196,7 @@ public final class Database {
             }
             return ranking.toArray(MapRank.class);
         } catch (SQLException ex) {
-            debug(ex.getMessage());
+            Log.debug(ex.getMessage());
         }
         return null;
     }
@@ -222,7 +220,7 @@ public final class Database {
                 return null;
             }
         } catch (SQLException ex) {
-            debug(ex.getMessage());
+            Log.debug(ex.getMessage());
         }
         return null;
     }
@@ -232,7 +230,7 @@ public final class Database {
      */
     public static void setMapData(Map md) {
         String name = Utils.escapeEverything(md.name).replaceAll("\\W", "");
-
+        Log.info("setting map data for " + name);
         if (getMapData(name) == null) {
             String sql = "INSERT INTO mapdata(name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -247,7 +245,7 @@ public final class Database {
                 pstmt.setLong(6 + 1, md.shortestGame);
                 pstmt.executeUpdate();
             } catch (SQLException ex) {
-                debug(ex.getMessage());
+                Log.debug(ex.getMessage());
             }
         } else {
             String sql = "UPDATE mapdata SET " +
@@ -270,7 +268,7 @@ public final class Database {
                 pstmt.setString(7, name);
                 pstmt.executeUpdate();
             } catch (SQLException ex) {
-                debug(ex.getMessage());
+                Log.debug(ex.getMessage());
             }
         }
     }
