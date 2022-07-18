@@ -106,7 +106,7 @@ public final class Database {
 
                 // send the data
                 int affectedRows = pstmt.executeUpdate();
-//                Log.info("player insert affected rows: " + affectedRows);
+                Log.info("player insert affected rows: " + affectedRows);
             } catch (SQLException ex) {
                 Log.err(ex.getMessage());
             }
@@ -137,7 +137,7 @@ public final class Database {
                 pstmt.setString(10, pd.uuid);
 
                 int affectedrows = pstmt.executeUpdate();
-//                Log.info("player update affected rows: " + affectedrows);
+                Log.info("player update affected rows: " + affectedrows);
             } catch (SQLException ex) {
                 Log.err(ex.getMessage());
             }
@@ -202,7 +202,7 @@ public final class Database {
             }
             return ranking.toArray(MapRank.class);
         } catch (SQLException ex) {
-            Log.debug(ex.getMessage());
+            Log.err(ex.getMessage());
         }
         return null;
     }
@@ -249,9 +249,10 @@ public final class Database {
                 pstmt.setLong(4 + 1, md.highscoreWaves);
                 pstmt.setLong(5 + 1, md.playTime);
                 pstmt.setLong(6 + 1, md.shortestGame);
-                pstmt.executeUpdate();
+                int rows = pstmt.executeUpdate();
+                Log.info("map insert rows: " + rows);
             } catch (SQLException ex) {
-                Log.debug(ex.getMessage());
+                Log.err(ex.getMessage());
             }
         } else {
             String sql = "UPDATE mapdata SET " +
@@ -272,9 +273,10 @@ public final class Database {
                 pstmt.setLong(5, md.playTime);
                 pstmt.setLong(6, md.shortestGame);
                 pstmt.setString(7, name);
-                pstmt.executeUpdate();
+                int rows = pstmt.executeUpdate();
+                Log.info("map update rows: " + rows);
             } catch (SQLException ex) {
-                Log.debug(ex.getMessage());
+                Log.err(ex.getMessage());
             }
         }
     }

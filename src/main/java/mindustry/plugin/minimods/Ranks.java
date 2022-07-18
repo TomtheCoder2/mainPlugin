@@ -90,8 +90,6 @@ public class Ranks implements MiniMod {
 
         // -- PLAYER SECTION -- //
         Events.on(EventType.GameOverEvent.class, event -> {
-            Log.info("+1 message");
-
             // +1 games to everyone
             // updates player's gamesPlayed
             for (Player p : Groups.player) {
@@ -143,7 +141,7 @@ public class Ranks implements MiniMod {
 
                 timeStart = System.currentTimeMillis();
             }
-        }, 120 * 1000, 120 * 1000);
+        }, 120, 120);
     }
 
     /**
