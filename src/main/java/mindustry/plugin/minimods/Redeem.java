@@ -70,7 +70,7 @@ public class Redeem implements MiniMod {
                     data.help = "Redeem a key";
                 },
                 ctx -> {
-                    String key = Long.toString((long) (Math.random() * 0xffffffffffL), 36).substring(0, 4);
+                    String key = Long.toString((long) (Math.random() * 0xffffffffffL), 36).substring(0, 5);
                     keys.put(key, ctx.author().getId());
                     ctx.success("Redeem", "Check your DMs for next steps.");
                     ctx.author().sendMessage(new EmbedBuilder()

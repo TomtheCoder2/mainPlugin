@@ -10,6 +10,7 @@ import arc.util.Structs;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
+import mindustry.entities.abilities.Ability;
 import mindustry.entities.units.UnitController;
 import mindustry.game.EventType;
 import mindustry.game.Team;
@@ -37,7 +38,7 @@ public class Pets implements MiniMod {
         double minErr = Double.POSITIVE_INFINITY;
         Team bestTeam = null;
         for (Team team : Team.all) {
-            if (team.id <= 5) continue; // don't want player to control pets
+            if (team.id <= 5 && team != Team.derelict) continue; // don't want player to control pets
 
             float[] hsv1 = team.color.toHsv(new float[3]);
             float[] hsv2 = color.toHsv(new float[3]);
@@ -140,16 +141,8 @@ public class Pets implements MiniMod {
                         return;
                     }
 
-                    int tier = 0;
-                    if (pet.species == UnitTypes.quad || pet.species == UnitTypes.scepter || pet.species == UnitTypes.vela || pet.species == UnitTypes.arkyid) {
-                        tier = 4;
-                    } else if (pet.species == UnitTypes.fortress || pet.species == UnitTypes.quasar || pet.species == UnitTypes.spiroct || pet.species == UnitTypes.zenith || pet.species == UnitTypes.mega) {
-                        tier = 3;
-                    } else if (pet.species == UnitTypes.mace || pet.species == UnitTypes.pulsar || pet.species == UnitTypes.atrax || pet.species == UnitTypes.horizon || pet.species == UnitTypes.poly) {
-                        tier = 2;
-                    } else if (pet.species == UnitTypes.dagger || pet.species == UnitTypes.nova || pet.species == UnitTypes.crawler || pet.species == UnitTypes.flare || pet.species == UnitTypes.mono) {
-                        tier = 1;
-                    } else {
+                    int tier = tierOf(pet.species);
+                    if (tier < 0) {
                         ctx.error("Unsupport Species", "Species must be T1-4, not be a naval unit, and not be the antumbra");
                         return;
                     }
@@ -200,6 +193,35 @@ public class Pets implements MiniMod {
                 }
         );
 
+        handler.register("updatepet", "<color:rrggbbaa> <name...>",
+                data -> {
+                    data.help = "Update an existing pet";
+                    data.category = "Pets";
+                },
+                ctx -> {
+                    Database.Player pd = Database.getDiscordData(ctx.author().getId());
+                    if (pd == null) {
+                        ctx.error("Not in database", "You have not linked your discord account. Use /redeem to link.");
+                        return;
+                    }                    
+
+                    String name = ctx.args.get("name");
+                    var pets = PetDatabase.getPets(pd.uuid);
+                    var pet = Structs.find(pets, p -> p.name.equalsIgnoreCase(name));
+                    if (pet == null) {
+                        ctx.error("No such pet", "You don't have a pet named '" + name + "'");
+                        return;
+                    }
+
+                    pet.color = Color.valueOf(ctx.args.get("color:rrggbbaa"));
+                    if (pet.color == null) {
+                        pet.color = Color.black;
+                    }
+
+                    ctx.success("Successfully updated " + pet.name, "Changed their color to " + pet.color.toString());
+                }
+        );
+
         handler.register("removepet", "<name...>",
                 data -> {
                     data.help = "Remove a pet";
@@ -227,7 +249,7 @@ public class Pets implements MiniMod {
         );
     }
 
-    private int maxPets(int rank) {
+    protected static int maxPets(int rank) {
         if (rank <= 1) {
             return 0;
         } else if (rank == 2) {
@@ -239,7 +261,20 @@ public class Pets implements MiniMod {
         }
     }
 
-    private int maxTier(int rank) {
+    protected static int tierOf(UnitType type) {
+        if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela || type == UnitTypes.arkyid) {
+            return 4;
+        } else if (type == UnitTypes.fortress || type == UnitTypes.quasar || type == UnitTypes.spiroct || type == UnitTypes.zenith || type == UnitTypes.mega) {
+            return 3;
+        } else if (type == UnitTypes.mace || type == UnitTypes.pulsar || type == UnitTypes.atrax || type == UnitTypes.horizon || type == UnitTypes.poly) {
+            return 2;
+        } else if (type == UnitTypes.dagger || type == UnitTypes.nova || type == UnitTypes.crawler || type == UnitTypes.flare || type == UnitTypes.mono) {
+            return 1;
+        }
+        return -1;
+    }
+
+    protected static int maxTier(int rank) {
         if (rank <= 1) {
             return 0;
         } else if (rank <= 3) {
