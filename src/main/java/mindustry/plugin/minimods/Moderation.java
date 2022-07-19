@@ -215,6 +215,7 @@ public class Moderation implements MiniMod {
         handler.register("bans", "", 
                 data -> {
                     data.help = "List all bans";
+                    data.category = "Moderation";
                     data.roles = new long[] { Roles.ADMIN, Roles.MOD };
                 },
                 ctx -> {
