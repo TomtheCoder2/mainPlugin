@@ -8,6 +8,7 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.math.geom.Position;
 import arc.struct.IntSet;
+import arc.struct.ObjectSet;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Log;
@@ -30,14 +31,17 @@ import mindustry.plugin.utils.GameMsg;
 import mindustry.type.UnitType;
 
 public class Pets implements MiniMod {
+    ObjectSet<String> havePets = new ObjectSet<>();
+
     class PetController implements UnitController {
-        // TODO
-        Player player;
+        final String uuid;
+        final Player player;
+        final String name;
         Unit unit;
-        String name;
 
         public PetController(Player player, String name) {
             this.player = player;
+            this.uuid = player.uuid();
             this.name = name;
         }
 
@@ -51,20 +55,44 @@ public class Pets implements MiniMod {
             return unit;
         }
 
+        long prevTime = System.currentTimeMillis();
+
+        @Override
+        public void removed(Unit ignore) {
+            havePets.remove(uuid);
+        }
+
         @Override
         public void updateUnit() {
             if (unit == null) return;
             if (!Groups.player.contains(p -> p == player)) {
                 Call.unitDespawn(unit);
             }
-            unit.x(player.x);
-            unit.y(player.y);
+
+            long dt = System.currentTimeMillis() - prevTime;
+            prevTime += dt;
+
+            unit.health(1f);
+            unit.shield(1f);
+
+            double theta = player.angleTo(player.mouseX, player.mouseY) * (Math.PI/180);
+            float vx = (player.x - (float)(5*Math.cos(theta))) - unit.x;
+            float vy = (player.y - (float)(5*Math.sin(theta))) - unit.y;
+            if (vx*vx+vy*vy > unit.type.speed*unit.type.speed) {
+                float mul = unit.type.speed*unit.type.speed/(vx*vx+vy*vy);
+                vx *= mul;
+                vy *= mul;
+            }
+
+            unit.x += vx*(dt/1000.0f);
+            unit.y += vy*(dt/1000.0f);
+
             unit.elevation(1f);
 //            Call.label(name, 1f, unit.x, unit.y);
         }
     }
 
-    class PetTeam extends Team {
+    static class PetTeam extends Team {
         public PetTeam(int id, String name, Color color) {
             super(id, name, color);
         }
@@ -93,9 +121,13 @@ public class Pets implements MiniMod {
     @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("pet", "[name]", "Spawns a pet", (args, player) -> {
+            if (havePets.contains(player.uuid())) {
+                player.sendMessage(GameMsg.error("Pet", "You already have a pet spawned!"));
+            }
+
             var pets = PetDatabase.getPets(player.uuid());
             if (pets == null || pets.length == 9) {
-                player.sendMessage(GameMsg.error("Pet", "You have no pets!"));
+                player.sendMessage(GameMsg.error("Pet", "You didn't create any pets. Join our Discord to make a pet."));
             }
 
             var pet = pets[(int)(Math.random() * pets.length)];
@@ -110,7 +142,7 @@ public class Pets implements MiniMod {
         });
     }
 
-    public void spawnPet(PetDatabase.Pet pet, Player player) {
+    private void spawnPet(PetDatabase.Pet pet, Player player) {
         Unit unit = pet.species.spawn(player.team(), player.x, player.y);
         if (unit instanceof MechUnit) {
             MechUnit mechUnit = (MechUnit)unit;
