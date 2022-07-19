@@ -87,6 +87,7 @@ public class Pets implements MiniMod {
             // keep pet alive
             unit.health(unit.maxHealth);
             unit.shield(0);
+            unit.shieldAlpha = 0;
 
             // movement
             double theta = player.unit().rotation * (Math.PI/180);
