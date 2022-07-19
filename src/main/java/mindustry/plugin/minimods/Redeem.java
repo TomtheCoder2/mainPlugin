@@ -33,11 +33,9 @@ public class Redeem implements MiniMod {
             long discordId = keys.get(key).longValue();
             keys.remove(key);
 
-            Optional<Server> serverOpt = DiscordVars.api.getServers().stream().filter(s -> s.getMemberById(discordId).isPresent()).findAny();
-            if (!serverOpt.isPresent()) {
-                player.sendMessage(GameMsg.error("Redeem", "Player with id " + discordId + " could not be found."));
-            }
-            Server server = serverOpt.get();
+            // init discord stuff
+            Server server = DiscordVars.api.getServers().iterator().next();
+            var user = DiscordVars.api.getUserById(discordId).join();
 
             // update database
             Database.Player pd = Database.getPlayerData(player.uuid());
@@ -49,7 +47,6 @@ public class Redeem implements MiniMod {
 
             // update discord roles
             var updater = server.createUpdater();
-            User user = server.getMemberById(discordId).get();
             for (var entry : Rank.roles) {
                 long roleID = entry.key;
                 int rankIdx = entry.value;
