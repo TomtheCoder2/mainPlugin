@@ -32,10 +32,7 @@ public class Cooldowns {
         if (lastUsePlayer.get(cmd) == null) {
             return true;
         }
-        if (lastUsePlayer.get(cmd).longValue() > System.currentTimeMillis() - cooldownMillis) {
-            return false;
-        }
-        return true;
+        return lastUsePlayer.get(cmd).longValue() <= System.currentTimeMillis() - cooldownMillis;
     }
 
     /**

@@ -9,13 +9,11 @@ import arc.graphics.g2d.TextureAtlas.AtlasRegion;
 import arc.graphics.g2d.TextureAtlas.TextureAtlasData;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
-import arc.struct.Seq;
 import mindustry.Vars;
 import mindustry.core.ContentLoader;
 import mindustry.core.Version;
 import mindustry.ctype.Content;
 import mindustry.ctype.ContentType;
-import mindustry.entities.units.BuildPlan;
 import mindustry.game.Schematic;
 import mindustry.game.Schematics;
 import mindustry.world.Block;
@@ -26,7 +24,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 public class ContentHandler {
     public static final byte[] mapHeader = {77, 83, 65, 86};

@@ -19,7 +19,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import java.lang.reflect.Field;
 
 public class Weapon implements MiniMod {
-    private ObjectMap<String, WeaponData> weaponDatas = new ObjectMap<>();
+    private final ObjectMap<String, WeaponData> weaponDatas = new ObjectMap<>();
 
     @Override
     public void registerEvents() {

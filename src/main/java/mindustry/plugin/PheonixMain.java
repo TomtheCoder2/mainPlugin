@@ -130,10 +130,11 @@ public class PheonixMain extends Plugin {
             String dbURL = databaseData.getString("url");
             String dbUser = databaseData.getString("user");
             String dbPwd = databaseData.getString("password");
+            String tableName = databaseData.getString("table");
             System.out.printf("database url: %s, user: %s%n\n", dbURL, dbUser);
 
             try { // test connection
-                Database.connect(dbURL, dbUser, dbPwd);
+                Database.connect(dbURL, dbUser, dbPwd, tableName);
             } catch (Exception e) {
                 err(e.toString());
                 err("Could not login to PostgresSQL database!");
@@ -176,8 +177,8 @@ public class PheonixMain extends Plugin {
         FallbackLoggerConfiguration.setTrace(false);
 
         // Update discord status
-        Timer.schedule((Runnable)this::updateDiscordStatus, 0, 60);
-        
+        Timer.schedule(this::updateDiscordStatus, 0, 60);
+
         Events.on(EventType.ServerLoadEvent.class, event -> {
 //            contentHandler = new ContentHandler();
             Log.info("Everything's loaded !");

@@ -15,8 +15,8 @@ public class Inspector implements MiniMod {
     /**
      * Players with inspector enabled
      */
-    private ObjectSet<String> players = new ObjectSet<>();
-    private ObjectMap<Pos, TileInfo> tileInfos = new ObjectMap<>();
+    private final ObjectSet<String> players = new ObjectSet<>();
+    private final ObjectMap<Pos, TileInfo> tileInfos = new ObjectMap<>();
 
     @Override
     public void registerCommands(CommandHandler handler) {

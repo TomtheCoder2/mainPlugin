@@ -27,14 +27,15 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 public class Translate implements MiniMod {
-    private ObjectSet<String> langs = ObjectSet.with("en", "ar", "az", "zh", "cs", "da", "nl", "eo", "fi", "fr", "de", "el", "he", "hi", "hu", "id", "ga", "it", "ja", "ko", "fa", "pl", "pt", "ru", "sk", "es", "sv", "tr", "uk", "vi");
-    private ObjectMap<String, ObjectSet<String>> playerLangs = new ObjectMap<>();
+    private final ObjectSet<String> langs = ObjectSet.with("en", "ar", "az", "zh", "cs", "da", "nl", "eo", "fi", "fr", "de", "el", "he", "hi", "hu", "id", "ga", "it", "ja", "ko", "fa", "pl", "pt", "ru", "sk", "es", "sv", "tr", "uk", "vi");
+    private final ObjectMap<String, ObjectSet<String>> playerLangs = new ObjectMap<>();
 
     private TranslateThread thread;
 
@@ -282,7 +283,7 @@ class TranslateApi {
         String response = null;
         try {
             HttpRequest req = HttpRequest.newBuilder()
-                    .POST(BodyPublishers.ofString("q=" + URLEncoder.encode(text, "utf-8")))
+                    .POST(BodyPublishers.ofString("q=" + URLEncoder.encode(text, StandardCharsets.UTF_8)))
                     .uri(URI.create("https://" + server + "/detect"))
                     .setHeader("User-Agent", Config.serverName)
                     .setHeader("Content-Type", "application/x-www-form-urlencoded")

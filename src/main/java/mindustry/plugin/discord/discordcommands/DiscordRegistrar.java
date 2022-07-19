@@ -29,7 +29,7 @@ public class DiscordRegistrar {
     /**
      * Includes aliases
      */
-    private ObjectMap<String, CommandEntry> commands = new ObjectMap<>();
+    private final ObjectMap<String, CommandEntry> commands = new ObjectMap<>();
 
     public DiscordRegistrar(String prefix) {
         this.prefix = prefix;
@@ -74,7 +74,7 @@ public class DiscordRegistrar {
                 String argName = argStr.substring(1, argStr.length() - 1);
 
                 boolean ellipses = false;
-                if (argStr.substring(argStr.length() - 4, argStr.length() - 1).equals("...")) {
+                if (argStr.startsWith("...", argStr.length() - 4)) {
                     if (i != argList.length - 1) {
                         throw new IllegalArgumentException("Ellipses argument " + argStr + " must be final argument");
                     }

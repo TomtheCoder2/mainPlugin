@@ -12,12 +12,27 @@ import mindustry.plugin.utils.GameMsg;
  * Events functionality
  */
 public class Events implements MiniMod {
+    private static Events instance;
     private String eventIP = null;
     private int eventPort = 0;
 
-    private static Events instance;
     public Events() {
         instance = this;
+    }
+
+    /**
+     * Joins an event, if there is one.
+     *
+     * @param player the player that will join
+     * @return true if the join was successful, false if not
+     */
+    public static boolean join(Player player) {
+        if (instance.eventIP != null) {
+            Call.connect(player.con, instance.eventIP, instance.eventPort);
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -70,19 +85,5 @@ public class Events implements MiniMod {
                 player.sendMessage(GameMsg.error("Events", "There is no ongoing event at this time."));
             }
         });
-    }
-
-    /** Joins an event, if there is one.
-     * 
-     * @param player the player that will join
-     * @return true if the join was successful, false if not
-     */
-    public static boolean join(Player player) {
-        if (instance.eventIP != null) { 
-            Call.connect(player.con, instance.eventIP, instance.eventPort);
-            return true;
-        }
-
-        return false;
     }
 }

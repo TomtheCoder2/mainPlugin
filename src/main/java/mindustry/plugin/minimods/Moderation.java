@@ -33,8 +33,8 @@ import java.util.ArrayList;
  * Manages mutes, freezes, bans, and other moderation-related commands
  */
 public class Moderation implements MiniMod {
-    private ObjectSet<String> frozen = new ObjectSet<>();
-    private ObjectSet<String> muted = new ObjectSet<>();
+    private final ObjectSet<String> frozen = new ObjectSet<>();
+    private final ObjectSet<String> muted = new ObjectSet<>();
 
     @Override
     public void registerEvents() {
