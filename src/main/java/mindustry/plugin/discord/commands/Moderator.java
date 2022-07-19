@@ -139,43 +139,6 @@
 //                }
 //            });
 //
-//            handler.registerCommand(new RoleRestrictedCommand("changemap") {
-//                {
-//                    help = "Change the current map to the one provided.";
-//                    roles = new long[] { banRole };
-//                    usage = "<mapname/mapid>";
-//                    category = management;
-//                    minArguments = 1;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    if (ctx.args.length < 2) {
-//                        eb.setTitle("Command terminated.");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("Not enough arguments, use `%changemap <mapname|mapid>`".replace("%", ioMain.prefix));
-//                        ctx.sendMessage(eb);
-//                        return;
-//                    }
-//                    Map found = getMapBySelector(ctx.message.trim());
-//                    if (found == null) {
-//                        eb.setTitle("Command terminated.");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("Map \"" + escapeCharacters(ctx.message.trim()) + "\" not found!");
-//                        ctx.sendMessage(eb);
-//                        return;
-//                    }
-//
-//                    changeMap(found);
-//
-//                    eb.setTitle("Command executed.");
-//                    eb.setDescription("Changed map to " + found.name());
-//                    ctx.sendMessage(eb);
-//
-//                    maps.reload();
-//                }
-//            });
-//
 //            handler.registerCommand(new RoleRestrictedCommand("iplookup") {
 //                {
 //                    help = "Make an ip lookup of an ip";

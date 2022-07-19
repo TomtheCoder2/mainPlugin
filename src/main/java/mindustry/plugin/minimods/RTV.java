@@ -15,7 +15,10 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.plugin.MiniMod;
+import mindustry.plugin.discord.Roles;
+import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
+import mindustry.plugin.utils.Utils;
 import mindustry.server.ServerControl;
 
 public final class RTV implements MiniMod {
@@ -142,6 +145,26 @@ public final class RTV implements MiniMod {
 
             player.sendMessage(GameMsg.info("RTV", "[orange]" + session.map + "[lightgray] - [orange]" + session.votes.size + "[lightgray] / " + requiredVotes() + " votes"));
         });
+    }
+
+    @Override
+    public void registerDiscordCommands(DiscordRegistrar handler) {
+        handler.register("changemap", "<map...>", 
+            data -> {
+                data.help = "Change map to the one specified";
+                data.roles = new long [] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
+                data.category = "Management";
+            },
+            ctx -> {
+                Map map = Utils.getMapBySelector(ctx.args.get("map"));
+                if (map == null) {
+                    ctx.error("No such map", "Map '" + ctx.args.get("map")  + "' not found");
+                }
+
+                changeMap(map);
+                ctx.success("Changed map", "Forced game over and changed map to " + map.name());
+            }
+        );
     }
 
     private class Session {
