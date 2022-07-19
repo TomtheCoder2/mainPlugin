@@ -18,7 +18,7 @@ public class Redeem implements MiniMod {
     /**
      * Map of key => discord ID
      */
-    private ObjectMap<String, Long> keys;
+    private ObjectMap<String, Long> keys = new ObjectMap<>();
 
     @Override
     public void registerCommands(CommandHandler handler) {
