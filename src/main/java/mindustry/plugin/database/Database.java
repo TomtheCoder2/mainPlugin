@@ -5,28 +5,25 @@ import arc.util.Log;
 import mindustry.plugin.utils.Utils;
 
 import java.sql.*;
-import java.util.*;
-
-import javax.naming.spi.DirStateFactory.Result;
 
 public final class Database {
     /**
      * SQL connection. Should never be null after initialization.
      */
     public static Connection conn;
-    public static String tableName;
+    private static String playerTable;
 
     /**
      * Connect to the PostgreSQL Server
      */
-    public static void connect(String url, String user, String password, String tableNameIn) throws SQLException {
+    public static void connect(String url, String user, String password, String playerTable) throws SQLException {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (Exception e) {
             e.printStackTrace();
         }
         conn = DriverManager.getConnection(url, user, password);
-        tableName = tableNameIn;
+        Database.playerTable = playerTable;
     }
 
     /**
@@ -37,7 +34,7 @@ public final class Database {
     public static Player getPlayerData(String uuid) {
         // search for the uuid
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink "
-                + "FROM " + tableName + " "
+                + "FROM " + playerTable + " "
                 + "WHERE uuid = ?";
         try {
             Log.debug("get player data of @, conn: @", uuid, conn.isClosed());
@@ -65,7 +62,7 @@ public final class Database {
      */
     public static Player getDiscordData(long id) {
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink"
-                + " FROM " + tableName + " "
+                + " FROM " + playerTable + " "
                 + "WHERE discordLink = ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -112,7 +109,7 @@ public final class Database {
     public static void setPlayerData(Player pd) {
         if (getPlayerData(pd.uuid) == null) {
             // define all variables
-            String sql = "INSERT INTO " + tableName + "(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink) "
+            String sql = "INSERT INTO " + playerTable + "(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink) "
                     + "VALUES(?, ?,?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -135,7 +132,7 @@ public final class Database {
                 Log.err(ex.getMessage());
             }
         } else {
-            String sql = "UPDATE " + tableName + " "
+            String sql = "UPDATE " + playerTable + " "
                     + "SET rank = ?, "
                     + "playTime = ?, "
                     + "buildingsBuilt = ?, "
@@ -177,7 +174,7 @@ public final class Database {
     public static PlayerRank[] rankPlayers(int limit, String column, int offset) {
         if (!column.matches("[A-Za-z0-9]+")) return null;
         String sql = "SELECT uuid, " + column + " " +
-                "FROM " + tableName + " " +
+                "FROM " + playerTable + " " +
                 "ORDER BY " + column + " DESC LIMIT ? OFFSET ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);

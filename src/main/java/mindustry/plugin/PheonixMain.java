@@ -130,11 +130,12 @@ public class PheonixMain extends Plugin {
             String dbURL = databaseData.getString("url");
             String dbUser = databaseData.getString("user");
             String dbPwd = databaseData.getString("password");
-            String tableName = databaseData.getString("table");
+            String playerTable = databaseData.getString("table_player");
+
             System.out.printf("database url: %s, user: %s%n\n", dbURL, dbUser);
 
             try { // test connection
-                Database.connect(dbURL, dbUser, dbPwd, tableName);
+                Database.connect(dbURL, dbUser, dbPwd, playerTable);
             } catch (Exception e) {
                 err(e.toString());
                 err("Could not login to PostgresSQL database!");
