@@ -37,6 +37,16 @@ public class Redeem implements MiniMod {
             Server server = DiscordVars.api.getServers().iterator().next();
             var user = DiscordVars.api.getUserById(discordId).join();
 
+            // remove previous links to discord acc
+            Database.Player prevPd;
+            do {
+                prevPd = Database.getDiscordData(discordId);
+                if (prevPd != null) {
+                    prevPd.discord = 0;
+                    Database.setPlayerData(prevPd);
+                }
+            } while (prevPd != null);
+
             // update database
             Database.Player pd = Database.getPlayerData(player.uuid());
             if (pd == null) {
