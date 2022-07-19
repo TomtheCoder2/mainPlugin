@@ -10,6 +10,7 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
+import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
@@ -38,7 +39,7 @@ public class Weapon implements MiniMod {
         handler.register("weapon", "<player> <bullet> [damage] [lifetime] [velocity]",
                 data -> {
                     data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
-                    data.category = "Moderation";
+                    data.category = "Cheats";
                     data.help = "Modify the specified player's weapon.";
                 },
                 ctx -> {
@@ -78,6 +79,8 @@ public class Weapon implements MiniMod {
                             .addInlineField("Type", ctx.args.get("bullet"))
                             .setColor(DiscordPalette.SUCCESS)
                     );
+
+                    DiscordLog.cheat("Weapon", ctx.author(), "Player: " + Utils.escapeEverything(player.name()) + "\nDamage: " + dmg + "\nLife: " + life + "\nVelocity: " +vel +"\nType: " + ctx.args.get("bullet"));
                 }
         );
     }
