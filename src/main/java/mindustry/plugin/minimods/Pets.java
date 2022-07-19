@@ -65,6 +65,7 @@ public class Pets implements MiniMod {
             var pets = PetDatabase.getPets(player.uuid());
             if (pets == null || pets.length == 9) {
                 player.sendMessage(GameMsg.error("Pet", "You didn't create any pets. Join our Discord to make a pet."));
+                return;
             }
 
             var pet = pets[(int) (Math.random() * pets.length)];
