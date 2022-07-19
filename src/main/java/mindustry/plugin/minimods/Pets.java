@@ -29,7 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Pets implements MiniMod {
-    ObjectSet<String> havePets = new ObjectSet<>();
+    ObjectSet<String> spawnedPets = new ObjectSet<String>();
 
     /**
      * Creates a team if one does not already exist
@@ -57,23 +57,22 @@ public class Pets implements MiniMod {
 
     @Override
     public void registerCommands(CommandHandler handler) {
-        handler.<Player>register("pet", "[name...]", "Spawns a pet", (args, player) -> {
-            if (havePets.contains(player.uuid())) {
-                player.sendMessage(GameMsg.error("Pet", "You already have a pet spawned!"));
-            }
-
+        handler.<Player>register("pet", "<name...>", "Spawns a pet", (args, player) -> {
             var pets = PetDatabase.getPets(player.uuid());
             if (pets == null || pets.length == 0) {
                 player.sendMessage(GameMsg.error("Pet", "You didn't create any pets. Join our Discord to make a pet."));
                 return;
             }
 
-            var pet = pets[(int) (Math.random() * pets.length)];
-            if (args.length != 0) {
-                pet = Structs.find(pets, p -> p.name.equalsIgnoreCase(args[0]));
-                if (pet == null) {
-                    player.sendMessage(GameMsg.error("Pet", "Pet '" + args[0] + "' doesn't exist"));
-                }
+            var pet = Structs.find(pets, p -> p.name.equalsIgnoreCase(args[0]));
+            if (pet == null) {
+                player.sendMessage(GameMsg.error("Pet", "Pet '" + args[0] + "' doesn't exist"));
+                return;
+            }
+
+            if (spawnedPets.contains(player.uuid() + "|" + pet.name)) {
+                player.sendMessage(GameMsg.error("Pet", "Pet '" + args[0] + "' is already spawned!"));
+                return;
             }
 
             spawnPet(pet, player);
@@ -325,7 +324,7 @@ public class Pets implements MiniMod {
 
         @Override
         public void removed(Unit ignore) {
-            havePets.remove(uuid);
+            spawnedPets.remove(uuid + "|" + name);
         }
 
         @Override
@@ -343,6 +342,7 @@ public class Pets implements MiniMod {
             unit.health(unit.maxHealth);
             unit.shield(0);
             unit.shieldAlpha = 0;
+            unit.armor(1000f);
 
             // movement
             double theta = player.unit().rotation * (Math.PI / 180);
