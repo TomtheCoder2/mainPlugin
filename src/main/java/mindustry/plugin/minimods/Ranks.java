@@ -14,6 +14,7 @@ import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.DiscordPalette;
+import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
@@ -352,6 +353,43 @@ public class Ranks implements MiniMod {
                             .setTitle("Map Ranking")
                             .setDescription(table)
                     );
+                }
+        );
+
+        handler.register("setrank", "<player> <rank>", 
+                data -> {
+                    data.help = "Set a player's in-game rank";
+                    data.roles = new long[] { Roles.MOD, Roles.ADMIN, Roles.APPRENTICE };
+                    data.category = "Management";
+                },
+                ctx -> {
+                    Player target = Utils.findPlayer(ctx.args.get("player"));
+                    if (target == null) {
+                        ctx.error("Player not found", ctx.args.get("player") + " is not online");
+                        return;
+                    }
+
+                    String rankQuery = ctx.args.get("rank");
+                    int rank = -1;
+                    for (int i =0 ; i < Rank.all.length; i++) {
+                        if (Integer.toString(i).equals(rankQuery) || Rank.all[i].name.equalsIgnoreCase(rankQuery)) {
+                            rank = i;
+                        }
+                    }
+                    if (rank == -1) {
+                        ctx.error("Invalid rank", rankQuery + " is not a valid rank");
+                        return;
+                    }
+
+                    var pd = Database.getPlayerData(target.uuid());
+                    if (pd == null) {
+                        pd = new Database.Player(target.uuid(), rank);
+                    }
+                    pd.rank = rank;
+                    Database.setPlayerData(pd);
+
+                    target.name = Rank.all[rank].tag + "[#" + Rank.all[rank].color.toString().substring(0,6) + "]" +  Utils.escapeEverything(target);
+                    ctx.success("Rank set", Utils.escapeEverything(target) + "'s rank is now set to " + Rank.all[rank].name);
                 }
         );
 
