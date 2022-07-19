@@ -14,7 +14,7 @@ public final class Database {
     /**
      * SQL connection. Should never be null after initialization.
      */
-    private static Connection conn;
+    public static Connection conn;
 
     /**
      * Connect to the PostgreSQL Server

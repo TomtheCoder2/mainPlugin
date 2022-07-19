@@ -85,6 +85,7 @@ public class Logs implements MiniMod {
                     usedSlurs.add(slur);
                 }
             }
+            if (usedSlurs.size ==0 ) return;
             
             Channels.LOG.sendMessage(new EmbedBuilder()
                 .setColor(DiscordPalette.WARN)

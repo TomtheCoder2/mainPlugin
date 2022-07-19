@@ -137,7 +137,7 @@ public class Ranks implements MiniMod {
                         pd = new Database.Player(player.uuid(), 0);
                     }
                     pd.playTime += elapsedTimeMin;
-                    pd.buildingsBuilt += buildingsBuiltCache.get(player.uuid());
+                    pd.buildingsBuilt += buildingsBuiltCache.get(player.uuid(), 0);
                     Database.setPlayerData(pd);
                 }
 
