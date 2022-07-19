@@ -1,7 +1,6 @@
 package mindustry.plugin.discord;
 
 import arc.struct.StringMap;
-import arc.util.Structs;
 import mindustry.gen.Groups;
 import mindustry.net.Administration;
 import mindustry.plugin.database.Database;
@@ -12,14 +11,11 @@ import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
-import org.springframework.context.annotation.Description;
-import org.springframework.data.util.ReflectionUtils.DescribedFieldFilter;
 
 import java.awt.*;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class DiscordLog {
@@ -42,14 +38,16 @@ public class DiscordLog {
         Channels.ERROR_LOG.sendMessage(eb);
     }
 
-    /** Log a cheat */
+    /**
+     * Log a cheat
+     */
     public static void cheat(String action, User mod, String information) {
         EmbedBuilder eb = new EmbedBuilder()
-            .setColor(DiscordPalette.INFO)
-            .addInlineField("Moderator", "<@" + mod.getId() + ">")
-            .addInlineField("Players", StreamSupport.stream(Groups.player.spliterator(), false)
-                .map(p -> Utils.escapeEverything(p.name()) + " `" + p.uuid() + "`")
-                .collect(Collectors.joining("\n")));
+                .setColor(DiscordPalette.INFO)
+                .addInlineField("Moderator", "<@" + mod.getId() + ">")
+                .addInlineField("Players", StreamSupport.stream(Groups.player.spliterator(), false)
+                        .map(p -> Utils.escapeEverything(p.name()) + " `" + p.uuid() + "`")
+                        .collect(Collectors.joining("\n")));
         if (information != null) {
             eb.addField("Additional Information", information);
         }

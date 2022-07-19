@@ -48,7 +48,7 @@ public class Kick implements MiniMod {
     /**
      * Timestamp of end of previous vote, in milliseconds
      */
-    private long previousVoteTime = 0;
+    private final long previousVoteTime = 0;
     private VoteSession session;
 
     /**
@@ -308,7 +308,7 @@ public class Kick implements MiniMod {
         }
 
         public static class Task extends Timer.Task {
-            private VoteSession session;
+            private final VoteSession session;
 
             public Task(VoteSession session) {
                 this.session = session;

@@ -10,18 +10,17 @@ import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
-
-import java.util.Optional;
-
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
+
+import java.util.Optional;
 
 public class Redeem implements MiniMod {
     /**
      * Map of key => discord ID
      */
-    private ObjectMap<String, Long> keys = new ObjectMap<>();
+    private final ObjectMap<String, Long> keys = new ObjectMap<>();
 
     @Override
     public void registerCommands(CommandHandler handler) {

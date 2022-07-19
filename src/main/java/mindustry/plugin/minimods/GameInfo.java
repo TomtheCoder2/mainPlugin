@@ -1,6 +1,7 @@
 package mindustry.plugin.minimods;
 
 import arc.Core;
+import arc.Events;
 import arc.files.Fi;
 import arc.struct.Seq;
 import arc.util.Log;
@@ -27,10 +28,10 @@ import mindustry.world.modules.ItemModule;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
-import arc.Events;
-
 import java.lang.reflect.Field;
 import java.time.Instant;
+
+import static mindustry.plugin.utils.Utils.escapeEverything;
 
 /**
  * Provides information relating to the current game.
@@ -105,7 +106,7 @@ public class GameInfo implements MiniMod {
                     eb.setTitle("Players: " + Groups.player.size());
                     String desc = "```\n";
                     for (Player p : Groups.player) {
-                        desc += String.format("%-9d : %s", p.id(), p.name());
+                        desc += String.format("%-9d : %s", p.id(), escapeEverything(p.name()));
                         if (p.admin) {
                             desc += " (admin)";
                         }
@@ -163,7 +164,7 @@ public class GameInfo implements MiniMod {
                             .setColor(DiscordPalette.INFO);
 
                     Fi tempDir = new Fi("temp/");
-                    Fi mapFile = tempDir.child(Config.serverName + "_" + Utils.escapeEverything(Vars.state.map.name()).replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msav");
+                    Fi mapFile = tempDir.child(Config.serverName + "_" + escapeEverything(Vars.state.map.name()).replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msav");
                     Core.app.post(() -> {
                         try {
                             SaveIO.write(mapFile);

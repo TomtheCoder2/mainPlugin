@@ -11,7 +11,6 @@ import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
-import mindustry.net.Administration;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.DiscordPalette;
@@ -20,10 +19,9 @@ import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.ui.Menus;
 import mindustry.world.Block;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.util.Arrays;
-
-import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
@@ -52,7 +50,7 @@ public class Ranks implements MiniMod {
     /**
      * Number of buildings built that have not been stored to the database.
      */
-    private ObjectMap<String, Integer> buildingsBuiltCache = new ObjectMap<>();
+    private final ObjectMap<String, Integer> buildingsBuiltCache = new ObjectMap<>();
     private long mapStartTime = System.currentTimeMillis();
 
     @Override
@@ -129,7 +127,7 @@ public class Ranks implements MiniMod {
 
             @Override
             public void run() {
-                int elapsedTimeMin = (int) Math.round((System.currentTimeMillis() - timeStart) / 1000) / 60;
+                int elapsedTimeMin = Math.round((System.currentTimeMillis() - timeStart) / 1000) / 60;
 
                 for (Player player : Groups.player) {
                     Database.Player pd = Database.getPlayerData(player.uuid());
@@ -235,7 +233,7 @@ public class Ranks implements MiniMod {
                 Rank rank = Rank.all[i];
                 sb.append(rank.tag)
                         .append(" [#")
-                        .append(rank.color.toString().substring(0, 6))
+                        .append(rank.color.toString(), 0, 6)
                         .append("]")
                         .append(rank.name)
                         .append("\n");
@@ -247,7 +245,7 @@ public class Ranks implements MiniMod {
             StringBuilder sb = new StringBuilder("[accent]List of all requirements:\n");
             for (int i = 0; i < Rank.all.length; i++) {
                 Rank rank = Rank.all[i];
-                sb.append("[#").append(rank.color.toString().substring(0, 6)).append("]")
+                sb.append("[#").append(rank.color.toString(), 0, 6).append("]")
                         .append(rank.name).append(" ");
                 if (rank.requirements != null) {
                     sb.append("[] : [orange]").append(rank.requirements).append("\n");
@@ -285,65 +283,76 @@ public class Ranks implements MiniMod {
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("ranking", "<playtime|gamesplayed|buildingsbuilt> [offset]", 
-            data -> {
-                data.help = "Returns a ranking of players.";
-            },
-            ctx -> {
-                String column = ctx.args.get("playtime|gamesplayed|buildingsbuilt");
-                int offset = ctx.args.getInt("offset", 0);
-                Database.PlayerRank[] ranking = Database.rankPlayers(10, column, offset);
-                if (ranking == null || ranking.length == 0) {
-                    ctx.error("No players found", "Make sure the stat is valid.");
-                    return;
-                }
-
-                String table = "```\n";
-                table += String.format("%3s %-20s %-10s\n", "", "Player", column);
-                for (int i = 0; i < ranking.length; i++) {
-                    var info = Vars.netServer.admins.getInfoOptional(ranking[i].uuid);
-                    String name = "<unknown>";
-                    if (info != null) {
-                        name = escapeEverything(info.lastName);
+        handler.register("ranking", "<playtime|gamesplayed|buildingsbuilt> [offset]",
+                data -> {
+                    data.help = "Returns a ranking of players.";
+                },
+                ctx -> {
+                    String column = ctx.args.get("playtime|gamesplayed|buildingsbuilt");
+                    switch (column) {
+                        case "p" -> {
+                            column = "playtime";
+                        }
+                        case "g" -> {
+                            column = "gamesplayed";
+                        }
+                        case "b" -> {
+                            column = "buildingsbuilt";
+                        }
                     }
-                    table += String.format("%3s %-20s %-10s\n", offset+i+1, name, ranking[i].stat);
-                }
-                table += "```";
+                    int offset = ctx.args.getInt("offset", 0);
+                    Database.PlayerRank[] ranking = Database.rankPlayers(10, column, offset);
+                    if (ranking == null || ranking.length == 0) {
+                        ctx.error("No players found", "Make sure the stat is valid.");
+                        return;
+                    }
 
-                ctx.sendEmbed(new EmbedBuilder()
-                    .setColor(DiscordPalette.INFO)
-                    .setTitle("Player Ranking")
-                    .setDescription(table)
-                );
-            }
+                    String table = "```\n";
+                    table += String.format("%3s %-20s %-10s\n", "", "Player", column);
+                    for (int i = 0; i < ranking.length; i++) {
+                        var info = Vars.netServer.admins.getInfoOptional(ranking[i].uuid);
+                        String name = "<unknown>";
+                        if (info != null) {
+                            name = escapeEverything(info.lastName);
+                        }
+                        table += String.format("%3s %-20s %-10s\n", offset + i + 1, name, ranking[i].stat);
+                    }
+                    table += "```";
+
+                    ctx.sendEmbed(new EmbedBuilder()
+                            .setColor(DiscordPalette.INFO)
+                            .setTitle("Player Ranking")
+                            .setDescription(table)
+                    );
+                }
         );
 
-        handler.register("mapranking", "<positiverating|negativerating|highscorewaves|playtime> [offset]", 
-            data -> {
-                data.help = "Returns a ranking of maps";
-            },
-            ctx -> {
-                String column = ctx.args.get("positiverating|negativerating|highscorewaves|playtime");
-                int offset = ctx.args.getInt("offset", 0);
-                Database.MapRank[] ranking = Database.rankMaps(10, column, offset);
-                if (ranking == null || ranking.length == 0) {
-                    ctx.error("No maps found", "Make sure the stat is valid.");
-                    return;
-                }
+        handler.register("mapranking", "<positiverating|negativerating|highscorewaves|playtime> [offset]",
+                data -> {
+                    data.help = "Returns a ranking of maps";
+                },
+                ctx -> {
+                    String column = ctx.args.get("positiverating|negativerating|highscorewaves|playtime");
+                    int offset = ctx.args.getInt("offset", 0);
+                    Database.MapRank[] ranking = Database.rankMaps(10, column, offset);
+                    if (ranking == null || ranking.length == 0) {
+                        ctx.error("No maps found", "Make sure the stat is valid.");
+                        return;
+                    }
 
-                String table = "```\n";
-                table += String.format("%3s %-30s %-10s\n", "", "Map", column);
-                for (int i = 0; i < ranking.length; i++) {
-                    table += String.format("%3s %-30s %-10s\n", offset+i+1, Utils.escapeColorCodes(ranking[i].name), ranking[i].stat);
-                }
-                table += "```";
+                    String table = "```\n";
+                    table += String.format("%3s %-30s %-10s\n", "", "Map", column);
+                    for (int i = 0; i < ranking.length; i++) {
+                        table += String.format("%3s %-30s %-10s\n", offset + i + 1, Utils.escapeColorCodes(ranking[i].name), ranking[i].stat);
+                    }
+                    table += "```";
 
-                ctx.sendEmbed(new EmbedBuilder()
-                    .setColor(DiscordPalette.INFO)
-                    .setTitle("Map Ranking")
-                    .setDescription(table)
-                );
-            }
+                    ctx.sendEmbed(new EmbedBuilder()
+                            .setColor(DiscordPalette.INFO)
+                            .setTitle("Map Ranking")
+                            .setDescription(table)
+                    );
+                }
         );
 
     }

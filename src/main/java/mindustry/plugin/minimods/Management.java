@@ -92,7 +92,7 @@ public class Management implements MiniMod {
                 EmbedBuilder eb = new EmbedBuilder();
                 eb.setTitle("All Config Values");
                 for (Administration.Config c : Administration.Config.all) {
-                    eb.addField(c.name() + ": " + c.get(), c.description, true);
+                    eb.addField(c.name + ": " + c.get(), c.description, true);
                 }
                 eb.setColor(Color.CYAN);
                 ctx.sendEmbed(eb);
@@ -100,9 +100,9 @@ public class Management implements MiniMod {
             }
 
             try {
-                Administration.Config c = Administration.Config.valueOf(ctx.args.get("name"));
+                Administration.Config c = Administration.Config.all.find(conf -> conf.name.equalsIgnoreCase(ctx.args.get("name")));
                 if (!ctx.args.containsKey("value")) {
-                    ctx.sendEmbed(Color.CYAN, "Configuration", c.name() + " is currently <" + c.getClass().getName() + "> " + c.get());
+                    ctx.sendEmbed(Color.CYAN, "Configuration", c.name + " is currently <" + c.getClass().getName() + "> " + c.get());
                     return;
                 }
 
@@ -116,7 +116,7 @@ public class Management implements MiniMod {
                     c.set(ctx.args.get("value").replace("\\n", "\n"));
                 }
 
-                ctx.sendEmbed(Color.CYAN, "Configuration", c.name() + " is now set to <" + c.getClass().getName() + "> " + c.get() + "\n\nPrevious Value: " + previousValue);
+                ctx.sendEmbed(Color.CYAN, "Configuration", c.name + " is now set to <" + c.getClass().getName() + "> " + c.get() + "\n\nPrevious Value: " + previousValue);
             } catch (IllegalArgumentException e) {
                 ctx.error("Unknown Configuration", e.getMessage());
             }

@@ -2,7 +2,6 @@ package mindustry.plugin.database;
 
 import arc.struct.Seq;
 import arc.util.Log;
-import mindustry.gen.Player;
 import mindustry.plugin.utils.Utils;
 
 import java.sql.*;
@@ -15,17 +14,19 @@ public final class Database {
      * SQL connection. Should never be null after initialization.
      */
     public static Connection conn;
+    public static String tableName;
 
     /**
      * Connect to the PostgreSQL Server
      */
-    public static void connect(String url, String user, String password) throws SQLException {
+    public static void connect(String url, String user, String password, String tableNameIn) throws SQLException {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (Exception e) {
             e.printStackTrace();
         }
         conn = DriverManager.getConnection(url, user, password);
+        tableName = tableNameIn;
     }
 
     /**
@@ -36,7 +37,7 @@ public final class Database {
     public static Player getPlayerData(String uuid) {
         // search for the uuid
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink "
-                + "FROM playerdata "
+                + "FROM " + tableName + " "
                 + "WHERE uuid = ?";
         try {
             Log.debug("get player data of @, conn: @", uuid, conn.isClosed());
@@ -64,7 +65,7 @@ public final class Database {
      */
     public static Player getDiscordData(long id) {
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink"
-                + " FROM playerdata "
+                + " FROM " + tableName + " "
                 + "WHERE discordLink = ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -92,7 +93,7 @@ public final class Database {
     public static void setPlayerData(Player pd) {
         if (getPlayerData(pd.uuid) == null) {
             // define all variables
-            String sql = "INSERT INTO playerdata(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink) "
+            String sql = "INSERT INTO " + tableName + "(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink) "
                     + "VALUES(?, ?,?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -115,7 +116,7 @@ public final class Database {
                 Log.err(ex.getMessage());
             }
         } else {
-            String sql = "UPDATE playerdata "
+            String sql = "UPDATE " + tableName + " "
                     + "SET rank = ?, "
                     + "playTime = ?, "
                     + "buildingsBuilt = ?, "
@@ -157,7 +158,7 @@ public final class Database {
     public static PlayerRank[] rankPlayers(int limit, String column, int offset) {
         if (!column.matches("[A-Za-z0-9]+")) return null;
         String sql = "SELECT uuid, " + column + " " +
-                "FROM playerdata " +
+                "FROM " + tableName + " " +
                 "ORDER BY " + column + " DESC LIMIT ? OFFSET ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -179,6 +180,7 @@ public final class Database {
 
         return null;
     }
+
     public static List<Map> rankMaps2() {
         HashMap<Pair, Map> maps = new HashMap<>();
         String sql = "SELECT * FROM mapdata;";
@@ -428,10 +430,6 @@ public final class Database {
             this.name = name;
         }
 
-        public int diff() {
-            return positiveRating - negativeRating;
-        }
-
         public static Map fromSQL(ResultSet rs) throws SQLException {
             Map md = new Map(rs.getString("name"));
             md.positiveRating = rs.getInt("positiverating");
@@ -441,6 +439,10 @@ public final class Database {
             md.playTime = rs.getLong("playtime");
             md.shortestGame = rs.getLong("shortestGame");
             return md;
+        }
+
+        public int diff() {
+            return positiveRating - negativeRating;
         }
 
         public Object clone() throws CloneNotSupportedException {

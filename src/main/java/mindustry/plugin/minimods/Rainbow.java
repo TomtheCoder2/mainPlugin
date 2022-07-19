@@ -90,7 +90,7 @@ public class Rainbow implements MiniMod {
                         // update rainbow (SINGULAR)
                         rainbowData.hue += rainbowData.speed;
                         rainbowData.hue = rainbowData.hue % 360;
-                        String hex = "#" + Color.HSVtoRGB(rainbowData.hue, 100, 100).toString();
+                        String hex = "#" + Color.HSVtoRGB(rainbowData.hue, 100, 100);
 
                         hex = hex.substring(0, hex.length() - 2);
                         if (rank < Rank.all.length && rank >= 0) { // this should never be false
