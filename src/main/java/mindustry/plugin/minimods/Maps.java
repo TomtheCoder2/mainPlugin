@@ -155,7 +155,7 @@ public class Maps implements MiniMod {
                     ctx.sendEmbed(eb);
                     eb = new EmbedBuilder().setTitle("Ranking");
                     StringBuilder sb = new StringBuilder();
-                    List<Database.Map> maps = Database.rankMaps2();
+                    var maps = Database.rankMapRatings(100, 0);
                     int c = 1;
                     for (Database.Map m : maps) {
                         if (!mapNames.contains(escapeEverything(m.name))) continue;
