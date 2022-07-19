@@ -48,7 +48,7 @@ public class Utils {
     public static String ruleMessage = "";
     // whether ip verification is in place (detect VPNs, disallow their build rights)
     public static Boolean verification = false;
-    public static Seq<String> bannedNames = new Seq<>();
+    public static ArrayList<String> bannedNames = new ArrayList<>();
     public static Pattern ipValidationPattern;
 
     public static void init() {

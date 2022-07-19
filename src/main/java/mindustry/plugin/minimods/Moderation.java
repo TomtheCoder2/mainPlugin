@@ -1,5 +1,6 @@
 package mindustry.plugin.minimods;
 
+import arc.Core;
 import arc.Events;
 import arc.struct.ObjectSet;
 import arc.util.CommandHandler;
@@ -25,6 +26,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;
 import java.time.Instant;
+import java.util.ArrayList;
 
 
 /**
@@ -81,6 +83,22 @@ public class Moderation implements MiniMod {
                     Call.infoMessage(player.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" +
                             "[lightgray]" + (ctx.args.containsKey("reason") ? "Reason: [accent]" + ctx.args.get("reason") : ""));
 
+                }
+        );
+
+        handler.register("banword", "[add/remove] [word]",
+                data -> {
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
+                    data.help = "Ban a bad word.";
+                    data.category = "Moderation";
+                },
+                ctx -> {
+                    ArrayList<String> bannedWords = (ArrayList<String>) Core.settings.get("bannedWords", ArrayList.class);
+                    if (ctx.args.size > 2) {
+                        switch (ctx.args.get("add/remove")) {
+                            // TODO: maybe make database idk
+                        }
+                    }
                 }
         );
 

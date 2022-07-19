@@ -202,25 +202,25 @@ public class ContentHandler {
         return Schematics.readBase64(text);
     }
 
-    public BufferedImage previewSchematic(Schematic schem) throws Exception {
-        if (schem.width > 256 || schem.height > 256) throw new IOException("Schematic cannot be larger than 64x64.");
-        BufferedImage image = new BufferedImage(schem.width * 32, schem.height * 32, BufferedImage.TYPE_INT_ARGB);
-
-        Draw.reset();
-        Seq<BuildPlan> requests = schem.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
-        currentGraphics = image.createGraphics();
-        currentImage = image;
-        requests.each(req -> {
-            req.animScale = 1f;
-            req.worldContext = false;
-            req.block.drawRequestRegion(req, requests);
-            Draw.reset();
-        });
-
-        requests.each(req -> req.block.drawRequestConfigTop(req, requests));
-
-        return image;
-    }
+//    public BufferedImage previewSchematic(Schematic schem) throws Exception {
+//        if (schem.width > 256 || schem.height > 256) throw new IOException("Schematic cannot be larger than 64x64.");
+//        BufferedImage image = new BufferedImage(schem.width * 32, schem.height * 32, BufferedImage.TYPE_INT_ARGB);
+//
+//        Draw.reset();
+//        Seq<BuildPlan> requests = schem.tiles.map(t -> new BuildPlan(t.x, t.y, t.rotation, t.block, t.config));
+//        currentGraphics = image.createGraphics();
+//        currentImage = image;
+//        requests.each(req -> {
+//            req.animScale = 1f;
+//            req.worldContext = false;
+//            req.block.drawRequestRegion(req, requests);
+//            Draw.reset();
+//        });
+//
+//        requests.each(req -> req.block.drawRequestConfigTop(req, requests));
+//
+//        return image;
+//    }
 
 //    public Map readMap(InputStream is) throws IOException {
 //        try (InputStream ifs = new InflaterInputStream(is); CounterInputStream counter = new CounterInputStream(ifs); DataInputStream stream = new DataInputStream(counter)) {
