@@ -3,8 +3,10 @@ package mindustry.plugin.minimods;
 import arc.Core;
 import arc.Events;
 import arc.struct.ObjectSet;
+import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Strings;
+import arc.util.Structs;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
@@ -207,6 +209,56 @@ public class Moderation implements MiniMod {
 
                     Database.setPlayerData(pd);
                     ctx.success("Unbanned " + Utils.escapeEverything(info.lastName), "Previous ban reason: " +banReason);
+                }
+        );
+
+        handler.register("bans", "", 
+                data -> {
+                    data.help = "List all bans";
+                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                },
+                ctx -> {
+                    EmbedBuilder eb = new EmbedBuilder()
+                        .setTitle("Banned players")
+                        .setColor(DiscordPalette.INFO);
+
+                    var bans = Vars.netServer.admins.getBanned();
+                    String s = bans.toString("\n", i -> "`" + i.id + "` | " + Utils.escapeEverything(i.lastName));
+                    eb.addField("Vars.net UUID bans", s.length() == 0 ? "None" : s);
+
+                    var ipBans = Vars.netServer.admins.getBannedIPs();
+                    s = ipBans.toString("\n", ip -> {
+                        var info = Vars.netServer.admins.findByIP(ip);
+                        if (info != null) {
+                            return "`" + ip + "` | uuid `" + info.id + "` | " + Utils.escapeEverything(info.lastName);
+                        } else {
+                            return "`" + ip + "`";
+                        }
+                    });
+                    eb.addField("Vars.net ID bans", s.length() == 0 ? "None" : s);
+
+                    var subnetBans = Vars.netServer.admins.subnetBans;
+                    s = subnetBans.toString("\n", subnet -> {
+                        return "`" + subnet + "`";
+                    });
+                    eb.addField("Vars.net subnet bans", s.length() == 0 ? "None": s);
+
+                    var dbBans = Database.bans();
+                    if (dbBans == null) {
+                        ctx.error("Internal Database Error", "Could not query database bans");
+                    } else {
+                        s = Seq.with(dbBans).toString("\n", p -> {
+                            var info = Vars.netServer.admins.getInfo(p.uuid);
+                            if (info == null) {
+                                return "`" + p.uuid + "`";
+                            } else {
+                                return "`" + p.uuid + "` | " + Utils.escapeEverything(info.lastName);
+                            }
+                        });
+                        eb.addField("Database bans", s.length() == 0 ? "None" :s);
+                    }
+
+                    ctx.sendEmbed(eb);
                 }
         );
 

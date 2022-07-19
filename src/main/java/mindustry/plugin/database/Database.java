@@ -86,6 +86,25 @@ public final class Database {
     }
 
     /**
+     * Retrieves all players that are banned in any way
+     */
+    public static Player[] bans() {
+        String sql = "SELECT * FROM playerdata WHERE banned = 1 OR bannedUntil <> 0";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            Seq<Player> players = new Seq<>();
+            while (rs.next()) {
+                players.add(Player.fromSQL(rs));                
+            }
+            return players.toArray(Player.class);
+        } catch(SQLException e) {
+            Log.err(e.getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Set player data
      *
      * @param pd player Data
