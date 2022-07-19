@@ -10,6 +10,9 @@ import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
+
+import java.util.Optional;
+
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
@@ -26,9 +29,16 @@ public class Redeem implements MiniMod {
             String key = args[0];
             if (!keys.containsKey(key)) {
                 player.sendMessage(GameMsg.error("Redeem", "Not a valid code. Try using the redeem command in Discord again."));
+                return;
             }
             long discordId = keys.get(key).longValue();
             keys.remove(key);
+
+            Optional<Server> serverOpt = DiscordVars.api.getServers().stream().filter(s -> s.getMemberById(discordId).isPresent()).findAny();
+            if (!serverOpt.isPresent()) {
+                player.sendMessage(GameMsg.error("Redeem", "Player with id " + discordId + " could not be found."));
+            }
+            Server server = serverOpt.get();
 
             // update database
             Database.Player pd = Database.getPlayerData(player.uuid());
@@ -39,12 +49,8 @@ public class Redeem implements MiniMod {
             Database.setPlayerData(pd);
 
             // update discord roles
-            Server server = DiscordVars.api.getServers().iterator().next();
             var updater = server.createUpdater();
-            User user = server.getMemberById(discordId).orElse(null);
-            if (user == null) {
-                player.sendMessage(GameMsg.error("Redeem", "Player with id " + discordId + " could not be found."));
-            }
+            User user = server.getMemberById(discordId).get();
             for (var entry : Rank.roles) {
                 long roleID = entry.key;
                 int rankIdx = entry.value;
@@ -53,6 +59,8 @@ public class Redeem implements MiniMod {
                 }
             }
             updater.update().join();
+
+            player.sendMessage(GameMsg.success("Redeem", "Successfully linked discord account"));
         });
     }
 
