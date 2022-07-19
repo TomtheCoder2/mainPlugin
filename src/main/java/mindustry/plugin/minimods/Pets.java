@@ -2,6 +2,7 @@ package mindustry.plugin.minimods;
 
 import arc.Events;
 import arc.graphics.Color;
+import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
@@ -10,6 +11,7 @@ import arc.util.Structs;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.UnitTypes;
+import mindustry.entities.Units;
 import mindustry.entities.abilities.Ability;
 import mindustry.entities.units.UnitController;
 import mindustry.game.EventType;
@@ -22,14 +24,19 @@ import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.type.UnitType;
+
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
+import java.io.IOException;
+import java.lang.instrument.ClassDefinition;
+import java.lang.instrument.Instrumentation;
+import java.lang.instrument.UnmodifiableClassException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Pets implements MiniMod {
-    ObjectSet<String> spawnedPets = new ObjectSet<String>();
+    ObjectMap<String, Seq<String>> spawnedPets = new ObjectMap<>();
 
     /**
      * Creates a team if one does not already exist
@@ -70,10 +77,13 @@ public class Pets implements MiniMod {
                 return;
             }
 
-            if (spawnedPets.contains(player.uuid() + "|" + pet.name)) {
+            var alreadySpawned = spawnedPets.get(player.uuid(), new Seq<>());
+            if (alreadySpawned.contains(pet.name)) {
                 player.sendMessage(GameMsg.error("Pet", "Pet '" + args[0] + "' is already spawned!"));
                 return;
             }
+            alreadySpawned.add(pet.name);
+            spawnedPets.put(player.uuid(), alreadySpawned);
 
             spawnPet(pet, player);
         });
@@ -324,7 +334,8 @@ public class Pets implements MiniMod {
 
         @Override
         public void removed(Unit ignore) {
-            spawnedPets.remove(uuid + "|" + name);
+            var pets = spawnedPets.get(uuid);
+            pets.remove(name);
         }
 
         @Override
@@ -344,8 +355,19 @@ public class Pets implements MiniMod {
             unit.shieldAlpha = 0;
             unit.armor(1000f);
 
+            // determine angle behind which to set
+            double theta = player.unit().rotation;
+            var allPets = spawnedPets.get(uuid);
+            if (allPets.size == 2) {
+                int idx = allPets.indexOf(name);
+                theta = theta - 25 + 50 * idx;
+            } else if (allPets.size == 3) {
+                int idx = allPets.indexOf(name);
+                theta = theta - 45 + 45 * idx;
+            }
+            theta *= (Math.PI / 180);
+
             // movement
-            double theta = player.unit().rotation * (Math.PI / 180);
             float vx = 10f * ((player.x - (float) (40 * Math.cos(theta))) - unit.x);
             float vy = 10f * ((player.y - (float) (40 * Math.sin(theta))) - unit.y);
             if (vx * vx + vy * vy > maxVel * maxVel) {
@@ -353,7 +375,6 @@ public class Pets implements MiniMod {
                 vx *= mul;
                 vy *= mul;
             }
-//            Log.info("vel: " + vx + " " + vy);
 
             unit.x += vx * (dt) / 1000f;
             unit.y += vy * (dt) / 1000f;
@@ -363,8 +384,7 @@ public class Pets implements MiniMod {
             unit.elevation(1f);
 
             // labels
-            if (!hasLabel && Math.abs(vx) < 0.1 && Math.abs(vy) < 0.1) {
-//                Log.info("name: " +name);
+            if (!hasLabel && Math.abs(vx) < 0.5 && Math.abs(vy) < 0.5) {
                 Call.label(name, 1f, unit.x, unit.y + 5);
                 hasLabel = true;
                 Timer.schedule(() -> {
