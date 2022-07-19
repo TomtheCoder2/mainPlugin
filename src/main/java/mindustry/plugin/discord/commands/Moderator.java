@@ -92,48 +92,6 @@
 //    public void registerCommands(DiscordCommands handler) {
 //        if (data.has("moderator_roleid")) {
 //            long banRole = Strings.parseLong(data.getString("moderator_roleid"), 0);
-//            handler.registerCommand(new RoleRestrictedCommand("admin") {
-//                {
-//                    help = "Toggle the admin status on a player.";
-//                    roles = new long[] { banRole };
-//                    usage = "<playerid|ip|name|teamid>";
-//                    category = moderation;
-//                    minArguments = 1;
-//                    hidden = true;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1].toLowerCase();
-//
-//
-//                    Player p = findPlayer(target);
-//                    if (p != null) {
-//                        Administration.PlayerInfo targetInfo = p.getInfo();
-////                        Call.infoMessage(p.con, ctx.message.split(" ", 2)[1]);
-////                        if (Vars.netServer.admins.getAdmins().contains(targetInfo)) {
-//                        if (!p.admin) {
-//                            netServer.admins.adminPlayer(targetInfo.id, targetInfo.adminUsid);
-//                            p.admin = true;
-//                            eb.setDescription("Promoted " + escapeEverything(p.name) + " to admin");
-//                        } else {
-//                            netServer.admins.unAdminPlayer(targetInfo.id);
-//                            p.admin = false;
-//                            eb.setDescription("Demoted " + escapeEverything(p.name) + " from admin");
-//                        }
-//                        eb.setTitle("Command executed!");
-//                        netServer.admins.save();
-//                    } else {
-//                        eb.setTitle("Command terminated!");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("Player could not be found or is offline.");
-//
-//                    }
-//                    ctx.sendMessage(eb);
-//                }
-//            });
-//
-//            // command with admin remove|add
 ////            handler.registerCommand(new RoleRestrictedCommand("admin") {
 ////                {
 ////                    help = "Toggle the admin status on a player.";

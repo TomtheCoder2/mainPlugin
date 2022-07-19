@@ -8,6 +8,7 @@ import arc.util.Time;
 import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.game.Gamemode;
+import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.maps.MapException;
 import mindustry.net.Administration;
@@ -230,6 +231,34 @@ public class Management implements MiniMod {
                     Log.err(err);
                     DiscordLog.error("IpApi lookup failed", err.getMessage(), null);
                 });
+            }
+        );
+
+        handler.register("admin", "<id|ip|name>", 
+            data -> {
+                data.help = "Toggle admin status of a player";
+                data.roles = new long [] { Roles.ADMIN, Roles.MOD };
+                data.category = "Management";
+            },
+            ctx -> {
+                String q = ctx.args.get("id|ip|name");
+                Player p = Utils.findPlayer(q);
+                if (p == null) {
+                    ctx.error("Player not found", "Player '" + q + "' does not exist");
+                    return;
+                }
+
+                var info = p.getInfo();
+                if (!p.admin) { 
+                    Vars.netServer.admins.adminPlayer(info.id, info.adminUsid);
+                    p.admin = true;
+                    ctx.success("Success", "Promoted " + Utils.escapeEverything(p) + " to admin");
+                } else {
+                    Vars.netServer.admins.unAdminPlayer(info.id);
+                    p.admin = false;
+                    ctx.success("Success", "Demoted " + Utils.escapeEverything(p) + " from admin");
+                }
+                Vars.netServer.admins.save();
             }
         );
     }
