@@ -106,7 +106,7 @@ public class Pets implements MiniMod {
             unit.elevation(1f);
 
             // labels
-            if (!hasLabel && vx < 0.1 && vy < 0.1) {
+            if (!hasLabel && Math.abs(vx) < 0.1 && Math.abs(vy) < 0.1) {
 //                Log.info("name: " +name);
                 Call.label(name, 1f, unit.x, unit.y+5);
                 hasLabel = true;
