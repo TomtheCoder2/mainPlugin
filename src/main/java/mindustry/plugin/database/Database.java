@@ -7,7 +7,7 @@ import mindustry.plugin.utils.Utils;
 import java.sql.*;
 import java.util.*;
 
-import static mindustry.plugin.database.Database.Map.fromSQL;
+import javax.naming.spi.DirStateFactory.Result;
 
 public final class Database {
     /**
@@ -181,23 +181,21 @@ public final class Database {
         return null;
     }
 
-    public static List<Map> rankMaps2() {
-        HashMap<Pair, Map> maps = new HashMap<>();
-        String sql = "SELECT * FROM mapdata;";
+    /** Rank all maps based on {@link Database.Map#positiveRating positiveRating} - {@link Database.Map#negativeRating negativeRating} */
+    public static Map[] rankMapRatings(int limit, int offset) {
+        String sql = "SELECT * FROM mapdata ORDER BY positiverating - negativerating DESC LIMIT ? OFFSET ?;";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, limit);
+            pstmt.setInt(2, offset);
+
             ResultSet rs = pstmt.executeQuery();
+            Seq<Map> maps = new Seq<>();
             while (rs.next()) {
-                String name = rs.getString("name");
-                Pair stats = new Pair(rs.getInt("positiveRating"), rs.getInt("negativeRating"));
-                if (stats.a != 0 || stats.b != 0) {
-                    maps.put(stats, fromSQL(rs));
-                }
+                Map map = Map.fromSQL(rs);
+                maps.add(map);
             }
-            List<Map> sorted = new ArrayList<>(maps.values());
-            sorted.sort(Comparator.comparing(Map::diff));
-            Collections.reverse(sorted);
-            return sorted;
+            return maps.toArray(Map.class);
         } catch (SQLException ex) {
             Log.err(ex.getMessage());
         }
@@ -248,7 +246,7 @@ public final class Database {
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                return fromSQL(rs);
+                return Map.fromSQL(rs);
             } else {
                 return null;
             }
@@ -441,26 +439,12 @@ public final class Database {
             return md;
         }
 
-        public int diff() {
+        public int overallRating() {
             return positiveRating - negativeRating;
         }
 
         public Object clone() throws CloneNotSupportedException {
             return super.clone();
-        }
-    }
-
-    static class Pair {
-        int a;
-        int b;
-
-        public Pair(int a, int b) {
-            this.a = a;
-            this.b = b;
-        }
-
-        public int diff() {
-            return a - b;
         }
     }
 }
