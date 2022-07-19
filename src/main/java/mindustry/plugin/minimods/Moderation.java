@@ -86,6 +86,7 @@ public class Moderation implements MiniMod {
                 }
         );
 
+        // TODO: this should be in communication
         handler.register("banword", "[add/remove] [word]",
                 data -> {
                     data.roles = new long[]{Roles.ADMIN, Roles.MOD};
@@ -150,14 +151,20 @@ public class Moderation implements MiniMod {
                     if (pd == null) {
                         pd = new Database.Player(uuid, 0);
                     }
-                    long duration = ctx.args.getLong("duration:minutes", 2 * 365 * 24 * 60) * 60;
-                    pd.bannedUntil = Instant.now().getEpochSecond() + duration;
+                    long duration;
+                    if (ctx.args.get("duration:minutes") != null && ctx.args.get("duration:minutes").equals("forever")) {
+                        duration = 0;
+                        pd.banned = true;                        
+                    } else {
+                        duration = ctx.args.getLong("duration:minutes", 2 * 365 * 24 * 60) * 60;
+                        pd.bannedUntil = Instant.now().getEpochSecond() + duration;
+                    }
                     pd.banReason = reason + "\n\n[accent]Until: " + Utils.epochToString(pd.bannedUntil) + " [accent]Ban ID: " + banID;
                     Database.setPlayerData(pd);
 
                     ctx.sendEmbed(new EmbedBuilder()
                             .setTitle("Banned " + info.lastName)
-                            .addField("Duration", duration / 60 + " minutes")
+                            .addField("Duration", duration == 0 ? "forever" :  duration / 60 + " minutes")
                             .addField("Until", Utils.epochToString(pd.bannedUntil))
                             .addField("Reason", reason)
                             .setFooter("Ban ID: " + banID)
@@ -169,6 +176,37 @@ public class Moderation implements MiniMod {
                     }
 
                     DiscordLog.logAction(LogAction.ban, info, ctx, reason);
+                }
+        );
+
+        handler.register("unban", "<player>",
+                data -> {
+                    data.help = "Unban a player";
+                    data.category = "Moderation";
+                    data.roles = new long [] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
+                },
+                ctx -> {
+                    Player p = Utils.findPlayer(ctx.args.get("player"));
+                    String uuid = ctx.args.get("player");
+                    if (p != null) {
+                        uuid = p.uuid();
+                    }
+
+                    var pd = Database.getPlayerData(uuid);
+                    if (pd == null) {
+                        ctx.error("Player not found", ctx.args.get("player") + " was not found");
+                        return;
+                    }
+
+                    pd.banned = false;
+                    String banReason = pd.banReason;
+                    pd.banReason = "";
+                    pd.bannedUntil = 0;
+                    Administration.PlayerInfo info = Vars.netServer.admins.getInfo(uuid);
+                    Vars.netServer.admins.unbanPlayerID(uuid);
+
+                    Database.setPlayerData(pd);
+                    ctx.success("Unbanned " + Utils.escapeEverything(info.lastName), "Previous ban reason: " +banReason);
                 }
         );
 
