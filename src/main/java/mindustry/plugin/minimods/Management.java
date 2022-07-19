@@ -2,6 +2,7 @@ package mindustry.plugin.minimods;
 
 import arc.Core;
 import arc.struct.IntSeq;
+import arc.util.Http;
 import arc.util.Log;
 import arc.util.Time;
 import mindustry.Vars;
@@ -13,13 +14,20 @@ import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
+import mindustry.plugin.discord.DiscordLog;
+import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.Config;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.json.JSONObject;
 
 import java.awt.*;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.time.Duration;
 
 public class Management implements MiniMod {
     @Override
@@ -177,6 +185,53 @@ public class Management implements MiniMod {
                 Core.app.exit();
             });
         });
+
+        handler.register("iplookup", "<ip|player>", 
+            data -> {
+                data.help = "Make an IP lookup";
+                data.roles = new long [] { Roles.MOD, Roles.ADMIN };
+                data.category = "Management";
+                data.aliases = new String[] { "il" };
+            },
+            ctx -> {
+                String name = ctx.args.get("ip|player");
+                var infos =  Vars.netServer.admins.searchNames(name); // strip colors is active
+                if (infos.size > 1) {
+                    ctx.error("Multiple players found that match name", infos.toSeq().toString("\n", i -> i.lastName));
+                }
+                String ip;
+                if (infos.size == 1) {
+                    ip = infos.iterator().next().lastIP;
+                } else {
+                    if (!name.matches("[a-f0-9:.]+")) {
+                        ctx.error("Player not found", "'" + name + "' is neither a valid player or a valid IP");
+                    }
+                    ip = name;
+                }
+                
+                Http.get("http://api.ipapi.com/" + ip + "?access_key=" + Config.ipApiKey, resp -> {
+                    JSONObject json = new JSONObject(resp.getResultAsString());
+                    EmbedBuilder eb = new EmbedBuilder()
+                        .setTitle("Lookup " + ip)
+                        .setColor(DiscordPalette.INFO)
+                        .addField("Continent", json.getString("continent_name"), true)
+                        .addField("City", json.getString("city"), true)
+                        .addField("Country", json.getString("country_name"), true)
+                        .addField("Region", json.getString("region_name"), true)
+                        .addField("Latitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("latitude")).floatValue())), true)
+                        .addField("Longitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("longitude")).floatValue())), true);
+
+                    if (json.has("zip")) {
+                        eb.addInlineField("Zip Code", json.get("zip").toString());
+                    }
+
+                    ctx.sendEmbed(eb);
+                }, err -> {
+                    Log.err(err);
+                    DiscordLog.error("IpApi lookup failed", err.getMessage(), null);
+                });
+            }
+        );
     }
 
     private static class TestData {
