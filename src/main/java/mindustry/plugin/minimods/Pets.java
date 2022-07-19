@@ -215,6 +215,12 @@ public class Pets implements MiniMod {
                     ctx.error("Too Many Pets", "You currently have " + pets.length + " pets, but a " + Rank.all[pd.rank].name+ " can only have " + maxPets(pd.rank) + " pets.");
                     return;
                 }
+                for (var pet : pets) {
+                    if (pet.name.equalsIgnoreCase(ctx.args.get("name"))) {
+                        ctx.error("Pet already exists", "You already have a pet named " + ctx.args.get("name"));
+                        return;
+                    }
+                }
                 
                 var pet = new PetDatabase.Pet(pd.uuid, ctx.args.get("name"));
                 pet.color = Color.valueOf(ctx.args.get("color:rrggbbaa"));
