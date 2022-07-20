@@ -17,7 +17,7 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 
-public class Discord implements MiniMod {
+public class Report implements MiniMod {
     @Override
     public void registerCommands(CommandHandler handler) {
         Cooldowns.instance.set("bug", 5 * 60);
