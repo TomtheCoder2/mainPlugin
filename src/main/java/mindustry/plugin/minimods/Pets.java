@@ -474,10 +474,10 @@ public class Pets implements MiniMod {
                     }
                 }
 
-                Log.info("possible ores: " + tiles.size);
+//                Log.info("possible ores: " + tiles.size);
                 if (tiles.size != 0) {
                     this.mining = tiles.random();
-                    Log.info("mining: " + this.mining.drop());
+//                    Log.info("mining: " + this.mining.drop());
                     isEating = true;
                 }
             }
