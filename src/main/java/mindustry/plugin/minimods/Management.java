@@ -8,6 +8,8 @@ import arc.util.Time;
 import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.game.Gamemode;
+import mindustry.gen.Call;
+import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.maps.MapException;
@@ -89,6 +91,23 @@ public class Management implements MiniMod {
                             .addInlineField("Pre-GC usage", pre + " MB")
                             .addInlineField("Post-GC usage", post + " MB")
                     );
+                }
+        );
+
+        handler.register("syncserver", "", 
+                data -> {
+                    data.help = "Re-sync everyone on the server. May kick everyone, you never know!";
+                    data.roles = new long[] {  Roles.MOD, Roles.ADMIN, Roles.APPRENTICE };
+                    data.category = "Management";
+                },
+                ctx -> {
+                    for (Player p : Groups.player) { 
+                        p.getInfo().lastSyncTime = Time.millis();
+                        Call.worldDataBegin(p.con);
+                        Vars.netServer.sendWorldData(p);
+                    }
+
+                    ctx.success("Re-synced server", "Synced " + Groups.player.size() + " players");
                 }
         );
 

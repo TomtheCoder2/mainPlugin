@@ -170,60 +170,6 @@
 //                }
 //            });
 //
-//            handler.registerCommand(new RoleRestrictedCommand("lookup") {
-//                {
-//                    help = "Check all information about the specified player.";
-//                    usage = "<player>";
-//                    roles = new long[] { banRole };
-//                    category = moderation;
-//                    minArguments = 1;
-//                    aliases.add("l");
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1];
-//
-//                    Administration.PlayerInfo info = getPlayerInfo(target);
-//
-//                    if (info != null) {
-//                        eb.setTitle(escapeEverything(info.lastName) + "'s lookup");
-//                        eb.addField("UUID", info.id);
-//                        eb.addField("Last used ip", info.lastIP);
-//                        StringBuilder s = lookup(eb, info);
-//                        s.append("\n**All used IPs: **\n");
-//                        for (String ip : info.ips) {
-//                            s.append(escapeEverything(ip)).append(" / ");
-//                        }
-//                        eb.setDescription(s.toString());
-//                    } else {
-//                        eb.setTitle("Command terminated");
-//                        eb.setColor(Pals.error);
-//                        eb.setDescription("Player could not be found or is offline.");
-//                    }
-//                    ctx.sendMessage(eb);
-//                }
-//            });
-//
-//            handler.registerCommand(new RoleRestrictedCommand("syncserver") {
-//                {
-//                    help = "Tell everyone to resync.\nMay kick everyone you never know!";
-//                    roles = new long[] { banRole };
-//                    category = management;
-//                }
-//
-//                public void run(Context ctx) {
-//                    for (Player p : Groups.player) {
-//                        Call.worldDataBegin(p.con);
-//                        netServer.sendWorldData(p);
-//                    }
-//                    EmbedBuilder eb = new EmbedBuilder()
-//                            .setTitle("Command executed.")
-//                            .setDescription("Synchronized every player's client with the server.");
-//                    ctx.sendMessage(eb);
-//                }
-//            });
-////
 //            handler.registerCommand(new RoleRestrictedCommand("convert") {
 //                {
 //                    help = "Change the provided player into a specific unit.";
