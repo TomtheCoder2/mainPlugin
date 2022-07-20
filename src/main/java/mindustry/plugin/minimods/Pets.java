@@ -446,7 +446,8 @@ public class Pets implements MiniMod {
             unit.elevation(1f);
 
             // labels
-            if (!hasLabel && Math.abs(vx) < 1 && Math.abs(vy) < 1) {
+            boolean isStill = Math.abs(vx) < 2 && Math.abs(vy) < 2;
+            if (!hasLabel && isStill) {
                 Call.label(name, 1f, unit.x, unit.y + 5);
                 hasLabel = true;
                 Timer.schedule(() -> {
@@ -454,7 +455,7 @@ public class Pets implements MiniMod {
                 }, 1f);
             }
 
-            handleFood(Math.abs(vx) < 1 && Math.abs(vy) < 1, dt);
+            handleFood(isStill, dt);
         }
 
         private int itemsEaten = 0;
