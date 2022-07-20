@@ -329,7 +329,10 @@ public class PheonixMain extends Plugin {
 
     public void updateDiscordStatus() {
         if (Vars.state.is(GameState.State.playing)) {
-            DiscordVars.api.updateActivity("with " + Groups.player.size() + (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
+            DiscordVars.api.updateActivity(
+                Utils.escapeColorCodes(Vars.state.map.name()) + 
+                " with " + Groups.player.size() + 
+                (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
         } else {
             DiscordVars.api.updateActivity(ActivityType.CUSTOM, "Not hosting");
         }
