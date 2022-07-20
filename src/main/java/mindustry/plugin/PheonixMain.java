@@ -16,6 +16,7 @@ import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
+import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
@@ -335,6 +336,8 @@ public class PheonixMain extends Plugin {
                 (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
         } else {
             DiscordVars.api.updateActivity(ActivityType.CUSTOM, "Not hosting");
+            DiscordLog.error("Server crashed", "Restarting...", null);
+            Core.app.exit();
         }
     }
 
