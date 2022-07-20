@@ -216,7 +216,7 @@ public class Pets implements MiniMod {
                     String foodEaten = "";
                     Item[] foods = possibleFoods(pet.species);
                     if (Structs.contains(foods, Items.coal)) {
-                        foodEaten += ":black_large_square: " + pet.eatenCoal + "\n";
+                        foodEaten += ":black_circle: " + pet.eatenCoal + "\n";
                     }
                     if (Structs.contains(foods, Items.copper)) {
                         foodEaten += ":brown_square: " + pet.eatenCopper + "\n";
@@ -228,7 +228,7 @@ public class Pets implements MiniMod {
                         foodEaten += ":blue_square: " + pet.eatenTitanium + "\n";
                     }
                     if (Structs.contains(foods, Items.thorium)) {
-                        foodEaten += ":red_square: " + pet.eatenThorium + "\n";
+                        foodEaten += ":red_heart: " + pet.eatenThorium + "\n";
                     }
                     if (Structs.contains(foods, Items.beryllium)) {
                         foodEaten += ":green_square: " + pet.eatenBeryllium + "\n";
