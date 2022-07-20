@@ -4,6 +4,7 @@ import arc.Core;
 import arc.struct.IntSeq;
 import arc.util.Http;
 import arc.util.Log;
+import arc.util.Strings;
 import arc.util.Time;
 import mindustry.Vars;
 import mindustry.core.GameState;
@@ -24,6 +25,7 @@ import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
 
@@ -112,7 +114,7 @@ public class Management implements MiniMod {
         );
 
         handler.register("config", "[name] [value...]", d -> {
-            d.help = "Configure server settings.";
+            d.help = "Configure server settings (`Administration.Config`)";
             d.category = "Management";
             d.roles = new long[]{Roles.ADMIN};
         }, ctx -> {
@@ -144,11 +146,74 @@ public class Management implements MiniMod {
                     c.set(ctx.args.get("value").replace("\\n", "\n"));
                 }
 
-                ctx.sendEmbed(Color.CYAN, "Configuration", c.name + " is now set to <" + c.getClass().getName() + "> " + c.get() + "\n\nPrevious Value: " + previousValue);
+                ctx.sendEmbed(Color.CYAN, "Configuration", c.name + " is now set to (`" + c.get().getClass().getSimpleName() + "`) " + c.get() + "\n\nPrevious Value: " + previousValue);
             } catch (IllegalArgumentException e) {
                 ctx.error("Unknown Configuration", e.getMessage());
             }
         });
+
+        handler.register("setting", "[name] [type] [value...]", 
+            data -> {
+                data.help = "Configure server settings (`Core.settings`)";
+                data.category = "Management";
+                data.roles = new long [] { Roles.ADMIN };
+            },
+            ctx -> {
+                if (!ctx.args.containsKey("name")) {
+                    EmbedBuilder eb = new EmbedBuilder()
+                        .setTitle("Settings")
+                        .setColor(DiscordPalette.INFO);
+                    for (String key : Core.settings.keys()) {
+                        Object o = Core.settings.get(key,null);
+                        String s;
+                        if (o == null) {
+                            s = "null";
+                        } else {
+                            s = "(`" + o.getClass().getSimpleName() + "`) " + o.toString();
+                        }
+                        eb.addInlineField(key, s);
+                    }
+                    ctx.sendEmbed(eb);
+                    return;
+                }
+
+                String name = ctx.args.get("name");
+                if (!ctx.args.containsKey("type")) {
+                    Object o = Core.settings.get(name, null);                    
+                    if (o == null) {
+                        ctx.error("No such setting", "Setting " + name + " does not exist");
+                        return;
+                    }
+                    
+                    ctx.success("Success", "Setting **" + name + "** is currently (`" + o.getClass().getSimpleName() + "`) " + o.toString());
+                    return;
+                }
+
+                if (!ctx.args.containsKey("value")) {
+                    ctx.error("Must provide value", "Missing value");
+                    return;
+                }
+
+                String typeName = ctx.args.get("type");
+                String valueStr = ctx.args.get("value");
+                Object value;
+                if (typeName.equalsIgnoreCase("String")) {
+                    value = valueStr;
+                } else if (typeName.equalsIgnoreCase("int")) {
+                    value = Strings.parseInt(valueStr, 0);
+                } else if (typeName.equalsIgnoreCase("long")) {
+                    value = Strings.parseLong(valueStr, 0);
+                } else if (typeName.equalsIgnoreCase("double")) {
+                    value = Strings.parseDouble(valueStr, 0);
+                } else {
+                    ctx.error("Unknown type", "Please contact a developer to add support for more types");
+                    return;
+                }
+                Core.settings.put(name, value);
+
+                ctx.success("Success", "Setting **" + name + "** was set to (`" + value.getClass().getSimpleName() + "`) " + value.toString());
+            }
+        );
 
         handler.register("start", "[map] [mode]", d -> {
             d.help = "Restart the server";

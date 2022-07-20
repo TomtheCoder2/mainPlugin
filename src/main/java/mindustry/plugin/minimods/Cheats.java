@@ -1,9 +1,15 @@
 package mindustry.plugin.minimods;
 
+import javax.swing.plaf.metal.MetalBorders.PaletteBorder;
+
+import arc.struct.Seq;
+import arc.util.Reflect;
+import arc.util.Strings;
 import arc.util.Structs;
 import mindustry.Vars;
 import mindustry.game.Team;
 import mindustry.gen.Call;
+import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.plugin.MiniMod;
@@ -69,6 +75,49 @@ public class Cheats implements MiniMod {
                     Call.unitDespawn(oldunit);
                     ctx.success("Success", "Changed " + Utils.escapeEverything(p.name()) + "'s unit to " + p.unit().type.name);
                     DiscordLog.cheat("Changed unit", ctx.author(), "Target: " + Utils.escapeEverything(p.name()) + "\nUnit: " +p.unit().type.name);
+                }
+        );
+
+        handler.register("team", "<player|all> <team>",
+                data -> {
+                    data.help = "Change a player's team";
+                    data.roles = new long[] { Roles.MOD, Roles.ADMIN, Roles.APPRENTICE };
+                    data.category = "Cheats";
+                    data.aliases = new String[] { "changeteamid" };
+                },
+                ctx -> {
+                    String query = ctx.args.get("player|all");
+                    Iterable<Player> players = null;
+                    if (query.equals("all")) {
+                        players = Groups.player;
+                    } else {
+                        Player p = Utils.findPlayer(query);
+                        if (p == null) {
+                            ctx.error("No such player", query + " is not online");
+                        }
+                        players = Seq.with(p);
+                    }
+
+                    Team team;
+                    if (Strings.canParseInt(ctx.args.get("team"))) {
+                        int id = ctx.args.getInt("team");
+                        if (id >= 256) {
+                            ctx.error("Team ID is too large", "Must be at most 256");
+                            return;
+                        }
+                        team = Team.all[id];
+                    } else {
+                        try {
+                            team = (Team)Reflect.get(Team.class, ctx.args.get("team"));
+                        } catch(Exception e)  {
+                            ctx.error("No such team", "Team " + ctx.args.get("team") + " does not exist");
+                            return;
+                        }
+                    }
+
+                    for (Player p : players) {
+                        p.team(team);
+                    }
                 }
         );
     }
