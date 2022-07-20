@@ -71,7 +71,7 @@ public class Moderation implements MiniMod {
                     String target = ctx.args.get("player");
                     Player player = Utils.findPlayer(target);
                     if (player == null) {
-                        ctx.reply("Player " + target + " not found.");
+                        ctx.reply("Player " + target + " not online.");
                         return;
                     }
 
@@ -80,8 +80,10 @@ public class Moderation implements MiniMod {
                     } else {
                         muted.remove(player.uuid());
                     }
+
                     boolean isMuted = muted.contains(player.uuid());
                     ctx.reply("Successfully " + (isMuted ? "muted" : "unmuted") + " " + Utils.escapeEverything(target));
+                    DiscordLog.moderation(isMuted ? "Muted" : "Unmuted", ctx.author(), Vars.netServer.admins.getInfo(player.uuid()), ctx.args.get("reason"), null);
                     Call.infoMessage(player.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" +
                             "[lightgray]" + (ctx.args.containsKey("reason") ? "Reason: [accent]" + ctx.args.get("reason") : ""));
 
@@ -124,8 +126,10 @@ public class Moderation implements MiniMod {
                     } else {
                         frozen.remove(player.uuid());
                     }
+
                     boolean isFrozen = frozen.contains(player.uuid());
                     ctx.reply("Successfully " + (isFrozen ? "frozen" : "thawed") + " " + Utils.escapeEverything(target));
+                    DiscordLog.moderation(isFrozen ? "Froze" : "Unfroze", ctx.author(), Vars.netServer.admins.getInfo(player.uuid()), ctx.args.get("reason"), null);
                     Call.infoMessage(player.con, "[cyan]You got " + (isFrozen ? "frozen" : "thawed") + " by a moderator.\n" +
                             "[lightgray]" + (ctx.args.containsKey("reason") ? "Reason: [accent]" + ctx.args.get("reason") : ""));
 
@@ -177,7 +181,7 @@ public class Moderation implements MiniMod {
                         player.con.kick(Packets.KickReason.banned);
                     }
 
-                    DiscordLog.logAction(LogAction.ban, info, ctx, reason);
+                    DiscordLog.moderation("Banned", ctx.author(), Vars.netServer.admins.getInfo(player.uuid()), reason, null);
                 }
         );
 
@@ -208,11 +212,12 @@ public class Moderation implements MiniMod {
                     Vars.netServer.admins.unbanPlayerID(uuid);
 
                     Database.setPlayerData(pd);
-                    ctx.success("Unbanned " + Utils.escapeEverything(info.lastName), "Previous ban reason: " +banReason);
+                    DiscordLog.moderation("Unban", ctx.author(), info, null, "Previous ban reason: " + banReason);
+                    ctx.success("Unbanned " + Utils.escapeEverything(info.lastName), "Previous ban reason: " + banReason);
                 }
         );
 
-        handler.register("banip", "<ip>", 
+        handler.register("banip", "<ip> [reason...]", 
                 data -> {
                     data.help = "Ban an IP, and ban any players with that IP by UUID";
                     data.category = "Moderation";
@@ -222,10 +227,11 @@ public class Moderation implements MiniMod {
                     String ip = ctx.args.get("ip");
                     Vars.netServer.admins.banPlayerIP(ip);
                     ctx.success("Banned IP", "Banned " + ip);
+                    DiscordLog.moderation("Ban IP", ctx.author(), null, ctx.args.get("reason"), "IP: " + ip);
                 }
         );
 
-        handler.register("unbanip", "<ip>", 
+        handler.register("unbanip", "<ip> [reason...]", 
                 data -> {
                     data.help = "Unban an IP";
                     data.category = "Moderation";
@@ -235,6 +241,7 @@ public class Moderation implements MiniMod {
                     String ip = ctx.args.get("ip");
                     Vars.netServer.admins.unbanPlayerIP(ip);
                     ctx.success("Unbanned IP", "Unbanned " + ip);
+                    DiscordLog.moderation("Unban IP", ctx.author(), null, ctx.args.get("reason"), "IP: " + ip);
                 }
         );
 
@@ -314,6 +321,7 @@ public class Moderation implements MiniMod {
                         Vars.netServer.admins.subnetBans.add(ctx.args.get("address"));
 
                         ctx.success("Added Subnet Ban", "Address: " + ctx.args.get("address"));
+                        DiscordLog.moderation("Ban subnet", ctx.author(), null, null, "Subnet: " + ctx.args.get("address"));
                     } else if (ctx.args.get("add/remove/list").equals("remove")) {
                         if (!ctx.args.containsKey("address")) {
                             ctx.error("Invalid Usage", "Must specify a subnet address");
@@ -322,13 +330,14 @@ public class Moderation implements MiniMod {
                         Vars.netServer.admins.subnetBans.remove(ctx.args.get("address"));
 
                         ctx.success("Removed Subnet Ban", "Address: " + ctx.args.get("address"));
+                        DiscordLog.moderation("Unban subnet", ctx.author(), null, null, "Subnet: " + ctx.args.get("address"));
                     } else {
                         ctx.error("Invalid Usage", "First argument must be add/remove/list");
                     }
                 }
         );
 
-        handler.register("unkick", "<player>", 
+        handler.register("unkick", "<player> [reason...]", 
                 data -> {
                     data.help = "Unkick the player";
                     data.aliases = new String [] { "pardon" } ;
@@ -348,9 +357,9 @@ public class Moderation implements MiniMod {
 
                     info.lastKicked = 0;
                     ctx.success("Unkicked player", "Successfully unkicked " + Utils.escapeColorCodes(info.lastName));
+                    DiscordLog.moderation("Unkick", ctx.author(), info, ctx.args.get("reason"), null);
                 }
         );
-
 
         handler.register("lookup", "<player>",
                 data -> {
@@ -409,11 +418,14 @@ public class Moderation implements MiniMod {
             } else {
                 frozen.remove(target.uuid());
             }
+
+            String reason = args.length > 1 ? args[1] : null;
             boolean isFrozen = frozen.contains(target.uuid());
             player.sendMessage(
                     GameMsg.custom("Mod", "cyan", "[cyan]Successfully " + (isFrozen ? "froze" : "thawed") + " " + Utils.escapeEverything(target)));
             Call.infoMessage(target.con, "[cyan]You got " + (isFrozen ? "frozen" : "thawed") + " by a moderator. \n"
-                    + "[lightgray]" + (args.length > 1 ? "Reason: [accent]" + args[1] : ""));
+                    + "[lightgray]" + (reason != null ? "Reason: [accent]" + reason : ""));
+            DiscordLog.moderation(isFrozen ? "Froze": "Thawed", Utils.escapeEverything(player.name), Vars.netServer.admins.getInfo(target.uuid()), reason, null);
         });
 
         handler.<Player>register("mute", "<player> [reason...]", "Mute a player. To unmute just use this command again.", (args, player) -> {
@@ -433,10 +445,13 @@ public class Moderation implements MiniMod {
             } else {
                 muted.remove(target.uuid());
             }
-            boolean isMuted = muted.contains(target.uuid());
+
+            String reason = args.length > 1 ? args[1] : null;
+            boolean isMuted = muted.contains(target.uuid());            
             player.sendMessage(GameMsg.custom("Mod", "cyan", "Successfully " + (isMuted ? "muted" : "unmuted") + " " + Utils.escapeEverything(target)));
             Call.infoMessage(target.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" +
                     "[lightgray]" + (args.length > 1 ? "Reason: [accent]" + args[1] : ""));
+            DiscordLog.moderation(isMuted ? "Muted": "Unmuted", Utils.escapeEverything(player.name), Vars.netServer.admins.getInfo(target.uuid()), reason, null);
         });
 
         Cooldowns.instance.set("gr", 5 * 60);

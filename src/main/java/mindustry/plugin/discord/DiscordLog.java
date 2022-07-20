@@ -9,6 +9,7 @@ import mindustry.plugin.utils.LogAction;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageAttachment;
+import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 
@@ -54,48 +55,25 @@ public class DiscordLog {
         Channels.LOG.sendMessage(eb);
     }
 
-    public static void logAction(LogAction action, Administration.PlayerInfo info, Context ctx, String reason) {
-        logAction(action, info, ctx, reason, null, null);
-    }
-
-    public static void logAction(LogAction action, Administration.PlayerInfo info, Context ctx, String reason, MessageAttachment mapFile) {
-        logAction(action, info, ctx, reason, mapFile, null);
-    }
-
-    public static void logAction(LogAction action, Context ctx, String reason, String ip) {
-        logAction(action, null, ctx, reason, null, ip);
-    }
-
-    public static void logAction(LogAction action, Administration.PlayerInfo info, Context ctx, String reason, MessageAttachment mapFile, String ip) {
-        EmbedBuilder eb = new EmbedBuilder();
-        final String reasonNotNull = Objects.equals(reason, "") || reason == null ? "Not provided" : reason;
-        switch (action) {
-            case ban, unban, blacklist, kick -> {
-                eb.setTitle(action.getName() + " " + Utils.escapeEverything(info.lastName))
-                        .addField("UUID", info.id, true)
-                        .addField("IP", info.lastIP, true)
-                        .addField(action + " by", "<@" + ctx.author().getIdAsString() + ">", true)
-                        .addField("Reason", reasonNotNull, true);
-            }
-            case ipBan, ipUnban -> {
-                eb.setTitle(action.getName() + " " + ip)
-                        .addField("IP", ip, true)
-                        .addField(action + " by", "<@" + ctx.author().getIdAsString() + ">", true)
-                        .addField("Reason", reasonNotNull, true);
-            }
-            case uploadMap, updateMap -> {
-                eb.setTitle(action.getName() + " " + Utils.escapeEverything(mapFile.getFileName()))
-                        .addField("Uploaded by ", "<@" + ctx.author().getIdAsString() + ">", true);
-            }
-            case setRank -> {
-                Database.Player pd = Database.getPlayerData(info.id);
-                eb.setTitle(Utils.escapeEverything(info.lastName) + "'s rank was set to " + Rank.all[pd.rank].name + "!")
-                        .setColor(new Color(0x00ff00))
-                        .addField("UUID", info.id)
-                        .addField("By", "<@" + ctx.author().getIdAsString() + ">");
-            }
+    public static void moderation(String action, String mod, Administration.PlayerInfo info, String reason, String additionalInfo) {
+        EmbedBuilder eb = new EmbedBuilder()
+            .setColor(DiscordPalette.WARN)
+            .addField("Moderator", mod)
+            .addField("Reason", reason == null || reason.equals("") ? "None" : reason);
+        if (info != null) {
+            eb.addField("Target UUID", info.id)
+            .addField("Target name", Utils.escapeEverything(info.lastName))
+            .addField("Target IP", info.lastIP);
+        }
+        if (additionalInfo != null) {
+            eb.setDescription(additionalInfo);
         }
         eb.setTimestampToNow();
+            
         Channels.LOG.sendMessage(eb);
+    }
+
+    public static void moderation(String action, User mod, Administration.PlayerInfo info, String reason, String additionalInfo) {
+        moderation(action, "<@" + mod.getId() + ">", info, reason, additionalInfo)
     }
 }
