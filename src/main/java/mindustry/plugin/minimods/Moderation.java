@@ -212,6 +212,32 @@ public class Moderation implements MiniMod {
                 }
         );
 
+        handler.register("banip", "<ip>", 
+                data -> {
+                    data.help = "Ban an IP, and ban any players with that IP by UUID";
+                    data.category = "Moderation";
+                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                },
+                ctx -> {
+                    String ip = ctx.args.get("ip");
+                    Vars.netServer.admins.banPlayerIP(ip);
+                    ctx.success("Banned IP", "Banned " + ip);
+                }
+        );
+
+        handler.register("unbanip", "<ip>", 
+                data -> {
+                    data.help = "Unban an IP";
+                    data.category = "Moderation";
+                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                },
+                ctx -> {
+                    String ip = ctx.args.get("ip");
+                    Vars.netServer.admins.unbanPlayerIP(ip);
+                    ctx.success("Unbanned IP", "Unbanned " + ip);
+                }
+        );
+
         handler.register("bans", "", 
                 data -> {
                     data.help = "List all bans";
@@ -225,7 +251,7 @@ public class Moderation implements MiniMod {
 
                     var bans = Vars.netServer.admins.getBanned();
                     String s = bans.toString("\n", i -> "`" + i.id + "` | " + Utils.escapeEverything(i.lastName));
-                    eb.addField("Vars.net UUID bans", s.length() == 0 ? "None" : s);
+                    eb.addField("NetServer UUID bans", s.length() == 0 ? "None" : s);
 
                     var ipBans = Vars.netServer.admins.getBannedIPs();
                     s = ipBans.toString("\n", ip -> {
@@ -236,13 +262,13 @@ public class Moderation implements MiniMod {
                             return "`" + ip + "`";
                         }
                     });
-                    eb.addField("Vars.net ID bans", s.length() == 0 ? "None" : s);
+                    eb.addField("NetServer IP bans", s.length() == 0 ? "None" : s);
 
                     var subnetBans = Vars.netServer.admins.subnetBans;
                     s = subnetBans.toString("\n", subnet -> {
                         return "`" + subnet + "`";
                     });
-                    eb.addField("Vars.net subnet bans", s.length() == 0 ? "None": s);
+                    eb.addField("NetServer subnet bans", s.length() == 0 ? "None": s);
 
                     var dbBans = Database.bans();
                     if (dbBans == null) {
@@ -299,6 +325,44 @@ public class Moderation implements MiniMod {
                     } else {
                         ctx.error("Invalid Usage", "First argument must be add/remove/list");
                     }
+                }
+        );
+
+
+        handler.register("lookup", "<player>",
+                data -> {
+                    data.category = "Moderation";
+                    data.roles = new long []{ Roles.ADMIN, Roles.MOD };
+                    data.aliases = new String[] { "l" };
+                    data.help = "Lookup information about a player";
+                },
+                ctx -> {
+                    var info = Utils.getPlayerInfo(ctx.args.get("player"));
+                    if (info == null) {
+                        ctx.error("No such player", ctx.args.get("player") + " is not in the database");
+                        return;
+                    }
+
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("Lookup: " + Utils.escapeEverything(info.lastName))
+                            .addInlineField("UUID", info.id)
+                            .addInlineField("Last IP", info.lastIP)
+                            .addInlineField("Last name", info.lastName)
+                            .addInlineField("Times kicked", info.timesKicked + "")
+                            .addField("Names", info.names.toString(" / "))
+                            .addField("IPs", info.ips.toString(" / "))
+                            .addField("NetServer banned", info.banned ? "Yes" : "No");
+                    
+                    var pd =Database.getPlayerData(info.id);
+                    if (pd != null) {
+                        eb.addInlineField("Rank", Rank.all[pd.rank].name)
+                            .addInlineField("Playtime", pd.playTime + " min")
+                            .addInlineField("Games", pd.gamesPlayed + "")
+                            .addInlineField("Buildings built", pd.buildingsBuilt + "")
+                            .addField("Database banned", pd.banned ? "Forever" : (pd.bannedUntil != 0 ? "Until " + Instant.ofEpochSecond(pd.bannedUntil).toString() : "No"));
+                    }
+
+                    ctx.sendEmbed(eb);
                 }
         );
     }

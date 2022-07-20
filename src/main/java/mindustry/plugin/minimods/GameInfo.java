@@ -119,6 +119,22 @@ public class GameInfo implements MiniMod {
                 }
         );
 
+        handler.register("playerinfo", "", 
+                data -> {
+                    data.help = "List online players, their IDs, IPs, and UUIDs";
+                    data.aliases = new String[] { "playersinfo", "pi" };
+                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                    data.category = "Management";
+                },
+                ctx -> {
+                    StringBuilder desc = new StringBuilder();
+                    for (Player p : Groups.player) {
+                        desc.append(String.format("`%-9d : %-24s : %-16s :` %s%s\n", p.id, p.uuid(), p.con.address, p.name, p.admin ? " (admin)" : ""));
+                    }
+                    ctx.sendEmbed(DiscordPalette.INFO, "Players online: " + Groups.player.size(), desc.toString());
+                }
+        );
+
         handler.register("status", "",
                 data -> {
                     data.help = "Show current status of the server";

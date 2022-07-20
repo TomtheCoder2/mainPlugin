@@ -212,7 +212,7 @@ public class Utils {
     }
 
     /**
-     * Find a player by name
+     * Find a player by name, id, uuid, or ip
      *
      * @param identifier the name, id, uuid, con or address
      */
