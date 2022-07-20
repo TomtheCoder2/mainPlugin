@@ -235,16 +235,25 @@ public class Utils {
     }
 
     /**
-     * get player info by uuid or name
+     * Get player info by uuid, name, or IP
      */
     public static Administration.PlayerInfo getPlayerInfo(String target) {
-        Administration.PlayerInfo info;
+        Administration.PlayerInfo info = null;
         Player player = findPlayer(target);
         if (player != null) {
             info = netServer.admins.getInfo(player.uuid());
-            System.out.println("Found " + player.name);
-        } else {
+        }
+        if (info == null) {
             info = netServer.admins.getInfoOptional(target);
+        }
+        if (info == null) {
+            info = netServer.admins.findByIP(target);
+        }
+        if (info == null) {
+            info = netServer.admins.findByName(target).first();
+        }
+        if (info == null) {
+            info = netServer.admins.searchNames(target).first();
         }
         return info;
     }

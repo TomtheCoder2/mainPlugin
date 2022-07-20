@@ -328,6 +328,29 @@ public class Moderation implements MiniMod {
                 }
         );
 
+        handler.register("unkick", "<player>", 
+                data -> {
+                    data.help = "Unkick the player";
+                    data.aliases = new String [] { "pardon" } ;
+                    data.category = "Moderation";
+                    data.roles = new long [] {Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
+                }, 
+                ctx -> {
+                    var info = Utils.getPlayerInfo(ctx.args.get("player"));
+                    if (info == null) {
+                        ctx.error("No such player", ctx.args.get("player") + " is not saved in the netserver data");
+                        return;
+                    }                    
+                    if (info.lastKicked == 0) {
+                        ctx.error("Player not kicked", Utils.escapeColorCodes(info.lastName) + " is not kicked");
+                        return;
+                    }
+
+                    info.lastKicked = 0;
+                    ctx.success("Unkicked player", "Successfully unkicked " + Utils.escapeColorCodes(info.lastName));
+                }
+        );
+
 
         handler.register("lookup", "<player>",
                 data -> {
