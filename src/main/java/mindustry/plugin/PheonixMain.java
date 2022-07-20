@@ -58,7 +58,6 @@ public class PheonixMain extends Plugin {
     protected MiniMod[] minimods = new MiniMod[]{
             new mindustry.plugin.minimods.Communication(),
             new mindustry.plugin.minimods.Cheats(),
-            new mindustry.plugin.minimods.Discord(),
             new mindustry.plugin.minimods.Events(),
             new mindustry.plugin.minimods.GameInfo(),
             new mindustry.plugin.minimods.Inspector(),
@@ -73,6 +72,7 @@ public class PheonixMain extends Plugin {
             new mindustry.plugin.minimods.Rainbow(),
             new mindustry.plugin.minimods.Ranks(),
             new mindustry.plugin.minimods.Redeem(),
+            new mindustry.plugin.minimods.Report(),
             new mindustry.plugin.minimods.RTV(),
             new mindustry.plugin.minimods.ServerInfo(),
             new mindustry.plugin.minimods.Translate(),

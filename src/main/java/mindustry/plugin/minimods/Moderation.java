@@ -454,64 +454,7 @@ public class Moderation implements MiniMod {
             DiscordLog.moderation(isMuted ? "Muted": "Unmuted", Utils.escapeEverything(player.name), Vars.netServer.admins.getInfo(target.uuid()), reason, null);
         });
 
-        Cooldowns.instance.set("gr", 5 * 60);
-        handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/gr' to get a list of ids)", (args, player) -> {
-            if (!Cooldowns.instance.canRun("gr", player.uuid())) {
-                GameMsg.ratelimit("Mod", "gr");
-            }
-            Cooldowns.instance.run("gr", player.uuid());
 
-            if (args.length == 0) {
-                StringBuilder builder = new StringBuilder();
-                builder.append("[orange]List or reportable players: \n");
-                for (Player p : Groups.player) {
-                    if (p.admin() || p.con == null) continue;
-
-                    builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id).append(")\n");
-                }
-                player.sendMessage(builder.toString());
-            } else {
-                Player found = null;
-                if (args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))) {
-                    int id = Strings.parseInt(args[0].substring(1));
-                    for (Player p : Groups.player) {
-                        if (p.id == id) {
-                            found = p;
-                            break;
-                        }
-                    }
-                } else {
-                    found = Utils.findPlayer(args[0]);
-                }
-
-                if (found == null) {
-                    player.sendMessage("[scarlet]No player[orange] '" + args[0] + "'[scarlet] found.");
-                }
-
-                if (found.admin()) {
-                    player.sendMessage("[scarlet]Did you really expect to be able to report an admin?");
-                } else if (found.team() != player.team()) {
-                    player.sendMessage("[scarlet]Only players on your team can be reported.");
-                } else {
-                    //send message
-                    if (args.length > 1) {
-                        new MessageBuilder()
-                                .setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
-                                        .addField("name", Utils.escapeColorCodes(found.name)).addField("reason", args[1]).setColor(Color.RED).setFooter("Reported by " + player.name))
-                                .setContent("<@&" + Roles.MOD + ">")
-                                .send(Channels.GR_REPORT);
-                    } else {
-                        new MessageBuilder()
-                                .setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
-                                        .addField("name", Utils.escapeColorCodes(found.name)).setColor(Color.RED).setFooter("Reported by " + player.name))
-                                .setContent("<@&" + Roles.MOD + ">")
-                                .send(Channels.GR_REPORT);
-                        Channels.GR_REPORT.sendMessage("<@&" + +Roles.MOD + ">");
-                    }
-                    Call.sendMessage(found.name + "[sky] is reported to discord.");
-                }
-            }
-        });
         handler.<Player>register("label", "<duration> <text...>", "[admin only] Create an in-world label at the current position.", (args, player) -> {
             if (!player.admin) {
                 player.sendMessage(GameMsg.noPerms("Mod"));
