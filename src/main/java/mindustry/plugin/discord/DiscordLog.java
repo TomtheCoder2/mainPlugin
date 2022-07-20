@@ -5,7 +5,6 @@ import mindustry.gen.Groups;
 import mindustry.net.Administration;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.discordcommands.Context;
-import mindustry.plugin.utils.LogAction;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageAttachment;
@@ -74,6 +73,6 @@ public class DiscordLog {
     }
 
     public static void moderation(String action, User mod, Administration.PlayerInfo info, String reason, String additionalInfo) {
-        moderation(action, "<@" + mod.getId() + ">", info, reason, additionalInfo)
+        moderation(action, "<@" + mod.getId() + ">", info, reason, additionalInfo);
     }
 }
