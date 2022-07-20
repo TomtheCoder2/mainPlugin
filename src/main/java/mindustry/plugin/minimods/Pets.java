@@ -345,7 +345,7 @@ public class Pets implements MiniMod {
             return new Item[] { Items.coal };
         } else if (type == UnitTypes.quasar || type == UnitTypes.pulsar) {
             return new Item[] { Items.beryllium, Items.titanium, Items.thorium };
-        } else if (type.flying) {
+        } else if (type.flying && type != UnitTypes.quad) {
             return  new Item[] { Items.copper, Items.lead, Items.titanium, Items.thorium };
         } else {
             return  new Item[] { Items.copper, Items.lead, Items.titanium };
