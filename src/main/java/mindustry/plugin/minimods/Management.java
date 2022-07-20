@@ -164,7 +164,7 @@ public class Management implements MiniMod {
                     int n = 0;
                     for (String key : Core.settings.keys()) {
                         Object value = Core.settings.get(key,null);
-                        data.append(Strings.format("%-24s, %12s, %s\n", key, value == null ? "Null" : value.getClass().getSimpleName(), value == null ? "null": value.toString()));
+                        data.append(String.format("%-24s, %12s, %s\n", key, value == null ? "Null" : value.getClass().getSimpleName(), value == null ? "null": value.toString()));
                         n++;
                     }
                     EmbedBuilder eb = new EmbedBuilder()
