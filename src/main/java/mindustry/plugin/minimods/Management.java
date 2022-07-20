@@ -20,6 +20,7 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
+import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
@@ -154,17 +155,17 @@ public class Management implements MiniMod {
 
         handler.register("setting", "[name] [type] [value...]", 
             data -> {
-                data.help = "Configure server settings (`Core.settings`)";
+                data.help = "Configure server settings (`Core.settings`). It is recommended to use " + DiscordVars.prefix + "config instead of this command.";
                 data.category = "Management";
                 data.roles = new long [] { Roles.ADMIN };
             },
             ctx -> {
                 if (!ctx.args.containsKey("name")) {
-                    StringBuilder data = new StringBuilder(String.format("%-32s, %12s, %s\n", "Setting", "Type", "Value"));
+                    StringBuilder data = new StringBuilder(String.format("%-48s, %-12s, %s\n", "Setting", "Type", "Value"));
                     int n = 0;
                     for (String key : Core.settings.keys()) {
                         Object value = Core.settings.get(key,null);
-                        data.append(String.format("%-32s, %12s, %s\n", key, value == null ? "Null" : value.getClass().getSimpleName(), value == null ? "null": value.toString()));
+                        data.append(String.format("%-48s, %-12s, %s\n", key, value == null ? "Null" : value.getClass().getSimpleName(), value == null ? "null": value.toString()));
                         n++;
                     }
                     EmbedBuilder eb = new EmbedBuilder()
