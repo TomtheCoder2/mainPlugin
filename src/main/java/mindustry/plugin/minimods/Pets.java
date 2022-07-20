@@ -228,7 +228,7 @@ public class Pets implements MiniMod {
                         foodEaten += ":blue_square: " + pet.eatenTitanium + "\n";
                     }
                     if (Structs.contains(foods, Items.thorium)) {
-                        foodEaten += ":red_heart: " + pet.eatenThorium + "\n";
+                        foodEaten += ":heart: " + pet.eatenThorium + "\n";
                     }
                     if (Structs.contains(foods, Items.beryllium)) {
                         foodEaten += ":green_square: " + pet.eatenBeryllium + "\n";
