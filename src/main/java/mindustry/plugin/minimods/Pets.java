@@ -461,7 +461,7 @@ public class Pets implements MiniMod {
         private long lastAction = 0;
         protected void handleFood(boolean isStill, long dt) {
             // food
-            if (!isEating && !unit.hasItem()) {
+            if (!isEating && !unit.hasItem() && isStill) {
                 int startX = unit.tileX() - 5;
                 int startY = unit.tileY() - 5;
                 Seq<Tile> tiles = new Seq<>();
