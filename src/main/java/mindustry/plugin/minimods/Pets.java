@@ -270,6 +270,7 @@ public class Pets implements MiniMod {
                         pet.color = Color.black;
                     }
 
+                    PetDatabase.updatePet(pet);
                     ctx.success("Successfully updated " + pet.name, "Changed their color to " + pet.color.toString());
                 }
         );
