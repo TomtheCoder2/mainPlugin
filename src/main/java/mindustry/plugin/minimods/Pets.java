@@ -128,6 +128,7 @@ public class Pets implements MiniMod {
         Events.fire(new EventType.UnitSpawnEvent(unit));
 
         // set team to correct team
+        // hacky solution, but doesnt work any other way
         Team team = getTeam(pet.color);
         Timer.schedule(() -> {
             unit.team(team);
