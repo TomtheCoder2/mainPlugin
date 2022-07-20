@@ -179,7 +179,8 @@ public class PheonixMain extends Plugin {
         FallbackLoggerConfiguration.setTrace(false);
 
         // Update discord status
-        Timer.schedule(this::updateDiscordStatus, 0, 60);
+        DiscordVars.api.updateActivity("Loading...");
+        Timer.schedule(this::updateDiscordStatus, 30, 60);
 
         Events.on(EventType.ServerLoadEvent.class, event -> {
 //            contentHandler = new ContentHandler();
@@ -338,6 +339,7 @@ public class PheonixMain extends Plugin {
             DiscordVars.api.updateActivity(ActivityType.CUSTOM, "Not hosting");
             DiscordLog.error("Server crashed", "Restarting...", null);
             Core.app.exit();
+            System.exit(1);
         }
     }
 

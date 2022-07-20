@@ -160,20 +160,22 @@ public class Management implements MiniMod {
             },
             ctx -> {
                 if (!ctx.args.containsKey("name")) {
+                    StringBuilder data = new StringBuilder(String.format("%-24s, %12s, %s\n", "Setting", "Type", "Value"));
+                    int n = 0;
+                    for (String key : Core.settings.keys()) {
+                        Object value = Core.settings.get(key,null);
+                        data.append(Strings.format("%-24s, %12s, %s\n", key, value == null ? "Null" : value.getClass().getSimpleName(), value == null ? "null": value.toString()));
+                        n++;
+                    }
                     EmbedBuilder eb = new EmbedBuilder()
                         .setTitle("Settings")
-                        .setColor(DiscordPalette.INFO);
-                    for (String key : Core.settings.keys()) {
-                        Object o = Core.settings.get(key,null);
-                        String s;
-                        if (o == null) {
-                            s = "null";
-                        } else {
-                            s = "(`" + o.getClass().getSimpleName() + "`) " + o.toString();
-                        }
-                        eb.addInlineField(key, s);
-                    }
-                    ctx.sendEmbed(eb);
+                        .setColor(DiscordPalette.INFO)
+                        .setDescription("Number of settings: " + n);
+                    ctx.sendMessage(
+                        new MessageBuilder()
+                           .addEmbed(eb)
+                            .addAttachment(data.toString().getBytes(), "data.csv")
+                        );
                     return;
                 }
 
