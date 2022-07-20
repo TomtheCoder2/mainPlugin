@@ -131,9 +131,8 @@ public class Pets implements MiniMod {
         }
         controller.unit(unit);
 
-        // spawn unit
-        Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);
-        Events.fire(new EventType.UnitSpawnEvent(unit));
+//        Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);
+//        Events.fire(new EventType.UnitSpawnEvent(unit));
     }
 
     @Override
@@ -397,6 +396,19 @@ public class Pets implements MiniMod {
             pets.remove(name);
         }
 
+        private Unit closePet() {
+            for (Unit unit : Groups.unit) {
+                if (isPet(unit)
+                    && unit.dst(this.unit) <= 15 * Vars.tilesize
+                    && unit.type == this.unit.type
+                    && unit != this.unit
+                    && petOwner(unit) != uuid) {
+                    return unit;
+                }
+            }
+            return null;
+        }
+
         private boolean isNearTurret() {
             Team team = player.team();
             if (team.data() == null) {
@@ -423,11 +435,34 @@ public class Pets implements MiniMod {
             return shouldHide[0];
         }
 
+        private boolean isPet(Unit unit) {
+            if (unit instanceof MechUnit) {
+                return ((MechUnit)unit).controller() instanceof PetController;
+            } else if (unit instanceof PayloadUnit) {
+                return ((PayloadUnit)unit).controller() instanceof PetController;                
+            }
+            return false;
+        }
+
+        private String petOwner(Unit unit) {
+            PetController controller = null;
+            if (unit instanceof MechUnit) {
+                controller = (PetController)((MechUnit)unit).controller();
+            } else if (unit instanceof PayloadUnit) {
+                controller = (PetController)((PayloadUnit)unit).controller();
+            }
+            return controller.uuid;
+        }
+
+
         long prevTime = System.currentTimeMillis();
         boolean hasLabel = false;
         boolean isEating = false;
         // mining subset of eating
         Tile mining = null;
+
+        // for friends
+        float friendRotDir = 0;
 
         @Override
         public void updateUnit() {
@@ -442,6 +477,7 @@ public class Pets implements MiniMod {
 
             // set team
             if (isNearTurret()) {
+                // stealth mode
                 unit.team = Team.derelict;
             } else {
                 unit.team = unitTeam;
@@ -477,8 +513,29 @@ public class Pets implements MiniMod {
             unit.x += vx * (dt) / 1000f;
             unit.y += vy * (dt) / 1000f;
 
+            // rotation
             if (!isEating) {
-                unit.rotation = unit.angleTo(player);
+                Unit closePet = closePet();
+                if (closePet != null) {
+                    float targetAngle = unit.angleTo(closePet);
+                    if (Math.abs(unit.rotation - targetAngle) >= 15) {
+                        unit.rotation += (targetAngle - unit.rotation) * 0.25f;
+                    } else {
+                        if (unit.rotation - targetAngle >= 15) {
+                            friendRotDir = -1;
+                        } else if (unit.rotation - targetAngle <= -15) {
+                            friendRotDir = 1;
+                        }
+
+                        if (friendRotDir > 0) {
+                            unit.rotation += 1;
+                        } else {
+                            unit.rotation -= 1;
+                        }
+                    }
+                } else {
+                    unit.rotation = unit.angleTo(player);
+                }
             }
 
             // boost
