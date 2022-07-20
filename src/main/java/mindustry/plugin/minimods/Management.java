@@ -160,11 +160,11 @@ public class Management implements MiniMod {
             },
             ctx -> {
                 if (!ctx.args.containsKey("name")) {
-                    StringBuilder data = new StringBuilder(String.format("%-24s, %12s, %s\n", "Setting", "Type", "Value"));
+                    StringBuilder data = new StringBuilder(String.format("%-32s, %12s, %s\n", "Setting", "Type", "Value"));
                     int n = 0;
                     for (String key : Core.settings.keys()) {
                         Object value = Core.settings.get(key,null);
-                        data.append(String.format("%-24s, %12s, %s\n", key, value == null ? "Null" : value.getClass().getSimpleName(), value == null ? "null": value.toString()));
+                        data.append(String.format("%-32s, %12s, %s\n", key, value == null ? "Null" : value.getClass().getSimpleName(), value == null ? "null": value.toString()));
                         n++;
                     }
                     EmbedBuilder eb = new EmbedBuilder()
