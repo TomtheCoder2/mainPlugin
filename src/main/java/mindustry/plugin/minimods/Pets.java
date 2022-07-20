@@ -18,6 +18,7 @@ import mindustry.entities.abilities.Ability;
 import mindustry.entities.units.UnitController;
 import mindustry.game.EventType;
 import mindustry.game.Team;
+import mindustry.game.Teams;
 import mindustry.gen.*;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
@@ -30,6 +31,11 @@ import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.blocks.defense.BuildTurret;
+import mindustry.world.blocks.defense.turrets.BaseTurret;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.blocks.defense.turrets.PointDefenseTurret;
+import mindustry.world.blocks.defense.turrets.Turret;
 
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
@@ -110,10 +116,12 @@ public class Pets implements MiniMod {
     }
 
     private void spawnPet(PetDatabase.Pet pet, Player player) {
+        // correct team can't be set instantly, otherwise pet won't spawn
         Unit unit = pet.species.spawn(player.team(), player.x, player.y);
 
         // initialize controller
-        UnitController controller = new PetController(player, pet.name);
+        Team team = getTeam(pet.color);
+        UnitController controller = new PetController(player, pet.name, pet.color, team);
         if (unit instanceof MechUnit) {
             MechUnit mechUnit = (MechUnit) unit;
             mechUnit.controller(controller);
@@ -126,13 +134,6 @@ public class Pets implements MiniMod {
         // spawn unit
         Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);
         Events.fire(new EventType.UnitSpawnEvent(unit));
-
-        // set team to correct team
-        // hacky solution, but doesnt work any other way
-        Team team = getTeam(pet.color);
-        Timer.schedule(() -> {
-            unit.team(team);
-        }, 1f);
     }
 
     @Override
@@ -364,16 +365,20 @@ public class Pets implements MiniMod {
         final String uuid;
         final Player player;
         final String name;
+        final Team unitTeam;
+        final Color color;
         /**
          * 1/s
          */
         int maxVel = 250;
         Unit unit;
 
-        public PetController(Player player, String name) {
+        public PetController(Player player, String name, Color color, Team unitTeam) {
             this.player = player;
             this.uuid = player.uuid();
             this.name = name;
+            this.color = color;
+            this.unitTeam = unitTeam;
         }
 
         @Override
@@ -392,6 +397,32 @@ public class Pets implements MiniMod {
             pets.remove(name);
         }
 
+        private boolean isNearTurret() {
+            Team team = player.team();
+            if (team.data() == null) {
+                return false;
+            }
+            final boolean[] shouldHide = new boolean[1];;
+            team.data().turretTree.intersect(unit.x - 500f, unit.y - 500f, 1000f, 1000f, turret -> {
+                if (!(turret.block() instanceof BaseTurret)) {
+                    Log.warn("a turret that isn't a turret: " + turret.getClass().getCanonicalName());
+                }
+                BaseTurret bt = (BaseTurret)turret.block();
+                boolean targetAir = true;
+                if (bt instanceof Turret) {
+                    targetAir = ((Turret)bt).targetAir;
+                }
+                if (bt instanceof PointDefenseTurret || bt instanceof BuildTurret) {
+                    targetAir = false;
+                }
+
+                if (targetAir && unit.dst(turret) <= bt.range + 10) {
+                    shouldHide[0] = true;
+                } 
+            });
+            return shouldHide[0];
+        }
+
         long prevTime = System.currentTimeMillis();
         boolean hasLabel = false;
         boolean isEating = false;
@@ -408,6 +439,13 @@ public class Pets implements MiniMod {
 
             long dt = System.currentTimeMillis() - prevTime;
             prevTime += dt;
+
+            // set team
+            if (isNearTurret()) {
+                unit.team = Team.derelict;
+            } else {
+                unit.team = unitTeam;
+            }
 
             // keep pet alive
             unit.health(unit.maxHealth);
@@ -449,7 +487,7 @@ public class Pets implements MiniMod {
             // labels
             boolean isStill = Math.abs(vx) < 2 && Math.abs(vy) < 2;
             if (!hasLabel && isStill) {
-                Call.label(name, 1f, unit.x, unit.y + 5);
+                Call.label("[#" + color.toString().substring(0, 6) + "]" + name, 1f, unit.x, unit.y + 5);
                 hasLabel = true;
                 Timer.schedule(() -> {
                     hasLabel = false;
