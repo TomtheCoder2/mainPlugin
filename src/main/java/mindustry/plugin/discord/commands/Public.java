@@ -22,24 +22,5 @@
 //    }
 //
 //    public void registerCommands(DiscordCommands handler) {
-//        if (data.has("appeal_roleid") && data.has("appeal_channel_id")) {
-//            String appealRole = data.getString("appeal_roleid");
-//            TextChannel appeal_channel = getTextChannel(data.getString("appeal_channel_id"));
-//
-//            handler.registerCommand(new Command("appeal") {
-//                {
-//                    help = "Request an appeal";
-//                }
-//
-//                public void run(Context ctx) {
-//                    ctx.author.asUser().get().addRole(api.getRoleById(appealRole).get());
-//                    EmbedBuilder eb = new EmbedBuilder().setTitle("Successfully requested an appeal").setDescription("Please head over to <#" + appeal_channel.getIdAsString() + ">!");
-//                    ctx.sendMessage(eb);
-//                    EmbedBuilder appealMessage = new EmbedBuilder().setTitle("Please use this format to appeal:").addField("1.Names", "All names used in game.").addField("2.Screenshot", "Send a screenshot of your ban screen").addField("3.Reason", "Explain what you did and why you want to get unbanned");
-//                    appeal_channel.sendMessage("<@" + ctx.author.getIdAsString() + ">");
-//                    appeal_channel.sendMessage(appealMessage);
-//                }
-//            });
-//        }
 //    }
 //}

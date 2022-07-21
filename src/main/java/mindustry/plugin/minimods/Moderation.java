@@ -19,6 +19,7 @@ import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
+import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.*;
@@ -351,12 +352,12 @@ public class Moderation implements MiniMod {
                         return;
                     }                    
                     if (info.lastKicked == 0) {
-                        ctx.error("Player not kicked", Utils.escapeColorCodes(info.lastName) + " is not kicked");
+                        ctx.error("Player not kicked", Utils.escapeEverything(info.lastName) + " is not kicked");
                         return;
                     }
 
                     info.lastKicked = 0;
-                    ctx.success("Unkicked player", "Successfully unkicked " + Utils.escapeColorCodes(info.lastName));
+                    ctx.success("Unkicked player", "Successfully unkicked " + Utils.escapeEverything(info.lastName));
                     DiscordLog.moderation("Unkick", ctx.author(), info, ctx.args.get("reason"), null);
                 }
         );
@@ -417,6 +418,30 @@ public class Moderation implements MiniMod {
                     p.sendMessage("Your name was changed to [orange]" + p.name + "[white] by a moderator");
                     ctx.success("Renamed player", "Renamed " + oldName + " to " + Strings.stripColors(p.name));
                     DiscordLog.moderation("Rename", ctx.author(), p.getInfo(), null, "Old: " + oldName + "\nNew: " + Strings.stripColors(p.name));
+                }
+        );
+
+        handler.register("appeal", "",
+                data -> {
+                    data.category = "Moderation";
+                    data.help = "Request an appeal";
+                },
+                ctx -> {
+                    ctx.author().addRole(DiscordVars.api.getRoleById(Roles.APPEAL).get()).join();   
+                    
+                    new MessageBuilder()
+                        .addEmbed(
+                            new EmbedBuilder()
+                                .setColor(DiscordPalette.WARN)
+                                .setTitle("Use the following format to appeal")
+                                .addField("1. Names", "All names that you've used in game")
+                                .addField("2. Screenshot", "Send a screenshot of your ban screen")
+                                .addField("3. Reason", "Explain what you did and why you want to get unbanned")
+                        )
+                        .setContent("<@" + ctx.author().getId() + ">")
+                        .send(Channels.APPEAL);
+                    
+                    ctx.success("Successfully requested an appeal", "Head over to <#" + Channels.APPEAL.getIdAsString() + ">");
                 }
         );
     }
