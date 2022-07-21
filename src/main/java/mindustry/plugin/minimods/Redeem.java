@@ -34,7 +34,7 @@ public class Redeem implements MiniMod {
             keys.remove(key);
 
             // init discord stuff
-            Server server = DiscordVars.api.getServers().iterator().next();
+            Server server = DiscordVars.server();
             var user = DiscordVars.api.getUserById(discordId).join();
 
             // remove previous links to discord acc

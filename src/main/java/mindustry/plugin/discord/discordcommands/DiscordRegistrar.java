@@ -115,7 +115,7 @@ public class DiscordRegistrar {
                 if (entry.value.data.hidden) continue;
                 if (entry.value.data.roles != null && !Arrays.stream(entry.value.data.roles).anyMatch(roleID -> 
                             // user has that role
-                            user.getRoles(DiscordVars.api.getServers().iterator().next()).stream().anyMatch(r -> r.getId() == roleID)
+                            user.getRoles(DiscordVars.server()).stream().anyMatch(r -> r.getId() == roleID)
                         )) continue;
 
                 String category = entry.value.data.category;
