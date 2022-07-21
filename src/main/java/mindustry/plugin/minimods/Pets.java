@@ -410,29 +410,34 @@ public class Pets implements MiniMod {
         }
 
         private boolean isNearTurret() {
-            Team team = player.team();
-            if (team.data() == null || team.data().turretTree == null) {
-                return false;
-            }
-            final boolean[] shouldHide = new boolean[1];;
-            team.data().turretTree.intersect(unit.x - 500f, unit.y - 500f, 1000f, 1000f, turret -> {
-                if (!(turret.block() instanceof BaseTurret)) {
-                    Log.warn("a turret that isn't a turret: " + turret.getClass().getCanonicalName());
+            for (var data : Vars.state.teams.active) {
+                if (data.turretTree == null) {
+                    continue;
                 }
-                BaseTurret bt = (BaseTurret)turret.block();
-                boolean targetAir = true;
-                if (bt instanceof Turret) {
-                    targetAir = ((Turret)bt).targetAir;
-                }
-                if (bt instanceof PointDefenseTurret || bt instanceof BuildTurret) {
-                    targetAir = false;
-                }
+                final boolean[] shouldHide = new boolean[1];
+                data.turretTree.intersect(unit.x - 500f, unit.y - 500f, 1000f, 1000f, turret -> {
+                    if (!(turret.block() instanceof BaseTurret)) {
+                        Log.warn("a turret that isn't a turret: " + turret.getClass().getCanonicalName());
+                    }
+                    BaseTurret bt = (BaseTurret)turret.block();
+                    boolean targetAir = true;
+                    if (bt instanceof Turret) {
+                        targetAir = ((Turret)bt).targetAir;
+                    }
+                    if (bt instanceof PointDefenseTurret || bt instanceof BuildTurret) {
+                        targetAir = false;
+                    }
 
-                if (targetAir && unit.dst(turret) <= bt.range + 10) {
-                    shouldHide[0] = true;
-                } 
-            });
-            return shouldHide[0];
+                    if (targetAir && unit.dst(turret) <= bt.range + 10) {
+                        shouldHide[0] = true;
+                    } 
+                });
+                if (shouldHide[0]) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private boolean isPet(Unit unit) {
@@ -544,7 +549,7 @@ public class Pets implements MiniMod {
             // labels
             boolean isStill = Math.abs(vx) < 2 && Math.abs(vy) < 2;
             if (!hasLabel && isStill) {
-                Call.label("[#" + color.toString().substring(0, 6) + "]" + name, 1f, unit.x, unit.y + 5);
+                Call.label("[#" + color.toString().substring(0, 6) + "]" + name, 1f, unit.x, unit.y + 2 * Vars.tilesize);
                 hasLabel = true;
                 Timer.schedule(() -> {
                     hasLabel = false;
