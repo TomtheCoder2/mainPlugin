@@ -411,7 +411,7 @@ public class Pets implements MiniMod {
 
         private boolean isNearTurret() {
             Team team = player.team();
-            if (team.data() == null) {
+            if (team.data() == null || team.data().turretTree == null) {
                 return false;
             }
             final boolean[] shouldHide = new boolean[1];;

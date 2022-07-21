@@ -221,7 +221,7 @@ public class PheonixMain extends Plugin {
 
                 Rank rank = Rank.all[pd.rank];
                 Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
-                player.name = rank.tag + player.name;
+                player.name = rank.tag + " " + player.name;
 
                 // Give Marshals admin
                 if (pd.rank == Rank.all.length - 1) {

@@ -96,7 +96,7 @@ public class Rainbow implements MiniMod {
                         if (rank < Rank.all.length && rank >= 0) { // this should never be false
                             player.name = "[" + hex + "]"
                                     + Rank.all[rank].tag
-                                    + "[" + hex + "]"
+                                    + " [" + hex + "]"
                                     + Utils.escapeEverything(player.name);
                         }
                     }

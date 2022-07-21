@@ -388,7 +388,7 @@ public class Ranks implements MiniMod {
                     pd.rank = rank;
                     Database.setPlayerData(pd);
 
-                    target.name = Rank.all[rank].tag + "[#" + Rank.all[rank].color.toString().substring(0,6) + "]" +  Utils.escapeEverything(target);
+                    target.name = Rank.all[rank].tag + " [#" + Rank.all[rank].color.toString().substring(0,6) + "]" +  Utils.escapeEverything(target);
                     ctx.success("Rank set", Utils.escapeEverything(target) + "'s rank is now set to " + Rank.all[rank].name);
                 }
         );
