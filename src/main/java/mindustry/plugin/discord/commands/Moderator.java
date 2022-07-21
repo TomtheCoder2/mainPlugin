@@ -406,26 +406,6 @@
 ////
 ////            });
 //
-//            handler.registerCommand(new RoleRestrictedCommand("js") {
-//                {
-//                    help = "Run a js command!";
-//                    usage = "<code>";
-//                    roles = new long[] { banRole };
-//                    category = management;
-//                    hidden = true;
-//                    minArguments = 1;
-//                }
-//
-//                public void run(Context ctx) {
-//                    Core.app.post(() -> {
-//                        EmbedBuilder eb = new EmbedBuilder();
-//                        eb.setTitle("Command executed successfully!");
-//                        System.out.println(ctx.message);
-//                        eb.setDescription("Output: " + mods.getScripts().runConsole(ctx.message));
-//                        ctx.sendMessage(eb);
-//                    });
-//                }
-//            });
 //
 //            handler.registerCommand(new RoleRestrictedCommand("ip") {
 //                {

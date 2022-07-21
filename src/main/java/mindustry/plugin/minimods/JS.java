@@ -20,7 +20,7 @@ public class JS implements MiniMod {
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
         handler.register("enablejs", "<true/false> [minutes]", d -> {
-            d.roles = new long[]{Roles.ADMIN};
+            d.roles = new long[]{Roles.ADMIN, Roles.MOD};
             d.category = "Moderation";
             d.help = "Enable/Disable JS command for everyone";
         }, ctx -> {
@@ -44,6 +44,18 @@ public class JS implements MiniMod {
                     ctx.error("Error", "First argument must be true or false");
             }
         });
+
+        handler.register("js", "<code>", 
+            data -> {
+                data.roles = new long[] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
+                data.category = "Moderation";
+                data.help = "Run JS code";
+            },
+            ctx -> {
+                String res = mods.getScripts().runConsole(ctx.args.get("code"));
+                ctx.success("Ran code", "Output:\n```\n" + res + "\n```");
+            }
+        );
     }
 
     private void enableJS(long sec, String name) {
