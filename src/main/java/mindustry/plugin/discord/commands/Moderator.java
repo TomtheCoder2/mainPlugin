@@ -407,49 +407,6 @@
 ////            });
 //
 //
-//            handler.registerCommand(new RoleRestrictedCommand("spawn") {
-//                {
-//                    help = "Spawn x units at the location of the specified player";
-//                    roles = new long[] { banRole };
-//                    category = management;
-//                    usage = "<playerid|ip|name> <unit> <amount>";
-//                    minArguments = 3;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1];
-//                    String targetUnit = ctx.args[2];
-//                    int amount = Integer.parseInt(ctx.args[3]);
-//                    UnitType desiredUnit = UnitTypes.dagger;
-//                    if (target.length() > 0 && targetUnit.length() > 0 && amount > 0 && amount < 1000) {
-//                        try {
-//                            Field field = UnitTypes.class.getDeclaredField(targetUnit);
-//                            desiredUnit = (UnitType) field.get(null);
-//                        } catch (NoSuchFieldException | IllegalAccessException ignored) {
-//                        }
-//
-//                        Player player = findPlayer(target);
-//                        if (player != null) {
-//                            UnitType finalDesiredUnit = desiredUnit;
-//                            IntStream.range(0, amount).forEach(i -> {
-//                                Unit unit = finalDesiredUnit.create(player.team());
-//                                unit.set(player.getX(), player.getY());
-//                                unit.add();
-//                            });
-//                            eb.setTitle("Command executed successfully.");
-//                            eb.setDescription("Spawned " + amount + " " + targetUnit + " near " + Utils.escapeEverything(player.name) + ".");
-//                            ctx.sendMessage(eb);
-//                        }
-//                    } else {
-//                        eb.setTitle("Command terminated");
-//                        eb.setDescription("Invalid arguments provided.");
-//                        eb.setColor(Pals.error);
-//                        ctx.sendMessage(eb);
-//                    }
-//                }
-//            });
-//
 //            handler.registerCommand(new RoleRestrictedCommand("killunits") {
 //                {
 //                    help = "Kills all units of the team of the specified player";

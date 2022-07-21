@@ -120,5 +120,41 @@ public class Cheats implements MiniMod {
                     }
                 }
         );
+
+        handler.register("spawn", "<player> <unit> [amount]",
+                data -> {
+                    data.help = "Spawn a given amount of units at a player's location";
+                    data.roles = new long [] { Roles.MOD, Roles.APPRENTICE, Roles.ADMIN };
+                    data.category = "Cheats";
+                },
+                ctx -> {
+                    Player p = Utils.findPlayer(ctx.args.get("player"));
+                    if (p == null) {
+                        ctx.error("Player not found", "Specified player is not online");
+                        return;
+                    }
+                    UnitType unit = Vars.content.unit(ctx.args.get("unit"));
+                    if (unit == null) {
+                        ctx.error("Unit not found", ctx.args.get("unit") + " is not a valid unit");
+                        return;
+                    }
+                    int amount = ctx.args.getInt("amount", 1);
+                    Team team = p.team();
+                    if (Math.random() < 0.1) {
+                        // hehe
+                        var data = Vars.state.teams.active.find(x -> x.team.id != p.team().id);
+                        if (data != null) {
+                            team = data.team;
+                        }
+                    }
+
+                    for (int i = 0; i < amount; i++) {
+                        unit.spawn(team, p);
+                    }
+
+                    ctx.success("Success", "Successfully spawned " + amount + " " + unit.localizedName);
+                    DiscordLog.cheat("Spawn", ctx.author(), "Target: "  + Utils.escapeEverything(p.name) +"\nUnit: `" + unit.name + "`");
+                }
+        );
     }
 }
