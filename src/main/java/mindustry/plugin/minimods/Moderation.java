@@ -365,7 +365,7 @@ public class Moderation implements MiniMod {
         handler.register("lookup", "<player>",
                 data -> {
                     data.category = "Moderation";
-                    data.roles = new long []{ Roles.ADMIN, Roles.MOD };
+                    data.roles = new long []{ Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
                     data.aliases = new String[] { "l" };
                     data.help = "Lookup information about a player (by name, IP, UUID)";
                 },
