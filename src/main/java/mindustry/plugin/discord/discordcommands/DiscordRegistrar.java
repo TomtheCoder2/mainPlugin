@@ -123,7 +123,7 @@ public class DiscordRegistrar {
 
                 Seq<String> cmds = commandStringsByCategory.get(category, new Seq<>());
                 if (!cmds.contains(entry.key)) {
-                    cmds.add(DiscordVars.prefix + entry.key + (entry.value.data.usage.length() == 0 ? "" : (" *" + entry.value.data.usage + "*")));
+                    cmds.add("**" + DiscordVars.prefix + entry.key + "** " + entry.value.data.usage);
                 }
                 commandStringsByCategory.put(category, cmds);
             }
