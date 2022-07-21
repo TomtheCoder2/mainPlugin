@@ -105,19 +105,27 @@ public class Pets implements MiniMod {
 
             var alreadySpawned = spawnedPets.get(player.uuid(), new Seq<>());
             if (alreadySpawned.contains(pet.name)) {
-                player.sendMessage(GameMsg.error("Pet", "Pet '" + args[0] + "' is already spawned!"));
+                player.sendMessage(GameMsg.error("Pet", "Pet '" + args[0] + "' is already spawned"));
                 return;
             }
+
+            if (!spawnPet(pet, player)) {
+                player.sendMessage(GameMsg.error("Pet", "Pet [#" + pet.color.toString().substring(0, 6) + "]" + pet.name + "[scarlet] can't be spawned here"));
+                return;
+            }
+
             alreadySpawned.add(pet.name);
             spawnedPets.put(player.uuid(), alreadySpawned);
-
-            spawnPet(pet, player);
+            player.sendMessage(GameMsg.success("Pet", "Pet [#" + pet.color.toString().substring(0, 6) + "]" + pet.name + "[green] successfully spawned!"));
         });
     }
 
-    private void spawnPet(PetDatabase.Pet pet, Player player) {
+    private boolean spawnPet(PetDatabase.Pet pet, Player player) {
         // correct team can't be set instantly, otherwise pet won't spawn
         Unit unit = pet.species.spawn(player.team(), player.x, player.y);
+        if (unit == null) {
+            return false;
+        }
 
         // initialize controller
         Team team = getTeam(pet.color);
@@ -133,6 +141,7 @@ public class Pets implements MiniMod {
 
 //        Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);
 //        Events.fire(new EventType.UnitSpawnEvent(unit));
+        return true;
     }
 
     @Override
@@ -394,6 +403,12 @@ public class Pets implements MiniMod {
         public void removed(Unit ignore) {
             var pets = spawnedPets.get(uuid);
             pets.remove(name);
+
+            if (player.con != null && player.con.isConnected()) {
+                player.sendMessage(GameMsg.custom("Pet", "yellow", "Your pet [#" + color.toString().substring(0,6) + "]" + name + "[yellow] died! " +
+                    "Make sure you are spawning any ground pets on empty tiles."
+                ));
+            }
         }
 
         private Unit closePet() {
@@ -523,19 +538,19 @@ public class Pets implements MiniMod {
                 Unit closePet = closePet();
                 if (closePet != null) {
                     float targetAngle = unit.angleTo(closePet);
-                    if (Math.abs(unit.rotation - targetAngle) >= 15) {
+                    if (Math.abs(unit.rotation - targetAngle) >= 45) {
                         unit.rotation += (targetAngle - unit.rotation) * 0.25f;
                     } else {
-                        if (unit.rotation - targetAngle >= 15) {
+                        if (unit.rotation - targetAngle >= 40) {
                             friendRotDir = -1;
-                        } else if (unit.rotation - targetAngle <= -15) {
+                        } else if (unit.rotation - targetAngle <= -25) {
                             friendRotDir = 1;
                         }
 
                         if (friendRotDir > 0) {
-                            unit.rotation += 1;
+                            unit.rotation += 3 * 360 * dt / 1000;
                         } else {
-                            unit.rotation -= 1;
+                            unit.rotation -= 3 * 360 * dt / 1000;
                         }
                     }
                 } else {
