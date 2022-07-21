@@ -108,12 +108,12 @@ public class DiscordRegistrar {
      * @param user the user, by which commands will be filtered (only commands they can use), or null for all commands
      */
     public EmbedBuilder helpEmbed(User user) {
-        ObjectMap<String, Seq<String>> commandsByCategory = new ObjectMap<>();
+        ObjectMap<String, Seq<String>> commandStringsByCategory = new ObjectMap<>();
 
         for (var entry : commands) {
             if (entry.key.equals(entry.value.data.name)) {
                 if (entry.value.data.hidden) continue;
-                if (entry.value.data.roles != null && !Arrays.stream(entry.value.data.roles).allMatch(roleID -> 
+                if (entry.value.data.roles != null && !Arrays.stream(entry.value.data.roles).anyMatch(roleID -> 
                             // user has that role
                             user.getRoles(DiscordVars.api.getServers().iterator().next()).stream().anyMatch(r -> r.getId() == roleID)
                         )) continue;
@@ -121,23 +121,23 @@ public class DiscordRegistrar {
                 String category = entry.value.data.category;
                 if (category == null) category = "General";
 
-                Seq<String> cmds = commandsByCategory.get(category, new Seq<>());
+                Seq<String> cmds = commandStringsByCategory.get(category, new Seq<>());
                 if (!cmds.contains(entry.key)) {
-                    cmds.add(entry.key);
+                    cmds.add(DiscordVars.prefix + entry.key + (entry.value.data.usage.length() == 0 ? "" : (" *" + entry.value.data.usage + "*")));
                 }
-                commandsByCategory.put(category, cmds);
+                commandStringsByCategory.put(category, cmds);
             }
         }
 
-        for (var list : commandsByCategory.values()) {
+        for (var list : commandStringsByCategory.values()) {
             list.sort();
         }
 
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Commands")
                 .setColor(DiscordPalette.INFO);
-        for (var entry : commandsByCategory) {
-            eb.addInlineField(entry.key, entry.value.toString("\n"));
+        for (var entry : commandStringsByCategory) {
+            eb.addField(entry.key, entry.value.toString("\n"));
         }
 
         return eb;
@@ -288,7 +288,7 @@ public class DiscordRegistrar {
         /**
          * Category
          */
-        public String category = "Public";
+        public String category = null;
         public boolean hidden = false;
 
         public Command(String name) {

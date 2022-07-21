@@ -32,6 +32,7 @@ public class Mods implements MiniMod {
         handler.register("mod", "<mod...>",
                 data -> {
                     data.help = "Get information about a specific mod";
+                    data.category = "Mods";
                 },
                 ctx -> {
                     var mod = findModByName(ctx.args.get("mod"));
@@ -68,7 +69,7 @@ public class Mods implements MiniMod {
 
         handler.register("uploadmod", "[.zip]", d -> {
             d.help = "Upload mod (include .zip file in message)";
-            d.category = "Management";
+            d.category = "Mods";
             d.roles = new long[]{Roles.ADMIN};
             d.aliases = new String[]{"umod"};
         }, ctx -> {
@@ -114,7 +115,7 @@ public class Mods implements MiniMod {
         handler.register("removemod", "<modname/id...>", d -> {
             d.help = "Remove a mod from the folder";
             d.roles = new long[]{Roles.ADMIN};
-            d.category = "Management";
+            d.category = "Mods";
             d.aliases = new String[]{"rmod"};
         }, ctx -> {
             var mod = findModByName(ctx.args.get("modname/id"));
@@ -146,7 +147,7 @@ public class Mods implements MiniMod {
                 data -> {
                     data.help = "List mods & versions";
                     data.aliases = new String[]{"version"};
-                    data.category = "Management";
+                    data.category = "Mods";
                 },
                 ctx -> {
                     EmbedBuilder eb = new EmbedBuilder()

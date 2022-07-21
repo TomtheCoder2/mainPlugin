@@ -156,9 +156,10 @@ public class Management implements MiniMod {
 
         handler.register("setting", "[name] [type] [value...]", 
             data -> {
-                data.help = "Configure server settings (`Core.settings`). It is recommended to use " + DiscordVars.prefix + "config instead of this command.";
+                data.help = "Configure server settings (`Core.settings`). It is recommended to use " + DiscordVars.prefix + "config instead of this command. **DO NOT USE THIS COMMAND**";
                 data.category = "Management";
                 data.roles = new long [] { Roles.ADMIN };
+                data.hidden = true;
             },
             ctx -> {
                 if (!ctx.args.containsKey("name")) {
@@ -279,7 +280,7 @@ public class Management implements MiniMod {
             data -> {
                 data.help = "Make an IP lookup";
                 data.roles = new long [] { Roles.MOD, Roles.ADMIN };
-                data.category = "Management";
+                data.category = "Moderation";
                 data.aliases = new String[] { "il" };
             },
             ctx -> {
@@ -287,6 +288,7 @@ public class Management implements MiniMod {
                 var infos =  Vars.netServer.admins.searchNames(name); // strip colors is active
                 if (infos.size > 1) {
                     ctx.error("Multiple players found that match name", infos.toSeq().toString("\n", i -> i.lastName));
+                    return;
                 }
                 String ip;
                 if (infos.size == 1) {
@@ -294,6 +296,7 @@ public class Management implements MiniMod {
                 } else {
                     if (!name.matches("[a-f0-9:.]+")) {
                         ctx.error("Player not found", "'" + name + "' is neither a valid player or a valid IP");
+                        return;
                     }
                     ip = name;
                 }

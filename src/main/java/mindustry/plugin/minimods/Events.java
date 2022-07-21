@@ -5,6 +5,7 @@ import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.DiscordPalette;
+import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 
@@ -41,6 +42,7 @@ public class Events implements MiniMod {
                 data -> {
                     data.help = "Update event IP & port";
                     data.category = "Management";
+                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
                 },
                 ctx -> {
                     if (!ctx.args.containsKey("ipaddr")) {
