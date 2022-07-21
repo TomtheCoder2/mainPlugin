@@ -7,6 +7,7 @@ import arc.util.CommandHandler;
 import arc.util.Strings;
 import arc.util.io.CounterInputStream;
 import mindustry.Vars;
+import mindustry.gen.Player;
 import mindustry.io.SaveIO;
 import mindustry.io.SaveVersion;
 import mindustry.maps.Map;
@@ -16,6 +17,7 @@ import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageAttachment;
@@ -209,6 +211,14 @@ public class Maps implements MiniMod {
 
     @Override
     public void registerCommands(CommandHandler handler) {
+        handler.<Player>register("maps", "List all maps", (args, player) -> {
+            StringBuilder msg = new StringBuilder();
+            msg.append(GameMsg.custom("Maps", "sky", "List of maps:\n"));
+            for (Map map : Vars.maps.customMaps()) {
+                msg.append(" - [white]" + map.name() + "[sky] [orange]" + map.width + "[sky]x[orange]" + map.height + " [sky][green]" + map.rules().mode().name() + "[sky]: " + map.description() + "\n");
+            }
 
+            player.sendMessage(msg.toString());
+        });
     }
 }
