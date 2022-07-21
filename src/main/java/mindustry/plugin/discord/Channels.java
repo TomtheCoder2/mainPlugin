@@ -47,7 +47,7 @@ public class Channels {
         ERROR_LOG = getChannel(api, obj.getString("error_log"));
 
         BOT = getChannel(api, obj.getString("bot"));
-        MOD_BOT = getChannel(api, obj.getString("staff_bot"));
+        MOD_BOT = getChannel(api, obj.getString("mod_bot"));
         APPRENTICE_BOT = getChannel(api, obj.getString("apprentice_bot"));
         ADMIN_BOT = getChannel(api, obj.getString("admin_bot"));
     }
