@@ -22,6 +22,7 @@ import mindustry.game.Teams;
 import mindustry.gen.*;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
@@ -226,22 +227,22 @@ public class Pets implements MiniMod {
                     String foodEaten = "";
                     Item[] foods = possibleFoods(pet.species);
                     if (Structs.contains(foods, Items.coal)) {
-                        foodEaten += ":black_circle: " + pet.eatenCoal + "\n";
+                        foodEaten += DiscordVars.emoji("coal").getMentionTag() + " " + pet.eatenCoal + "\n";
                     }
                     if (Structs.contains(foods, Items.copper)) {
-                        foodEaten += ":brown_square: " + pet.eatenCopper + "\n";
+                        foodEaten += DiscordVars.emoji("copper").getMentionTag() + " " + pet.eatenCopper + "\n";
                     }
                     if (Structs.contains(foods, Items.lead)) {
-                        foodEaten += ":purple_square: " + pet.eatenLead + "\n";
+                        foodEaten += DiscordVars.emoji("lead").getMentionTag() + " " + pet.eatenLead + "\n";
                     }
                     if (Structs.contains(foods, Items.titanium)) {
-                        foodEaten += ":blue_square: " + pet.eatenTitanium + "\n";
+                        foodEaten += DiscordVars.emoji("titanium").getMentionTag() + " " + pet.eatenTitanium + "\n";
                     }
                     if (Structs.contains(foods, Items.thorium)) {
-                        foodEaten += ":heart: " + pet.eatenThorium + "\n";
+                        foodEaten += DiscordVars.emoji("thorium").getMentionTag() + " " + pet.eatenThorium + "\n";
                     }
                     if (Structs.contains(foods, Items.beryllium)) {
-                        foodEaten += ":green_square: " + pet.eatenBeryllium + "\n";
+                        foodEaten += DiscordVars.emoji("beryllium").getMentionTag() + " " + pet.eatenBeryllium + "\n";
                     }
 
                     ctx.sendEmbed(new EmbedBuilder()

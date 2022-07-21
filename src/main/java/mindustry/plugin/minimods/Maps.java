@@ -3,6 +3,8 @@ package mindustry.plugin.minimods;
 import arc.Core;
 import arc.files.Fi;
 import arc.struct.StringMap;
+import arc.util.CommandHandler;
+import arc.util.Strings;
 import arc.util.io.CounterInputStream;
 import mindustry.Vars;
 import mindustry.io.SaveIO;
@@ -148,22 +150,20 @@ public class Maps implements MiniMod {
                     EmbedBuilder eb = new EmbedBuilder();
                     eb.setTitle("Maps");
                     eb.setColor(DiscordPalette.INFO);
-                    List<String> mapNames = new ArrayList<>();
                     for (Map map : Vars.maps.customMaps()) {
-                        eb.addInlineField(Utils.escapeColorCodes(map.name()), map.rules().mode().name() + "\n" + map.width + "x" + map.height);
-                        mapNames.add(escapeEverything(map.name()));
+                        eb.addInlineField(Strings.stripColors(map.name()), map.rules().mode().name() + "\n" + map.width + "x" + map.height);
                     }
                     ctx.sendEmbed(eb);
+
                     eb = new EmbedBuilder().setTitle("Ranking");
                     StringBuilder sb = new StringBuilder();
                     var maps = Database.rankMapRatings(100, 0);
                     int c = 1;
                     for (Database.Map m : maps) {
-                        if (!mapNames.contains(escapeEverything(m.name))) continue;
-                        sb.append(String.format("%-2d | %-4d | %-4d | %-4d %s\n", c, m.positiveRating, m.negativeRating, m.positiveRating - m.negativeRating, m.name));
+                        sb.append(String.format("%-2d | %-4d | %-4d | %-4d %s\n", c, m.positiveRating, m.negativeRating, m.positiveRating - m.negativeRating, Strings.stripColors(m.name)));
                         c++;
                     }
-                    eb.setDescription("```" + sb + "```");
+                    eb.setDescription("```\n" + sb + "\n```");
                     ctx.sendEmbed(eb);
                 }
         );
@@ -205,5 +205,10 @@ public class Maps implements MiniMod {
                     );
                 }
         );
+    }
+
+    @Override
+    public void registerCommands(CommandHandler handler) {
+
     }
 }
