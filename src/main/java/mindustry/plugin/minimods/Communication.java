@@ -17,6 +17,7 @@ import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
+import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import mindustry.ui.Menus;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -218,7 +219,7 @@ public class Communication implements MiniMod {
 
                             ctx.success("Sent Message", "Sent message to all members of team " + team.name);
                         } catch (NoSuchFieldException | IllegalAccessException e) {
-                            Player p = Utils.findPlayer(target);
+                            Player p = Query.findPlayerEntity(target);
                             if (p == null) {
                                 ctx.error("No such player", "'" + target + "' is not a player or a team");
                             }
@@ -236,7 +237,7 @@ public class Communication implements MiniMod {
             //find player by name
 //            Player other = Groups.player.find(p -> p.name.equalsIgnoreCase(args[0]));
 
-            Player other = Utils.findPlayer(args[0]);
+            Player other = Query.findPlayerEntity(args[0]);
 
             // give error message with scarlet-colored text if player isn't found
             if (other == null) {

@@ -15,6 +15,7 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.utils.GameMsg;
+import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
@@ -145,7 +146,7 @@ public class Kick implements MiniMod {
                 return;
             }
 
-            Player found = Utils.findPlayer(args[0]);
+            Player found = Query.findPlayerEntity(args[0]);
             if (found == null) {
                 if (args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))) {
                     int id = Strings.parseInt(args[0].substring(1));

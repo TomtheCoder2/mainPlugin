@@ -21,6 +21,7 @@ import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
+import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
@@ -61,7 +62,7 @@ public class GameInfo implements MiniMod {
                 },
                 ctx -> {
                     EmbedBuilder eb = new EmbedBuilder();
-                    Administration.PlayerInfo info = Utils.getPlayerInfo(ctx.args.get("player"));
+                    Administration.PlayerInfo info = Query.findPlayerInfo(ctx.args.get("player"));
                     if (info == null) {
                         ctx.error("Error", "Player '" + ctx.args.get("player") + "' not found or is offline");
                         return;

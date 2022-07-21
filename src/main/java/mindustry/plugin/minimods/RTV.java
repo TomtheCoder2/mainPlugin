@@ -18,6 +18,7 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
+import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import mindustry.server.ServerControl;
 
@@ -156,7 +157,7 @@ public final class RTV implements MiniMod {
                 data.category = "Management";
             },
             ctx -> {
-                Map map = Utils.getMapBySelector(ctx.args.get("map"));
+                Map map = Query.findMap(ctx.args.get("map"));
                 if (map == null) {
                     ctx.error("No such map", "Map '" + ctx.args.get("map")  + "' not found");
                 }

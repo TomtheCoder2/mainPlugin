@@ -14,6 +14,7 @@ import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
@@ -58,7 +59,7 @@ public class Weapon implements MiniMod {
                         return;
                     }
 
-                    Player player = Utils.findPlayer(ctx.args.get("player"));
+                    Player player = Query.findPlayerEntity(ctx.args.get("player"));
                     if (player == null) {
                         ctx.error("No Such Player", ctx.args.get("player") + " does not exist");
                         return;

@@ -16,6 +16,7 @@ import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.ui.Menus;
@@ -267,7 +268,7 @@ public class Ranks implements MiniMod {
         });
         handler.<Player>register("stats", "[player]", "Display stats of the specified player.", (args, player) -> {
             if (args.length > 0) {
-                Player p = Utils.findPlayer(args[0]);
+                Player p = Query.findPlayerEntity(args[0]);
                 if (p != null) {
                     Database.Player pd = Database.getPlayerData(p.uuid());
                     if (pd != null) {
@@ -363,7 +364,7 @@ public class Ranks implements MiniMod {
                     data.category = "Management";
                 },
                 ctx -> {
-                    Player target = Utils.findPlayer(ctx.args.get("player"));
+                    Player target = Query.findPlayerEntity(ctx.args.get("player"));
                     if (target == null) {
                         ctx.error("Player not found", ctx.args.get("player") + " is not online");
                         return;

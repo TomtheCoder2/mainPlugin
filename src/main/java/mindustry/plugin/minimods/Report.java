@@ -11,6 +11,7 @@ import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.utils.Cooldowns;
 import mindustry.plugin.utils.GameMsg;
+import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 
 import org.javacord.api.entity.message.MessageBuilder;
@@ -68,7 +69,7 @@ public class Report implements MiniMod {
                         }
                     }
                 } else {
-                    found = Utils.findPlayer(args[0]);
+                    found = Query.findPlayerEntity(args[0]);
                 }
 
                 if (found == null) {

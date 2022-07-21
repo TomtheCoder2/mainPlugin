@@ -14,6 +14,7 @@ import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -125,7 +126,7 @@ public class Maps implements MiniMod {
                     data.aliases = new String[]{"rm"};
                 },
                 ctx -> {
-                    Map found = Utils.getMapBySelector(ctx.args.get("map"));
+                    Map found = Query.findMap(ctx.args.get("map"));
                     if (found == null) {
                         ctx.error("Map not found", "Map '" + ctx.args.get("map") + "' does not exist");
                     }
@@ -173,7 +174,7 @@ public class Maps implements MiniMod {
                     data.category = "Maps";
                 },
                 ctx -> {
-                    Map found = Utils.getMapBySelector(ctx.args.get("map"));
+                    Map found = Query.findMap(ctx.args.get("map"));
                     if (found == null) {
                         ctx.error("No such map", "Map '" + ctx.args.get("map") + " does not exist in the playlist");
                         return;

@@ -16,7 +16,6 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.maps.Maps;
-import mindustry.net.Administration;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.discordcommands.Context;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
@@ -105,7 +104,9 @@ public class Utils {
      * Remove all color codes
      *
      * @param string the input string (for example a name or a message)
+     * @deprecated use {@link arc.util.Strings#stripColors Strings.stripColors} instead
      */
+    @Deprecated
     public static String escapeColorCodes(String string) {
         return Strings.stripColors(string);
     }
@@ -116,8 +117,7 @@ public class Utils {
      * @param string the player name (in most cases)
      */
     public static String escapeEverything(String string) {
-        return escapeColorCodes(string
-//                .replaceAll(" ", "")
+        return Strings.stripColors(string
                         .replaceAll("\\|(.)\\|", "")
                         .replaceAll("\\[accent\\]", "")
                         .replaceAll("\\|(.)\\|", "")
@@ -125,10 +125,11 @@ public class Utils {
     }
 
     /**
-     * check if a string is an ip
-     *
-     * @implNote ik there are functions for that, but I like to do it with regex
+     * Check if a string is an IP.
+     * This function is wrong because it does not
+     * take into account IPv6 addresses.
      */
+    @Deprecated
     public static boolean isValidIPAddress(String ip) {
         // If the IP address is empty
         // return false
@@ -188,110 +189,12 @@ public class Utils {
         return message;
     }
 
-
-    // region getters
-
-    /**
-     * Get a map by name
-     *
-     * @param query the map name
-     */
-    public static Map getMapBySelector(String query) {
-        Map found = null;
-        try {
-            // try by number
-            found = maps.customMaps().get(Integer.parseInt(query));
-        } catch (Exception e) {
-            // try by name
-            for (Map m : maps.customMaps()) {
-                if (m.name().replaceAll(" ", "").toLowerCase().contains(query.toLowerCase().replaceAll(" ", ""))) {
-                    found = m;
-                    break;
-                }
-            }
-        }
-        return found;
-    }
-
-    public static class Query {
-        /** Find a team by id or name */
-        public static Team findTeam(String query) {
-            if (Strings.canParseInt(query)) {
-                int id = Strings.parseInt(query);
-                if (id < 256) {
-                    return Team.all[id];
-                }
-                return null;
-            } else {
-                return Structs.find(Team.all, t -> t.name.equalsIgnoreCase(query));
-            }
-        }
-    }
-
-    /**
-     * Find a player by name, id, uuid, or ip
-     *
-     * @param identifier the name, id, uuid, con or address
-     */
-    public static Player findPlayer(String identifier) {
-        Player found = null;
-        for (Player player : Groups.player) {
-            if (player == null) return null; // how does that even happen wtf
-            if (player.uuid() == null) return null;
-            if (player.con == null) return null;
-            if (player.con.address == null) return null;
-
-            if (player.con.address.equals(identifier.replaceAll(" ", "")) ||
-                    String.valueOf(player.id).equals(identifier.replaceAll(" ", "")) ||
-                    player.uuid().equals(identifier.replaceAll(" ", "")) ||
-                    escapeEverything(player).toLowerCase().replaceAll(" ", "").startsWith(identifier.toLowerCase().replaceAll(" ", ""))) {
-                found = player;
-            }
-        }
-        return found;
-    }
-
-    /**
-     * Get player info by uuid, name, or IP
-     */
-    public static Administration.PlayerInfo getPlayerInfo(String target) {
-        Administration.PlayerInfo info = null;
-        Player player = findPlayer(target);
-        if (player != null) {
-            info = netServer.admins.getInfo(player.uuid());
-        }
-        if (info == null) {
-            info = netServer.admins.getInfoOptional(target);
-        }
-        if (info == null) {
-            info = netServer.admins.findByIP(target);
-        }
-        if (info == null) {
-            info = netServer.admins.findByName(target).first();
-        }
-        if (info == null) {
-            info = netServer.admins.searchNames(target).first();
-        }
-        return info;
-    }
-
-    @Deprecated
-    public static boolean isInt(String str) {
-        try {
-            @SuppressWarnings("unused")
-            int x = Integer.parseInt(str);
-            return true; //String is an Integer
-        } catch (NumberFormatException e) {
-            return false; //String is not an Integer
-        }
-
-    }
-
     /**
      * Change the current map
-     *
+     * @deprecated Anything that uses this should be in the RTV minimod
      * @param found map
      */
+    @Deprecated
     public static void changeMap(Map found) {
         Class<Maps> mapsClass = Maps.class;
         Field mapsField;
@@ -808,7 +711,7 @@ public class Utils {
             }
 
             final String uuid = ranks[i].uuid;
-            Player p = Groups.player.find(x -> x.uuid() == uuid);
+            Player p = Groups.player.find(x -> x.uuid().equals(uuid));
             if (p != null) {
                 sb.append(p.name);
             }

@@ -16,6 +16,7 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
@@ -50,7 +51,7 @@ public class Cheats implements MiniMod {
                     }
 
                     ctx.success("Filled core", "Filled core of team " + team.name);
-                    DiscordLog.cheat("Filled core", ctx.author(), "Team: " + team.name + "\nMap:\n" + Utils.escapeColorCodes(Vars.state.map.name()));
+                    DiscordLog.cheat("Filled core", ctx.author(), "Team: " + team.name + "\nMap:\n" + Strings.stripColors(Vars.state.map.name()));
                 }
         );
 
@@ -65,7 +66,7 @@ public class Cheats implements MiniMod {
                     if (unit == null) {
                         ctx.error("Invalid unit type", ctx.args.get("unit") + " is not a valid unit type");
                     }
-                    Player p = Utils.findPlayer(ctx.args.get("player"));
+                    Player p = Query.findPlayerEntity(ctx.args.get("player"));
                     if (p == null) {
                         ctx.error("Player not found", ctx.args.get("player") + " is not online");
                     }
@@ -91,28 +92,17 @@ public class Cheats implements MiniMod {
                     if (query.equals("all")) {
                         players = Groups.player;
                     } else {
-                        Player p = Utils.findPlayer(query);
+                        Player p = Query.findPlayerEntity(query);
                         if (p == null) {
                             ctx.error("No such player", query + " is not online");
                         }
                         players = Seq.with(p);
                     }
 
-                    Team team;
-                    if (Strings.canParseInt(ctx.args.get("team"))) {
-                        int id = ctx.args.getInt("team");
-                        if (id >= 256) {
-                            ctx.error("Team ID is too large", "Must be at most 256");
-                            return;
-                        }
-                        team = Team.all[id];
-                    } else {
-                        try {
-                            team = (Team)Reflect.get(Team.class, ctx.args.get("team"));
-                        } catch(Exception e)  {
-                            ctx.error("No such team", "Team " + ctx.args.get("team") + " does not exist");
-                            return;
-                        }
+                    Team team = Query.findTeam(ctx.args.get("team"));
+                    if (team == null) {
+                        ctx.error("No such team", "Team " + ctx.args.get("team") + " does not exist");
+                        return;
                     }
 
                     for (Player p : players) {
@@ -128,7 +118,7 @@ public class Cheats implements MiniMod {
                     data.category = "Cheats";
                 },
                 ctx -> {
-                    Player p = Utils.findPlayer(ctx.args.get("player"));
+                    Player p = Query.findPlayerEntity(ctx.args.get("player"));
                     if (p == null) {
                         ctx.error("Player not found", "Specified player is not online");
                         return;
@@ -164,7 +154,7 @@ public class Cheats implements MiniMod {
                     data.roles = new long[] { Roles.MOD, Roles.APPRENTICE, Roles.ADMIN };
                 },
                 ctx -> {
-                    Team team = Utils.Query.findTeam(ctx.args.get("team"));
+                    Team team = Query.findTeam(ctx.args.get("team"));
                     if (team == null) {
                         ctx.error("No such team", "Team " + ctx.args.get("team") + " is not a team");
                         return;

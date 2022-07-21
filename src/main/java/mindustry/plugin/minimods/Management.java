@@ -24,6 +24,7 @@ import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
+import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.Embed;
@@ -239,7 +240,7 @@ public class Management implements MiniMod {
 
             Map map = Vars.maps.getShuffleMode().next(mode, Vars.state.map);
             if (ctx.args.containsKey("map")) {
-                map = Utils.getMapBySelector(ctx.args.get("map"));
+                map = Query.findMap(ctx.args.get("map"));
                 if (map == null) {
                     ctx.error("Invalid Map", "Map '" + ctx.args.get("map") + "' does not exist");
                 }
@@ -329,7 +330,7 @@ public class Management implements MiniMod {
             },
             ctx -> {
                 String q = ctx.args.get("id|ip|name");
-                Player p = Utils.findPlayer(q);
+                Player p = Query.findPlayerEntity(q);
                 if (p == null) {
                     ctx.error("Player not found", "Player '" + q + "' does not exist");
                     return;

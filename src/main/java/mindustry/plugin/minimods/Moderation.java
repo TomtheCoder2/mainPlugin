@@ -69,7 +69,7 @@ public class Moderation implements MiniMod {
                 },
                 ctx -> {
                     String target = ctx.args.get("player");
-                    Player player = Utils.findPlayer(target);
+                    Player player = Query.findPlayerEntity(target);
                     if (player == null) {
                         ctx.reply("Player " + target + " not online.");
                         return;
@@ -115,7 +115,7 @@ public class Moderation implements MiniMod {
                 },
                 ctx -> {
                     String target = ctx.args.get("player");
-                    Player player = Utils.findPlayer(target);
+                    Player player = Query.findPlayerEntity(target);
                     if (player == null) {
                         ctx.reply("Player " + target + " not found.");
                         return;
@@ -144,7 +144,7 @@ public class Moderation implements MiniMod {
                     data.aliases = new String[]{"b", "banish"};
                 },
                 ctx -> {
-                    Administration.PlayerInfo info = Utils.getPlayerInfo(ctx.args.get("player"));
+                    Administration.PlayerInfo info = Query.findPlayerInfo(ctx.args.get("player"));
                     if (info == null) {
                         ctx.error("Error", "Player " + ctx.args.get("player") + " not found.");
                         return;
@@ -176,7 +176,7 @@ public class Moderation implements MiniMod {
                             .setFooter("Ban ID: " + banID)
                     );
 
-                    Player player = Groups.player.find(p -> p.uuid() == uuid);
+                    Player player = Groups.player.find(p -> p.uuid().equals(uuid));
                     if (player != null) {
                         player.con.kick(Packets.KickReason.banned);
                     }
@@ -192,7 +192,7 @@ public class Moderation implements MiniMod {
                     data.roles = new long [] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
                 },
                 ctx -> {
-                    Player p = Utils.findPlayer(ctx.args.get("player"));
+                    Player p = Query.findPlayerEntity(ctx.args.get("player"));
                     String uuid = ctx.args.get("player");
                     if (p != null) {
                         uuid = p.uuid();
@@ -345,7 +345,7 @@ public class Moderation implements MiniMod {
                     data.roles = new long [] {Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
                 }, 
                 ctx -> {
-                    var info = Utils.getPlayerInfo(ctx.args.get("player"));
+                    var info = Query.findPlayerInfo(ctx.args.get("player"));
                     if (info == null) {
                         ctx.error("No such player", ctx.args.get("player") + " is not saved in the netserver data");
                         return;
@@ -369,7 +369,7 @@ public class Moderation implements MiniMod {
                     data.help = "Lookup information about a player";
                 },
                 ctx -> {
-                    var info = Utils.getPlayerInfo(ctx.args.get("player"));
+                    var info = Query.findPlayerInfo(ctx.args.get("player"));
                     if (info == null) {
                         ctx.error("No such player", ctx.args.get("player") + " is not in the database");
                         return;
@@ -407,7 +407,7 @@ public class Moderation implements MiniMod {
                 return;
             }
 
-            Player target = Utils.findPlayer(args[0]);
+            Player target = Query.findPlayerEntity(args[0]);
             if (target == null) {
                 player.sendMessage(GameMsg.error("Mod", "Player not found."));
                 return;
@@ -434,7 +434,7 @@ public class Moderation implements MiniMod {
                 return;
             }
 
-            Player target = Utils.findPlayer(args[0]);
+            Player target = Query.findPlayerEntity(args[0]);
             if (target == null) {
                 player.sendMessage(GameMsg.error("Mod", "Player not found."));
                 return;
