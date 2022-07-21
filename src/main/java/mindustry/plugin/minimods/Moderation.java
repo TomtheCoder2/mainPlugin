@@ -382,7 +382,7 @@ public class Moderation implements MiniMod {
                     
                     eb.addField("Names", info.names.toString(" / "));
                             
-                    if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.STAFF_BOT.getId()) {
+                    if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.MOD_BOT.getId()) {
                         eb.addField("IPs", info.ips.toString(" / "))
                             .addField("UUID", info.id)
                             .addInlineField("Last IP", info.lastIP);

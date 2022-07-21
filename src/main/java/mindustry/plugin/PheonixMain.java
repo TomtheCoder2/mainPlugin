@@ -171,7 +171,8 @@ public class PheonixMain extends Plugin {
 
         Channels.BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.ADMIN_BOT.addMessageCreateListener(registrar::dispatchEvent);
-        Channels.STAFF_BOT.addMessageCreateListener(registrar::dispatchEvent);
+        Channels.APPRENTICE_BOT.addMessageCreateListener(registrar::dispatchEvent);
+        Channels.MOD_BOT.addMessageCreateListener(registrar::dispatchEvent);
         DiscordVars.api = api;
 
         Utils.init();

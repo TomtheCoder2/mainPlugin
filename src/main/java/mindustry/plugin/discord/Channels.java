@@ -23,7 +23,8 @@ public class Channels {
     public static TextChannel ERROR_LOG;
 
     public static TextChannel BOT;
-    public static TextChannel STAFF_BOT;
+    public static TextChannel MOD_BOT;
+    public static TextChannel APPRENTICE_BOT;
     public static TextChannel ADMIN_BOT;
 
     /**
@@ -46,7 +47,8 @@ public class Channels {
         ERROR_LOG = getChannel(api, obj.getString("error_log"));
 
         BOT = getChannel(api, obj.getString("bot"));
-        STAFF_BOT = getChannel(api, obj.getString("staff_bot"));
+        MOD_BOT = getChannel(api, obj.getString("staff_bot"));
+        APPRENTICE_BOT = getChannel(api, obj.getString("apprentice_bot"));
         ADMIN_BOT = getChannel(api, obj.getString("admin_bot"));
     }
 }
