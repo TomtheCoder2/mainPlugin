@@ -377,14 +377,21 @@ public class Moderation implements MiniMod {
                     }
 
                     EmbedBuilder eb = new EmbedBuilder()
-                            .setTitle("Lookup: " + Utils.escapeEverything(info.lastName))
-                            .addInlineField("UUID", info.id)
-                            .addInlineField("Last IP", info.lastIP)
-                            .addInlineField("Last name", info.lastName)
-                            .addInlineField("Times kicked", info.timesKicked + "")
-                            .addField("Names", info.names.toString(" / "))
-                            .addField("IPs", info.ips.toString(" / "))
-                            .addField("NetServer banned", info.banned ? "Yes" : "No");
+                            .setColor(DiscordPalette.INFO)
+                            .setTitle("Lookup: " + Utils.escapeEverything(info.lastName));
+                    
+                    eb.addField("Names", info.names.toString(" / "));
+                            
+                    if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.STAFF_BOT.getId()) {
+                        eb.addField("IPs", info.ips.toString(" / "))
+                            .addField("UUID", info.id)
+                            .addInlineField("Last IP", info.lastIP);
+                    }
+                    
+                    eb
+                        .addInlineField("Last name", info.lastName)
+                        .addField("Times kicked", info.timesKicked + "")
+                        .addField("NetServer banned", info.banned ? "Yes" : "No");
                     
                     var pd =Database.getPlayerData(info.id);
                     if (pd != null) {
@@ -392,7 +399,8 @@ public class Moderation implements MiniMod {
                             .addInlineField("Playtime", pd.playTime + " min")
                             .addInlineField("Games", pd.gamesPlayed + "")
                             .addInlineField("Buildings built", pd.buildingsBuilt + "")
-                            .addField("Database banned", pd.banned ? "Forever" : (pd.bannedUntil != 0 ? "Until " + Instant.ofEpochSecond(pd.bannedUntil).toString() : "No"));
+                            .addInlineField("Banned", pd.banned ? "Forever" : (pd.bannedUntil != 0 ? "Until " + Instant.ofEpochSecond(pd.bannedUntil).toString() : "No"))
+                            .addInlineField("Ban Reason", pd.banReason == null || pd.banReason.equals("") ? "None" : pd.banReason);
                     }
 
                     ctx.sendEmbed(eb);
