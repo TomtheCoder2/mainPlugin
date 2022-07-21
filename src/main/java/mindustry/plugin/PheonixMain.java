@@ -161,10 +161,11 @@ public class PheonixMain extends Plugin {
             data.help = "Display information about commands";
             data.aliases = new String[]{"h"};
         }, ctx -> {
-            if (ctx.args.containsKey("cmd")) {
+            if (ctx.args.containsKey("cmd") && !ctx.args.get("cmd").equals("all")) {
                 ctx.sendEmbed(finalRegistrar.helpEmbed(ctx.args.get("cmd")));
             } else {
-                ctx.sendEmbed(finalRegistrar.helpEmbed());
+                boolean all = ctx.args.containsKey("all");
+                ctx.sendEmbed(finalRegistrar.helpEmbed(all ? null : ctx.author()));
             }
         });
 

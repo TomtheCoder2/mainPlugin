@@ -10,6 +10,7 @@ import mindustry.plugin.discord.Roles;
 import mindustry.plugin.utils.Config;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.util.Arrays;
@@ -103,14 +104,23 @@ public class DiscordRegistrar {
         }
     }
 
-    public EmbedBuilder helpEmbed() {
+    /** Returns a help embed listing all commands
+     * @param user the user, by which commands will be filtered (only commands they can use), or null for all commands
+     */
+    public EmbedBuilder helpEmbed(User user) {
         ObjectMap<String, Seq<String>> commandsByCategory = new ObjectMap<>();
 
         for (var entry : commands) {
             if (entry.key.equals(entry.value.data.name)) {
                 if (entry.value.data.hidden) continue;
+                if (entry.value.data.roles != null && !Arrays.stream(entry.value.data.roles).allMatch(roleID -> 
+                            // user has that role
+                            user.getRoles(DiscordVars.api.getServers().iterator().next()).stream().anyMatch(r -> r.getId() == roleID)
+                        )) continue;
+
                 String category = entry.value.data.category;
                 if (category == null) category = "General";
+
                 Seq<String> cmds = commandsByCategory.get(category, new Seq<>());
                 if (!cmds.contains(entry.key)) {
                     cmds.add(entry.key);
