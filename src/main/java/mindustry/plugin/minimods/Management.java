@@ -349,6 +349,40 @@ public class Management implements MiniMod {
                 Vars.netServer.admins.save();
             }
         );
+
+        handler.register("message", "<stats|rules|info|welcome> [message...]", 
+            data -> {
+                data.category = "Management";
+                data.aliases = new String[] { "edit" } ;
+                data.roles = new long [] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
+                data.help = "Set or view a message";
+            },
+            ctx -> {
+                String messageName = ctx.args.get("stats|rules|info|welcome");
+                String settingName = switch (messageName) {
+                    case "stats", "s" -> "statMessage";
+                    case "rules", "r" -> "ruleMessage";
+                    case "info", "i" -> "infoMessage";
+                    case "welcome", "w", "motd" -> "welcomeMessage";
+                    default -> null;
+                };
+                if (settingName == null) {
+                    ctx.error("Invalid setting name", ":(");
+                    return;
+                }
+
+                String message=  ctx.args.get("message");
+                if (message == null) {
+                    ctx.sendEmbed(DiscordPalette.INFO, "Current value of `" + settingName + "`",
+                        Core.settings.has(settingName) ? "None" : "```\n" + Core.settings.get(settingName) + "\n```");
+                    return;
+                }
+                
+                Core.settings.put(settingName, message);
+                Core.settings.autosave();
+                ctx.success("Set `" + settingName + "`", "```\n" + message + "\n```");
+            }
+        );
     }
 
     private static class TestData {

@@ -366,7 +366,7 @@ public class Moderation implements MiniMod {
                     data.category = "Moderation";
                     data.roles = new long []{ Roles.ADMIN, Roles.MOD };
                     data.aliases = new String[] { "l" };
-                    data.help = "Lookup information about a player";
+                    data.help = "Lookup information about a player (by name, IP, UUID)";
                 },
                 ctx -> {
                     var info = Query.findPlayerInfo(ctx.args.get("player"));
