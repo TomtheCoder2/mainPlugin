@@ -163,7 +163,7 @@ public class Maps implements MiniMod {
                     var maps = Database.rankMapRatings(100, 0);
                     int c = 1;
                     for (Database.Map m : maps) {
-                        sb.append(String.format("%-2d | %-4d | %-4d | %-5.1f %s\n", c, m.positiveRating, m.negativeRating, m.positiveRating / (double)(m.positiveRating + m.negativeRating) * 100 + "%", Strings.stripColors(m.name)));
+                        sb.append(String.format("%-2d | %-4d | %-4d | %-5.1f%% %s\n", c, m.positiveRating, m.negativeRating, m.positiveRating / (double)(m.positiveRating + m.negativeRating) * 100, Strings.stripColors(m.name)));
                         c++;
                     }
                     eb.setDescription("```\n" + sb + "\n```");
