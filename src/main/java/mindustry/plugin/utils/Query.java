@@ -84,10 +84,12 @@ public class Query {
             info = netServer.admins.findByIP(target);
         }
         if (info == null) {
-            info = netServer.admins.findByName(target).first();
+            var res =  netServer.admins.findByName(target);
+            info = res.size == 0 ? null : res.first();
         }
         if (info == null) {
-            info = netServer.admins.searchNames(target).first();
+            var res = netServer.admins.searchNames(target);
+            info = res.size == 0 ? null : res.first();
         }
         return info;
     }
