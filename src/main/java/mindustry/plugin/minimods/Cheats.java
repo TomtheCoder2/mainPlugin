@@ -139,6 +139,7 @@ public class Cheats implements MiniMod {
                     }
                     tile.setNet(block, p.team(), rotation);
                     ctx.success("Set block successfully", "Set block at (" + tile.x + ", " + tile.y + ") to " + block.name);
+                    DiscordLog.cheat("Set block", ctx.author(), "Target: " + Utils.escapeEverything(p.name()) + "\nBlock: " + block.name);
                 }
         );
 

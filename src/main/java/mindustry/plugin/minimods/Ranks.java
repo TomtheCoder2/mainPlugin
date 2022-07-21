@@ -4,6 +4,7 @@ import arc.Events;
 import arc.struct.ObjectMap;
 import arc.util.CommandHandler;
 import arc.util.Log;
+import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.Blocks;
@@ -13,6 +14,7 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
@@ -345,7 +347,7 @@ public class Ranks implements MiniMod {
                     String table = "```\n";
                     table += String.format("%3s %-30s %-10s\n", "", "Map", column);
                     for (int i = 0; i < ranking.length; i++) {
-                        table += String.format("%3s %-30s %-10s\n", offset + i + 1, Utils.escapeColorCodes(ranking[i].name), ranking[i].stat);
+                        table += String.format("%3s %-30s %-10s\n", offset + i + 1, Strings.stripColors(ranking[i].name), ranking[i].stat);
                     }
                     table += "```";
 
@@ -360,7 +362,7 @@ public class Ranks implements MiniMod {
         handler.register("setrank", "<player> <rank>", 
                 data -> {
                     data.help = "Set a player's in-game rank";
-                    data.roles = new long[] { Roles.MOD, Roles.ADMIN, Roles.APPRENTICE };
+                    data.roles = new long[] { Roles.MOD, Roles.ADMIN };
                     data.category = "Management";
                 },
                 ctx -> {
@@ -391,8 +393,39 @@ public class Ranks implements MiniMod {
 
                     target.name = Rank.all[rank].tag + " [#" + Rank.all[rank].color.toString().substring(0,6) + "]" +  Utils.escapeEverything(target);
                     ctx.success("Rank set", Utils.escapeEverything(target) + "'s rank is now set to " + Rank.all[rank].name);
+
+                    DiscordLog.moderation("Set rank", ctx.author(), Vars.netServer.admins.getInfo(pd.uuid), null, "Rank: " + Rank.all[rank].name + " (" + rank + ")");
                 }
         );
 
+        handler.register("setstats", "<player> <playtime> <buildingsbuilt> <gamesplayed>", 
+                data -> {
+                    data.help = "Set a player's game statistics";
+                    data.category = "Management";
+                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                },
+                ctx -> {
+                    var info = Query.findPlayerInfo(ctx.args.get("player"));
+                    if (info == null) {
+                        ctx.error("No such player", "There is no such player in the database");
+                        return;
+                    }
+                    
+                    var pd = Database.getPlayerData(info.id);
+                    if (pd == null) {
+                        ctx.error("No such player", "There is no such player in the database");
+                        return;
+                    }
+
+                    int playtime = ctx.args.getInt("playtime");
+                    int buildingsbuilt = ctx.args.getInt("buildingsbuilt");
+                    int gamesplayed = ctx.args.getInt("gamesplayed");
+                    pd.playTime = playtime;
+                    pd.buildingsBuilt = buildingsbuilt;
+                    pd.gamesPlayed = gamesplayed;
+
+                    ctx.success("Set player stats", "Play time: " + playtime + " min\nBuildings built: " + buildingsbuilt + "\nGames played: " + gamesplayed);
+                }
+        );
     }
 }
