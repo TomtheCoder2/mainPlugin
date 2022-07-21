@@ -5,6 +5,8 @@ import arc.Events;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Strings;
+import arc.util.Structs;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -209,6 +211,21 @@ public class Utils {
             }
         }
         return found;
+    }
+
+    public static class Query {
+        /** Find a team by id or name */
+        public static Team findTeam(String query) {
+            if (Strings.canParseInt(query)) {
+                int id = Strings.parseInt(query);
+                if (id < 256) {
+                    return Team.all[id];
+                }
+                return null;
+            } else {
+                return Structs.find(Team.all, t -> t.name.equalsIgnoreCase(query));
+            }
+        }
     }
 
     /**

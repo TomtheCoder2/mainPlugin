@@ -1,10 +1,12 @@
 package mindustry.plugin.discord;
 
 import arc.struct.StringMap;
+import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.net.Administration;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.discordcommands.Context;
+import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageAttachment;
@@ -52,6 +54,7 @@ public class DiscordLog {
             eb.addField("Additional Information", information);
         }
         Channels.LOG.sendMessage(eb);
+        Call.sendMessage(GameMsg.custom("Cheat", "yellow", mod.getDiscriminatedName() + " has used the " + action + " cheat!"));
     }
 
     public static void moderation(String action, String mod, Administration.PlayerInfo info, String reason, String additionalInfo) {

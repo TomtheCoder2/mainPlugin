@@ -405,53 +405,6 @@
 ////                }
 ////
 ////            });
-//
-//
-//            handler.registerCommand(new RoleRestrictedCommand("killunits") {
-//                {
-//                    help = "Kills all units of the team of the specified player";
-//                    roles = new long[] { banRole };
-//                    category = management;
-//                    usage = "<playerid|ip|name> <unit>";
-//                    minArguments = 2;
-//                }
-//
-//                public void run(Context ctx) {
-//                    EmbedBuilder eb = new EmbedBuilder();
-//                    String target = ctx.args[1];
-//                    String targetUnit = ctx.args[2];
-//                    UnitType desiredUnit = UnitTypes.dagger;
-//                    if (target.length() > 0 && targetUnit.length() > 0) {
-//                        try {
-//                            Field field = UnitTypes.class.getDeclaredField(targetUnit);
-//                            desiredUnit = (UnitType) field.get(null);
-//                        } catch (NoSuchFieldException | IllegalAccessException ignored) {
-//                        }
-//
-//                        Player player = findPlayer(target);
-//                        if (player != null) {
-//                            int amount = 0;
-//                            for (Unit unit : Groups.unit) {
-//                                if (unit.team == player.team()) {
-//                                    if (unit.type == desiredUnit) {
-//                                        unit.kill();
-//                                        amount++;
-//                                    }
-//                                }
-//                            }
-//                            eb.setTitle("Command executed successfully.");
-//                            eb.setDescription("Killed " + amount + " " + targetUnit + "s on team " + player.team());
-//                            ctx.sendMessage(eb);
-//                        }
-//                    } else {
-//                        eb.setTitle("Command terminated");
-//                        eb.setDescription("Invalid arguments provided.");
-//                        eb.setColor(Pals.error);
-//                        ctx.sendMessage(eb);
-//                    }
-//                }
-//            });
-//
 //            handler.registerCommand(new RoleRestrictedCommand("setblock") {
 //                {
 //                    help = "Create a block at the player's current location and on the player's current team.";

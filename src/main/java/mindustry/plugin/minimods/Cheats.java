@@ -156,5 +156,35 @@ public class Cheats implements MiniMod {
                     DiscordLog.cheat("Spawn", ctx.author(), "Target: "  + Utils.escapeEverything(p.name) +"\nUnit: `" + unit.name + "`");
                 }
         );
+
+        handler.register("killunits", "<team> <unit|all>", 
+                data -> {
+                    data.help = "Kill all units of a team";
+                    data.category = "Cheats";
+                    data.roles = new long[] { Roles.MOD, Roles.APPRENTICE, Roles.ADMIN };
+                },
+                ctx -> {
+                    Team team = Utils.Query.findTeam(ctx.args.get("team"));
+                    if (team == null) {
+                        ctx.error("No such team", "Team " + ctx.args.get("team") + " is not a team");
+                        return;
+                    }
+
+                    UnitType type = Vars.content.unit(ctx.args.get("unit"));
+                    if (type == null && !ctx.args.get("unit").equals("all")) {
+                        ctx.error("No such unit", "That is not a valid unit");
+                    }
+
+                    int amount = 0;
+                    for (Unit unit : Groups.unit) {
+                        if (unit.team == team && unit.type == type) {
+                            unit.kill();
+                            amount += 1;
+                        }
+                    }
+
+                    ctx.success("Killed " + amount + " units", "From team " + team.name);
+                }
+        );
     }
 }
