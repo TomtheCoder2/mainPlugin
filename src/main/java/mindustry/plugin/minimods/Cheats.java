@@ -20,6 +20,8 @@ import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
+import mindustry.world.Block;
+import mindustry.world.Tile;
 
 public class Cheats implements MiniMod {
     @Override
@@ -108,6 +110,35 @@ public class Cheats implements MiniMod {
                     for (Player p : players) {
                         p.team(team);
                     }
+                }
+        );
+
+        handler.register("setblock", "<player> <block> [rotation]",
+                data -> {
+                    data.help = "Create a block at the player's current location for the player's team";
+                    data.roles = new long [] { Roles.MOD, Roles.APPRENTICE, Roles.ADMIN };
+                    data.category = "Cheats";
+                },
+                ctx -> {
+                    Player p = Query.findPlayerEntity(ctx.args.get("player"));
+                    if (p == null) {
+                        ctx.error("Player not found", "Target player is not online");
+                        return;
+                    }
+                    Block block = Vars.content.block(ctx.args.get("block"));
+                    if (block==null) {
+                        ctx.error("Block not found", ctx.args.get("block") + " is not a valid block");
+                        return;
+                    }
+                    int rotation = ctx.args.getInt("rotation", 0);
+
+                    Tile tile = Vars.world.tile(p.tileX(), p.tileY());
+                    if (tile == null) {
+                        ctx.error("Tile is null", "Player is out of bounds");
+                        return;
+                    }
+                    tile.setNet(block, p.team(), rotation);
+                    ctx.success("Set block successfully", "Set block at (" + tile.x + ", " + tile.y + ") to " + block.name);
                 }
         );
 
