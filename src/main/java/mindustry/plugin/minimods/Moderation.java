@@ -397,6 +397,28 @@ public class Moderation implements MiniMod {
                     ctx.sendEmbed(eb);
                 }
         );
+
+        handler.register("rename", "<player> <name...>",
+                data -> {
+                    data.category = "Moderation";
+                    data.roles = new long [] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
+                    data.aliases = new String[] {"r"};
+                },
+                ctx -> {
+                    Player p = Query.findPlayerEntity(ctx.args.get("player"));
+                    if (p == null) {
+                        ctx.error("Player not found", "Target player is not online");
+                        return;
+                    }
+
+                    String oldName = Utils.escapeEverything(p.name);
+                    p.name = ctx.args.get("name");
+
+                    p.sendMessage("Your name was changed to [orange]" + p.name + "[white] by a moderator");
+                    ctx.success("Renamed player", "Renamed " + oldName + " to " + Strings.stripColors(p.name));
+                    DiscordLog.moderation("Rename", ctx.author(), p.getInfo(), null, "Old: " + oldName + "\nNew: " + Strings.stripColors(p.name));
+                }
+        );
     }
 
     @Override
