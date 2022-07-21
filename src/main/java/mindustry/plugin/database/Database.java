@@ -199,7 +199,7 @@ public final class Database {
 
     /** Rank all maps based on {@link Database.Map#positiveRating positiveRating} - {@link Database.Map#negativeRating negativeRating} */
     public static Map[] rankMapRatings(int limit, int offset) {
-        String sql = "SELECT * FROM mapdata ORDER BY positiverating DESC LIMIT ? OFFSET ?;";
+        String sql = "SELECT * FROM mapdata ORDER BY positiverating DESC LIMIT ? OFFSET ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, limit);
@@ -211,7 +211,7 @@ public final class Database {
                 Map map = Map.fromSQL(rs);
                 maps.add(map);
             }
-            maps.sort(m -> m.positiveRating - m.negativeRating);
+            maps.sort(m -> (float)m.positiveRating / (float)m.negativeRating);
             return maps.toArray(Map.class);
         } catch (SQLException ex) {
             Log.err(ex.getMessage());
