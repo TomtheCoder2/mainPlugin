@@ -549,7 +549,7 @@ public class Pets implements MiniMod {
             // labels
             boolean isStill = Math.abs(vx) < 2 && Math.abs(vy) < 2;
             if (!hasLabel && isStill) {
-                Call.label("[#" + color.toString().substring(0, 6) + "]" + name, 1f, unit.x, unit.y + 2 * Vars.tilesize);
+                Call.label("[#" + color.toString().substring(0, 6) + "]" + name, 1f, unit.x, unit.y + unit.hitSize()/2 + Vars.tilesize);
                 hasLabel = true;
                 Timer.schedule(() -> {
                     hasLabel = false;
