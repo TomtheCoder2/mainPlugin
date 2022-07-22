@@ -142,7 +142,7 @@ public class Pets implements MiniMod {
         Team team = getTeam(pet.color);
         UnitController controller = new PetController(player, pet.name, pet.color, team);
         try {
-            Field field = unit.class.getField("controller");
+            Field field = unit.getClass().getField("controller");
             field.set(unit, controller);
         } catch(Exception e) {
             Log.err(e);
