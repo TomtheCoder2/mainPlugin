@@ -230,7 +230,7 @@ public class PheonixMain extends Plugin {
                 Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
             }
 
-            Call.infoMessage(player.con, welcomeMessage);
+            Call.infoMessage(player.con, Utils.Message.welcome());
 
 //
 //            CompletableFuture.runAsync(() -> {

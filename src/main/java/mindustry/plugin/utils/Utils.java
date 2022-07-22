@@ -41,16 +41,26 @@ import static mindustry.Vars.*;
 
 public class Utils {
     public static int chatMessageMaxSize = 256;
-    public static String welcomeMessage = "";
-    public static String statMessage = "";
-    public static String infoMessage = "";
-    public static String reqMessage = "";
-    public static String rankMessage = "";
-    public static String ruleMessage = "";
     // whether ip verification is in place (detect VPNs, disallow their build rights)
     public static Boolean verification = false;
     public static ArrayList<String> bannedNames = new ArrayList<>();
     public static Pattern ipValidationPattern;
+
+
+    public static class Message {
+        public static String stat() {
+            return Core.settings.getString("statMessage");
+        }
+        public static String welcome() {
+            return Core.settings.getString("welcomeMessage");
+        }
+        public static String info() {
+            return Core.settings.getString("infoMessage");
+        }
+        public static String rules() {
+            return Core.settings.getString("rulesMessage");
+        }
+    }
 
     public static void init() {
         bannedNames.add("IGGGAMES");
@@ -62,14 +72,7 @@ public class Utils {
         bannedNames.add("андрей");
         bannedNames.add("THIS IS MY KINGDOM CUM, THIS IS MY CUM");
         bannedNames.add("HITLER");
-
-        statMessage = Core.settings.getString("statMessage");
-        reqMessage = Core.settings.getString("reqMessage");
-        rankMessage = Core.settings.getString("rankMessage");
-        welcomeMessage = Core.settings.getString("welcomeMessage");
-        ruleMessage = Core.settings.getString("ruleMessage");
-        infoMessage = Core.settings.getString("infoMessage");
-
+        
         // setup regex for ip validation
         // Regex for digit from 0 to 255.
         String zeroTo255

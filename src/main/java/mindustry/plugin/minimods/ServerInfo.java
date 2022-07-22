@@ -16,11 +16,11 @@ public class ServerInfo implements MiniMod {
     @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("info", "Display info about our server.", (args, player) -> {
-            Call.infoMessage(player.con, Utils.infoMessage);
+            Call.infoMessage(player.con, Utils.Message.info());
         });
 
         handler.<Player>register("rules", "Server rules. Please read carefully.", (args, player) -> {
-            Call.infoMessage(player.con, Utils.ruleMessage);
+            Call.infoMessage(player.con, Utils.Message.rules());
         });
 
         handler.<Player>register("discord", "Place a message block below a player with links for our discord server.", (args, player) -> {

@@ -274,13 +274,13 @@ public class Ranks implements MiniMod {
                 if (p != null) {
                     Database.Player pd = Database.getPlayerData(p.uuid());
                     if (pd != null) {
-                        Call.infoMessage(player.con, Utils.formatMessage(p, Utils.statMessage));
+                        Call.infoMessage(player.con, Utils.formatMessage(p, Utils.Message.stat()));
                     }
                 } else {
                     player.sendMessage("[scarlet]Error: Player not found or offline");
                 }
             } else {
-                Call.infoMessage(player.con, Utils.formatMessage(player, Utils.statMessage));
+                Call.infoMessage(player.con, Utils.formatMessage(player, Utils.Message.stat()));
             }
         });
     }
