@@ -68,6 +68,7 @@ public class PheonixMain extends Plugin {
             new mindustry.plugin.minimods.Report(),
             new mindustry.plugin.minimods.RTV(),
             new mindustry.plugin.minimods.ServerInfo(),
+            new mindustry.plugin.minimods.Skipwave(),
             new mindustry.plugin.minimods.Translate(),
             new mindustry.plugin.minimods.Weapon(),
     };
