@@ -2,6 +2,7 @@ package mindustry.plugin.minimods;
 
 import arc.Events;
 import arc.struct.Seq;
+import arc.util.Align;
 import arc.util.CommandHandler;
 import arc.util.Strings;
 import arc.util.Timer;
@@ -21,15 +22,17 @@ import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import mindustry.ui.Menus;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.postgresql.translation.messages_sr;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Communication implements MiniMod {
-    private ScreenMessage message;
+    private Announcement announcement = null;
+    private Seq<String> screenMessages = new Seq<>();
 
-    private static void showScreenMessage(ScreenMessage msg, Player target) {
+    private static void showAnnouncement(Announcement msg, Player target) {
         int id = Menus.registerMenu((player, selection) -> {
             String action = msg.buttons[selection].action;
             if (action == null) {
@@ -70,6 +73,15 @@ public class Communication implements MiniMod {
             }
         });
 
+        Timer.schedule(() -> {
+            int ypos = 300;
+            for (String message : screenMessages) {
+                Call.infoPopup(message, 10f, Align.topRight, ypos, 0, 0, 0);
+                ypos += message.split("\n").length * 20;
+                ypos += 20;
+            }
+        }, 10f, 10f);
+
         Channels.CHAT.addMessageCreateListener(event -> {
             if (event.getMessageAuthor().isBotUser()) {
                 return;
@@ -80,53 +92,53 @@ public class Communication implements MiniMod {
         Events.on(EventType.PlayerJoin.class, event -> {
             Timer.schedule(() -> {
                 if (!event.player.con.isConnected()) return;
-                if (this.message != null)
-                    showScreenMessage(this.message, event.player);
+                if (this.announcement != null)
+                    showAnnouncement(this.announcement, event.player);
             }, 15);
         });
     }
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("screenmessage", "[title] [stuff...]",
+        handler.register("announcement", "[title] [stuff...]",
                 data -> {
                     data.usage = "<title...> <buttons...> <message...> OR [clear]";
-                    data.help = "Send an on-screen message. Button syntax is [action:Some text] or [Some text]. Possible actions are 'event'.";
+                    data.help = "Set the announcement for the server. Button syntax is [action:Some text] or [Some text]. Possible actions are 'event'.";
                     data.roles = new long[]{Roles.APPRENTICE, Roles.MOD, Roles.ADMIN};
                     data.category = "Communication";
                 },
                 ctx -> {
                     String title = ctx.args.get("title");
                     if (title == null) {
-                        if (this.message == null) {
-                            ctx.sendEmbed(DiscordPalette.INFO, "No Screen Message", "There is no active screen message.");
+                        if (this.announcement == null) {
+                            ctx.sendEmbed(DiscordPalette.INFO, "No Announcement", "There is no active announcement.");
                             return;
                         }
 
-                        ctx.sendEmbed(message.embed().setTitle("Active Screen Message"));
+                        ctx.sendEmbed(announcement.embed().setTitle("Active Announcement"));
                         return;
                     }
                     if (title.equals("clear")) {
-                        if (this.message == null) {
-                            ctx.error("No Screen Message", "There is no active screen message to clear.");
+                        if (this.announcement == null) {
+                            ctx.error("No Announcement", "There is no active announcement to clear.");
                             return;
                         }
 
-                        ctx.sendEmbed(message.embed().setTitle("Removed Message").setColor(DiscordPalette.SUCCESS));
+                        ctx.sendEmbed(announcement.embed().setTitle("Removed Announcement").setColor(DiscordPalette.SUCCESS));
                         return;
                     }
 
                     String stuff = ctx.args.get("stuff");
-                    if (this.message != null) {
-                        ctx.error("Screen Message Already Exists", "Use `" + DiscordVars.prefix + "screenmessage clear` to delete the screen message");
+                    if (this.announcement != null) {
+                        ctx.error("Announcement Already Exists", "Use `" + DiscordVars.prefix + "announcement clear` to delete the announcement");
                         return;
                     }
                     if (stuff == null) {
-                        ctx.error("Message Body Required", "Cannot have screen message without message body");
+                        ctx.error("Message Body Required", "Cannot have announcement without message body");
                         return;
                     }
                     if (!stuff.contains("[")) {
-                        ctx.error("Buttons Required", "Cannot have screen message without buttons");
+                        ctx.error("Buttons Required", "Cannot have announcement without buttons");
                     }
 
                     // title = the title
@@ -136,7 +148,7 @@ public class Communication implements MiniMod {
                     title = stuff.substring(0, firstBracket);
                     stuff = stuff.substring(firstBracket);
 
-                    Seq<ScreenMessage.Button> buttons = new Seq<>();
+                    Seq<Announcement.Button> buttons = new Seq<>();
                     int bracketDepth = 0;
                     int buttonStart = -1;
                     int messageStart = 0;
@@ -161,7 +173,7 @@ public class Communication implements MiniMod {
                                 String buttonData = stuff.substring(buttonStart + 1, i);
                                 buttonStart = -1;
 
-                                var button = new ScreenMessage.Button();
+                                var button = new Announcement.Button();
                                 String[] parts = buttonData.split(":");
                                 if (parts.length == 1) {
                                     button.action = null;
@@ -181,22 +193,76 @@ public class Communication implements MiniMod {
 
                     String message = stuff.substring(messageStart);
 
-                    ScreenMessage msg = new ScreenMessage();
+                    Announcement msg = new Announcement();
                     msg.title = title;
                     msg.message = message;
-                    msg.buttons = buttons.toArray(ScreenMessage.Button.class);
-                    this.message = msg;
+                    msg.buttons = buttons.toArray(Announcement.Button.class);
+                    this.announcement = msg;
 
-                    showScreenMessage(msg, null);
+                    showAnnouncement(msg, null);
 
                     ctx.sendEmbed(msg.embed());
+                }
+        );
+
+        handler.register("screenmessage", "<add|remove|list> [message...]",
+                data -> {
+                    data.roles = new long[] { Roles.APPRENTICE, Roles.MOD, Roles.ADMIN };
+                    data.category = "Communication";
+                    data.help = "Show a persistent screen message on the side";
+                },
+                ctx -> {
+                    switch (ctx.args.get("add|remove|list")) {
+                        case "list":
+                            EmbedBuilder eb = new EmbedBuilder()
+                                .setTitle("Active Screen Messages")
+                                .setColor(DiscordPalette.INFO);
+                            if (screenMessages.size == 0) {
+                                eb.setDescription("None");
+                            }
+
+                            int i = 0;
+                            for (String message : screenMessages) {
+                                eb.addField(i + "", "```\n" + message + "\n```");
+                                i++;
+                            }
+                            ctx.sendEmbed(eb);
+                            break;
+                        case "remove":
+                            String idstr = ctx.args.get("message");
+                            if (idstr == null || !Strings.canParseInt(idstr)) {
+                                ctx.error("Invalid ID", "ID must be a number");
+                                return;
+                            }                            
+                            int id = Strings.parseInt(idstr);
+                            if (id >= screenMessages.size || id < 0) {
+                                ctx.error("Invalid ID", "ID is out of range");
+                                return;
+                            }
+                            
+                            String message = screenMessages.get(id);
+                            screenMessages.remove(id);
+                            ctx.success("Successfully removed message " + id, "```\n" + message + "\n```");
+                            break;
+                        case "add":
+                            message = ctx.args.get("message");
+                            if (message == null) {
+                                ctx.error("Must provide message", ":(");
+                                return;
+                            }
+                            message = message.replace("\\n ", "\n").replace("\\n", "\n");
+
+                            screenMessages.add(message);
+                            ctx.success("Successfully added message", ":)");
+                            break;
+                    }
                 }
         );
 
         handler.register("alert", "<player|all|team> <message...>",
                 data -> {
                     data.roles = new long[]{Roles.APPRENTICE, Roles.MOD, Roles.ADMIN};
-                    data.help = "Alert player(s) using on-screen message";
+                    data.help = "Alert player(s) using a one-time on-screen message";
                     data.aliases = new String[]{"a"};
                     data.category = "Communication";
                 },
@@ -259,7 +325,7 @@ public class Communication implements MiniMod {
 
     }
 
-    public static class ScreenMessage {
+    public static class Announcement {
         String title;
         String message;
         Button[] buttons;
