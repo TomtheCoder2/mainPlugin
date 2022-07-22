@@ -465,6 +465,7 @@ public class Pets implements MiniMod {
                 if (enemyUnit.team() == player.team() && !enemyUnit.isPlayer() &&
                     !(enemyUnit.controller() instanceof PetController) && 
                     !(enemyUnit.controller() instanceof MinerAI) && // exclude mono
+                    enemyUnit.type.targetAir &&
                     enemyUnit.type != UnitTypes.mega && enemyUnit.type != UnitTypes.poly) { // exclude mega & poly
                         if (unit.dst(enemyUnit) <= enemyUnit.range() + Vars.tilesize) {
                             return true;
