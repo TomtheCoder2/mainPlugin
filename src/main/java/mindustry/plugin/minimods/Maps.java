@@ -13,6 +13,7 @@ import mindustry.io.SaveVersion;
 import mindustry.maps.Map;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
@@ -117,11 +118,13 @@ public class Maps implements MiniMod {
                         .setColor(DiscordPalette.WARN)
                         .setImage(ContentServer.renderRaw(data))
                         .setFooter("Size: " + meta.getInt("width") + "x" + meta.getInt("height"));
-                    ctx.reply(
-                        new MessageBuilder()
-                            .addEmbed(eb)
-                            .addAttachment(data, "Map " + Strings.stripColors(meta.get("name")) + ".msav")
-                    );
+                    new MessageBuilder()
+                        .addEmbed(eb)
+                        .addAttachment(data, "Map " + Strings.stripColors(meta.get("name")) + ".msav")
+                        .send(Channels.MAP_SUBMISSIONS)
+                        .join();
+
+                    ctx.success("Submitted map", "Map " + Strings.stripColors(meta.get("name")) + " queued for review by map reviewers in <#" + Channels.MAP_SUBMISSIONS.getId() + ">!");
                 }
         );
 

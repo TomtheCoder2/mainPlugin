@@ -40,7 +40,7 @@ public class Context {
      * @param message reply with this message
      */
     public void reply(MessageBuilder message) {
-        message.send(channel());
+        message.send(channel()).join();
     }
 
     /**

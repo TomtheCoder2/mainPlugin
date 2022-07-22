@@ -447,7 +447,8 @@ public class Moderation implements MiniMod {
                                 .addField("3. Reason", "Explain what you did and why you want to get unbanned")
                         )
                         .setContent("<@" + ctx.author().getId() + ">")
-                        .send(Channels.APPEAL);
+                        .send(Channels.APPEAL)
+                        .join();
                     
                     ctx.success("Successfully requested an appeal", "Head over to <#" + Channels.APPEAL.getIdAsString() + ">");
                 }
