@@ -1,6 +1,7 @@
 package mindustry.plugin.effect;
 
 
+import arc.Core;
 import arc.files.Fi;
 import arc.graphics.Color;
 import arc.struct.ObjectMap;
@@ -27,12 +28,13 @@ public class EffectHelper {
         tasks.forEach(Timer.Task::cancel);
         tasks = new Seq<>();
 
-        final Fi effect = PheonixMain.pluginDir.child("effects.properties");
+        final var pluginDir = Core.settings.getDataDirectory().child("mods");
+        final Fi effect = pluginDir.child("effects.properties");
         if (!effect.exists()) effect.copyTo(new Fi("effects.properties"));
 
         properties = new ObjectMap<>();
         PropertiesUtils.load(
-                properties, PheonixMain.pluginDir.child("effects.properties").reader()
+                properties, pluginDir.child("effects.properties").reader()
         );
 
 

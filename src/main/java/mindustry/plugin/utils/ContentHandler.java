@@ -25,6 +25,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+@Deprecated
 public class ContentHandler {
     public static final byte[] mapHeader = {77, 83, 65, 86};
     public static final String schemHeader = "bXNjaAB";

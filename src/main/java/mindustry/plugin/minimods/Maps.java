@@ -110,15 +110,17 @@ public class Maps implements MiniMod {
                         return;
                     }
 
-                    ctx.sendEmbed(
-                            new EmbedBuilder()
-                                    .setTitle(escapeEverything(meta.get("name")))
-                                    .setDescription(meta.get("description"))
-                                    .setAuthor(ctx.author().getDisplayName(ctx.server()), ctx.author().getAvatar().getUrl().toString(), ctx.author().getAvatar().getUrl().toString())
-                                    .setColor(DiscordPalette.WARN)
-                                    .setFooter("Size: " + meta.getInt("width") + "x" + meta.getInt("height"))
-
-                            // TODO: Image from Content Server
+                    EmbedBuilder eb = new EmbedBuilder()
+                        .setTitle(escapeEverything(meta.get("name")))
+                        .setDescription(meta.get("description"))
+                        .setAuthor(ctx.author().getDisplayName(ctx.server()), ctx.author().getAvatar().getUrl().toString(), ctx.author().getAvatar().getUrl().toString())
+                        .setColor(DiscordPalette.WARN)
+                        .setImage(ContentServer.renderRaw(data))
+                        .setFooter("Size: " + meta.getInt("width") + "x" + meta.getInt("height"));
+                    ctx.reply(
+                        new MessageBuilder()
+                            .addEmbed(eb)
+                            .addAttachment(data, "Map " + Strings.stripColors(meta.get("name")) + ".msav")
                     );
                 }
         );
@@ -201,7 +203,7 @@ public class Maps implements MiniMod {
                                 .addInlineField("Total Play Time", md.playTime + " min");
                     }
 
-                    eb.setImage(ContentServer.render(found));
+                    eb.setImage(ContentServer.renderMap(found));
 
                     ctx.reply(
                             new MessageBuilder()

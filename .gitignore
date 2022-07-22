@@ -9,5 +9,6 @@ scp.bat
 /config/
 /config/mods/
 /config/maps
+!/config/pheonix/block_colors.png
 bin
 *.class

@@ -46,15 +46,7 @@ public class PheonixMain extends Plugin {
 //    public static Net net = new Net();
 //    public static Prefs prefs = new Prefs(prefsFile);
 //    public GetMap map = new GetMap();
-    public static final Fi pluginDir = new Fi("./config/mods/");
-    public static final long CDT = 300L;
-    public static final LocalDateTime startTime = LocalDateTime.now();
     private static final String lennyFace = "( \u0361\u00B0 \u035C\u0296 \u0361\u00B0)";
-    public static ContentHandler contentHandler; // map and schem handler
-    //    static Gson gson = new Gson();
-    public static int logCount = 0; // only log join/leaves every 5 minutes
-    //    public ObjectMap<String, TextChannel> discChannels = new ObjectMap<>();
-    //    private final String fileNotFoundErrorMessage = "File not found: config\\mods\\settings.json";
 
     protected MiniMod[] minimods = new MiniMod[]{
             new mindustry.plugin.minimods.Communication(),

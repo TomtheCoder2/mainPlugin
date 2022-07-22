@@ -21,6 +21,7 @@ import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
+import mindustry.plugin.utils.ContentServer;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
@@ -178,6 +179,7 @@ public class GameInfo implements MiniMod {
                             .addInlineField("TPS", Core.graphics.getFramesPerSecond() + "")
                             .addInlineField("Next wave in", Math.round(Vars.state.wavetime / (double) Core.graphics.getFramesPerSecond()) + " seconds")
                             .addInlineField("Server Uptime", uptimeSb.toString())
+                            .setImage(ContentServer.renderGame())
                             .setColor(DiscordPalette.INFO);
 
                     Fi tempDir = new Fi("temp/");
@@ -189,7 +191,6 @@ public class GameInfo implements MiniMod {
                             Log.info("Saved to @", mapFile);
                             Log.debug(mapFile.absolutePath());
 
-                            // TODO: Show image w/ content server
                             ctx.sendMessage(new MessageBuilder()
                                     .addEmbed(eb)
                                     .addAttachment(mapFile.file())
