@@ -141,13 +141,7 @@ public class Pets implements MiniMod {
         // initialize controller
         Team team = getTeam(pet.color);
         UnitController controller = new PetController(player, pet.name, pet.color, team);
-        try {
-            Field field = unit.getClass().getField("controller");
-            field.set(unit, controller);
-        } catch(Exception e) {
-            Log.err(e);
-            return false;
-        }
+        unit.controller(controller);
         controller.unit(unit);
 
 //        Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);
