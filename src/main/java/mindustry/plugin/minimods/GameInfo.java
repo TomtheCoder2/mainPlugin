@@ -87,7 +87,7 @@ public class GameInfo implements MiniMod {
                 ctx -> {
                     StringBuilder desc = new StringBuilder();
                     for (Player p : Groups.player) {
-                        desc.append(String.format("`%-9d : %-24s : %-16s :` %s%s\n", p.id, p.uuid(), p.con.address, p.name, p.admin ? " (admin)" : ""));
+                        desc.append(String.format("`%-9d : %-24s : %-16s :` %s%s\n", p.id, p.uuid(), p.con.address, Utils.escapeEverything(p.name), p.admin ? " (admin)" : ""));
                     }
                     ctx.sendEmbed(DiscordPalette.INFO, "Players online: " + Groups.player.size(), desc.toString());
                 }

@@ -15,6 +15,7 @@ import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 
@@ -74,30 +75,28 @@ public class Report implements MiniMod {
 
                 if (found == null) {
                     player.sendMessage("[scarlet]No player[orange] '" + args[0] + "'[scarlet] found.");
+                    return;
                 }
 
-                if (found.admin()) {
-                    player.sendMessage("[scarlet]Did you really expect to be able to report an admin?");
-                } else if (found.team() != player.team()) {
+                if (found.team() != player.team()) {
                     player.sendMessage("[scarlet]Only players on your team can be reported.");
-                } else {
-                    //send message
-                    if (args.length > 1) {
-                        new MessageBuilder()
-                                .setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
-                                        .addField("name", Utils.escapeColorCodes(found.name)).addField("Reason", args[1]).setColor(DiscordPalette.ERROR).setFooter("Reported by " + player.name))
-                                .setContent("<@&" + Roles.MOD + "> <@&" + Roles.APPRENTICE + ">")
-                                .send(Channels.GR_REPORT);
-                    } else {
-                        new MessageBuilder()
-                                .setEmbed(new EmbedBuilder().setTitle("Potential griefer online")
-                                        .addField("name", Utils.escapeColorCodes(found.name)).setColor(DiscordPalette.ERROR).setFooter("Reported by " + player.name))
-                                .setContent("<@&" + Roles.MOD + "> <@&" + Roles.APPRENTICE + ">")
-                                .send(Channels.GR_REPORT);
-                        Channels.GR_REPORT.sendMessage("<@&" + +Roles.MOD + ">");
-                    }
-                    Call.sendMessage(found.name + "[sky] is reported to discord.");
+                    return;
                 }
+
+                EmbedBuilder eb = new EmbedBuilder().setTitle("Potential Griefer Online")
+                    .addField("Name", Utils.escapeEverything(found.name))
+                    .setColor(DiscordPalette.ERROR)
+                    .setFooter("Reported by: " + Utils.escapeEverything(player.name));
+                
+                if (args.length > 1) {
+                    eb.addField("Reason", args[1]);
+                }
+
+                new MessageBuilder()
+                        .setEmbed(eb)
+                        .setContent("<@&" + Roles.MOD + "> <@&" + Roles.APPRENTICE + ">")
+                        .send(Channels.GR_REPORT);
+                Call.sendMessage(found.name + "[sky] is reported to discord.");
             }
         });
     }
