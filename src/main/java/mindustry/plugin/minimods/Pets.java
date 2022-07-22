@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.lang.instrument.ClassDefinition;
 import java.lang.instrument.Instrumentation;
 import java.lang.instrument.UnmodifiableClassException;
+import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -140,7 +141,13 @@ public class Pets implements MiniMod {
         // initialize controller
         Team team = getTeam(pet.color);
         UnitController controller = new PetController(player, pet.name, pet.color, team);
-        Reflect.set(unit, "controller", controller);
+        try {
+            Field field = unit.class.getField("controller");
+            field.set(unit, controller);
+        } catch(Exception e) {
+            Log.err(e);
+            return false;
+        }
         controller.unit(unit);
 
 //        Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);
