@@ -104,6 +104,7 @@ public class Pets implements MiniMod {
 
             if (args.length == 0) {
                 player.sendMessage(GameMsg.custom("Pet", "sky", Seq.with(pets).toString(", ", p -> p.name)));
+                return;
             }
 
             var pet = Structs.find(pets, p -> p.name.equalsIgnoreCase(args[0]));
