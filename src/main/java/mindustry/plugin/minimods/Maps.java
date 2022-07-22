@@ -17,6 +17,7 @@ import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.ContentServer;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
@@ -200,6 +201,7 @@ public class Maps implements MiniMod {
                                 .addInlineField("Total Play Time", md.playTime + " min");
                     }
 
+                    eb.setImage(ContentServer.render(found));
 
                     ctx.reply(
                             new MessageBuilder()
