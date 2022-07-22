@@ -7,6 +7,7 @@ import arc.struct.ObjectSet;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Log;
+import arc.util.Reflect;
 import arc.util.Structs;
 import arc.util.Timer;
 import mindustry.Vars;
@@ -64,8 +65,8 @@ public class Pets implements MiniMod {
             float[] hsv2 = color.toHsv(new float[3]);
             double err =
                     1.0 * (hsv1[0] - hsv2[0]) * (hsv1[0] - hsv2[0]) +
-                            100.0 * (hsv1[1] - hsv2[1]) * (hsv1[1] - hsv2[1]) +
-                            100.0 * (hsv1[2] - hsv2[2]) * (hsv1[2] - hsv2[2]);
+                            200.0 * 200.0 * (hsv1[1] - hsv2[1]) * (hsv1[1] - hsv2[1]) +
+                            200.0 * 200.0 * (hsv1[2] - hsv2[2]) * (hsv1[2] - hsv2[2]);
             if (err < minErr) {
                 minErr = err;
                 bestTeam = team;
@@ -131,13 +132,7 @@ public class Pets implements MiniMod {
         // initialize controller
         Team team = getTeam(pet.color);
         UnitController controller = new PetController(player, pet.name, pet.color, team);
-        if (unit instanceof MechUnit) {
-            MechUnit mechUnit = (MechUnit) unit;
-            mechUnit.controller(controller);
-        } else if (unit instanceof PayloadUnit) {
-            var payloadUnit = (PayloadUnit) unit;
-            payloadUnit.controller(controller);
-        }
+        Reflect.set(unit, "controller", controller);
         controller.unit(unit);
 
 //        Call.spawnEffect(unit.x, unit.y, unit.rotation, unit.type);
@@ -457,21 +452,11 @@ public class Pets implements MiniMod {
         }
 
         private boolean isPet(Unit unit) {
-            if (unit instanceof MechUnit) {
-                return ((MechUnit)unit).controller() instanceof PetController;
-            } else if (unit instanceof PayloadUnit) {
-                return ((PayloadUnit)unit).controller() instanceof PetController;                
-            }
-            return false;
+            return unit.controller() instanceof PetController;
         }
 
         private String petOwner(Unit unit) {
-            PetController controller = null;
-            if (unit instanceof MechUnit) {
-                controller = (PetController)((MechUnit)unit).controller();
-            } else if (unit instanceof PayloadUnit) {
-                controller = (PetController)((PayloadUnit)unit).controller();
-            }
+            PetController controller = (PetController)unit.controller();
             return controller.uuid;
         }
 
