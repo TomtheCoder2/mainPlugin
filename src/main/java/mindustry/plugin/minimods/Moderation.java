@@ -45,6 +45,7 @@ public class Moderation implements MiniMod {
             Vars.netServer.admins.addChatFilter((player, message) -> {
                 assert player != null;
                 if (muted.contains(player.uuid())) {
+                    player.sendMessage("[scarlet]You are muted! Ask a mod to unmute you");
                     return null;
                 }
                 return message;
