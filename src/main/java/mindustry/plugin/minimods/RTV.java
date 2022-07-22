@@ -193,7 +193,7 @@ public final class RTV implements MiniMod {
             this.map = map;
             this.endTime = System.currentTimeMillis() + endTime;
 
-            Timer.schedule(new Task(this), this.endTime);
+            Timer.schedule(new Task(this), this.endTime / 1000);
         }
 
         /**
@@ -238,7 +238,7 @@ public final class RTV implements MiniMod {
                 }
 
                 if (System.currentTimeMillis() < session.endTime) {
-                    Timer.schedule(new Task(session), session.endTime - System.currentTimeMillis());
+                    Timer.schedule(new Task(session), (session.endTime - System.currentTimeMillis()) / 1000);
                     return;
                 }
 
