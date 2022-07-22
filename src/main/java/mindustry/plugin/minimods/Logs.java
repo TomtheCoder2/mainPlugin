@@ -11,7 +11,7 @@ import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 /**
- * Logs player actions, such as player join & leave and suspicious activity
+ * Logs player actions, such as player join &amp; leave and suspicious activity
  */
 public class Logs implements MiniMod {
     Seq<JoinPlayerInfo> leftPlayers = new Seq<>();

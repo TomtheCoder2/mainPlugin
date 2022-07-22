@@ -27,6 +27,7 @@ import mindustry.world.Tiles;
 import mindustry.world.WorldContext;
 import mindustry.world.blocks.environment.Floor;
 
+/** Renders maps and schematics to images. Requires certain data files, such as {@code block_colors.png} */
 public class ContentServer {
     static {
         Pixmap pixmap = new Pixmap(Core.settings.getDataDirectory().child("pheonix/block_colors.png"));
