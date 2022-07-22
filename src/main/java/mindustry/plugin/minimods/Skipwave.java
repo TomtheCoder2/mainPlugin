@@ -34,10 +34,10 @@ public class Skipwave implements MiniMod {
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("skipwave", "[y/n]", "Skip wave of enemies", (args, player) -> {
             int vote = 1;
-            if (args.length > 1) {
-                switch (args[1]) {
+            if (args.length > 0) {
+                switch (args[0]) {
                     case "y", "yes": vote = 1; break;
-                    case "n", "no": vote = 0; break;
+                    case "n", "no": vote = -1; break;
                     default:
                         player.sendMessage(GameMsg.error("Skipwave", "Second argument must be 'yes' or 'no'"));
                         return;
