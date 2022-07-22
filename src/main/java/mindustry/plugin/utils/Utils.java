@@ -610,6 +610,16 @@ public class Utils {
         return embedBuilder;
     }
 
+    /** Parses color in RRGGBB or RRGGBBAA format
+     * @return the color, or {@code null} on failure
+     */
+    public static arc.graphics.Color parseColor(String rgb) {
+        try {
+            return arc.graphics.Color.valueOf(rgb);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     // copied and pasted from the internet, hope it works
     public static boolean onlyDigits(String str) {

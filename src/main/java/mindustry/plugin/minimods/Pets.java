@@ -142,7 +142,7 @@ public class Pets implements MiniMod {
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("addpet", "<species> <color:rrggbbaa> <name...>",
+        handler.register("addpet", "<species> <color:rrggbb> <name...>",
                 data -> {
                     data.help = "Create a new pet";
                     data.category = "Pets";
@@ -167,9 +167,10 @@ public class Pets implements MiniMod {
                     }
 
                     var pet = new PetDatabase.Pet(pd.uuid, ctx.args.get("name"));
-                    pet.color = Color.valueOf(ctx.args.get("color:rrggbbaa"));
+                    pet.color = Utils.parseColor(ctx.args.get("color:rrggbb"));
                     if (pet.color == null) {
-                        pet.color = Color.black;
+                        ctx.error("Not a valid color", "Make sure you are using `rrggbb` format");
+                        return;
                     }
                     pet.species = Vars.content.units().find(u -> u.name.equalsIgnoreCase(ctx.args.get("species")));
                     if (pet.species == null) {
@@ -251,7 +252,7 @@ public class Pets implements MiniMod {
                 }
         );
 
-        handler.register("updatepet", "<color:rrggbbaa> <name...>",
+        handler.register("updatepet", "<color:rrggbb> <name...>",
                 data -> {
                     data.help = "Update an existing pet";
                     data.category = "Pets";
@@ -271,9 +272,10 @@ public class Pets implements MiniMod {
                         return;
                     }
 
-                    pet.color = Color.valueOf(ctx.args.get("color:rrggbbaa"));
+                    pet.color = Utils.parseColor(ctx.args.get("color:rrggbb"));
                     if (pet.color == null) {
-                        pet.color = Color.black;
+                        ctx.error("Not a valid color", "Make sure you are using `rrggbb` format");
+                        return;
                     }
 
                     PetDatabase.updatePet(pet);
