@@ -97,6 +97,7 @@ public class Cheats implements MiniMod {
                         Player p = Query.findPlayerEntity(query);
                         if (p == null) {
                             ctx.error("No such player", query + " is not online");
+                            return;
                         }
                         players = Seq.with(p);
                     }
@@ -107,9 +108,14 @@ public class Cheats implements MiniMod {
                         return;
                     }
 
+                    int n = 0;
                     for (Player p : players) {
                         p.team(team);
+                        n++;
                     }
+
+                    ctx.success("Changed " + n + " players' team", "Team: " + team.name);
+                    DiscordLog.cheat("Changed team", ctx.author(), "Target: " + query + "\nTeam: " + team.name);
                 }
         );
 
@@ -192,20 +198,21 @@ public class Cheats implements MiniMod {
                         return;
                     }
 
-                    UnitType type = Vars.content.unit(ctx.args.get("unit"));
+                    UnitType type = Vars.content.unit(ctx.args.get("unit|all"));
                     if (type == null && !ctx.args.get("unit").equals("all")) {
                         ctx.error("No such unit", "That is not a valid unit");
                     }
 
                     int amount = 0;
                     for (Unit unit : Groups.unit) {
-                        if (unit.team == team && unit.type == type) {
+                        if (unit.team == team && (type == null || unit.type == type)) {
                             unit.kill();
                             amount += 1;
                         }
                     }
 
                     ctx.success("Killed " + amount + " units", "From team " + team.name);
+                    DiscordLog.cheat("Kill units", ctx.author(), "Team: " + team.name + "\nUnits killed: " + amount + "\nUnit type: " + (type == null ? "all" : type.name));
                 }
         );
     }
