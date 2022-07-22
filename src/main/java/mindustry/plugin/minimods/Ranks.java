@@ -347,6 +347,7 @@ public class Ranks implements MiniMod {
                     String table = "```\n";
                     table += String.format("%3s %-30s %-10s\n", "", "Map", column);
                     for (int i = 0; i < ranking.length; i++) {
+                        if (Query.findMap(ranking[i].name) == null) continue;
                         table += String.format("%3s %-30s %-10s\n", offset + i + 1, Strings.stripColors(ranking[i].name), ranking[i].stat);
                     }
                     table += "```";
