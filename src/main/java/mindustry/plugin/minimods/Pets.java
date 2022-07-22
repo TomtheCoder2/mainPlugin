@@ -58,15 +58,22 @@ public class Pets implements MiniMod {
     private Team getTeam(Color color) {
         double minErr = Double.POSITIVE_INFINITY;
         Team bestTeam = null;
+
+        // hsv2 = hsv of the desired color
+        float[] hsv2 = color.toHsv(new float[3]);
+        if (hsv2[2] <= 0.3 && hsv2[1] <= 0.15) {
+            return Team.derelict;
+        }
+
         for (Team team : Team.all) {
             if (team.id <= 5 && team != Team.derelict) continue; // don't want player to control pets
 
             float[] hsv1 = team.color.toHsv(new float[3]);
-            float[] hsv2 = color.toHsv(new float[3]);
             double err =
                     1.0 * (hsv1[0] - hsv2[0]) * (hsv1[0] - hsv2[0]) +
                             200.0 * 200.0 * (hsv1[1] - hsv2[1]) * (hsv1[1] - hsv2[1]) +
                             200.0 * 200.0 * (hsv1[2] - hsv2[2]) * (hsv1[2] - hsv2[2]);
+
             if (err < minErr) {
                 minErr = err;
                 bestTeam = team;
