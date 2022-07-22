@@ -11,6 +11,7 @@ import arc.util.Reflect;
 import arc.util.Structs;
 import arc.util.Timer;
 import mindustry.Vars;
+import mindustry.ai.types.MinerAI;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.content.UnitTypes;
@@ -431,7 +432,8 @@ public class Pets implements MiniMod {
             return null;
         }
 
-        private boolean isNearTurret() {
+        /** Returns whether the pet is near a turret or friendly unit */
+        private boolean isNearDanger() {
             for (var data : Vars.state.teams.active) {
                 if (data.turretTree == null) {
                     continue;
@@ -450,13 +452,24 @@ public class Pets implements MiniMod {
                         targetAir = false;
                     }
 
-                    if (targetAir && unit.dst(turret) <= bt.range + 10) {
+                    if (targetAir && unit.dst(turret) <= bt.range + Vars.tilesize) {
                         shouldHide[0] = true;
                     } 
                 });
                 if (shouldHide[0]) {
                     return true;
                 }
+            }
+
+            for (Unit enemyUnit : Groups.unit) {
+                if (enemyUnit.team() == player.team() && !enemyUnit.isPlayer() &&
+                    !(enemyUnit.controller() instanceof PetController) && 
+                    !(enemyUnit.controller() instanceof MinerAI) && // exclude mono
+                    enemyUnit.type != UnitTypes.mega && enemyUnit.type != UnitTypes.poly) { // exclude mega & poly
+                        if (unit.dst(enemyUnit) <= enemyUnit.range() + Vars.tilesize) {
+                            return true;
+                        }
+                    }
             }
 
             return false;
@@ -493,7 +506,7 @@ public class Pets implements MiniMod {
             prevTime += dt;
 
             // set team
-            if (isNearTurret()) {
+            if (isNearDanger()) {
                 // stealth mode
                 unit.team = Team.derelict;
             } else {
