@@ -162,7 +162,7 @@ public class Pets implements MiniMod {
                     }
 
                     var pets = PetDatabase.getPets(pd.uuid);
-                    if (pets.length > maxPets(pd.rank)) {
+                    if (pets.length >= maxPets(pd.rank)) {
                         ctx.error("Too Many Pets", "You currently have " + pets.length + " pets, but a " + Rank.all[pd.rank].name + " can only have " + maxPets(pd.rank) + " pets.");
                         return;
                     }
