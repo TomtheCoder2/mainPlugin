@@ -45,7 +45,8 @@ public class DiscordLog {
      */
     public static void cheat(String action, User mod, String information) {
         EmbedBuilder eb = new EmbedBuilder()
-                .setColor(DiscordPalette.INFO)
+                .setColor(java.awt.Color.PINK)
+                .setTitle(action)
                 .addInlineField("Moderator", "<@" + mod.getId() + ">")
                 .addInlineField("Players", StreamSupport.stream(Groups.player.spliterator(), false)
                         .map(p -> Utils.escapeEverything(p.name()) + " `" + p.uuid() + "`")
@@ -60,6 +61,7 @@ public class DiscordLog {
     public static void moderation(String action, String mod, Administration.PlayerInfo info, String reason, String additionalInfo) {
         EmbedBuilder eb = new EmbedBuilder()
             .setColor(DiscordPalette.WARN)
+            .setTitle(action)
             .addField("Moderator", mod)
             .addField("Reason", reason == null || reason.equals("") ? "None" : reason);
         if (info != null) {

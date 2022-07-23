@@ -147,7 +147,8 @@ public class Translate implements MiniMod {
 }
 
 /**
- * Runs the translations & sends messages to discord and chat
+ * Runs the translations & returns callbacks.
+ * All callbacks are run on the main thread.
  */
 class TranslateThread extends Thread {
     protected BlockingQueue<Req> queue = new LinkedBlockingQueue<>(64);
