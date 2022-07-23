@@ -46,6 +46,7 @@ public class Translate implements MiniMod {
 
         Events.on(EventType.PlayerChatEvent.class, event -> {
             if (event.player == null) return;
+            if (event.message.startsWith("/")) return; //don't translate commands
 
             // remove unnecessary language entries
             ObjectSet<String> langsToRemove = new ObjectSet<>();
@@ -110,7 +111,7 @@ public class Translate implements MiniMod {
                                 .setTitle("Translate")
                                 .setColor(DiscordPalette.INFO)
                                 .setDescription(resp.text)
-                                .setFooter("Host: " + resp.host));
+                                .setFooter("Powered by LibreTranslate"));
 
                     })) {
                         ctx.error("Translate Error", "Queue is full.");
@@ -209,41 +210,11 @@ class TranslateThread extends Thread {
 }
 
 class TranslateApi {
-    // Randomly cycle through servers to use translate.
-    // That way we decrease the load on any single server. 
-    // https://github.com/LibreTranslate/LibreTranslate#mirrors
-    private final static String[] SERVERS = new String[]{
-            "libretranslate.de",
-            "translate.argosopentech.com",
-//        "translate.api.skitzen.com", does not work
-            "libretranslate.pussthecat.org",
-            "translate.fortytwo-it.com",
-//        "translate.terraprint.co", does not work.
-            "lt.vern.cc"
-    };
-
-    private static int serverIdx = 0;
-
-    private static String getHost(String server) {
-        String[] parts = server.split("\\.");
-        if (parts.length <= 1) {
-            return server;
-        } else {
-            return parts[parts.length - 2] + "." + parts[parts.length - 1];
-        }
-    }
-
-    private static String getServer() {
-        String server = SERVERS[serverIdx];
-        serverIdx = (serverIdx + 1) % SERVERS.length;
-        return server;
-    }
-
+    private final static String SERVER = "http://172.104.253.198:5000";
     /**
      * Translates a piece of text
      */
     public static Resp translate(String text, String fromLang, String toLang) {
-        String server = getServer();
         String response = null;
         try {
             JSONObject reqObj = new JSONObject()
@@ -253,25 +224,24 @@ class TranslateApi {
 
             HttpRequest req = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(reqObj.toString()))
-                    .uri(URI.create("https://" + server + "/translate"))
+                    .uri(URI.create(SERVER + "/translate"))
                     .setHeader("User-Agent", Config.serverName)
                     .setHeader("Content-Type", "application/json")
-
                     .build();
+
             HttpResponse<String> resp = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build().send(req, HttpResponse.BodyHandlers.ofString());
             response = resp.body();
             JSONObject respObj = new JSONObject(new JSONTokener(resp.body()));
             if (respObj.has("error")) {
-                DiscordLog.error("Translate: Translate Server Error", respObj.getString("error"), StringMap.of("Host", getHost(server)));
-                return new Resp(respObj.getString("error"), getHost(server), false);
+                DiscordLog.error("Translate: Translate Server Error", respObj.getString("error"), null);
+                return new Resp(respObj.getString("error"), false);
             }
-            return new Resp(respObj.getString("translatedText"), getHost(server));
+            return new Resp(respObj.getString("translatedText"));
         } catch (Exception e) {
-            Log.err("Translate error for server: " + server);
             e.printStackTrace();
             DiscordLog.error("Translate: Translate Internal Error", e.getMessage(),
-                    StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
-            return translate(text, fromLang, toLang);
+                    StringMap.of("Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
+            return null;
         }
     }
 
@@ -279,12 +249,11 @@ class TranslateApi {
      * Detects the language of a piece of text.
      */
     public static String detect(String text) {
-        String server = getServer();
         String response = null;
         try {
             HttpRequest req = HttpRequest.newBuilder()
                     .POST(BodyPublishers.ofString("q=" + URLEncoder.encode(text, StandardCharsets.UTF_8)))
-                    .uri(URI.create("https://" + server + "/detect"))
+                    .uri(URI.create(SERVER + "/detect"))
                     .setHeader("User-Agent", Config.serverName)
                     .setHeader("Content-Type", "application/x-www-form-urlencoded")
                     .build();
@@ -294,31 +263,28 @@ class TranslateApi {
             if (respObj instanceof JSONObject) {
                 String error = ((JSONObject) respObj).getString("error");
                 Log.err("Translate error: " + error);
-                DiscordLog.error("Translate: Detect Server Error", error, StringMap.of("Host", getHost(server)));
+                DiscordLog.error("Translate: Detect Server Error", error, null);
                 return null;
             }
             JSONArray array = (JSONArray) respObj;
             return array.getJSONObject(0).getString("language");
         } catch (Exception error) {
             DiscordLog.error("Translate: Detect Internal Error", error.getMessage(),
-                    StringMap.of("Host", getHost(server), "Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
-            return detect(text);
+                    StringMap.of("Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));
+            return null;
         }
     }
 
     public static class Resp {
         public String text;
         public String error;
-        public String host;
 
-        public Resp(String error, String host, boolean eeek) {
+        public Resp(String error, boolean eeek) {
             this.error = error;
-            this.host = host;
         }
 
-        public Resp(String text, String host) {
+        public Resp(String text) {
             this.text = text;
-            this.host = host;
         }
     }
 }
