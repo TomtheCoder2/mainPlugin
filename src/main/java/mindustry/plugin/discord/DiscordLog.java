@@ -48,7 +48,7 @@ public class DiscordLog {
                 .setColor(java.awt.Color.PINK)
                 .setTitle(action)
                 .addInlineField("Moderator", "<@" + mod.getId() + ">")
-                .addInlineField("Players", StreamSupport.stream(Groups.player.spliterator(), false)
+                .addInlineField("Players online", StreamSupport.stream(Groups.player.spliterator(), false)
                         .map(p -> Utils.escapeEverything(p.name()) + " `" + p.uuid() + "`")
                         .collect(Collectors.joining("\n")));
         if (information != null) {
