@@ -3,8 +3,13 @@ package mindustry.plugin.minimods;
 import arc.Events;
 import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
+import arc.util.Align;
 import arc.util.CommandHandler;
+import arc.util.Timer;
+import mindustry.Vars;
 import mindustry.game.EventType;
+import mindustry.gen.Call;
+import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.utils.GameMsg;
@@ -17,6 +22,7 @@ public class Inspector implements MiniMod {
      */
     private final ObjectSet<String> players = new ObjectSet<>();
     private final ObjectMap<Pos, TileInfo> tileInfos = new ObjectMap<>();
+    private final ObjectMap<String, Pos> activeTiles = new ObjectMap<>();
 
     @Override
     public void registerCommands(CommandHandler handler) {
@@ -63,29 +69,43 @@ public class Inspector implements MiniMod {
 
         Events.on(EventType.WorldLoadEvent.class, event -> {
             tileInfos.clear();
+            activeTiles.clear();
         });
 
         Events.on(EventType.TapEvent.class, event -> {
             if (event.tile == null) return;
             if (!players.contains(event.player.uuid())) return;
 
-            String s = "[white]" + event.tile.block().name + "[pink] ([white]" + event.tile.x + "[pink], [white]" + event.tile.y + "[pink])";
-            TileInfo info = tileInfos.get(new Pos(event.tile));
-            if (info != null) {
-                if (info.configuredByName != null) {
-                    s += "\n - Last configured by: [white]" + info.configuredByName + "[pink]" + (event.player.admin ? " [orange]" + info.configuredBy : "");
-                }
-                if (info.placedByName != null) {
-                    s += "\n - Last placed by: [white]" + info.placedByName + "[pink]" + (event.player.admin ? " [orange]" + info.placedBy : "");
-                }
-                if (info.destroyedByName != null) {
-                    s += "\n - Last destroyed " + (info.previousBlock == null ? "" : " from [accent]" + info.previousBlock.name) + "[pink] by: [white]" + info.destroyedByName + "[pink]"
-                            + (event.player.admin ? " [orange]" + info.destroyedBy : "");
-                }
-            }
-
-            event.player.sendMessage(GameMsg.custom("Inspector", "pink", s));
+            activeTiles.put(event.player.uuid(), new Pos(event.tile));
         });
+
+        Timer.schedule(() -> {
+            for (var entry : activeTiles) {
+                if (!players.contains(entry.key)) continue; // skip people with inactive inspector
+                Player player = Groups.player.find(x -> x.uuid().equals(entry.key));
+                if (player == null) continue;
+
+                Tile tile = Vars.world.tile(entry.value.x, entry.value.y);
+                if (tile == null) continue;
+
+                String s = "[white]" + tile.block().name + "[pink] ([white]" + tile.x + "[pink], [white]" + tile.y + "[pink])";
+                TileInfo info = tileInfos.get(entry.value);
+                if (info != null) {
+                    if (info.configuredByName != null) {
+                        s += "\n - Last configured by: [white]" + info.configuredByName + "[pink]" + (player.admin ? " [orange]" + info.configuredBy : "");
+                    }
+                    if (info.placedByName != null) {
+                        s += "\n - Last placed by: [white]" + info.placedByName + "[pink]" + (player.admin ? " [orange]" + info.placedBy : "");
+                    }
+                    if (info.destroyedByName != null) {
+                        s += "\n - Last destroyed " + (info.previousBlock == null ? "" : " from [accent]" + info.previousBlock.name) + "[pink] by: [white]" + info.destroyedByName + "[pink]"
+                                + (player.admin ? " [orange]" + info.destroyedBy : "");
+                    }
+                }
+    
+                Call.infoPopup(player.con, s, 1f, Align.bottomRight, 0, 0, 200, 0);
+            }
+        }, 1f, 1f);
     }
 
     private static class Pos {
