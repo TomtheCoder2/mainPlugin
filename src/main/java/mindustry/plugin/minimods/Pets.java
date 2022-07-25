@@ -517,13 +517,13 @@ public class Pets implements MiniMod {
             return controller.uuid;
         }
 
-        private CoreBlock.CoreBuild closeCore() {
+        private CoreBlock.CoreBuild closeCore(float targetx, float targety) {
             var cores = Vars.state.teams.cores(player.team());
             if (cores == null || cores.size == 0) return null;
             CoreBlock.CoreBuild closestCore = null;
-            float closestDst = 8 * Vars.tilesize;
+            float closestDst = 12 * Vars.tilesize;
             for (var core : cores) {
-                if (unit.dst(core.x, core.y) <= closestDst) {
+                if (core.dst(targetx, targety) <= closestDst) {
                     closestDst = unit.dst(core.x, core.y);
                     closestCore = core;
                 }
@@ -580,11 +580,11 @@ public class Pets implements MiniMod {
             // movement
             float targetx = (player.x - (float) (40 * Math.cos(theta)));
             float targety = (player.y - (float) (40 * Math.sin(theta)));
-            if (closeCore() != null) {
-                var core = closeCore();
-                double thetaCore = core.angleTo(targetx, targety);
-                targetx = core.x + 8 * (float)Math.cos(thetaCore);
-                targety = core.y + 8 * (float)Math.sin(thetaCore);
+            var core = closeCore(targetx, targety);
+            if (core != null) {
+                double thetaCore = core.angleTo(targetx, targety) * Math.PI / 180;
+                targetx = core.x + 12 * (float)Vars.tilesize * (float)Math.cos(thetaCore);
+                targety = core.y + 12 * (float)Vars.tilesize * (float)Math.sin(thetaCore);
             }
 
             float vx = 10f * (targetx - unit.x);
