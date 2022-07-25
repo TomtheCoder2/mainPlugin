@@ -135,6 +135,7 @@ public class Utils {
 
     /** Return the rank marker, which includes the player tag */
     public static String rankMarker(Rank rank) {
+        if (rank.tag == null) return "";
         return "[#bc1900][[[#" + rank.color.toString().substring(0, 6) + "]" + rank.tag + "[#bc1900]]";
     }
 
@@ -143,6 +144,7 @@ public class Utils {
      * @param name the player name, including color codes
      */
     public static String formatName(Rank rank, String name) {
+        if (rank.tag == null) return name;
         return rankMarker(rank) + " [white]" + name;
     }
 
@@ -150,6 +152,7 @@ public class Utils {
      * Format a player name
      */
     public static String formatName(Rank rank, Player player) {
+        if (rank.tag == null) return player.name;
         return rankMarker(rank) + " [#" + player.color().toString().substring(0, 6) + "]" + escapeRankTag(player.name);
     }
     

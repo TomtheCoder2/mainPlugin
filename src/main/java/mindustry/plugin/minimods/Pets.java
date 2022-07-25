@@ -39,6 +39,7 @@ import mindustry.world.blocks.defense.turrets.BaseTurret;
 import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.PointDefenseTurret;
 import mindustry.world.blocks.defense.turrets.Turret;
+import mindustry.world.blocks.storage.CoreBlock;
 
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
@@ -371,9 +372,36 @@ public class Pets implements MiniMod {
         }
     }
 
-    static class PetTeam extends Team {
-        public PetTeam(int id, String name, Color color) {
-            super(id, name, color);
+    protected static int rank(PetDatabase.Pet pet) {
+        var items = possibleFoods(pet.species);
+        long min = Long.MAX_VALUE;
+        for (var item : items) {
+            long value = switch(item.name) {
+                case "coal" -> pet.eatenCoal;
+                case "copper" -> pet.eatenCopper;
+                case "lead" -> pet.eatenLead;
+                case "titanium" -> pet.eatenTitanium;
+                case "thorium" -> pet.eatenThorium;
+                case "beryllium" -> pet.eatenBeryllium;
+                default -> 0;
+            };
+            if (value < min) {
+                min = value;
+            }
+        }
+
+        if (min < 100) {
+            return 0;
+        } else if (min < 250) {
+            return 1;
+        } else if (min < 500) {
+            return 2;
+        } else if (min < 1000) {
+            return 3;
+        } else if (min < 5000) {
+            return 4;
+        } else {
+            return 5;
         }
     }
 
@@ -485,6 +513,19 @@ public class Pets implements MiniMod {
             return controller.uuid;
         }
 
+        private CoreBlock.CoreBuild closeCore() {
+            var cores = Vars.state.teams.cores(player.team());
+            if (cores == null || cores.size == 0) return null;
+            CoreBlock.CoreBuild closestCore = null;
+            float closestDst = 8 * Vars.tilesize;
+            for (var core : cores) {
+                if (unit.dst(core.x, core.y) <= closestDst) {
+                    closestDst = unit.dst(core.x, core.y);
+                    closestCore = core;
+                }
+            }
+            return closestCore;
+        }
 
         long prevTime = System.currentTimeMillis();
         boolean hasLabel = false;
@@ -533,8 +574,17 @@ public class Pets implements MiniMod {
             theta *= (Math.PI / 180);
 
             // movement
-            float vx = 10f * ((player.x - (float) (40 * Math.cos(theta))) - unit.x);
-            float vy = 10f * ((player.y - (float) (40 * Math.sin(theta))) - unit.y);
+            float targetx = (player.x - (float) (40 * Math.cos(theta)));
+            float targety = (player.y - (float) (40 * Math.sin(theta)));
+            if (closeCore() != null) {
+                var core = closeCore();
+                double thetaCore = core.angleTo(targetx, targety);
+                targetx = core.x + 8 * (float)Math.cos(thetaCore);
+                targety = core.y + 8 * (float)Math.sin(thetaCore);
+            }
+
+            float vx = 10f * (targetx - unit.x);
+            float vy = 10f * (targety - unit.y);
             if (vx * vx + vy * vy > maxVel * maxVel) {
                 double mul = Math.sqrt(maxVel * maxVel / ((double) vx * vx + (double) vy * vy));
                 vx *= mul;
@@ -549,19 +599,19 @@ public class Pets implements MiniMod {
                 Unit closePet = closePet();
                 if (closePet != null) {
                     float targetAngle = unit.angleTo(closePet);
-                    if (Math.abs(unit.rotation - targetAngle) >= 45) {
+                    if (Math.abs(unit.rotation - targetAngle) >= 30) {
                         unit.rotation += (targetAngle - unit.rotation) * 0.25f;
                     } else {
-                        if (unit.rotation - targetAngle >= 40) {
+                        if (unit.rotation - targetAngle >= 25) {
                             friendRotDir = -1;
                         } else if (unit.rotation - targetAngle <= -25) {
                             friendRotDir = 1;
                         }
 
                         if (friendRotDir > 0) {
-                            unit.rotation += 3 * 360 * dt / 1000;
+                            unit.rotation += 2*360 * dt / 1000;
                         } else {
-                            unit.rotation -= 3 * 360 * dt / 1000;
+                            unit.rotation -= 2*360 * dt / 1000;
                         }
                     }
                 } else {
