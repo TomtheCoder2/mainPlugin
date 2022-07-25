@@ -357,6 +357,13 @@ public class Moderation implements MiniMod {
                         return;
                     }
 
+                    var pd = Database.getPlayerData(info.id);
+                    if (pd != null) {
+                        pd.bannedUntil = 0;
+                        // don't set "ban" because kicking does not permaban
+                        Database.setPlayerData(pd);
+                    }
+
                     info.lastKicked = 0;
                     ctx.success("Unkicked player", "Successfully unkicked " + Utils.escapeEverything(info.lastName));
                     DiscordLog.moderation("Unkick", ctx.author(), info, ctx.args.get("reason"), null);
