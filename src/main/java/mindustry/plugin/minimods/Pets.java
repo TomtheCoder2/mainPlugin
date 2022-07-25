@@ -391,18 +391,19 @@ public class Pets implements MiniMod {
             }
         }
 
-        if (min < 100) {
-            return 0;
-        } else if (min < 250) {
-            return 1;
-        } else if (min < 500) {
-            return 2;
-        } else if (min < 1000) {
-            return 3;
-        } else if (min < 5000) {
-            return 4;
-        } else {
+
+        if        (min > 1000000) {
             return 5;
+        } else if (min > 100000) {
+            return 4;
+        } else if (min > 10000) {
+            return 3;
+        } else if (min > 1000) {
+            return 2;
+        } else if (min > 500) {
+            return 1;
+        } else {
+            return 0;
         }
     }
 
