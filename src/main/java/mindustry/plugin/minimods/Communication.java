@@ -83,10 +83,20 @@ public class Communication implements MiniMod {
         }, 10f, 10f);
 
         Channels.CHAT.addMessageCreateListener(event -> {
-            if (event.getMessageAuthor().isBotUser()) {
+            if (!event.getMessageAuthor().isRegularUser()) {
                 return;
             }
-            Call.sendMessage("[sky]" + (event.getMessageAuthor().getDiscriminatedName()) + ":[white] " + event.getMessageContent());
+
+            var server = event.getServer().get();
+            var author = event.getMessageAuthor().asUser().get();
+            String name = "";
+            if (author.getNickname(server).isPresent()) {
+                name = author.getNickname(server) + " (" + author.getDiscriminatedName() + ")";
+            } else {
+                name = author.getDiscriminatedName();
+            }
+
+            Call.sendMessage("[sky]" + name + ":[white] " + event.getMessageContent());
         });
 
         Events.on(EventType.PlayerJoin.class, event -> {

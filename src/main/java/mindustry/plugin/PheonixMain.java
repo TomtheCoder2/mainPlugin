@@ -18,6 +18,7 @@ import mindustry.mod.Plugin;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
+import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
@@ -263,7 +264,7 @@ public class PheonixMain extends Plugin {
         // Log game over
         Events.on(EventType.GameOverEvent.class, event -> {
             if (Groups.player.size() > 0) {
-                EmbedBuilder gameOverEmbed = new EmbedBuilder().setTitle("Game over!").setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves and " + Groups.player.size() + " players!").setColor(new Color(0x33FFEC));
+                EmbedBuilder gameOverEmbed = new EmbedBuilder().setTitle("Game over!").setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves and " + Groups.player.size() + " players!").setColor(DiscordPalette.INFO);
                 Channels.LOG.sendMessage(gameOverEmbed);
                 Channels.CHAT.sendMessage(gameOverEmbed);
             }
