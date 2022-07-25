@@ -19,6 +19,11 @@ import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
+import mindustry.world.blocks.defense.turrets.ItemTurret;
+import mindustry.world.blocks.defense.turrets.LiquidTurret;
+import mindustry.world.blocks.defense.turrets.PowerTurret;
+import mindustry.world.blocks.defense.turrets.Turret;
+
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.lang.reflect.Field;
@@ -45,21 +50,37 @@ public class Weapon implements MiniMod {
         } catch(NoSuchFieldException | IllegalAccessException f) {}
 
         String[] parts = query.split(":");
-        if (parts.length > 2 )return null;
+        if (parts.length > 2)return null;
 
         var unit = Vars.content.unit(parts[0]);
-        if (unit == null) {
-            return null;
-        }
-        int idx = 0;
-        if (parts.length == 2) {
-            idx = Strings.parseInt(parts[1]);
-        }
-        if (idx >= unit.weapons.size) {
-            return null;
-        }
+        if (unit != null) {
+            int idx = 0;
+            if (parts.length == 2) {
+                idx = Strings.parseInt(parts[1]);
+            }
+            if (idx >= unit.weapons.size) {
+                return null;
+            }
 
-        return unit.weapons.get(idx).bullet;
+            return unit.weapons.get(idx).bullet;
+        } else {
+            var turret = Vars.content.block(parts[0]);
+            if (turret instanceof ItemTurret) {
+                if (parts.length == 1) return null;
+                var item = Vars.content.item(parts[1]);
+                if (item == null) return null;
+                return ((ItemTurret)turret).ammoTypes.get(item);
+            } else if (turret instanceof LiquidTurret) {
+                if (parts.length == 1) return null;
+                var item = Vars.content.liquid(parts[1]);
+                if (item == null) return null;
+                return ((LiquidTurret)turret).ammoTypes.get(item);
+            } else if (turret instanceof PowerTurret) {
+                return ((PowerTurret)turret).shootType;
+            } else {
+                return null;
+            }
+        }
     }
 
     @Override
@@ -79,7 +100,7 @@ public class Weapon implements MiniMod {
                         ctx.error("No Such Bullet", "Bullet '" + ctx.args.get("bullet") + "' does not exist. Either use one of the predefined bullets bullets:\n```\n" +
                                 Seq.with(Bullets.class.getDeclaredFields()).filter(x -> x.getType().equals(BulletType.class)).map(x -> x.getName()).toString("\n")
                                 + "\n```\n" + 
-                                "Or use the format `unit-name:index`, where `index` is an integer, to get the weapon of a unit"
+                                "Or use the format `unit-name:index` or `turret-name:ammo`, where `index` is an integer, to get the weapon of a unit"
                         );
                         return;
                     }
