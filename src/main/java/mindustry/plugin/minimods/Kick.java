@@ -14,6 +14,7 @@ import mindustry.net.Administration;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
+import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
@@ -327,13 +328,18 @@ public class Kick implements MiniMod {
                     return;
                 }
 
+                Player plaintiff = Groups.player.find(x -> x.uuid().equals(session.plaintiff));
+                String plaintiffName = plaintiff == null ? "" : Utils.escapeEverything(plaintiff.name);
                 Player target = Groups.player.find(x -> x.uuid().equals(session.target));
                 if (session.countVotes() >= session.requiredVotes()) {
                     Call.sendMessage(GameMsg.info("Kick", "Vote passed. Defendant [orange]" + target.name + "[lightgray] will be banned for 60 minutes."));
                     kick(session);
+
+                    DiscordLog.moderation("Votekick", plaintiffName + " `" + session.plaintiff + "`", target.getInfo(), null, "Succeeded");
                     session.clear();
                 } else {
                     Call.sendMessage(GameMsg.info("Kick", "Vote for [orange]" + target.name + "[lightgray] failed."));
+                    DiscordLog.moderation("Votekick", plaintiffName + " `" + session.plaintiff + "`", target.getInfo(), null, "Failed");
                     session.clear();
                 }
 
