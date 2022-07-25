@@ -142,7 +142,7 @@ public class Pets implements MiniMod {
 
         // initialize controller
         Team team = getTeam(pet.color);
-        UnitController controller = new PetController(player, pet.name, pet.color, team);
+        UnitController controller = new PetController(player, pet.name, pet.color, team, rank(pet));
         unit.controller(controller);
         controller.unit(unit);
 
@@ -255,10 +255,11 @@ public class Pets implements MiniMod {
                     ctx.sendEmbed(new EmbedBuilder()
                             .setColor(new java.awt.Color(pet.color.r, pet.color.g, pet.color.b))
                             .setTitle("Pet: " + pet.name)
-                            .addInlineField("Owner", ownerName)
                             .addInlineField("Species", pet.species.localizedName)
                             .addInlineField("Color", "#" + pet.color.toString())
-                            .addInlineField("Food Eaten", foodEaten.trim())
+                            .addField("Food Eaten", foodEaten.trim())
+                            .addInlineField("Rank", Rank.all[rank(pet)].name)
+                            .addInlineField("Owner", ownerName)
                     );
                 }
         );
@@ -415,14 +416,16 @@ public class Pets implements MiniMod {
          * 1/s
          */
         int maxVel = 250;
+        int rank = 0;
         Unit unit;
 
-        public PetController(Player player, String name, Color color, Team unitTeam) {
+        public PetController(Player player, String name, Color color, Team unitTeam, int rank) {
             this.player = player;
             this.uuid = player.uuid();
             this.name = name;
             this.color = color;
             this.unitTeam = unitTeam;
+            this.rank = rank;
         }
 
         @Override
@@ -625,7 +628,7 @@ public class Pets implements MiniMod {
             // labels
             boolean isStill = Math.abs(vx) < 2 && Math.abs(vy) < 2;
             if (!hasLabel && isStill) {
-                Call.label("[#" + color.toString().substring(0, 6) + "]" + name, 1f, unit.x, unit.y + unit.hitSize()/2 + Vars.tilesize);
+                Call.label(Utils.formatName(Rank.all[rank], "[#" + color.toString().substring(0, 6) + "]" + name), 1f, unit.x, unit.y + unit.hitSize()/2 + Vars.tilesize);
                 hasLabel = true;
                 Timer.schedule(() -> {
                     hasLabel = false;
@@ -724,6 +727,7 @@ public class Pets implements MiniMod {
                         } else if (item == Items.beryllium) {
                             pet.eatenBeryllium += amount;
                         }
+                        rank = rank(pet);
                         PetDatabase.updatePet(pet);
                     }
                 }
