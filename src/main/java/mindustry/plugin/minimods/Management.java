@@ -2,6 +2,7 @@ package mindustry.plugin.minimods;
 
 import arc.Core;
 import arc.struct.IntSeq;
+import arc.struct.LongSeq;
 import arc.util.Http;
 import arc.util.Log;
 import arc.util.Strings;
@@ -35,6 +36,7 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Duration;
+import java.util.Arrays;
 
 public class Management implements MiniMod {
     @Override
@@ -46,7 +48,7 @@ public class Management implements MiniMod {
                     data.category = "Management";
                 },
                 ctx -> {
-                    long time = ctx.args.getLong("time", 1000);
+                    long time = ctx.args.getLong("time", 5)*1000;
 
                     TestData data = new TestData();
                     final Runnable[] scanTPS = new Runnable[1];
@@ -58,22 +60,27 @@ public class Management implements MiniMod {
                                             new EmbedBuilder()
                                                     .setColor(Color.YELLOW)
                                                     .setTitle("Stability Test Results")
-                                                    .setDescription(
-                                                            "Min TPS: " + data.min() + "\n" +
-                                                                    "Max TPS: " + data.max() + "\n" +
-                                                                    "Avg TPS: " + data.avg() + "\n" +
-                                                                    "Median TPS: " + data.med() + "\n"
+                                                    .addInlineField("TPS", 
+                                                        "Min: " + data.minTPS() + "\n" + 
+                                                        "Avg: " + data.avgTPS() + "\n" + 
+                                                        "Median: " + data.medTPS() + "\n" + 
+                                                        "Max: " + data.maxTPS() + "\n"
+                                                    )
+                                                    .addInlineField("Memory", 
+                                                        "Min: " + data.minMem() + "\n" +
+                                                        "Avg: " + data.avgMem() + "\n" + 
+                                                        "Max: " +data.maxMem() + "\n"
                                                     ))
                                     .addAttachment(data.csv().getBytes(), "data.csv")
                             );
                         } else {
-                            data.tpsMeasurements.add(Core.graphics.getFramesPerSecond());
+                            data.step();
                             Core.app.post(scanTPS[0]);
                         }
                     };
                     Core.app.post(scanTPS[0]);
 
-                    ctx.success("Stability Test Started", "Results will come out in " + time + "ms");
+                    ctx.success("Stability Test Started", "Results will come out in " + time/1000 + "s");
                 }
         );
 
@@ -389,42 +396,52 @@ public class Management implements MiniMod {
     }
 
     private static class TestData {
-        public IntSeq tpsMeasurements;
+        private IntSeq tpsMeasurements = new IntSeq();
+        private LongSeq memMeasurements = new LongSeq();
 
         public TestData() {
             tpsMeasurements = new IntSeq();
         }
 
-        public int min() {
-            if (tpsMeasurements.size == 0) return 0;
-
-            int min = Integer.MAX_VALUE;
-            for (int i = 0; i < tpsMeasurements.size; i++) {
-                int tps = tpsMeasurements.get(i);
-                if (tps < min) min = tps;
-            }
-            return min;
+        public void step() {
+            memMeasurements.add(Core.app.getJavaHeap());
+            tpsMeasurements.add(Core.graphics.getFramesPerSecond());
         }
 
-        public int max() {
-            int max = 0;
-            for (int i = 0; i < tpsMeasurements.size; i++) {
-                int tps = tpsMeasurements.get(i);
-                if (tps > max) max = tps;
-            }
-            return max;
+        public int minTPS() {
+            if (tpsMeasurements.size == 0) return 0;
+            return Arrays.stream(tpsMeasurements.items).limit(tpsMeasurements.size).min().getAsInt();
         }
 
-        public double avg() {
-            if (tpsMeasurements.size == 0) return 0;
+        public long minMem() {
+            if (memMeasurements.size == 0) return 0;
+            return Arrays.stream(memMeasurements.items).limit(memMeasurements.size).min().getAsLong();
+        }
 
+        public long maxMem() {
+            if (memMeasurements.size == 0) return 0;
+            return Arrays.stream(memMeasurements.items).limit(memMeasurements.size).max().getAsLong();
+        }
+
+        public long avgMem() { 
+            if (memMeasurements.size == 0) return 0;;
+            return Arrays.stream(memMeasurements.items).limit(memMeasurements.size).sum() / memMeasurements.size;
+        }
+
+        public int maxTPS() {
+            if (tpsMeasurements.size == 0) return 0;
+            return Arrays.stream(tpsMeasurements.items).limit(tpsMeasurements.size).max().getAsInt();
+        }
+
+        public double avgTPS() {
+            if (tpsMeasurements.size == 0) return 0;
             return (double) tpsMeasurements.sum() / (double) tpsMeasurements.size;
         }
 
         /**
          * Returns the median TPS
          */
-        public int med() {
+        public int medTPS() {
             if (tpsMeasurements.size == 0) return 0;
 
             IntSeq s = new IntSeq(tpsMeasurements);
@@ -437,13 +454,15 @@ public class Management implements MiniMod {
          */
         public String csv() {
             StringBuilder sb = new StringBuilder();
-            sb.append("Iteration,TPS\n");
+            sb.append("Iteration,TPS,Memory\n");
             int iter = 1;
             for (int i = 0; i < tpsMeasurements.size; i++) {
                 int tps = tpsMeasurements.get(i);
                 sb.append(iter);
                 sb.append(",");
                 sb.append(tps);
+                sb.append(",");
+                sb.append(memMeasurements.get(i));
                 sb.append("\n");
 
                 iter++;
