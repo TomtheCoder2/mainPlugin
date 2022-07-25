@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Structs;
 
@@ -115,16 +116,55 @@ public class Utils {
     }
 
     /**
-     * remove everything (rank symbol colors etc.)
+     * remove rank symbol & colors
      *
-     * @param string the player name (in most cases)
+     * @param name the player name (in most cases)
      */
-    public static String escapeEverything(String string) {
-        return Strings.stripColors(string
-                        .replaceAll("\\|(.)\\|", "")
-                        .replaceAll("\\[accent\\]", "")
-                        .replaceAll("\\|(.)\\|", "")
-        ).replaceAll("\\|(.)\\|", "");
+    public static String escapeEverything(String name) {
+        return Strings.stripColors(escapeRankTag(name));
+    }
+
+    /**
+     * remove rank symbols & colors
+     *
+     * @param player the player
+     */
+    public static String escapeEverything(Player player) {
+        return escapeEverything(player.name);
+    }
+
+    /** Return the rank marker, which includes the player tag */
+    public static String rankMarker(Rank rank) {
+        return "[#bc1900][[[#" + rank.color.toString().substring(0, 6) + "]" + rank.tag + "[#bc1900]]";
+    }
+
+    /**
+     * Format a player name
+     * @param name the player name, including color codes
+     */
+    public static String formatName(Rank rank, String name) {
+        return rankMarker(rank) + " [white]" + name;
+    }
+
+    /** 
+     * Format a player name
+     */
+    public static String formatName(Rank rank, Player player) {
+        return rankMarker(rank) + " [#" + player.color().toString().substring(0, 6) + "]" + escapeRankTag(player.name);
+    }
+    
+
+    /** Escape rank tag from a properly-formatted player's name */
+    public static String escapeRankTag(String name) {
+        for (Rank rank : Rank.all) {
+            String prefix = rankMarker(rank);
+            if (name.startsWith(prefix)) name = name.substring(prefix.length());
+            if (name.startsWith(" ")) name = name.substring(1);
+            prefix = Strings.stripColors(rankMarker(rank));
+            if (name.startsWith(prefix)) name = name.substring(prefix.length());
+            if (name.startsWith(" ")) name = name.substring(1);
+        }
+        return name;
     }
 
     /**
@@ -148,16 +188,6 @@ public class Utils {
         // Return if the IP address
         // matched the ReGex
         return m.matches();
-    }
-
-
-    /**
-     * remove everything (rank symbol colors etc.)
-     *
-     * @param player the player
-     */
-    public static String escapeEverything(Player player) {
-        return escapeEverything(player.name);
     }
 
     /**

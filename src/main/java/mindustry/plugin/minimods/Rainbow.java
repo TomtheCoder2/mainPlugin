@@ -43,6 +43,12 @@ public class Rainbow implements MiniMod {
                 } else {  // toggle off
                     data.remove(player.uuid());
                     player.sendMessage(GameMsg.custom("Rainbow", "sky", "Effect toggled off."));
+
+                    // Reset their name
+                    var pd = Database.getPlayerData(player.uuid());
+                    if (pd != null) {
+                        player.name = Utils.formatName(Rank.all[pd.rank], "[#" + player.color().toString().substring(0, 6) + "]" + Utils.escapeEverything(player.name));
+                    }
                 }
             }
         });
@@ -94,10 +100,7 @@ public class Rainbow implements MiniMod {
 
                         hex = hex.substring(0, hex.length() - 2);
                         if (rank < Rank.all.length && rank >= 0) { // this should never be false
-                            player.name = "[" + hex + "]"
-                                    + Rank.all[rank].tag
-                                    + "[" + hex + "]"
-                                    + Utils.escapeEverything(player.name);
+                            player.name = Utils.formatName(Rank.all[rank], "[" + hex + "]" + Utils.escapeEverything(player.name));
                         }
                     }
                 }

@@ -6,6 +6,7 @@ import arc.files.Fi;
 import arc.struct.ObjectMap;
 import arc.util.CommandHandler;
 import arc.util.Log;
+import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.core.GameState;
@@ -194,15 +195,13 @@ public class PheonixMain extends Plugin {
             Database.Player pd = Database.getPlayerData(player.uuid());
 
             // check if he's impersonating a rank
-            // remove all color codes, so it's not possible to just change the color of the rank symbol
-            String escapedName = escapeColorCodes(player.name).replaceAll("\\[accent\\]", "");
             for (int i = 0; i < Rank.all.length; i++) {
                 if (i == 0) continue;
 
                 Rank rank = Rank.all[i];
-                if (escapedName.toLowerCase().contains(escapeColorCodes(rank.tag).replaceAll("\\[accent\\]", ""))) {
+                if (player.name.toLowerCase().contains(rank.tag)) {
                     player.con.kick("[scarlet]Dont impersonate a rank.");
-                    Log.warn("Player " + escapedName + " tried to impersonate rank: " + rank.name);
+                    Log.warn("Player " + Strings.stripColors(player.name) + " tried to impersonate rank: " + rank.name);
                     return;
                 }
             }
@@ -216,14 +215,14 @@ public class PheonixMain extends Plugin {
 
                 Rank rank = Rank.all[pd.rank];
                 Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
-                player.name = rank.tag + player.name;
+                player.name = Utils.formatName(rank, player);
 
                 // Give Marshals admin
                 if (pd.rank == Rank.all.length - 1) {
                     player.admin = true;
                 }
             } else { // not in database
-                info("New player connected: " + escapeColorCodes(event.player.name));
+                info("New player connected: " + Strings.stripColors(event.player.name));
                 Database.setPlayerData(new Database.Player(player.uuid(), 0));
 
                 Rank rank = Rank.all[0];

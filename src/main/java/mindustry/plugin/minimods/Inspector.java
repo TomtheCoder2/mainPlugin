@@ -88,22 +88,23 @@ public class Inspector implements MiniMod {
                 Tile tile = Vars.world.tile(entry.value.x, entry.value.y);
                 if (tile == null) continue;
 
-                String s = "[white]" + tile.block().name + "[pink] ([white]" + tile.x + "[pink], [white]" + tile.y + "[pink])";
+                String s = "[accent]" + tile.block().name + "[white] ([coral]" + tile.x + "[white], [coral]" + tile.y + "[white])";
                 TileInfo info = tileInfos.get(entry.value);
                 if (info != null) {
                     if (info.configuredByName != null) {
-                        s += "\n - Last configured by: [white]" + info.configuredByName + "[pink]" + (player.admin ? " [orange]" + info.configuredBy : "");
+                        s += "\n - Last configured by: [accent]" + info.configuredByName + (player.admin ? " [pink]" + info.configuredBy : "") + "[white]";
                     }
                     if (info.placedByName != null) {
-                        s += "\n - Last placed by: [white]" + info.placedByName + "[pink]" + (player.admin ? " [orange]" + info.placedBy : "");
+                        s += "\n - Last placed by: [accent]" + info.placedByName + (player.admin ? " [pink]" + info.placedBy : "") + "[white]";
                     }
                     if (info.destroyedByName != null) {
-                        s += "\n - Last destroyed " + (info.previousBlock == null ? "" : " from [accent]" + info.previousBlock.name) + "[pink] by: [white]" + info.destroyedByName + "[pink]"
-                                + (player.admin ? " [orange]" + info.destroyedBy : "");
+                        s += "\n - Last destroyed" + (info.previousBlock == null ? "" : " from [accent]" + info.previousBlock.name)
+                                + "[white] by: [accent]" + info.destroyedByName
+                                + (player.admin ? " [pink]" + info.destroyedBy : "") + "[white]";
                     }
                 }
     
-                Call.infoPopup(player.con, s, 1f, Align.bottomRight, 0, 0, 200, 0);
+                Call.infoPopup(player.con, s, 1f, Align.bottomRight, 0, 0, 400, 0);
             }
         }, 1f, 1f);
     }

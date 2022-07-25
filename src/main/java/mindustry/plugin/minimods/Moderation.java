@@ -520,7 +520,7 @@ public class Moderation implements MiniMod {
             for (Player p : Groups.player) {
                 Database.Player pd = Database.getPlayerData(p.uuid());
                 if (pd == null) continue;
-                p.name = Rank.all[pd.rank].tag + Vars.netServer.admins.getInfo(p.uuid()).lastName;
+                p.name = Utils.formatName(Rank.all[pd.rank], Vars.netServer.admins.getInfo(pd.uuid).lastName);
             }
             player.sendMessage("[cyan]Reset names!");
         });

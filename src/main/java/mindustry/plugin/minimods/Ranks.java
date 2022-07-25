@@ -235,12 +235,7 @@ public class Ranks implements MiniMod {
             StringBuilder sb = new StringBuilder("[accent]Ranks\n");
             for (int i = 0; i < Rank.all.length; i++) {
                 Rank rank = Rank.all[i];
-                sb.append(rank.tag)
-                        .append(" [#")
-                        .append(rank.color.toString(), 0, 6)
-                        .append("]")
-                        .append(rank.name)
-                        .append("\n");
+                sb.append(Utils.formatName(rank, rank.name));
             }
             sb.append("\n[green]Type [sky]/req [green]to see the requirements for the ranks");
             Call.infoMessage(player.con, sb.toString());
@@ -392,7 +387,7 @@ public class Ranks implements MiniMod {
                     pd.rank = rank;
                     Database.setPlayerData(pd);
 
-                    target.name = Rank.all[rank].tag + "[#" + Rank.all[rank].color.toString().substring(0,6) + "]" +  Utils.escapeEverything(target);
+                    target.name = Utils.formatName(Rank.all[pd.rank], target);
                     ctx.success("Rank set", Utils.escapeEverything(target) + "'s rank is now set to " + Rank.all[rank].name);
 
                     DiscordLog.moderation("Set rank", ctx.author(), Vars.netServer.admins.getInfo(pd.uuid), null, "Rank: " + Rank.all[rank].name + " (" + rank + ")");
