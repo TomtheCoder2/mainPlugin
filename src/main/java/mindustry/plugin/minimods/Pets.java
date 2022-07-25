@@ -40,6 +40,7 @@ import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.PointDefenseTurret;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.storage.CoreBlock;
+import mindustry.world.meta.Env;
 
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
@@ -54,6 +55,7 @@ import java.sql.SQLException;
 
 public class Pets implements MiniMod {
     ObjectMap<String, Seq<String>> spawnedPets = new ObjectMap<>();
+
 
     /**
      * Creates a team if one does not already exist
@@ -94,6 +96,16 @@ public class Pets implements MiniMod {
                 unit.itemCapacity = 10;
             }
         }
+
+
+        Events.on(EventType.WorldLoadEvent.class, event -> {
+            /** Enable serpulo units on erekir... alternative is to modify source code supportsEnv function */
+            for (var unit : Vars.content.units()) {
+                unit.envDisabled = (unit.envDisabled & ~Env.scorching);
+                unit.envRequired = (unit.envRequired & ~Env.terrestrial);
+                unit.envEnabled = (unit.envEnabled  | Env.scorching);
+            }
+        });
     }
 
     @Override
@@ -651,7 +663,10 @@ public class Pets implements MiniMod {
                     for (int y = startY; y < startY + 10; y++) {                        
                         Tile tile = Vars.world.tiles.get(x, y);
                         if (tile == null) continue;
-                        if (tile.drop() != null && Structs.contains(possibleFoods(unit.type), tile.drop()) && tile.block() == Blocks.air) {
+                        if (
+                            (tile.drop() != null && Structs.contains(possibleFoods(unit.type), tile.drop()) && tile.block() == Blocks.air) ||
+                            (tile.wallDrop() != null && Structs.contains(possibleFoods(unit.type), tile.wallDrop()))
+                            ) {
                             tiles.add(tile);
                         }
                     }
