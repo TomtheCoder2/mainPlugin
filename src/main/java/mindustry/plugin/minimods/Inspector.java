@@ -88,19 +88,19 @@ public class Inspector implements MiniMod {
                 Tile tile = Vars.world.tile(entry.value.x, entry.value.y);
                 if (tile == null) continue;
 
-                String s = "[accent]" + tile.block().name + "[white] ([coral]" + tile.x + "[white], [coral]" + tile.y + "[white])";
+                String s = "[accent]" + tile.block().name + "[white] ([orange]" + tile.x + "[white], [orange]" + tile.y + "[white])";
                 TileInfo info = tileInfos.get(entry.value);
                 if (info != null) {
                     if (info.configuredByName != null) {
-                        s += "\n - Last configured by: [accent]" + info.configuredByName + (player.admin ? " [pink]" + info.configuredBy : "") + "[white]";
+                        s += "\n - Last configured by: [accent]" + info.configuredByName + (player.admin ? " [sky]" + info.configuredBy : "") + "[white]";
                     }
                     if (info.placedByName != null) {
-                        s += "\n - Last placed by: [accent]" + info.placedByName + (player.admin ? " [pink]" + info.placedBy : "") + "[white]";
+                        s += "\n - Last placed by: [accent]" + info.placedByName + (player.admin ? " [sky]" + info.placedBy : "") + "[white]";
                     }
                     if (info.destroyedByName != null) {
                         s += "\n - Last destroyed" + (info.previousBlock == null ? "" : " from [accent]" + info.previousBlock.name)
                                 + "[white] by: [accent]" + info.destroyedByName
-                                + (player.admin ? " [pink]" + info.destroyedBy : "") + "[white]";
+                                + (player.admin ? " [sky]" + info.destroyedBy : "") + "[white]";
                     }
                 }
     
