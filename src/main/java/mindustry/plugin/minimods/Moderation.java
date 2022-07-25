@@ -511,25 +511,6 @@ public class Moderation implements MiniMod {
             DiscordLog.moderation(isMuted ? "Muted": "Unmuted", Utils.escapeEverything(player.name), Vars.netServer.admins.getInfo(target.uuid()), reason, null);
         });
 
-
-        handler.<Player>register("label", "<duration> <text...>", "[admin only] Create an in-world label at the current position.", (args, player) -> {
-            if (!player.admin) {
-                player.sendMessage(GameMsg.noPerms("Mod"));
-                return;
-            }
-
-            if (args[0].length() <= 0 || args[1].length() <= 0) {
-                player.sendMessage("[scarlet]Invalid arguments provided.");
-                return;
-            }
-
-            float x = player.getX();
-            float y = player.getY();
-
-            Tile targetTile = Vars.world.tileWorld(x, y);
-            Call.label(args[1], Float.parseFloat(args[0]), targetTile.worldx(), targetTile.worldy());
-        });
-
         handler.<Player>register("reset", "Set everyone's name back to the original name.", (args, player) -> {
             if (!player.admin) {
                 player.sendMessage(GameMsg.noPerms("Mod"));

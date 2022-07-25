@@ -222,9 +222,9 @@ public class Maps implements MiniMod {
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("maps", "List all maps", (args, player) -> {
             StringBuilder msg = new StringBuilder();
-            msg.append(GameMsg.custom("Maps", "sky", "List of maps:\n"));
+            msg.append(GameMsg.custom("Maps", "white", "List of maps:\n"));
             for (Map map : Vars.maps.customMaps()) {
-                msg.append(" - [white]" + map.name() + "[sky] [orange]" + map.width + "[sky]x[orange]" + map.height + " [sky][green]" + map.rules().mode().name() + "[sky]: " + map.description() + "\n");
+                msg.append("[white] - [sky]" + map.name() + " [accent]" + map.width + "[white]x[accent]" + map.height + " [lightgray]" + map.rules().mode().name());
             }
 
             player.sendMessage(msg.toString());

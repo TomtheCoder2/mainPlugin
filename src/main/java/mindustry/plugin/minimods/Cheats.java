@@ -3,6 +3,7 @@ package mindustry.plugin.minimods;
 import javax.swing.plaf.metal.MetalBorders.PaletteBorder;
 
 import arc.struct.Seq;
+import arc.util.CommandHandler;
 import arc.util.Reflect;
 import arc.util.Strings;
 import arc.util.Structs;
@@ -16,6 +17,7 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
@@ -215,5 +217,26 @@ public class Cheats implements MiniMod {
                     DiscordLog.cheat("Kill units", ctx.author(), "Team: " + team.name + "\nUnits killed: " + amount + "\nUnit type: " + (type == null ? "all" : type.name));
                 }
         );
+    }
+
+    @Override
+    public void registerCommands(CommandHandler handler) {
+        handler.<Player>register("label", "<duration> <text...>", "[admin only] Create an in-world label at the current position.", (args, player) -> {
+            if (!player.admin) {
+                player.sendMessage(GameMsg.noPerms("Cheat"));
+                return;
+            }
+
+            if (args[0].length() <= 0 || args[1].length() <= 0) {
+                player.sendMessage("[scarlet]Invalid arguments provided.");
+                return;
+            }
+
+            float x = player.getX();
+            float y = player.getY();
+
+            Tile targetTile = Vars.world.tileWorld(x, y);
+            Call.label(args[1], Float.parseFloat(args[0]), targetTile.worldx(), targetTile.worldy());
+        });
     }
 }
