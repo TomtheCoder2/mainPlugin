@@ -3,7 +3,10 @@ package mindustry.plugin.minimods;
 import arc.Events;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.util.Strings;
+import mindustry.Vars;
 import mindustry.content.Bullets;
+import mindustry.content.UnitTypes;
 import mindustry.entities.bullet.BulletType;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
@@ -35,6 +38,30 @@ public class Weapon implements MiniMod {
         });
     }
 
+    public BulletType findBullet(String query) {
+        try {
+            Field field = Bullets.class.getDeclaredField(query);
+            return (BulletType) field.get(null);
+        } catch(NoSuchFieldException | IllegalAccessException f) {}
+
+        String[] parts = query.split(":");
+        if (parts.length > 2 )return null;
+
+        var unit = Vars.content.unit(parts[0]);
+        if (unit == null) {
+            return null;
+        }
+        int idx = 0;
+        if (parts.length == 2) {
+            idx = Strings.parseInt(parts[1]);
+        }
+        if (idx >= unit.weapons.size) {
+            return null;
+        }
+
+        return unit.weapons.get(idx).bullet;
+    }
+
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
         handler.register("weapon", "<player> <bullet> [damage] [lifetime] [velocity]",
@@ -47,14 +74,12 @@ public class Weapon implements MiniMod {
                     float dmg = ctx.args.getFloat("damage", 1.0f);
                     float life = ctx.args.getFloat("lifetime", 1.0f);
                     float vel = ctx.args.getFloat("velocity", 1.0f);
-                    BulletType bulletType = null;
-                    try {
-                        Field field = Bullets.class.getDeclaredField(ctx.args.get("bullet"));
-                        bulletType = (BulletType) field.get(null);
-                    } catch (NoSuchFieldException | IllegalAccessException f) {
-                        ctx.error("No Such Bullet", "Bullet '" + ctx.args.get("bullet") + "' does not exist. Available bullets:\n```\n" +
+                    BulletType bulletType = findBullet(ctx.args.get("bullet"));
+                    if (bulletType == null) {
+                        ctx.error("No Such Bullet", "Bullet '" + ctx.args.get("bullet") + "' does not exist. Either use one of the predefined bullets bullets:\n```\n" +
                                 Seq.with(Bullets.class.getDeclaredFields()).filter(x -> x.getType().equals(BulletType.class)).map(x -> x.getName()).toString("\n")
-                                + "\n```"
+                                + "\n```\n" + 
+                                "Or use the format `unit-name:index`, where `index` is an integer, to get the weapon of a unit"
                         );
                         return;
                     }
