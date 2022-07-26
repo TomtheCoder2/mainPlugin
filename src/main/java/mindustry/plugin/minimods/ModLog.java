@@ -74,6 +74,7 @@ public class ModLog implements MiniMod {
                     .setTitle("Mod Log: " + Utils.escapeEverything(info.lastName))
                     .setDescription(sb.toString())
                     .addInlineField("Total", formatMinutes(total))
+                    .addInlineField("Days", entries.length + "")
                     .addInlineField("Average", formatMinutes(entries.length == 0 ? 0  : (total / entries.length)))
                 );
             }

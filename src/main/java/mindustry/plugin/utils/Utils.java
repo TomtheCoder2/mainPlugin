@@ -136,7 +136,7 @@ public class Utils {
     /** Return the rank marker, which includes the player tag */
     public static String rankMarker(Rank rank) {
         if (rank.tag == null) return "";
-        return "[#ffbdb3]|[#" + rank.color.toString().substring(0, 6) + "]" + rank.tag + "[#ffbdb3]|";
+        return "[accent]|[#" + rank.color.toString().substring(0, 6) + "]" + rank.tag + "[accent]|";
     }
 
     /**
