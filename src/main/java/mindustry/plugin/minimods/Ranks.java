@@ -2,6 +2,8 @@ package mindustry.plugin.minimods;
 
 import arc.Events;
 import arc.struct.ObjectMap;
+import arc.struct.ObjectSet;
+import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Log;
 import arc.util.Strings;
@@ -18,6 +20,7 @@ import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
@@ -26,6 +29,8 @@ import mindustry.world.Block;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.util.Arrays;
+
+import com.fasterxml.jackson.databind.node.BooleanNode;
 
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
@@ -57,6 +62,11 @@ public class Ranks implements MiniMod {
     private final ObjectMap<String, Integer> buildingsBuiltCache = new ObjectMap<>();
     private long mapStartTime = System.currentTimeMillis();
 
+    /**
+     * Who has already rated the map
+     */
+    private final ObjectSet<String> hasRatedMap = new ObjectSet<>();
+
     @Override
     public void registerEvents() {
         // -- MAP SECTION -- //
@@ -65,11 +75,19 @@ public class Ranks implements MiniMod {
             mapStartTime = System.currentTimeMillis();
 
             // rate menu
+            hasRatedMap.clear();
             Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
                     rateMenu(null);
                 }
+            }, 10 * 60);
+        });
+
+        Events.on(EventType.PlayerJoin.class, event -> {
+            Timer.schedule(() -> {
+                if (event.player.con == null || !event.player.con.isConnected()) return;
+                rateMenu(event.player);
             }, 10 * 60);
         });
 
@@ -149,11 +167,13 @@ public class Ranks implements MiniMod {
     }
 
     /**
-     * Popup a rate menu for the given player, or all player
+     * Popup a rate menu for the given player, or all players
+     * If a player has already rated the current map, the rate menu is not shown
      *
      * @param p The player to popup, or null for all players
+     * @return false if a player has already voted
      */
-    private void rateMenu(Player p) {
+    private boolean rateMenu(Player p) {
         String mapName = escapeEverything(Vars.state.map.name());
         int id = Menus.registerMenu((player, selection) -> {
             Database.Map md = Database.getMapData(mapName);
@@ -166,20 +186,28 @@ public class Ranks implements MiniMod {
             } else if (selection == 1) {
                 md.negativeRating += 1;
                 player.sendMessage("Successfully gave a [red]negative [white]feedback for " + mapName + "[white]!");
+            } else {
+                return;
             }
+
+            hasRatedMap.add(player.uuid());
             Database.setMapData(md);
         });
+
+        Iterable<Player> players;
         if (p == null) {
-            Call.menu(id,
-                    "Rate this map! [pink]" + mapName,
-                    "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
-                    new String[][]{
-                            new String[]{"[green]Yes", "[scarlet]No"},
-                            new String[]{"Close"}
-                    }
-            );
+            players = Seq.with(p);
         } else {
-            Call.menu(p.con, id,
+            players = Groups.player;
+        }
+
+        boolean alreadyVoted = false;
+        for (var player : players) {
+            if (hasRatedMap.contains(player.uuid())) {
+                alreadyVoted = true;
+                continue;
+            }
+            Call.menu(player.con, id,
                     "Rate this map! [pink]" + mapName,
                     "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
                     new String[][]{
@@ -188,6 +216,7 @@ public class Ranks implements MiniMod {
                     }
             );
         }
+        return !alreadyVoted;
     }
 
     /**
@@ -276,6 +305,11 @@ public class Ranks implements MiniMod {
                 }
             } else {
                 Call.infoMessage(player.con, Utils.formatMessage(player, Utils.Message.stat()));
+            }
+        });
+        handler.<Player>register("rate", "", "Rate the current map", (args, player) -> {
+            if (!rateMenu(player)) {
+                player.sendMessage(GameMsg.error("Rate", "You've already rated this map"));
             }
         });
     }
