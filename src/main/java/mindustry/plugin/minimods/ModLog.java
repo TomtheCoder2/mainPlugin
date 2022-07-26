@@ -73,8 +73,8 @@ public class ModLog implements MiniMod {
                     .setColor(DiscordPalette.INFO)
                     .setTitle("Mod Log: " + Utils.escapeEverything(info.lastName))
                     .setDescription(sb.toString())
-                    .addField("Total", formatMinutes(total))
-                    .addField("Average", formatMinutes(total / entries.length))
+                    .addInlineField("Total", formatMinutes(total))
+                    .addInlineField("Average", formatMinutes(entries.length == 0 ? 0  : (total / entries.length)))
                 );
             }
         );
@@ -105,7 +105,6 @@ class ModDatabase {
                 pstmt.setShort(2, year);
                 pstmt.setShort(3, month);
                 pstmt.setShort(4, day);
-                pstmt.setLong(5, minutes);
                 rs = pstmt.executeQuery();
             }
 
