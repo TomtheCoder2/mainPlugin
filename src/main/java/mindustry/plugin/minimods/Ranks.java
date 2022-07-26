@@ -30,8 +30,6 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.util.Arrays;
 
-import com.fasterxml.jackson.databind.node.BooleanNode;
-
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
 /**
