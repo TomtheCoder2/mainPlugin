@@ -62,6 +62,7 @@ public class PheonixMain extends Plugin {
             new mindustry.plugin.minimods.Management(),
             new mindustry.plugin.minimods.Maps(),
             new mindustry.plugin.minimods.Moderation(),
+            new mindustry.plugin.minimods.ModLog(),
             new mindustry.plugin.minimods.Mods(),
             new mindustry.plugin.minimods.Pets(),
             new mindustry.plugin.minimods.Rainbow(),
