@@ -16,14 +16,19 @@ import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
+import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.ContentServer;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
+
 import org.javacord.api.entity.message.MessageAttachment;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.MessageFlag;
+import org.javacord.api.entity.message.component.Button;
+import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.io.ByteArrayInputStream;
@@ -42,6 +47,73 @@ import static mindustry.plugin.utils.Utils.escapeEverything;
 public class Maps implements MiniMod {
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
+        DiscordVars.api.addButtonClickListener(event -> {
+            var msg = event.getButtonInteraction().getMessage();
+            var eb = msg.getEmbeds().get(0);
+            switch (event.getButtonInteraction().getCustomId()) {
+                case "map-accept" -> {
+                    if (!event.getButtonInteraction().getUser().getRoles(DiscordVars.server()).stream().anyMatch(r -> r.getId() == Roles.MAP_SUBMISSIONS)) {
+                        event.getInteraction().createImmediateResponder()
+                            .setContent("You are not a map reviewer.").setFlags(MessageFlag.EPHEMERAL).respond();                
+                        return;
+                    }
+
+                    event.getInteraction().respondLater(true)
+                        .thenAccept(updater -> {
+                            var attachment = msg.getAttachments().get(0);
+                            byte[] data = attachment.downloadAsByteArray().join();
+                            if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
+                                updater.setContent("Error: `" + attachment.getFileName() + "` is corrupted or invalid.").update();
+                                return;
+                            }
+
+                            msg.createUpdater()
+                                .setEmbed(
+                                    eb.toBuilder()
+                                        .setFooter("Accepted")
+                                        .setColor(DiscordPalette.SUCCESS))
+                                .removeAllComponents()
+                                .applyChanges();
+                              
+                            Fi file = Core.settings.getDataDirectory().child("maps").child(attachment.getFileName());
+                            boolean didExist = file.exists();
+                            if (didExist) file.delete();
+                            file.writeBytes(data);
+
+                            Vars.maps.reload();
+
+                            updater.setContent("Accepted " + eb.getTitle().orElse("") + ".").update();
+                        });
+                }
+                case "map-reject" ->  {
+                    if (!event.getButtonInteraction().getUser().getRoles(DiscordVars.server()).stream().anyMatch(r -> r.getId() == Roles.MAP_SUBMISSIONS)) {
+                        event.getInteraction().createImmediateResponder()
+                            .setContent("You are not a map reviewer.").setFlags(MessageFlag.EPHEMERAL).respond();                
+                        return;
+                    }
+
+                    msg.createUpdater()
+                        .setEmbed(
+                            eb.toBuilder()
+                                .setFooter("Rejected")
+                                .setColor(DiscordPalette.ERROR)
+                        )
+                        .removeAllComponents()
+                        .applyChanges();
+                        
+                    event.getInteraction().createImmediateResponder()
+                        .setContent("Rejected " + eb.getTitle().orElse("") + ".")
+                        .setFlags(MessageFlag.EPHEMERAL).respond();            
+                }
+                case "map-discuss" -> {
+                    msg.createThread(eb.getTitle().orElse("Map") + " Discussion", 60);
+                    event.getInteraction().createImmediateResponder()
+                        .setContent("Created discussion thread for " + eb.getTitle().orElse("") + ".")
+                        .setFlags(MessageFlag.EPHEMERAL).respond();            
+                }
+            }
+        });
+
         handler.register("addmap", "",
                 data -> {
                     data.usage = "<.msav attachment>";
@@ -117,10 +189,15 @@ public class Maps implements MiniMod {
                         .setAuthor(ctx.author().getDisplayName(ctx.server()), ctx.author().getAvatar().getUrl().toString(), ctx.author().getAvatar().getUrl().toString())
                         .setColor(DiscordPalette.WARN)
                         .setImage(ContentServer.renderRaw(data))
-                        .setFooter("Size: " + meta.getInt("width") + "x" + meta.getInt("height"));
+                        .addInlineField("Size", meta.getInt("width") + "x" + meta.getInt("height"));
                     new MessageBuilder()
                         .addEmbed(eb)
                         .addAttachment(data, "Map " + Strings.stripColors(meta.get("name")) + ".msav")
+                        .addActionRow(
+                            Button.success("map-accept", "Accept"),
+                            Button.danger("map-reject", "Reject"),
+                            Button.secondary("map-discuss", "Discuss")
+                        )
                         .send(Channels.MAP_SUBMISSIONS)
                         .join();
 

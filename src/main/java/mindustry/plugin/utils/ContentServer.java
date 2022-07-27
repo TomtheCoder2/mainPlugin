@@ -86,6 +86,7 @@ public class ContentServer {
         Fi fi = Fi.tempFile("render-raw");
         fi.writeBytes(data);
         try {
+            
             Map m = MapIO.createMap(fi, true);
             return renderMap(m);
         } catch (Exception e) {

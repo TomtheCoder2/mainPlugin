@@ -144,6 +144,7 @@ public class PheonixMain extends Plugin {
         }
 
         try {
+            DiscordVars.api = api;
             for (MiniMod mod : minimods) {
                 mod.registerDiscordCommands(registrar);
             }
@@ -169,7 +170,6 @@ public class PheonixMain extends Plugin {
         Channels.ADMIN_BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.APPRENTICE_BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.MOD_BOT.addMessageCreateListener(registrar::dispatchEvent);
-        DiscordVars.api = api;
 
         Utils.init();
         EffectHelper.init();
