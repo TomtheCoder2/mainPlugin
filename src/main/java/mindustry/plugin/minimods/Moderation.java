@@ -194,10 +194,10 @@ public class Moderation implements MiniMod {
                     data.roles = new long [] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
                 },
                 ctx -> {
-                    Player p = Query.findPlayerEntity(ctx.args.get("player"));
+                    var info = Query.findPlayerInfo(ctx.args.get("player"));
                     String uuid = ctx.args.get("player");
-                    if (p != null) {
-                        uuid = p.uuid();
+                    if (info != null) {
+                        uuid = info.id;
                     }
 
                     var pd = Database.getPlayerData(uuid);
@@ -210,7 +210,6 @@ public class Moderation implements MiniMod {
                     String banReason = pd.banReason;
                     pd.banReason = "";
                     pd.bannedUntil = 0;
-                    Administration.PlayerInfo info = Vars.netServer.admins.getInfo(uuid);
                     Vars.netServer.admins.unbanPlayerID(uuid);
 
                     Database.setPlayerData(pd);
