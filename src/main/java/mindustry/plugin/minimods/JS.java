@@ -1,6 +1,7 @@
 package mindustry.plugin.minimods;
 
 import arc.util.CommandHandler;
+import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
@@ -8,6 +9,7 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
+import mindustry.plugin.utils.GameMsg;
 
 import java.util.Objects;
 
@@ -68,14 +70,16 @@ public class JS implements MiniMod {
                 return;
             }
             enableJS = false;
-            Call.sendMessage("[cyan]/js[accent] command disabled for everyone!");
+            Call.sendMessage(GameMsg.info("JS", "[" + GameMsg.CMD + "]/js[] command now disabled!"));
         }, sec);
-        Call.sendMessage("[accent]Marshal " + name + "[accent] enabled the js command for everyone for " + (sec / 60) + " minutes! Do [cyan]/js <script...>[accent] to use it.");
+        Call.sendMessage(GameMsg.info("JS", 
+            "[white]" + name + "[" + GameMsg.INFO + "] enabled the js command for everyone for "
+                + (sec / 60) + " minutes! Do [" + GameMsg.CMD + "]/js <script...>[] to use it."));
     }
 
     private void disableJS(String name) {
         enableJS = false;
-        Call.sendMessage("[accent]Marshal " + name + "[accent] disabled the [cyan]/js[accent] command for everyone!");
+        Call.sendMessage(GameMsg.info("JS", "[white]" + name + "[" + GameMsg.INFO + "] disabled the [" + GameMsg.CMD + "]/js[" + GameMsg.INFO + "] command for everyone!"));
     }
 
     @Override
@@ -83,11 +87,8 @@ public class JS implements MiniMod {
         handler.<Player>register("enablejs", "<true/false> [time]", "Enable/Disable js command for everyone. (Time in minutes)", (arg, player) -> {
             Database.Player pd = Database.getPlayerData(player.uuid());
             if (arg.length > 1) {
-                try {
-                    Integer.parseInt(arg[1]);
-                } catch (Exception e) {
-                    player.sendMessage("[scarlet]Second argument has to be an Integer!");
-                }
+                if (!Strings.canParseInt(arg[1]))
+                    player.sendMessage(GameMsg.error("JS", "Second argument must be an integer"));
             }
             if (player.admin && Objects.requireNonNull(pd).rank >= 10) {
                 switch (arg[0]) {
@@ -98,12 +99,12 @@ public class JS implements MiniMod {
                         disableJS(player.name);
                     }
                     default -> {
-                        player.sendMessage("[scarlet]Second argument has to be true or false.");
+                        player.sendMessage(GameMsg.error("JS", "First argument must be 'true' or 'false'"));
                         return;
                     }
                 }
             } else {
-                player.sendMessage("[scarlet]This command is restricted to admins!");
+                player.sendMessage(GameMsg.noPerms("JS"));
             }
         });
 
@@ -111,7 +112,7 @@ public class JS implements MiniMod {
             if (player.admin || enableJS) {
                 player.sendMessage(mods.getScripts().runConsole(arg[0]));
             } else {
-                player.sendMessage("[scarlet]This command is restricted to admins!");
+                player.sendMessage(GameMsg.noPerms("JS"));
             }
         });
     }

@@ -4,8 +4,13 @@ package mindustry.plugin.utils;
  * Utility package for formatting in-game messages.
  */
 public class GameMsg {
+    public static String ERROR = "scarlet";
+    public static String SUCCESS = "green";
+    public static String INFO = "accent";
+    /** Color to display commands in */
+    public static String CMD = "cyan";
     public static String ratelimit(String category, String command) {
-        return "[scarlet]<[blue]" + category + "[scarlet]>: You've exceeded the rate limit for [pink]/" + command + "[scarlet]. Wait a while before using it again.";
+        return "[scarlet]<[blue]" + category + "[scarlet]>: You've exceeded the rate limit for [" + CMD + "]/" + command + "[scarlet]. Wait a while before using it again.";
     }
 
     public static String noPerms(String category) {
@@ -17,7 +22,7 @@ public class GameMsg {
     }
 
     public static String info(String category, String msg) {
-        return "[lightgray]<[blue]" + category + "[lightgray]>: " + msg;
+        return "[accent]<[blue]" + category + "[accent]>: " + msg;
     }
 
     public static String success(String category, String msg) {

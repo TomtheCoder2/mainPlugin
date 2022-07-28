@@ -81,7 +81,7 @@ public class Kick implements MiniMod {
     public void registerEvents() {
         Events.on(EventType.PlayerLeave.class, event -> {
             if (session != null && session.target.equals(event.player.uuid())) {
-                Call.sendMessage(GameMsg.info("Kick", "[orange]" + event.player.name() + " [lightgray] has left while a defendant and will be banned for 60 minutes."));
+                Call.sendMessage(GameMsg.info("Kick", "Player [white]" + event.player.name() + " [" + GameMsg.INFO + "] has left while a defendant and will be banned for 60 minutes."));
                 kick(session);
                 session.clear();
             }
@@ -189,9 +189,9 @@ public class Kick implements MiniMod {
             session.addVote(player.uuid(), 1);
             Timer.schedule(new VoteSession.Task(session), VOTE_TIME);
 
-            Call.sendMessage(GameMsg.info("Kick", "Plaintiff [orange]" + player.name + "[lightgray] has voted to kick defendent [orange]" + found.name + "[lightgray] " +
+            Call.sendMessage(GameMsg.info("Kick", "Plaintiff [white]" + player.name + "[" + GameMsg.INFO + "] has voted to kick defendent [white]" + found.name + "[" + GameMsg.INFO + "] " +
                     "(1/" + session.requiredVotes() + "). " +
-                    "Type [sky]/kick y[lightgray] to agree and [sky]/kick n[lightgray] to disagree."));
+                    "Type [" + GameMsg.CMD + "]/kick y[" + GameMsg.INFO + "] to agree and [" + GameMsg.CMD + "]/kick n[" + GameMsg.INFO + "] to disagree."));
         });
 
         handler.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Or cancel the current kick.", (arg, player) -> {
@@ -209,9 +209,9 @@ public class Kick implements MiniMod {
             if (arg[0].equalsIgnoreCase("c")) {
                 if (session.plaintiff.equals(player.uuid()) || player.admin) {
                     session.clear();
-                    Call.sendMessage(GameMsg.info("Kick", "Player [orange]" + player.name() + "[lightgray] canceled the votekick of " + target.name + "."));
+                    Call.sendMessage(GameMsg.info("Kick", "Player [orange]" + player.name() + "[" + GameMsg.INFO + "] canceled the votekick of [white]" + target.name));
                 } else {
-                    player.sendMessage(GameMsg.error("Kick", "[sky]/vote c[scarlet] can only be used by the plaintiff and admins."));
+                    player.sendMessage(GameMsg.error("Kick", "[" + GameMsg.CMD + "]/vote c[" + GameMsg.ERROR + "] can only be used by the plaintiff and admins."));
                 }
                 return;
             }
@@ -238,9 +238,9 @@ public class Kick implements MiniMod {
                 return;
             }
 
-            Call.sendMessage(GameMsg.info("Kick", "Player [orange]" + player.name + "[lightgray] has voted to kick [orange]" + target.name + "[lightgray] " +
+            Call.sendMessage(GameMsg.info("Kick", "Player [white]" + player.name + "[" + GameMsg.INFO +  "] has voted to " + (sign > 0 ? "kick" : "not kick") + " [white]" + target.name + "[" + GameMsg.INFO + "] " +
                     "(" + session.countVotes() + "/" + session.requiredVotes() + "). " +
-                    "Type [sky]/kick y[lightgray] to agree and [sky]/kick n[lightgray] to disagree."));
+                    "Type [" + GameMsg.CMD + "]/kick y[" + GameMsg.INFO + "] to kick and [" + GameMsg.CMD + "]/kick n[" + GameMsg.INFO + "] to not kick."));
 
             session.addVote(player.uuid(), sign);
         });
@@ -332,13 +332,13 @@ public class Kick implements MiniMod {
                 String plaintiffName = plaintiff == null ? "" : Utils.escapeEverything(plaintiff.name);
                 Player target = Groups.player.find(x -> x.uuid().equals(session.target));
                 if (session.countVotes() >= session.requiredVotes()) {
-                    Call.sendMessage(GameMsg.info("Kick", "Vote passed. Defendant [orange]" + target.name + "[lightgray] will be banned for 60 minutes."));
+                    Call.sendMessage(GameMsg.info("Kick", "Vote passed. Defendant [white]" + target.name + "[" + GameMsg.INFO + "] will be banned for 60 minutes."));
                     kick(session);
 
                     DiscordLog.moderation("Votekick", plaintiffName + " `" + session.plaintiff + "`", target.getInfo(), null, "Succeeded");
                     session.clear();
                 } else {
-                    Call.sendMessage(GameMsg.info("Kick", "Vote for [orange]" + target.name + "[lightgray] failed."));
+                    Call.sendMessage(GameMsg.info("Kick", "Vote for [white]" + target.name + "[" + GameMsg.INFO + "] failed."));
                     DiscordLog.moderation("Votekick", plaintiffName + " `" + session.plaintiff + "`", target.getInfo(), null, "Failed");
                     session.clear();
                 }
