@@ -253,47 +253,38 @@ public class Moderation implements MiniMod {
                     data.roles = new long[] { Roles.ADMIN, Roles.MOD };
                 },
                 ctx -> {
-                    EmbedBuilder eb = new EmbedBuilder()
-                        .setTitle("Banned players")
-                        .setColor(DiscordPalette.INFO);
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Ban Type,UUID,IP,Name,Until\n");
 
                     var bans = Vars.netServer.admins.getBanned();
-                    String s = bans.toString("\n", i -> "`" + i.id + "` | " + Utils.escapeEverything(i.lastName));
-                    eb.addField("NetServer UUID bans", s.length() == 0 ? "None" : s);
+                    for (var ban : bans) {
+                        sb.append(String.format("NS UUID,%s,%s,%s,\n", ban.id, ban.lastIP, Utils.escapeEverything(ban.lastName)));
+                    }
 
                     var ipBans = Vars.netServer.admins.getBannedIPs();
-                    s = ipBans.toString("\n", ip -> {
+                    for (var ip : ipBans) {
                         var info = Vars.netServer.admins.findByIP(ip);
-                        if (info != null) {
-                            return "`" + ip + "` | uuid `" + info.id + "` | " + Utils.escapeEverything(info.lastName);
-                        } else {
-                            return "`" + ip + "`";
-                        }
-                    });
-                    eb.addField("NetServer IP bans", s.length() == 0 ? "None" : s);
+                        sb.append(String.format("NS IP,%s,%s,%s,\n", info == null ? "" : info.id, ip, info == null ? "" : Utils.escapeEverything(info.lastName)));
+                    }
 
                     var subnetBans = Vars.netServer.admins.subnetBans;
-                    s = subnetBans.toString("\n", subnet -> {
-                        return "`" + subnet + "`";
-                    });
-                    eb.addField("NetServer subnet bans", s.length() == 0 ? "None": s);
+                    for (var subnet : subnetBans) {
+                        sb.append(String.format("NS Subnet,%s,%s,%s,\n", "", subnet, ""));
+                    }
 
                     var dbBans = Database.bans();
                     if (dbBans == null) {
                         ctx.error("Internal Database Error", "Could not query database bans");
                     } else {
-                        s = Seq.with(dbBans).toString("\n", p -> {
-                            var info = Vars.netServer.admins.getInfo(p.uuid);
-                            if (info == null) {
-                                return "`" + p.uuid + "`";
-                            } else {
-                                return "`" + p.uuid + "` | " + Utils.escapeEverything(info.lastName);
-                            }
-                        });
-                        eb.addField("Database bans", s.length() == 0 ? "None" :s);
+                        for (var pd : dbBans) {
+                            var info = Vars.netServer.admins.getInfo(pd.uuid);
+                            sb.append(String.format("Database,%s,%s,%s,%s\n", pd.uuid, info == null ? "" : info.lastIP, Utils.escapeEverything(info.lastName), pd.banned ? "" : Utils.epochToString(pd.bannedUntil)));
+                        }
                     }
 
-                    ctx.sendEmbed(eb);
+                    ctx.sendMessage(new MessageBuilder()
+                        .addAttachment(sb.toString().getBytes(), "bans.csv")
+                    );
                 }
         );
 
