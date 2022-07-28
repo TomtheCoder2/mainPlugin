@@ -26,6 +26,9 @@ public class Skipwave implements MiniMod {
         Events.on(EventType.WaveEvent.class, event -> {
             votes.clear();
         });
+        Events.on(EventType.WorldLoadEvent.class, event -> {
+            votes.clear();
+        });
     }
 
     private static int requiredVotes() {
