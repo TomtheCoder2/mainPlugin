@@ -173,13 +173,13 @@ public class Pets implements MiniMod {
                 ctx -> {
                     Database.Player pd = Database.getDiscordData(ctx.author().getId());
                     if (pd == null) {
-                        ctx.error("Not in database", "You have not linked your discord account. Use /redeem to link.");
+                        ctx.error("Not in database", "You have not linked your discord account. Type **" + DiscordVars.prefix + "redeem** to link.");
                         return;
                     }
 
                     var pets = PetDatabase.getPets(pd.uuid);
                     if (pets.length >= maxPets(pd.rank)) {
-                        ctx.error("Too Many Pets", "You currently have " + pets.length + " pets, but a " + Rank.all[pd.rank].name + " can only have " + maxPets(pd.rank) + " pets.");
+                        ctx.error("Too Many Pets", "You currently have " + pets.length + " pets, but a " + Rank.all[pd.rank].name + " can only have " + maxPets(pd.rank) + " pets. Increase your rank for more pets.");
                         return;
                     }
                     for (var pet : pets) {
@@ -213,7 +213,7 @@ public class Pets implements MiniMod {
                     }
 
                     PetDatabase.addPet(pet);
-                    ctx.success("Created pet", "Successfully created " + pet.name);
+                    ctx.success("Created pet", "Successfully created " + pet.name + ". Type in-game **/pet " + pet.name + "** to spawn your pet.");
                 }
         );
 

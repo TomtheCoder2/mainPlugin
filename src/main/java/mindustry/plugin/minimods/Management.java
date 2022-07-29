@@ -98,7 +98,7 @@ public class Management implements MiniMod {
                     ctx.sendEmbed(new EmbedBuilder()
                             .setColor(Color.YELLOW)
                             .setTitle("Garbage Collected")
-                            .setDescription((post - pre) + " MB of garbage collected")
+                            .setDescription((pre - post) + " MB of garbage collected")
                             .addInlineField("Pre-GC usage", pre + " MB")
                             .addInlineField("Post-GC usage", post + " MB")
                     );
