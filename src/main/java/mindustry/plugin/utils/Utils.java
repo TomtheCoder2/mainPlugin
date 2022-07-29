@@ -44,7 +44,6 @@ public class Utils {
     public static int chatMessageMaxSize = 256;
     // whether ip verification is in place (detect VPNs, disallow their build rights)
     public static Boolean verification = false;
-    public static ArrayList<String> bannedNames = new ArrayList<>();
     public static Pattern ipValidationPattern;
 
 
@@ -64,15 +63,6 @@ public class Utils {
     }
 
     public static void init() {
-        bannedNames.add("IGGGAMES");
-        bannedNames.add("CODEX");
-        bannedNames.add("VALVE");
-        bannedNames.add("tuttop");
-        bannedNames.add("Volas Y0uKn0w1sR34Lp");
-        bannedNames.add("IgruhaOrg");
-        bannedNames.add("андрей");
-        bannedNames.add("THIS IS MY KINGDOM CUM, THIS IS MY CUM");
-        bannedNames.add("HITLER");
         
         // setup regex for ip validation
         // Regex for digit from 0 to 255.
@@ -169,6 +159,8 @@ public class Utils {
         }
         return name;
     }
+
+
 
     /**
      * Check if a string is an IP.
@@ -556,92 +548,6 @@ public class Utils {
 //        }
 //    }
 
-    /**
-     * Converts a {@link JsonObject} to {@link EmbedBuilder}.
-     * Supported Fields: Title, Author, Description, Color, Fields, Thumbnail, Footer.
-     *
-     * @param json The JsonObject
-     * @return The Embed
-     */
-    public static EmbedBuilder jsonToEmbed(JsonObject json) {
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-
-        JsonPrimitive titleObj = json.getAsJsonPrimitive("title");
-        if (titleObj != null) { // Make sure the object is not null before adding it onto the embed.
-            embedBuilder.setTitle(titleObj.getAsString());
-        }
-
-        JsonObject authorObj = json.getAsJsonObject("author");
-        if (authorObj != null) {
-            String authorName = authorObj.get("name").getAsString();
-            String authorIconUrl = authorObj.get("icon_url").getAsString();
-            String authorUrl = null;
-            if (authorObj.get("url") != null)
-                authorUrl = authorObj.get("url").getAsString();
-            if (authorIconUrl != null) // Make sure the icon_url is not null before adding it onto the embed. If its null then add just the author's name.
-                embedBuilder.setAuthor(authorName, (authorUrl != null ? authorUrl : "https://www.youtube.com/watch?v=iik25wqIuFo"), authorIconUrl); // default: little rick roll
-            else
-                embedBuilder.setAuthor(authorName);
-        }
-
-        JsonPrimitive descObj = json.getAsJsonPrimitive("description");
-        if (descObj != null) {
-            embedBuilder.setDescription(descObj.getAsString());
-        }
-
-        JsonPrimitive colorObj = json.getAsJsonPrimitive("color");
-        if (colorObj != null) {
-            Color color = new Color(colorObj.getAsInt());
-            embedBuilder.setColor(color);
-        }
-
-        JsonObject imageObj = json.getAsJsonObject("image");
-        if (imageObj != null) {
-            embedBuilder.setImage(imageObj.get("url").getAsString());
-        }
-
-        JsonArray fieldsArray = json.getAsJsonArray("fields");
-        if (fieldsArray != null) {
-            // Loop over the fields array and add each one by order to the embed.
-            fieldsArray.forEach(ele -> {
-                debug(ele);
-                if (ele != null && !ele.isJsonNull()) {
-                    String name = ele.getAsJsonObject().get("name").getAsString();
-                    String content = ele.getAsJsonObject().get("value").getAsString();
-                    boolean inline = false;
-                    if (ele.getAsJsonObject().has("inline")) {
-                        inline = ele.getAsJsonObject().get("inline").getAsBoolean();
-                    }
-                    embedBuilder.addField(name, content, inline);
-                }
-            });
-        }
-
-        JsonObject thumbnailObj = json.getAsJsonObject("thumbnail");
-        if (thumbnailObj != null) {
-            embedBuilder.setThumbnail(thumbnailObj.get("url").getAsString());
-        }
-
-        JsonPrimitive timeStampObj = json.getAsJsonPrimitive("timestamp");
-        if (timeStampObj != null) {
-            if (timeStampObj.getAsBoolean()) {
-                embedBuilder.setTimestampToNow();
-            }
-        }
-
-        JsonObject footerObj = json.getAsJsonObject("footer");
-        if (footerObj != null) {
-            String content = footerObj.get("text").getAsString();
-            String footerIconUrl = footerObj.get("icon_url").getAsString();
-
-            if (footerIconUrl != null)
-                embedBuilder.setFooter(content, footerIconUrl);
-            else
-                embedBuilder.setFooter(content);
-        }
-
-        return embedBuilder;
-    }
 
     /** Parses color in RRGGBB or RRGGBBAA format
      * @return the color, or {@code null} on failure

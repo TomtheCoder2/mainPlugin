@@ -7,6 +7,7 @@ import arc.struct.ObjectMap;
 import arc.util.CommandHandler;
 import arc.util.Log;
 import arc.util.Strings;
+import arc.util.Structs;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.core.GameState;
@@ -35,6 +36,7 @@ import org.json.JSONTokener;
 import java.awt.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static arc.util.Log.err;
@@ -188,7 +190,18 @@ public class PheonixMain extends Plugin {
 
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;
-            if (bannedNames.contains(escapeEverything(player.name))) {
+            String[] bannedNames = new String[] { 
+                "IGGGAMES",
+                "CODEX",
+                "VALVE",
+                "tuttop",
+                "Volas Y0uKn0w1sR34Lp",
+                "IgruhaOrg",
+                "андрей",
+                "THIS IS MY KINGDOM CUM, THIS IS MY CUM",
+                "HITLER"
+            };
+            if (Structs.contains(bannedNames, s -> s.equals(escapeEverything(player.name)))) {
                 player.con.kick("[scarlet]Please change your name.");
                 return;
             }
