@@ -56,6 +56,7 @@ public class Redeem implements MiniMod {
             Database.setPlayerData(pd);
 
             // update discord roles
+            var roles = user.getRoles(server);
             var updater = server.createUpdater();
             for (var entry : Rank.roles) {
                 long roleID = entry.key;
@@ -63,6 +64,9 @@ public class Redeem implements MiniMod {
                 if (rankIdx <= pd.rank) {
                     updater.addRoleToUser(user, server.getRoleById(roleID).get());
                 }
+            }
+            for (var role : roles) {
+                updater.addRoleToUser(user, role);
             }
             updater.update().join();
 
