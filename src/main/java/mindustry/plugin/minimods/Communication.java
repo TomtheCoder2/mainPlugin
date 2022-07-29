@@ -6,7 +6,9 @@ import arc.util.Align;
 import arc.util.CommandHandler;
 import arc.util.Strings;
 import arc.util.Timer;
+import mindustry.Vars;
 import mindustry.game.EventType;
+import mindustry.game.Gamemode;
 import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -329,10 +331,13 @@ public class Communication implements MiniMod {
         handler.removeCommand("t");
         handler.<Player>register("t", "<message...>", "Send a message only to your teammates.", (args, player) -> {
             String message = args[0];
-            String raw = "[#" + player.team().color.toString() + "]<T> " + Utils.formatMessage(player, message);
+            String raw = "[#" + player.team().color.toString() + "]<T> " + Vars.netServer.chatFormatter.format(player, message);
             Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(raw, player, message));
-        });
 
+            if (Vars.state.rules.mode() != Gamemode.pvp) {
+                Channels.CHAT.sendMessage("<T> **" + Utils.escapeEverything(player.name) + "**: " + Strings.stripGlyphs(message));
+            }
+        });
     }
 
     public static class Announcement {
