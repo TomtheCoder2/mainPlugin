@@ -201,6 +201,7 @@ public class Ranks implements MiniMod {
 
         boolean alreadyVoted = false;
         for (var player : players) {
+            if (player == null) continue; // ????
             if (hasRatedMap.contains(player.uuid())) {
                 alreadyVoted = true;
                 continue;
@@ -262,7 +263,7 @@ public class Ranks implements MiniMod {
             StringBuilder sb = new StringBuilder("[accent]Ranks\n");
             for (int i = 0; i < Rank.all.length; i++) {
                 Rank rank = Rank.all[i];
-                sb.append(Utils.formatName(rank, rank.name));
+                sb.append(Utils.formatName(rank, "[white]" + rank.name) + "\n");
             }
             sb.append("\n[green]Type [sky]/req [green]to see the requirements for the ranks");
             Call.infoMessage(player.con, sb.toString());
