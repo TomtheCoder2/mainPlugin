@@ -382,12 +382,12 @@ public class Moderation implements MiniMod {
                             
                     if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.MOD_BOT.getId()) {
                         eb.addField("IPs", info.ips.toString(" / "))
-                            .addField("UUID", info.id)
+                            .addInlineField("UUID", info.id)
                             .addInlineField("Last IP", info.lastIP);
                     }
                     
                     eb
-                        .addInlineField("Last name", info.lastName)
+                        .addField("Last name", info.lastName)
                         .addField("Times kicked", info.timesKicked + "")
                         .addField("NetServer banned", info.banned ? "Yes" : "No");
                     
@@ -399,6 +399,10 @@ public class Moderation implements MiniMod {
                             .addInlineField("Buildings built", pd.buildingsBuilt + "")
                             .addInlineField("Banned", pd.banned ? "Forever" : (pd.bannedUntil != 0 ? "Until " + Instant.ofEpochSecond(pd.bannedUntil).toString() : "No"))
                             .addInlineField("Ban Reason", pd.banReason == null || pd.banReason.equals("") ? "None" : pd.banReason);
+                        
+                        if (pd.discord != 0) {
+                            eb.addField("Discord", "<@" + pd.discord + ">");
+                        }
                     }
 
                     ctx.sendEmbed(eb);
