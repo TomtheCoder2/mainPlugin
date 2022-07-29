@@ -67,9 +67,9 @@ public class Management implements MiniMod {
                                                         "Max: " + data.maxTPS() + "\n"
                                                     )
                                                     .addInlineField("Memory", 
-                                                        "Min: " + data.minMem() + "\n" +
-                                                        "Avg: " + data.avgMem() + "\n" + 
-                                                        "Max: " +data.maxMem() + "\n"
+                                                        "Min: " + (data.minMem()/1024) + "kB\n" +
+                                                        "Avg: " + (data.avgMem()/1024) + "kB\n" + 
+                                                        "Max: " + (data.maxMem()/1024) + "kB\n"
                                                     ))
                                     .addAttachment(data.csv().getBytes(), "data.csv")
                             );
