@@ -41,7 +41,10 @@ public class Skipwave implements MiniMod {
         handler.<Player>register("skipwave", "[y/n]", "Skip wave of enemies", (args, player) -> {
             if (!Cooldowns.instance.canRun("skipwave", player.uuid())) {
                 player.sendMessage(GameMsg.ratelimit("Skip", "skipwave"));
+                return;
             }
+            Cooldowns.instance.run("skipwave", player.uuid());
+            
             boolean vote = true;
             if (args.length > 0) {
                 switch (args[0]) {
