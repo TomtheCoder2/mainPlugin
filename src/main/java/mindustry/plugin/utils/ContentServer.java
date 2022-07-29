@@ -73,8 +73,9 @@ public class ContentServer {
      */
     public static BufferedImage renderMap(Map map) {
         try {
-            return pixmapToImage(MapIO.generatePreview(map));
-        } catch(IOException e) {
+            return null;          
+//            return pixmapToImage(MapIO.generatePreview(map));
+        } catch(Exception e) {
             Log.err(e);
             return null;
         }
@@ -86,9 +87,9 @@ public class ContentServer {
         Fi fi = Fi.tempFile("render-raw");
         fi.writeBytes(data);
         try {
-            
-            Map m = MapIO.createMap(fi, true);
-            return renderMap(m);
+            return null;
+//            Map m = MapIO.createMap(fi, true);
+//            return renderMap(m);
         } catch (Exception e) {
             Log.err(e);
             return null;
