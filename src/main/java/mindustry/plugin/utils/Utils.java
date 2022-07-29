@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.util.CommandHandler;
 import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Structs;
@@ -548,6 +549,22 @@ public class Utils {
 //        }
 //    }
 
+
+    public static void registerRankCommand(CommandHandler handler, String text, String params, int minRank, String description, CommandHandler.CommandRunner<Player> runner) {
+        handler.<Player>register(text, params, description, (args, player) -> {
+            int rank = 0;
+            var pd = Database.getPlayerData(player.uuid());
+            if (pd != null) {
+                rank = pd.rank;
+            }
+
+            if (rank >= minRank || player.admin) {
+                runner.accept(args, player);
+            } else {
+                player.sendMessage(GameMsg.noPerms(null));
+            }
+        });
+    }
 
     /** Parses color in RRGGBB or RRGGBBAA format
      * @return the color, or {@code null} on failure

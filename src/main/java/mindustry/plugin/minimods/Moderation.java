@@ -455,12 +455,8 @@ public class Moderation implements MiniMod {
 
     @Override
     public void registerCommands(CommandHandler handler) {
-        handler.<Player>register("freeze", "<player> [reason...]", "Freeze a player. To unfreeze just use this command again.", (args, player) -> {
-            if (!player.admin()) {
-                player.sendMessage(GameMsg.noPerms("Mod"));
-                return;
-            }
-
+        Utils.registerRankCommand(handler, "freeze", "<player> [reason...]", Rank.APPRENTICE, 
+            "Freeze a player. To unfreeze just use this command again.", (args, player) -> {
             Player target = Query.findPlayerEntity(args[0]);
             if (target == null) {
                 player.sendMessage(GameMsg.error("Mod", "Player not found."));
@@ -482,12 +478,8 @@ public class Moderation implements MiniMod {
             DiscordLog.moderation(isFrozen ? "Froze": "Thawed", Utils.escapeEverything(player.name), Vars.netServer.admins.getInfo(target.uuid()), reason, null);
         });
 
-        handler.<Player>register("mute", "<player> [reason...]", "Mute a player. To unmute just use this command again.", (args, player) -> {
-            if (!player.admin()) {
-                player.sendMessage(GameMsg.noPerms("Mod"));
-                return;
-            }
-
+        Utils.registerRankCommand(handler, "mute", "<player> [reason...]", Rank.APPRENTICE,
+            "Mute a player. To unmute just use this command again.", (args, player) -> {
             Player target = Query.findPlayerEntity(args[0]);
             if (target == null) {
                 player.sendMessage(GameMsg.error("Mod", "Player not found."));
@@ -508,12 +500,8 @@ public class Moderation implements MiniMod {
             DiscordLog.moderation(isMuted ? "Muted": "Unmuted", Utils.escapeEverything(player.name), Vars.netServer.admins.getInfo(target.uuid()), reason, null);
         });
 
-        handler.<Player>register("reset", "Set everyone's name back to the original name.", (args, player) -> {
-            if (!player.admin) {
-                player.sendMessage(GameMsg.noPerms("Mod"));
-                return;
-            }
-
+        Utils.registerRankCommand(handler, "reset", "", Rank.APPRENTICE, 
+            "Set everyone's name back to the original name.", (args, player) -> {
             for (Player p : Groups.player) {
                 Database.Player pd = Database.getPlayerData(p.uuid());
                 if (pd == null) continue;

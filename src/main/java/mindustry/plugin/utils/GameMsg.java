@@ -14,7 +14,10 @@ public class GameMsg {
     }
 
     public static String noPerms(String category) {
-        return "[scarlet]<[blue]" + category + "[scarlet]>: You don't have the required rank for this command. Learn more about ranks with [pink]/info[scarlet]";
+        if (category == null) {
+            return "You don't have the required rank for this command. Learn more about ranks with [" + CMD + "]/info[scarlet]";
+        }
+        return "[scarlet]<[blue]" + category + "[scarlet]>: You don't have the required rank for this command. Learn more about ranks with [" + CMD + "]/info[scarlet]";
     }
 
     public static String error(String category, String msg) {

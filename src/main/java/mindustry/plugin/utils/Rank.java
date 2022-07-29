@@ -25,6 +25,8 @@ public class Rank {
             new Rank("\uE814", "Marshal", new Color(0xcb9c7aff), "Admin", "Be admin"),                // 11
     };
 
+    public final static int APPRENTICE = 9;
+
     /**
      * A mapping from discord role IDs to rank indexes
      */
