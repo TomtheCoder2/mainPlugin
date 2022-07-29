@@ -69,6 +69,7 @@ public class Translate implements MiniMod {
                     if (lang.equals(entry.key)) continue; // skip messages in same language
                     final ObjectSet<String> uuids = entry.value;
                     thread.addTranslate(message, lang, entry.key, resp -> {
+                        if (resp == null) return;
                         if (resp.error == null) {
                             for (String uuid : uuids) {
                                 Player p = Groups.player.find(x -> x.uuid().equals(uuid));
@@ -103,6 +104,9 @@ public class Translate implements MiniMod {
                 },
                 ctx -> {
                     if (!thread.addTranslate(ctx.args.get("text"), "auto", ctx.args.get("lang"), resp -> {
+                        if (resp == null) {
+                            ctx.error("Translate error", "No response");
+                        }
                         if (resp.error != null) {
                             ctx.error("Translate Error", resp.error);
                             return;

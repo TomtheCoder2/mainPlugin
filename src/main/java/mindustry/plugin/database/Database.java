@@ -86,7 +86,7 @@ public final class Database {
      * Retrieves all players that are banned in any way
      */
     public static Player[] bans() {
-        String sql = "SELECT * FROM playerdata WHERE banned = 1 OR bannedUntil <> 0";
+        String sql = "SELECT * FROM playerdata WHERE banned = true OR bannedUntil <> 0";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
