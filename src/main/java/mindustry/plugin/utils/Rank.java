@@ -26,6 +26,7 @@ public class Rank {
     };
 
     public final static int APPRENTICE = 9;
+    public final static int MOD = 10;
 
     /**
      * A mapping from discord role IDs to rank indexes

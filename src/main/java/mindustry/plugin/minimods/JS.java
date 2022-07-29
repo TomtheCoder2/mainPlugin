@@ -10,6 +10,8 @@ import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
+import mindustry.plugin.utils.Rank;
+import mindustry.plugin.utils.Utils;
 
 import java.util.Objects;
 
@@ -84,27 +86,22 @@ public class JS implements MiniMod {
 
     @Override
     public void registerCommands(CommandHandler handler) {
-        handler.<Player>register("enablejs", "<true/false> [time]", "Enable/Disable js command for everyone. (Time in minutes)", (arg, player) -> {
-            Database.Player pd = Database.getPlayerData(player.uuid());
+        Utils.registerRankCommand(handler, "enablejs", "<true/false> [time]", Rank.MOD, "Enable/Disable js command for everyone. (Time in minutes)", (arg, player) -> {
             if (arg.length > 1) {
                 if (!Strings.canParseInt(arg[1]))
                     player.sendMessage(GameMsg.error("JS", "Second argument must be an integer"));
             }
-            if (player.admin && Objects.requireNonNull(pd).rank >= 10) {
-                switch (arg[0]) {
-                    case "true", "t" -> {
-                        enableJS(arg.length > 1 ? Integer.parseInt(arg[1]) * 60 : 10 * 60, player.name);
-                    }
-                    case "false", "f" -> {
-                        disableJS(player.name);
-                    }
-                    default -> {
-                        player.sendMessage(GameMsg.error("JS", "First argument must be 'true' or 'false'"));
-                        return;
-                    }
+            switch (arg[0]) {
+                case "true", "t" -> {
+                    enableJS(arg.length > 1 ? Integer.parseInt(arg[1]) * 60 : 10 * 60, player.name);
                 }
-            } else {
-                player.sendMessage(GameMsg.noPerms("JS"));
+                case "false", "f" -> {
+                    disableJS(player.name);
+                }
+                default -> {
+                    player.sendMessage(GameMsg.error("JS", "First argument must be 'true' or 'false'"));
+                    return;
+                }
             }
         });
 
