@@ -383,8 +383,9 @@ public class Management implements MiniMod {
 
                 String message=  ctx.args.get("message");
                 if (message == null) {
+                    Object value = Core.settings.get(settingName, null);
                     ctx.sendEmbed(DiscordPalette.INFO, "Current value of `" + settingName + "`",
-                        Core.settings.has(settingName) ? "None" : "```\n" + Core.settings.get(settingName, null) + "\n```");
+                        value == null ? "None" : "```\n" + value + "\n```");
                     return;
                 }
                 
