@@ -56,17 +56,12 @@ public class Redeem implements MiniMod {
             Database.setPlayerData(pd);
 
             // update discord roles
-            if (pd.rank <= 6) {
-                // for rank >= 6, don't risk removing roles
-                var updater = server.createUpdater();
-                for (var entry : Rank.roles) {
-                    long roleID = entry.key;
-                    int rankIdx = entry.value;
-                    if (rankIdx <= pd.rank) {
-                        updater.addRoleToUser(user, server.getRoleById(roleID).get());
-                    }
+            for (var entry : Rank.roles) {
+                long roleID = entry.key;
+                int rankIdx = entry.value;
+                if (rankIdx <= pd.rank) {
+                    user.addRole(server.getRoleById(roleID).get());
                 }
-                updater.update().join();
             }
 
             player.sendMessage(GameMsg.success("Redeem", "Successfully linked discord account"));
