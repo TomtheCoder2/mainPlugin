@@ -1,6 +1,7 @@
 package mindustry.plugin.utils;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +15,10 @@ import arc.graphics.g2d.Draw;
 import arc.scene.ui.Image;
 import arc.util.Log;
 import arc.util.io.CounterInputStream;
+import arc.util.io.Reads;
 import mindustry.Vars;
+import mindustry.content.Blocks;
+import mindustry.game.Team;
 import mindustry.io.MapIO;
 import mindustry.io.SaveIO;
 import mindustry.io.SaveVersion;
@@ -62,38 +66,10 @@ public class ContentServer {
                 if (color.r == 0 && color.g == 0 && color.b == 0) {
                     Log.warn("invalid tile | block " + tile.block().name + " | floor " + tile.floor().name + " | overlay " + tile.overlay().name);
                 }
-                image.setRGB(x, y, rgb(color));
+                image.setRGB(x, tiles.height - y - 1, rgb(color));
             }
         }
         return image;
-    }
-
-    /** Renders a map to an image
-     * @return the rendered image, or null if it failed
-     */
-    public static BufferedImage renderMap(Map map) {
-        try {
-            return null;          
-//            return pixmapToImage(MapIO.generatePreview(map));
-        } catch(Exception e) {
-            Log.err(e);
-            return null;
-        }
-    }
-
-    /** Renders a map given in raw bytes. May fail.
-     */
-    public static BufferedImage renderRaw(byte[] data) {
-        Fi fi = Fi.tempFile("render-raw");
-        fi.writeBytes(data);
-        try {
-            return null;
-//            Map m = MapIO.createMap(fi, true);
-//            return renderMap(m);
-        } catch (Exception e) {
-            Log.err(e);
-            return null;
-        }
     }
 
     /** Renders the ongoing game */
@@ -101,13 +77,118 @@ public class ContentServer {
         return renderTiles(Vars.world.tiles);
     }
 
-    private static BufferedImage pixmapToImage(Pixmap pixmap) {
-        var image = new BufferedImage(pixmap.width, pixmap.height, BufferedImage.TYPE_INT_ARGB);
-        for (int x = 0; x < pixmap.width; x++) {
-            for (int y = 0; y < pixmap.height; y++) {
-                image.setRGB(x, y, rgb(new Color(pixmap.get(x, y))));
-            }
+    /** Renders a map to an image
+     * @return the rendered image, or null if it failed
+     */
+    public static BufferedImage renderMap(Map map) {
+        return renderData(map.file.read(Vars.bufferSize)); 
+    }
+
+    /** Renders a map given in raw bytes. May fail.
+     */
+    public static BufferedImage renderRaw(byte[] data) {
+        return renderData(new ByteArrayInputStream(data));
+    }
+
+    /** Renders an image given an input stream of a map file */
+    protected static BufferedImage renderData(InputStream s) {
+        try(InputStream is = new InflaterInputStream(s); CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)) {
+            SaveIO.readHeader(stream);
+            int version = stream.readInt();
+            var ver = SaveIO.getSaveWriter(version);
+            ver.region("meta", stream, counter, ver::readStringMap);
+            ver.region("content", stream, counter, ver::readContentHeader);
+
+            final BufferedImage[] image = new BufferedImage[1];
+            ver.region("preview_map", stream, counter, in -> {
+                int width = in.readUnsignedShort();
+                int height = in.readUnsignedShort();
+
+                Log.info(width + "," + height);
+                image[0] = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                for (int i = 0; i < width * height; i++) {
+                    int x = i % width;
+                    int y = i / width;
+
+//                    Log.info(x + "," + y);
+                    short floorID = in.readShort();
+                    short oreID = in.readShort();
+                    int consecutives = in.readUnsignedByte();
+
+                    Block floor = Vars.content.block(floorID);
+                    if (floor == null) floor = Blocks.stone;
+                    Block overlay = Vars.content.block(oreID);
+                    
+                    var color = (floor != null && floor instanceof Floor && floor.asFloor().wallOre && overlay != null) || (overlay != null && overlay.useColor) ? overlay.mapColor : floor.mapColor;
+                    image[0].setRGB(x, height - y - 1, rgb(color));
+
+                    for (int j = i + 1; j < i + 1 +consecutives; j++) {
+                        int newx = j % width, newy = j / width;
+                        image[0].setRGB(newx, height - newy - 1, rgb(color));
+                    }
+                    i += consecutives;
+                }
+
+                for (int i = 0; i < width * height; i++) {
+                    int x = i % width;
+                    int y = i / width;
+
+                    short blockID = in.readShort();
+                    Block block_ = Vars.content.block(blockID);
+                    if (block_ == null) block_ = Blocks.air;
+                    final Block block = block_;
+
+                    byte packedCheck = in.readByte();
+                    boolean hadEntity = (packedCheck & 1) != 0;
+                    boolean hadData = (packedCheck & 2) != 0;    
+
+                    boolean isCenter = true;
+                    if (hadEntity) isCenter = in.readBoolean();
+                    
+                    final Team[] team = new Team[1];
+                    int consecutives = 0;
+                    if (hadEntity) {
+                        if (isCenter) {
+                            if (block.hasBuilding()) {
+                                try {
+                                    ver.readChunk(in, true, in2 -> {
+                                        byte revision = in.readByte();
+                                        Tile tile = new CachedTile();
+                                        tile.setBlock(block);
+                                        if (tile.build != null) tile.build.readAll(Reads.get(in2), revision);
+                                        team[0] = tile.team();
+                                    });
+                                } catch(Throwable e) {
+                                    throw new IOException("Failed to read tile entity of block: " + block, e);
+                                }
+                            } else {
+                                ver.skipChunk(in, true);
+                            }
+                        }
+                    } else if (hadData) {
+                        stream.readByte();
+                    } else {
+                        consecutives =  stream.readUnsignedByte();
+                    }
+
+                    for (int j = i; j < i + 1 + consecutives; j++) {
+                        int newx = j % width, newy = j / width;
+                        if (block.synthetic() && team[0] != null) {
+                            image[0].setRGB(newx, height - newy - 1, rgb(team[0].color));
+                        } else if (block.solid) {
+                            // not much importance, but this ignores wall ores
+                            image[0].setRGB(newx, height - newy - 1, rgb(block.mapColor));
+                        }
+    
+                    }
+
+                    i += consecutives;
+                }
+            });
+            return image[0];
+        } catch(Exception e) {
+            Log.err(e);
+            return null;
         }
-        return image;
     }
 }
