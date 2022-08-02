@@ -337,9 +337,9 @@ public class Pets implements MiniMod {
     protected static int maxPets(int rank) {
         if (rank <= 1) {
             return 0;
-        } else if (rank == 2) {
+        } else if (rank <= 3) {
             return 1;
-        } else if (rank == 3) {
+        } else if (rank == 4) {
             return 2;
         } else {
             return 3;
@@ -362,9 +362,9 @@ public class Pets implements MiniMod {
     protected static int maxTier(int rank) {
         if (rank <= 1) {
             return 0;
-        } else if (rank <= 3) {
+        } else if (rank == 2) {
             return 1;
-        } else if (rank == 4) {
+        } else if (rank <= 4) {
             return 2;
         } else if (rank == 5) {
             return 3;
