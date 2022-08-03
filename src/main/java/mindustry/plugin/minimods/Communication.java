@@ -28,12 +28,13 @@ import org.postgresql.translation.messages_sr;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Communication implements MiniMod {
     private Announcement announcement = null;
     private Seq<String> screenMessages = new Seq<>();
-
+    
     private static void showAnnouncement(Announcement msg, Player target) {
         int id = Menus.registerMenu((player, selection) -> {
             String action = msg.buttons[selection].action;

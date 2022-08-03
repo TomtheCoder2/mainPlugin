@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.files.Fi;
 import arc.struct.ObjectMap;
+import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Log;
 import arc.util.Strings;
@@ -52,7 +53,7 @@ public class PheonixMain extends Plugin {
 //    public GetMap map = new GetMap();
     private static final String lennyFace = "( \u0361\u00B0 \u035C\u0296 \u0361\u00B0)";
 
-    protected MiniMod[] minimods = new MiniMod[]{
+    protected Seq<MiniMod> minimods = Seq.with(
             new mindustry.plugin.minimods.Communication(),
             new mindustry.plugin.minimods.Cheats(),
             new mindustry.plugin.minimods.Events(),
@@ -66,7 +67,6 @@ public class PheonixMain extends Plugin {
             new mindustry.plugin.minimods.Moderation(),
             new mindustry.plugin.minimods.ModLog(),
             new mindustry.plugin.minimods.Mods(),
-            new mindustry.plugin.minimods.Pets(),
             new mindustry.plugin.minimods.Rainbow(),
             new mindustry.plugin.minimods.Ranks(),
             new mindustry.plugin.minimods.Redeem(),
@@ -75,8 +75,8 @@ public class PheonixMain extends Plugin {
             new mindustry.plugin.minimods.ServerInfo(),
             new mindustry.plugin.minimods.Skipwave(),
             new mindustry.plugin.minimods.Translate(),
-            new mindustry.plugin.minimods.Weapon(),
-    };
+            new mindustry.plugin.minimods.Weapon()
+    );
 
     // register event handlers and create variables in the constructor
     public PheonixMain() {
@@ -138,6 +138,11 @@ public class PheonixMain extends Plugin {
             } catch (Exception e) {
                 err(e.toString());
                 err("Could not login to PostgresSQL database!");
+            }
+
+            JSONObject minimodsData = data.getJSONObject("minimods");
+            if (!(minimodsData.has("pets") && minimodsData.getBoolean("pets") == false)) {
+                minimods.add(new mindustry.plugin.minimods.Pets());
             }
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
