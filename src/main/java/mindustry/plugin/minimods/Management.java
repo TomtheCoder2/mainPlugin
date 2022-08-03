@@ -364,7 +364,7 @@ public class Management implements MiniMod {
             data -> {
                 data.category = "Management";
                 data.aliases = new String[] { "edit" } ;
-                data.roles = new long [] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
+                data.roles = new long [] { Roles.ADMIN, Roles.MOD };
                 data.help = "Set or view a message";
             },
             ctx -> {
