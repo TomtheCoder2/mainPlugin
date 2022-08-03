@@ -140,9 +140,11 @@ public class PheonixMain extends Plugin {
                 err("Could not login to PostgresSQL database!");
             }
 
-            JSONObject minimodsData = data.getJSONObject("minimods");
-            if (!(minimodsData.has("pets") && minimodsData.getBoolean("pets") == false)) {
-                minimods.add(new mindustry.plugin.minimods.Pets());
+            if (data.has("minimods")) {
+                JSONObject minimodsData = data.getJSONObject("minimods");
+                if (!(minimodsData.has("pets") && minimodsData.getBoolean("pets") == false)) {
+                    minimods.add(new mindustry.plugin.minimods.Pets());
+                }
             }
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
