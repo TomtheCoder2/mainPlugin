@@ -27,8 +27,9 @@ public class Rainbow implements MiniMod {
         handler.<Player>register("rainbow", "[speed]", "Give your username a rainbow animation", (args, player) -> {
             synchronized (data) {
                 RainbowData rainbowData = data.get(player.uuid());
+                Database.Player playerData = Database.getPlayerData(player.uuid());
                 if (rainbowData == null || args.length != 0) { // toggle on
-                    rainbowData = new RainbowData();
+                    rainbowData = new RainbowData(playerData == null ? 0 : playerData.rank);
 
                     if (args.length != 0) {
                         try {
@@ -57,11 +58,13 @@ public class Rainbow implements MiniMod {
     private static class RainbowData {
         public int hue;
         public int speed; // d_hue
+        public int rank;
 
         // Defaults
-        public RainbowData() {
+        public RainbowData(int rank) {
             hue = (int) (Math.random() * 360);
             speed = 5;
+            this.rank = rank;
         }
     }
 
@@ -87,11 +90,12 @@ public class Rainbow implements MiniMod {
                             continue;
                         }
 
-                        Database.Player playerData = Database.getPlayerData(player.uuid());
-                        int rank = 0;
-                        if (playerData != null) {
-                            rank = playerData.rank;
-                        }
+//                        Database.Player playerData = Database.getPlayerData(player.uuid());
+//                        int rank = 0;
+//                        if (playerData != null) {
+//                            rank = playerData.rank;
+//                        }
+                        int rank = rainbowData.rank;
 
                         // update rainbow (SINGULAR)
                         rainbowData.hue += rainbowData.speed;

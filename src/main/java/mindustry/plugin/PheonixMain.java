@@ -71,7 +71,6 @@ public class PheonixMain extends Plugin {
             new mindustry.plugin.minimods.Ranks(),
             new mindustry.plugin.minimods.Redeem(),
             new mindustry.plugin.minimods.Report(),
-            new mindustry.plugin.minimods.RTV(),
             new mindustry.plugin.minimods.ServerInfo(),
             new mindustry.plugin.minimods.Skipwave(),
             new mindustry.plugin.minimods.Translate(),
@@ -142,8 +141,11 @@ public class PheonixMain extends Plugin {
 
             if (data.has("minimods")) {
                 JSONObject minimodsData = data.getJSONObject("minimods");
-                if (!(minimodsData.has("pets") && minimodsData.getBoolean("pets") == false)) {
+                if (!(minimodsData.has("pets") && !minimodsData.getBoolean("pets"))) {
                     minimods.add(new mindustry.plugin.minimods.Pets());
+                }
+                if (!(minimodsData.has("rtv") && !minimodsData.getBoolean("rtv"))) {
+                    minimods.add(new mindustry.plugin.minimods.RTV());
                 }
             }
         } catch (Exception e) {

@@ -14,25 +14,25 @@ import mindustry.game.Teams.TeamData;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.io.SaveIO;
-import mindustry.net.Administration;
 import mindustry.plugin.MiniMod;
-import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
 import mindustry.plugin.utils.ContentServer;
-import mindustry.plugin.utils.Query;
-import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
 import mindustry.world.modules.ItemModule;
+import org.javacord.api.entity.emoji.KnownCustomEmoji;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.lang.reflect.Field;
-import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 
+import static mindustry.plugin.discord.DiscordVars.api;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
 /**
@@ -77,11 +77,11 @@ public class GameInfo implements MiniMod {
                 }
         );
 
-        handler.register("playerinfo", "", 
+        handler.register("playerinfo", "",
                 data -> {
                     data.help = "List online players, their IDs, IPs, and UUIDs";
-                    data.aliases = new String[] { "playersinfo", "pi" };
-                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                    data.aliases = new String[]{"playersinfo", "pi"};
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                     data.category = "Management";
                 },
                 ctx -> {
@@ -159,11 +159,29 @@ public class GameInfo implements MiniMod {
                 }
         );
 
+        HashMap<Item, KnownCustomEmoji> emojiHashMap = new HashMap<>();
+
         handler.register("resinfo", "[team]",
                 data -> {
                     data.help = "Show amount of resources in core.";
                 },
                 ctx -> {
+                    if (emojiHashMap.isEmpty()) {
+                        for (Field field : Items.class.getDeclaredFields()) {
+                            if (field.getType().equals(Item.class)) {
+                                try {
+                                    Item item = (Item) field.get(null);
+                                    Collection<KnownCustomEmoji> emojis = api.getServerById(861522903522607124L).get().getCustomEmojisByNameIgnoreCase(item.name.replaceAll("-", ""));
+                                    System.out.println(item.name.replaceAll("-", ""));
+                                    System.out.println(Arrays.toString(emojis.toArray()));
+                                    emojiHashMap.putIfAbsent(item, emojis.iterator().next());
+                                } catch (IllegalAccessException e) {
+                                    Log.err(e);
+                                }
+                            }
+                        }
+//                        System.out.println(emojiHashMap);
+                    }
                     Team team = Vars.state.rules.defaultTeam;
                     if (ctx.args.containsKey("team")) {
                         team = Seq.with(Team.all).find(x -> x.name.equalsIgnoreCase(ctx.args.get("team")));
@@ -184,6 +202,7 @@ public class GameInfo implements MiniMod {
                             try {
                                 Item item = (Item) field.get(null);
                                 eb.addInlineField(item.localizedName, items.get(item) + "");
+//                                eb.addInlineField(emojiHashMap.get(item).getMentionTag(), items.get(item) + "");
                             } catch (IllegalAccessException e) {
                                 Log.err(e);
                             }
