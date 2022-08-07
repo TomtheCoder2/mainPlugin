@@ -4,10 +4,12 @@ import arc.struct.LongSeq;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.struct.StringMap;
+import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.utils.Config;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
 import org.javacord.api.entity.user.User;
@@ -25,12 +27,11 @@ import static mindustry.plugin.discord.DiscordVars.api;
  * Represents a registry of commands
  */
 public class DiscordRegistrar {
-    private String prefix = null;
-
     /**
      * Includes aliases
      */
     private final ObjectMap<String, CommandEntry> commands = new ObjectMap<>();
+    private String prefix = null;
 
     public DiscordRegistrar(String prefix) {
         this.prefix = prefix;
@@ -104,7 +105,9 @@ public class DiscordRegistrar {
         }
     }
 
-    /** Returns a help embed listing all commands
+    /**
+     * Returns a help embed listing all commands
+     *
      * @param user the user, by which commands will be filtered (only commands they can use), or null for all commands
      */
     public EmbedBuilder helpEmbed(User user) {
@@ -113,10 +116,10 @@ public class DiscordRegistrar {
         for (var entry : commands) {
             if (entry.key.equals(entry.value.data.name)) {
                 if (entry.value.data.hidden) continue;
-                if (entry.value.data.roles != null && !Arrays.stream(entry.value.data.roles).anyMatch(roleID -> 
-                            // user has that role
-                            user.getRoles(DiscordVars.server()).stream().anyMatch(r -> r.getId() == roleID)
-                        )) continue;
+                if (entry.value.data.roles != null && !Arrays.stream(entry.value.data.roles).anyMatch(roleID ->
+                        // user has that role
+                        user.getRoles(DiscordVars.server()).stream().anyMatch(r -> r.getId() == roleID)
+                )) continue;
 
                 String category = entry.value.data.category;
                 if (category == null) category = "General";
@@ -188,6 +191,29 @@ public class DiscordRegistrar {
             ) {
                 Context ctx = new Context(event, null);
                 ctx.error("Lack of permission", "Required to have one of the following roles: <@&" + cmdRoles.toString("><@&") + ">");
+                return;
+            }
+            // TODO fix this, its really ugly
+            TextChannel channel = event.getChannel();
+            if ((cmdRoles.contains(Roles.APPRENTICE) &&
+                    cmdRoles.contains(Roles.MOD) &&
+                    cmdRoles.contains(Roles.ADMIN)) && channel == Channels.BOT) {
+                Context ctx = new Context(event, null);
+                ctx.error("Lack of permission", "Please use a another channel.");
+                return;
+            }
+            if ((cmdRoles.contains(Roles.MOD) &&
+                    cmdRoles.contains(Roles.ADMIN) &&
+                    !cmdRoles.contains(Roles.APPRENTICE)) && channel == Channels.APPRENTICE_BOT) {
+                Context ctx = new Context(event, null);
+                ctx.error("Lack of permission", "Please use a another channel.");
+                return;
+            }
+            if ((!cmdRoles.contains(Roles.MOD) &&
+                    cmdRoles.contains(Roles.ADMIN) &&
+                    !cmdRoles.contains(Roles.APPRENTICE)) && channel == Channels.MOD_BOT) {
+                Context ctx = new Context(event, null);
+                ctx.error("Lack of permission", "Please use a another channel.");
                 return;
             }
         }
