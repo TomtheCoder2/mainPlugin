@@ -1,7 +1,10 @@
 package mindustry.plugin.minimods;
 
+import javax.swing.plaf.metal.MetalBorders.PaletteBorder;
+
 import arc.struct.Seq;
 import arc.util.CommandHandler;
+import arc.util.Reflect;
 import arc.util.Strings;
 import arc.util.Structs;
 import mindustry.Vars;
@@ -29,7 +32,7 @@ public class Cheats implements MiniMod {
                 data -> {
                     data.aliases = new String[]{"fillitems"};
                     data.category = "Cheats";
-                    data.roles = new long[]{Roles.MOD, Roles.ADMIN, Roles.APPRENTICE};
+                    data.roles = new long[]{Roles.MOD, Roles.ADMIN};
                 },
                 ctx -> {
                     String teamName = ctx.args.get("team");
@@ -56,10 +59,10 @@ public class Cheats implements MiniMod {
                 }
         );
 
-        handler.register("convert", "<player> <unit>",
+        handler.register("convert", "<player> <unit>", 
                 data -> {
                     data.help = "Convert a player into a unit";
-                    data.roles = new long[]{Roles.MOD, Roles.ADMIN, Roles.APPRENTICE};
+                    data.roles = new long[] { Roles.MOD, Roles.ADMIN };
                     data.category = "Cheats";
                 },
                 ctx -> {
@@ -71,21 +74,21 @@ public class Cheats implements MiniMod {
                     if (p == null) {
                         ctx.error("Player not found", ctx.args.get("player") + " is not online");
                     }
-
+                    
                     Unit oldunit = p.unit();
                     p.unit(unit.spawn(p.x, p.y));
                     Call.unitDespawn(oldunit);
                     ctx.success("Success", "Changed " + Utils.escapeEverything(p.name()) + "'s unit to " + p.unit().type.name);
-                    DiscordLog.cheat("Changed unit", ctx.author(), "Target: " + Utils.escapeEverything(p.name()) + "\nUnit: " + p.unit().type.name);
+                    DiscordLog.cheat("Changed unit", ctx.author(), "Target: " + Utils.escapeEverything(p.name()) + "\nUnit: " +p.unit().type.name);
                 }
         );
 
         handler.register("team", "<player|all> <team>",
                 data -> {
                     data.help = "Change a player's team";
-                    data.roles = new long[]{Roles.MOD, Roles.ADMIN, Roles.APPRENTICE};
+                    data.roles = new long[] { Roles.MOD, Roles.ADMIN };
                     data.category = "Cheats";
-                    data.aliases = new String[]{"changeteamid"};
+                    data.aliases = new String[] { "changeteamid" };
                 },
                 ctx -> {
                     String query = ctx.args.get("player|all");
@@ -121,7 +124,7 @@ public class Cheats implements MiniMod {
         handler.register("setblock", "<player> <block> [rotation]",
                 data -> {
                     data.help = "Create a block at the player's current location for the player's team";
-                    data.roles = new long[]{Roles.MOD, Roles.APPRENTICE, Roles.ADMIN};
+                    data.roles = new long [] { Roles.MOD, Roles.ADMIN };
                     data.category = "Cheats";
                 },
                 ctx -> {
@@ -131,7 +134,7 @@ public class Cheats implements MiniMod {
                         return;
                     }
                     Block block = Vars.content.block(ctx.args.get("block"));
-                    if (block == null) {
+                    if (block==null) {
                         ctx.error("Block not found", ctx.args.get("block") + " is not a valid block");
                         return;
                     }
@@ -151,7 +154,7 @@ public class Cheats implements MiniMod {
         handler.register("spawn", "<player> <unit> [amount]",
                 data -> {
                     data.help = "Spawn a given amount of units at a player's location";
-                    data.roles = new long[]{Roles.MOD, Roles.APPRENTICE, Roles.ADMIN};
+                    data.roles = new long [] { Roles.MOD, Roles.ADMIN };
                     data.category = "Cheats";
                 },
                 ctx -> {
@@ -180,15 +183,15 @@ public class Cheats implements MiniMod {
                     }
 
                     ctx.success("Success", "Successfully spawned " + amount + " " + unit.localizedName);
-                    DiscordLog.cheat("Spawn", ctx.author(), "Target: " + Utils.escapeEverything(p.name) + "\nUnit: `" + unit.name + "`");
+                    DiscordLog.cheat("Spawn", ctx.author(), "Target: "  + Utils.escapeEverything(p.name) +"\nUnit: `" + unit.name + "`");
                 }
         );
 
-        handler.register("killunits", "<team> <unit|all>",
+        handler.register("killunits", "<team> <unit|all>", 
                 data -> {
                     data.help = "Kill all units of a team";
                     data.category = "Cheats";
-                    data.roles = new long[]{Roles.MOD, Roles.APPRENTICE, Roles.ADMIN};
+                    data.roles = new long[] { Roles.MOD, Roles.ADMIN };
                 },
                 ctx -> {
                     Team team = Query.findTeam(ctx.args.get("team"));
