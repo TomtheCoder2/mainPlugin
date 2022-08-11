@@ -6,14 +6,11 @@ import arc.util.Timer;
 import mindustry.gen.Call;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
-import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
-
-import java.util.Objects;
 
 import static mindustry.Vars.mods;
 
@@ -49,16 +46,16 @@ public class JS implements MiniMod {
             }
         });
 
-        handler.register("js", "<code>", 
-            data -> {
-                data.roles = new long[] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
-                data.category = "Moderation";
-                data.help = "Run JS code";
-            },
-            ctx -> {
-                String res = mods.getScripts().runConsole(ctx.args.get("code"));
-                ctx.success("Ran code", "Output:\n```\n" + res + "\n```");
-            }
+        handler.register("js", "<code>",
+                data -> {
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                    data.category = "Moderation";
+                    data.help = "Run JS code";
+                },
+                ctx -> {
+                    String res = mods.getScripts().runConsole(ctx.args.get("code"));
+                    ctx.success("Ran code", "Output:\n```\n" + res + "\n```");
+                }
         );
     }
 
@@ -74,9 +71,9 @@ public class JS implements MiniMod {
             enableJS = false;
             Call.sendMessage(GameMsg.info("JS", "[" + GameMsg.CMD + "]/js[] command now disabled!"));
         }, sec);
-        Call.sendMessage(GameMsg.info("JS", 
-            "[white]" + name + "[" + GameMsg.INFO + "] enabled the js command for everyone for "
-                + (sec / 60) + " minutes! Do [" + GameMsg.CMD + "]/js <script...>[] to use it."));
+        Call.sendMessage(GameMsg.info("JS",
+                "[white]" + name + "[" + GameMsg.INFO + "] enabled the js command for everyone for "
+                        + (sec / 60) + " minutes! Do [" + GameMsg.CMD + "]/js <script...>[] to use it."));
     }
 
     private void disableJS(String name) {

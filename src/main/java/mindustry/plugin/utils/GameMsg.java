@@ -7,8 +7,11 @@ public class GameMsg {
     public static String ERROR = "scarlet";
     public static String SUCCESS = "green";
     public static String INFO = "accent";
-    /** Color to display commands in */
+    /**
+     * Color to display commands in
+     */
     public static String CMD = "cyan";
+
     public static String ratelimit(String category, String command) {
         return "[scarlet]<[blue]" + category + "[scarlet]>: You've exceeded the rate limit for [" + CMD + "]/" + command + "[scarlet]. Wait a while before using it again.";
     }

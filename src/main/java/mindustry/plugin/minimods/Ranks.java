@@ -58,12 +58,11 @@ public class Ranks implements MiniMod {
      * Number of buildings built that have not been stored to the database.
      */
     private final ObjectMap<String, Integer> buildingsBuiltCache = new ObjectMap<>();
-    private long mapStartTime = System.currentTimeMillis();
-
     /**
      * Who has already rated the map
      */
     private final ObjectSet<String> hasRatedMap = new ObjectSet<>();
+    private long mapStartTime = System.currentTimeMillis();
 
     @Override
     public void registerEvents() {
@@ -388,10 +387,10 @@ public class Ranks implements MiniMod {
                 }
         );
 
-        handler.register("setrank", "<player> <rank>", 
+        handler.register("setrank", "<player> <rank>",
                 data -> {
                     data.help = "Set a player's in-game rank";
-                    data.roles = new long[] { Roles.MOD, Roles.ADMIN };
+                    data.roles = new long[]{Roles.MOD, Roles.ADMIN};
                     data.category = "Management";
                 },
                 ctx -> {
@@ -403,7 +402,7 @@ public class Ranks implements MiniMod {
 
                     String rankQuery = ctx.args.get("rank");
                     int rank = -1;
-                    for (int i =0 ; i < Rank.all.length; i++) {
+                    for (int i = 0; i < Rank.all.length; i++) {
                         if (Integer.toString(i).equals(rankQuery) || Rank.all[i].name.equalsIgnoreCase(rankQuery)) {
                             rank = i;
                         }
@@ -427,11 +426,11 @@ public class Ranks implements MiniMod {
                 }
         );
 
-        handler.register("setstats", "<player> <playtime> <buildingsbuilt> <gamesplayed>", 
+        handler.register("setstats", "<player> <playtime> <buildingsbuilt> <gamesplayed>",
                 data -> {
                     data.help = "Set a player's game statistics";
                     data.category = "Management";
-                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                 },
                 ctx -> {
                     var info = Query.findPlayerInfo(ctx.args.get("player"));
@@ -439,7 +438,7 @@ public class Ranks implements MiniMod {
                         ctx.error("No such player", "There is no such player in the database");
                         return;
                     }
-                    
+
                     var pd = Database.getPlayerData(info.id);
                     if (pd == null) {
                         ctx.error("No such player", "There is no such player in the database");

@@ -2,14 +2,9 @@ package mindustry.plugin;
 
 import arc.Core;
 import arc.Events;
-import arc.files.Fi;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
-import arc.util.CommandHandler;
-import arc.util.Log;
-import arc.util.Strings;
-import arc.util.Structs;
-import arc.util.Timer;
+import arc.util.*;
 import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.game.EventType;
@@ -18,11 +13,7 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.mod.Plugin;
 import mindustry.plugin.database.Database;
-import mindustry.plugin.discord.Channels;
-import mindustry.plugin.discord.DiscordLog;
-import mindustry.plugin.discord.DiscordPalette;
-import mindustry.plugin.discord.DiscordVars;
-import mindustry.plugin.discord.Roles;
+import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.utils.*;
@@ -34,17 +25,14 @@ import org.javacord.api.util.logging.FallbackLoggerConfiguration;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.awt.*;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Objects;
 
 import static arc.util.Log.err;
 import static arc.util.Log.info;
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.state;
-import static mindustry.plugin.utils.Utils.*;
+import static mindustry.plugin.utils.Utils.escapeEverything;
 
 public class PheonixMain extends Plugin {
     //    public static final File prefsFile = new File("prefs.properties");
@@ -199,16 +187,16 @@ public class PheonixMain extends Plugin {
 
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;
-            String[] bannedNames = new String[] { 
-                "IGGGAMES",
-                "CODEX",
-                "VALVE",
-                "tuttop",
-                "Volas Y0uKn0w1sR34Lp",
-                "IgruhaOrg",
-                "андрей",
-                "THIS IS MY KINGDOM CUM, THIS IS MY CUM",
-                "HITLER"
+            String[] bannedNames = new String[]{
+                    "IGGGAMES",
+                    "CODEX",
+                    "VALVE",
+                    "tuttop",
+                    "Volas Y0uKn0w1sR34Lp",
+                    "IgruhaOrg",
+                    "андрей",
+                    "THIS IS MY KINGDOM CUM, THIS IS MY CUM",
+                    "HITLER"
             };
             if (Structs.contains(bannedNames, s -> s.equals(escapeEverything(player.name)))) {
                 player.con.kick("[scarlet]Please change your name.");
@@ -350,9 +338,9 @@ public class PheonixMain extends Plugin {
     public void updateDiscordStatus() {
         if (Vars.state.is(GameState.State.playing)) {
             DiscordVars.api.updateActivity(
-                Utils.escapeColorCodes(Vars.state.map.name()) + 
-                " with " + Groups.player.size() + 
-                (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
+                    Utils.escapeColorCodes(Vars.state.map.name()) +
+                            " with " + Groups.player.size() +
+                            (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
         } else {
             DiscordVars.api.updateActivity(ActivityType.CUSTOM, "Not hosting");
             DiscordLog.error("Server crashed", "Restarting...", null);

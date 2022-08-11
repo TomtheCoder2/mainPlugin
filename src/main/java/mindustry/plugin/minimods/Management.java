@@ -18,24 +18,17 @@ import mindustry.maps.MapException;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
-import mindustry.plugin.discord.Channels;
-import mindustry.plugin.discord.DiscordLog;
-import mindustry.plugin.discord.DiscordPalette;
-import mindustry.plugin.discord.DiscordVars;
-import mindustry.plugin.discord.Roles;
+import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
-import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
 
 import java.awt.*;
 import java.math.BigDecimal;
-import java.net.URI;
-import java.time.Duration;
 import java.util.Arrays;
 
 public class Management implements MiniMod {
@@ -48,7 +41,7 @@ public class Management implements MiniMod {
                     data.category = "Management";
                 },
                 ctx -> {
-                    long time = ctx.args.getLong("time", 5)*1000;
+                    long time = ctx.args.getLong("time", 5) * 1000;
 
                     TestData data = new TestData();
                     final Runnable[] scanTPS = new Runnable[1];
@@ -60,16 +53,16 @@ public class Management implements MiniMod {
                                             new EmbedBuilder()
                                                     .setColor(Color.YELLOW)
                                                     .setTitle("Stability Test Results")
-                                                    .addInlineField("TPS", 
-                                                        "Min: " + data.minTPS() + "\n" + 
-                                                        "Avg: " + data.avgTPS() + "\n" + 
-                                                        "Median: " + data.medTPS() + "\n" + 
-                                                        "Max: " + data.maxTPS() + "\n"
+                                                    .addInlineField("TPS",
+                                                            "Min: " + data.minTPS() + "\n" +
+                                                                    "Avg: " + data.avgTPS() + "\n" +
+                                                                    "Median: " + data.medTPS() + "\n" +
+                                                                    "Max: " + data.maxTPS() + "\n"
                                                     )
-                                                    .addInlineField("Memory", 
-                                                        "Min: " + (data.minMem()/1024) + " kB\n" +
-                                                        "Avg: " + (data.avgMem()/1024) + " kB\n" + 
-                                                        "Max: " + (data.maxMem()/1024) + " kB\n"
+                                                    .addInlineField("Memory",
+                                                            "Min: " + (data.minMem() / 1024) + " kB\n" +
+                                                                    "Avg: " + (data.avgMem() / 1024) + " kB\n" +
+                                                                    "Max: " + (data.maxMem() / 1024) + " kB\n"
                                                     ))
                                     .addAttachment(data.csv().getBytes(), "data.csv")
                             );
@@ -80,7 +73,7 @@ public class Management implements MiniMod {
                     };
                     Core.app.post(scanTPS[0]);
 
-                    ctx.success("Stability Test Started", "Results will come out in " + time/1000 + "s");
+                    ctx.success("Stability Test Started", "Results will come out in " + time / 1000 + "s");
                 }
         );
 
@@ -105,14 +98,14 @@ public class Management implements MiniMod {
                 }
         );
 
-        handler.register("syncserver", "", 
+        handler.register("syncserver", "",
                 data -> {
                     data.help = "Re-sync everyone on the server. May kick everyone, you never know!";
-                    data.roles = new long[] {  Roles.MOD, Roles.ADMIN, Roles.APPRENTICE };
+                    data.roles = new long[]{Roles.MOD, Roles.ADMIN, Roles.APPRENTICE};
                     data.category = "Management";
                 },
                 ctx -> {
-                    for (Player p : Groups.player) { 
+                    for (Player p : Groups.player) {
                         p.getInfo().lastSyncTime = Time.millis();
                         Call.worldDataBegin(p.con);
                         Vars.netServer.sendWorldData(p);
@@ -161,70 +154,70 @@ public class Management implements MiniMod {
             }
         });
 
-        handler.register("setting", "[name] [type] [value...]", 
-            data -> {
-                data.help = "Configure server settings (`Core.settings`). It is recommended to use " + DiscordVars.prefix + "config instead of this command. **DO NOT USE THIS COMMAND**";
-                data.category = "Management";
-                data.roles = new long [] { Roles.ADMIN };
-                data.hidden = true;
-            },
-            ctx -> {
-                if (!ctx.args.containsKey("name")) {
-                    StringBuilder data = new StringBuilder(String.format("%-48s, %-12s, %s\n", "Setting", "Type", "Value"));
-                    int n = 0;
-                    for (String key : Core.settings.keys()) {
-                        Object value = Core.settings.get(key,null);
-                        data.append(String.format("%-48s, %-12s, %s\n", key, value == null ? "Null" : value.getClass().getSimpleName(), value == null ? "null": value.toString()));
-                        n++;
-                    }
-                    EmbedBuilder eb = new EmbedBuilder()
-                        .setTitle("Settings")
-                        .setColor(DiscordPalette.INFO)
-                        .setDescription("Number of settings: " + n);
-                    ctx.sendMessage(
-                        new MessageBuilder()
-                           .addEmbed(eb)
-                            .addAttachment(data.toString().getBytes(), "data.csv")
+        handler.register("setting", "[name] [type] [value...]",
+                data -> {
+                    data.help = "Configure server settings (`Core.settings`). It is recommended to use " + DiscordVars.prefix + "config instead of this command. **DO NOT USE THIS COMMAND**";
+                    data.category = "Management";
+                    data.roles = new long[]{Roles.ADMIN};
+                    data.hidden = true;
+                },
+                ctx -> {
+                    if (!ctx.args.containsKey("name")) {
+                        StringBuilder data = new StringBuilder(String.format("%-48s, %-12s, %s\n", "Setting", "Type", "Value"));
+                        int n = 0;
+                        for (String key : Core.settings.keys()) {
+                            Object value = Core.settings.get(key, null);
+                            data.append(String.format("%-48s, %-12s, %s\n", key, value == null ? "Null" : value.getClass().getSimpleName(), value == null ? "null" : value.toString()));
+                            n++;
+                        }
+                        EmbedBuilder eb = new EmbedBuilder()
+                                .setTitle("Settings")
+                                .setColor(DiscordPalette.INFO)
+                                .setDescription("Number of settings: " + n);
+                        ctx.sendMessage(
+                                new MessageBuilder()
+                                        .addEmbed(eb)
+                                        .addAttachment(data.toString().getBytes(), "data.csv")
                         );
-                    return;
-                }
-
-                String name = ctx.args.get("name");
-                if (!ctx.args.containsKey("type")) {
-                    Object o = Core.settings.get(name, null);                    
-                    if (o == null) {
-                        ctx.error("No such setting", "Setting " + name + " does not exist");
                         return;
                     }
-                    
-                    ctx.success("Success", "Setting **" + name + "** is currently (`" + o.getClass().getSimpleName() + "`) " + o.toString());
-                    return;
-                }
 
-                if (!ctx.args.containsKey("value")) {
-                    ctx.error("Must provide value", "Missing value");
-                    return;
-                }
+                    String name = ctx.args.get("name");
+                    if (!ctx.args.containsKey("type")) {
+                        Object o = Core.settings.get(name, null);
+                        if (o == null) {
+                            ctx.error("No such setting", "Setting " + name + " does not exist");
+                            return;
+                        }
 
-                String typeName = ctx.args.get("type");
-                String valueStr = ctx.args.get("value");
-                Object value;
-                if (typeName.equalsIgnoreCase("String")) {
-                    value = valueStr;
-                } else if (typeName.equalsIgnoreCase("int")) {
-                    value = Strings.parseInt(valueStr, 0);
-                } else if (typeName.equalsIgnoreCase("long")) {
-                    value = Strings.parseLong(valueStr, 0);
-                } else if (typeName.equalsIgnoreCase("double")) {
-                    value = Strings.parseDouble(valueStr, 0);
-                } else {
-                    ctx.error("Unknown type", "Please contact a developer to add support for more types");
-                    return;
-                }
-                Core.settings.put(name, value);
+                        ctx.success("Success", "Setting **" + name + "** is currently (`" + o.getClass().getSimpleName() + "`) " + o.toString());
+                        return;
+                    }
 
-                ctx.success("Success", "Setting **" + name + "** was set to (`" + value.getClass().getSimpleName() + "`) " + value.toString());
-            }
+                    if (!ctx.args.containsKey("value")) {
+                        ctx.error("Must provide value", "Missing value");
+                        return;
+                    }
+
+                    String typeName = ctx.args.get("type");
+                    String valueStr = ctx.args.get("value");
+                    Object value;
+                    if (typeName.equalsIgnoreCase("String")) {
+                        value = valueStr;
+                    } else if (typeName.equalsIgnoreCase("int")) {
+                        value = Strings.parseInt(valueStr, 0);
+                    } else if (typeName.equalsIgnoreCase("long")) {
+                        value = Strings.parseLong(valueStr, 0);
+                    } else if (typeName.equalsIgnoreCase("double")) {
+                        value = Strings.parseDouble(valueStr, 0);
+                    } else {
+                        ctx.error("Unknown type", "Please contact a developer to add support for more types");
+                        return;
+                    }
+                    Core.settings.put(name, value);
+
+                    ctx.success("Success", "Setting **" + name + "** was set to (`" + value.getClass().getSimpleName() + "`) " + value.toString());
+                }
         );
 
         handler.register("start", "[map] [mode]", d -> {
@@ -283,116 +276,116 @@ public class Management implements MiniMod {
             });
         });
 
-        handler.register("iplookup", "<ip|player>", 
-            data -> {
-                data.help = "Make an IP lookup";
-                data.roles = new long [] { Roles.MOD, Roles.ADMIN };
-                data.category = "Moderation";
-                data.aliases = new String[] { "il" };
-            },
-            ctx -> {
-                String name = ctx.args.get("ip|player");
-                var infos =  Vars.netServer.admins.searchNames(name); // strip colors is active
-                if (infos.size > 1) {
-                    ctx.error("Multiple players found that match name", infos.toSeq().toString("\n", i -> i.lastName));
-                    return;
-                }
-                String ip;
-                if (infos.size == 1) {
-                    ip = infos.iterator().next().lastIP;
-                } else {
-                    if (!name.matches("[a-f0-9:.]+")) {
-                        ctx.error("Player not found", "'" + name + "' is neither a valid player or a valid IP");
+        handler.register("iplookup", "<ip|player>",
+                data -> {
+                    data.help = "Make an IP lookup";
+                    data.roles = new long[]{Roles.MOD, Roles.ADMIN};
+                    data.category = "Moderation";
+                    data.aliases = new String[]{"il"};
+                },
+                ctx -> {
+                    String name = ctx.args.get("ip|player");
+                    var infos = Vars.netServer.admins.searchNames(name); // strip colors is active
+                    if (infos.size > 1) {
+                        ctx.error("Multiple players found that match name", infos.toSeq().toString("\n", i -> i.lastName));
                         return;
                     }
-                    ip = name;
-                }
-                
-                Http.get("http://api.ipapi.com/" + ip + "?access_key=" + Config.ipApiKey, resp -> {
-                    JSONObject json = new JSONObject(resp.getResultAsString());
-                    EmbedBuilder eb = new EmbedBuilder()
-                        .setTitle("Lookup " + ip)
-                        .setColor(DiscordPalette.INFO)
-                        .addField("Continent", json.getString("continent_name"), true)
-                        .addField("City", json.getString("city"), true)
-                        .addField("Country", json.getString("country_name"), true)
-                        .addField("Region", json.getString("region_name"), true)
-                        .addField("Latitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("latitude")).floatValue())), true)
-                        .addField("Longitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("longitude")).floatValue())), true);
-
-                    if (json.has("zip")) {
-                        eb.addInlineField("Zip Code", json.get("zip").toString());
+                    String ip;
+                    if (infos.size == 1) {
+                        ip = infos.iterator().next().lastIP;
+                    } else {
+                        if (!name.matches("[a-f0-9:.]+")) {
+                            ctx.error("Player not found", "'" + name + "' is neither a valid player or a valid IP");
+                            return;
+                        }
+                        ip = name;
                     }
 
-                    ctx.sendEmbed(eb);
-                }, err -> {
-                    Log.err(err);
-                    DiscordLog.error("IpApi lookup failed", err.getMessage(), null);
-                });
-            }
+                    Http.get("http://api.ipapi.com/" + ip + "?access_key=" + Config.ipApiKey, resp -> {
+                        JSONObject json = new JSONObject(resp.getResultAsString());
+                        EmbedBuilder eb = new EmbedBuilder()
+                                .setTitle("Lookup " + ip)
+                                .setColor(DiscordPalette.INFO)
+                                .addField("Continent", json.getString("continent_name"), true)
+                                .addField("City", json.getString("city"), true)
+                                .addField("Country", json.getString("country_name"), true)
+                                .addField("Region", json.getString("region_name"), true)
+                                .addField("Latitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("latitude")).floatValue())), true)
+                                .addField("Longitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("longitude")).floatValue())), true);
+
+                        if (json.has("zip")) {
+                            eb.addInlineField("Zip Code", json.get("zip").toString());
+                        }
+
+                        ctx.sendEmbed(eb);
+                    }, err -> {
+                        Log.err(err);
+                        DiscordLog.error("IpApi lookup failed", err.getMessage(), null);
+                    });
+                }
         );
 
-        handler.register("admin", "<id|ip|name>", 
-            data -> {
-                data.help = "Toggle admin status of a player";
-                data.roles = new long [] { Roles.ADMIN, Roles.MOD };
-                data.category = "Management";
-            },
-            ctx -> {
-                String q = ctx.args.get("id|ip|name");
-                Player p = Query.findPlayerEntity(q);
-                if (p == null) {
-                    ctx.error("Player not found", "Player '" + q + "' does not exist");
-                    return;
-                }
+        handler.register("admin", "<id|ip|name>",
+                data -> {
+                    data.help = "Toggle admin status of a player";
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
+                    data.category = "Management";
+                },
+                ctx -> {
+                    String q = ctx.args.get("id|ip|name");
+                    Player p = Query.findPlayerEntity(q);
+                    if (p == null) {
+                        ctx.error("Player not found", "Player '" + q + "' does not exist");
+                        return;
+                    }
 
-                var info = p.getInfo();
-                if (!p.admin) { 
-                    Vars.netServer.admins.adminPlayer(info.id, info.adminUsid);
-                    p.admin = true;
-                    ctx.success("Success", "Promoted " + Utils.escapeEverything(p) + " to admin");
-                } else {
-                    Vars.netServer.admins.unAdminPlayer(info.id);
-                    p.admin = false;
-                    ctx.success("Success", "Demoted " + Utils.escapeEverything(p) + " from admin");
+                    var info = p.getInfo();
+                    if (!p.admin) {
+                        Vars.netServer.admins.adminPlayer(info.id, info.adminUsid);
+                        p.admin = true;
+                        ctx.success("Success", "Promoted " + Utils.escapeEverything(p) + " to admin");
+                    } else {
+                        Vars.netServer.admins.unAdminPlayer(info.id);
+                        p.admin = false;
+                        ctx.success("Success", "Demoted " + Utils.escapeEverything(p) + " from admin");
+                    }
+                    Vars.netServer.admins.save();
                 }
-                Vars.netServer.admins.save();
-            }
         );
 
-        handler.register("message", "<stats|rules|info|welcome> [message...]", 
-            data -> {
-                data.category = "Management";
-                data.aliases = new String[] { "edit" } ;
-                data.roles = new long [] { Roles.ADMIN, Roles.MOD };
-                data.help = "Set or view a message";
-            },
-            ctx -> {
-                String messageName = ctx.args.get("stats|rules|info|welcome");
-                String settingName = switch (messageName) {
-                    case "stats", "s" -> "statMessage";
-                    case "rules", "r" -> "ruleMessage";
-                    case "info", "i" -> "infoMessage";
-                    case "welcome", "w", "motd" -> "welcomeMessage";
-                    default -> null;
-                };
-                if (settingName == null) {
-                    ctx.error("Invalid setting name", ":(");
-                    return;
-                }
+        handler.register("message", "<stats|rules|info|welcome> [message...]",
+                data -> {
+                    data.category = "Management";
+                    data.aliases = new String[]{"edit"};
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
+                    data.help = "Set or view a message";
+                },
+                ctx -> {
+                    String messageName = ctx.args.get("stats|rules|info|welcome");
+                    String settingName = switch (messageName) {
+                        case "stats", "s" -> "statMessage";
+                        case "rules", "r" -> "ruleMessage";
+                        case "info", "i" -> "infoMessage";
+                        case "welcome", "w", "motd" -> "welcomeMessage";
+                        default -> null;
+                    };
+                    if (settingName == null) {
+                        ctx.error("Invalid setting name", ":(");
+                        return;
+                    }
 
-                String message=  ctx.args.get("message");
-                if (message == null) {
-                    Object value = Core.settings.get(settingName, null);
-                    ctx.sendEmbed(DiscordPalette.INFO, "Current value of `" + settingName + "`",
-                        value == null ? "None" : "```\n" + value + "\n```");
-                    return;
+                    String message = ctx.args.get("message");
+                    if (message == null) {
+                        Object value = Core.settings.get(settingName, null);
+                        ctx.sendEmbed(DiscordPalette.INFO, "Current value of `" + settingName + "`",
+                                value == null ? "None" : "```\n" + value + "\n```");
+                        return;
+                    }
+
+                    Core.settings.put(settingName, message);
+                    Core.settings.autosave();
+                    ctx.success("Set `" + settingName + "`", "```\n" + message + "\n```");
                 }
-                
-                Core.settings.put(settingName, message);
-                Core.settings.autosave();
-                ctx.success("Set `" + settingName + "`", "```\n" + message + "\n```");
-            }
         );
     }
 
@@ -424,8 +417,9 @@ public class Management implements MiniMod {
             return Arrays.stream(memMeasurements.items).limit(memMeasurements.size).max().getAsLong();
         }
 
-        public long avgMem() { 
-            if (memMeasurements.size == 0) return 0;;
+        public long avgMem() {
+            if (memMeasurements.size == 0) return 0;
+            ;
             return Arrays.stream(memMeasurements.items).limit(memMeasurements.size).sum() / memMeasurements.size;
         }
 

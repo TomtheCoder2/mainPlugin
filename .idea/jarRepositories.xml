@@ -26,5 +26,15 @@
       <option name="name" value="maven" />
       <option name="url" value="https://www.jitpack.io" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="https://www.mindustryjitpack.git" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven" />
+      <option name="name" value="maven" />
+      <option name="url" value="https://www.mindustryjitpack.io" />
+    </remote-repository>
   </component>
 </project>

@@ -1,7 +1,5 @@
 package mindustry.plugin.utils;
 
-import static mindustry.Vars.netServer;
-
 import arc.util.Strings;
 import arc.util.Structs;
 import mindustry.Vars;
@@ -11,7 +9,11 @@ import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.net.Administration;
 
-/** Utilities class concerning querying maps, players, entities, etc.  */
+import static mindustry.Vars.netServer;
+
+/**
+ * Utilities class concerning querying maps, players, entities, etc.
+ */
 public class Query {
     /**
      * Find a map by name or index
@@ -32,7 +34,9 @@ public class Query {
         return found;
     }
 
-    /** Find a team by id or name */
+    /**
+     * Find a team by id or name
+     */
     public static Team findTeam(String query) {
         if (Strings.canParseInt(query)) {
             int id = Strings.parseInt(query);
@@ -57,7 +61,7 @@ public class Query {
             if (player.uuid() == null) return null;
             if (player.con == null) return null;
             if (player.con.address == null) return null;
-    
+
             if (player.con.address.equals(identifier.replaceAll(" ", "")) ||
                     String.valueOf(player.id).equals(identifier.replaceAll(" ", "")) ||
                     player.uuid().equals(identifier.replaceAll(" ", "")) ||
@@ -84,7 +88,7 @@ public class Query {
             info = netServer.admins.findByIP(target);
         }
         if (info == null) {
-            var res =  netServer.admins.findByName(target);
+            var res = netServer.admins.findByName(target);
             info = res.size == 0 ? null : res.first();
         }
         if (info == null) {

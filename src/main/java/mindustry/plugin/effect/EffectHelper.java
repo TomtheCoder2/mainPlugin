@@ -12,7 +12,6 @@ import arc.util.io.PropertiesUtils;
 import mindustry.content.Fx;
 import mindustry.entities.Effect;
 import mindustry.gen.Player;
-import mindustry.plugin.PheonixMain;
 
 import java.lang.reflect.Field;
 

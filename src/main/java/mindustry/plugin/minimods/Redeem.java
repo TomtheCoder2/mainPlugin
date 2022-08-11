@@ -12,9 +12,6 @@ import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.server.Server;
-import org.javacord.api.entity.user.User;
-
-import java.util.Optional;
 
 public class Redeem implements MiniMod {
     /**

@@ -3,10 +3,8 @@ package mindustry.plugin.minimods;
 import arc.Core;
 import arc.Events;
 import arc.struct.ObjectSet;
-import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Strings;
-import arc.util.Structs;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
@@ -16,18 +14,15 @@ import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
-import mindustry.plugin.discord.Channels;
-import mindustry.plugin.discord.DiscordLog;
-import mindustry.plugin.discord.DiscordPalette;
-import mindustry.plugin.discord.DiscordVars;
-import mindustry.plugin.discord.Roles;
+import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
-import mindustry.plugin.utils.*;
-import mindustry.world.Tile;
+import mindustry.plugin.utils.GameMsg;
+import mindustry.plugin.utils.Query;
+import mindustry.plugin.utils.Rank;
+import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
-import java.awt.*;
 import java.time.Instant;
 import java.util.ArrayList;
 
@@ -162,7 +157,7 @@ public class Moderation implements MiniMod {
                     long duration;
                     if (ctx.args.get("duration:minutes") != null && ctx.args.get("duration:minutes").equals("forever")) {
                         duration = 0;
-                        pd.banned = true;                        
+                        pd.banned = true;
                     } else {
                         duration = ctx.args.getLong("duration:minutes", 2 * 365 * 24 * 60) * 60;
                         pd.bannedUntil = Instant.now().getEpochSecond() + duration;
@@ -172,7 +167,7 @@ public class Moderation implements MiniMod {
 
                     ctx.sendEmbed(new EmbedBuilder()
                             .setTitle("Banned " + info.lastName)
-                            .addField("Duration", duration == 0 ? "forever" :  duration / 60 + " minutes")
+                            .addField("Duration", duration == 0 ? "forever" : duration / 60 + " minutes")
                             .addField("Until", Utils.epochToString(pd.bannedUntil))
                             .addField("Reason", reason)
                             .setFooter("Ban ID: " + banID)
@@ -191,7 +186,7 @@ public class Moderation implements MiniMod {
                 data -> {
                     data.help = "Unban a player";
                     data.category = "Moderation";
-                    data.roles = new long [] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
                 },
                 ctx -> {
                     var info = Query.findPlayerInfo(ctx.args.get("player"));
@@ -218,11 +213,11 @@ public class Moderation implements MiniMod {
                 }
         );
 
-        handler.register("banip", "<ip> [reason...]", 
+        handler.register("banip", "<ip> [reason...]",
                 data -> {
                     data.help = "Ban an IP, and ban any players with that IP by UUID";
                     data.category = "Moderation";
-                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                 },
                 ctx -> {
                     String ip = ctx.args.get("ip");
@@ -232,11 +227,11 @@ public class Moderation implements MiniMod {
                 }
         );
 
-        handler.register("unbanip", "<ip> [reason...]", 
+        handler.register("unbanip", "<ip> [reason...]",
                 data -> {
                     data.help = "Unban an IP";
                     data.category = "Moderation";
-                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                 },
                 ctx -> {
                     String ip = ctx.args.get("ip");
@@ -246,11 +241,11 @@ public class Moderation implements MiniMod {
                 }
         );
 
-        handler.register("bans", "", 
+        handler.register("bans", "",
                 data -> {
                     data.help = "List all bans";
                     data.category = "Moderation";
-                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                 },
                 ctx -> {
                     StringBuilder sb = new StringBuilder();
@@ -283,7 +278,7 @@ public class Moderation implements MiniMod {
                     }
 
                     ctx.sendMessage(new MessageBuilder()
-                        .addAttachment(sb.toString().getBytes(), "bans.csv")
+                            .addAttachment(sb.toString().getBytes(), "bans.csv")
                     );
                 }
         );
@@ -329,19 +324,19 @@ public class Moderation implements MiniMod {
                 }
         );
 
-        handler.register("unkick", "<player> [reason...]", 
+        handler.register("unkick", "<player> [reason...]",
                 data -> {
                     data.help = "Unkick the player";
-                    data.aliases = new String [] { "pardon" } ;
+                    data.aliases = new String[]{"pardon"};
                     data.category = "Moderation";
-                    data.roles = new long [] {Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
-                }, 
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                },
                 ctx -> {
                     var info = Query.findPlayerInfo(ctx.args.get("player"));
                     if (info == null) {
                         ctx.error("No such player", ctx.args.get("player") + " is not saved in the netserver data");
                         return;
-                    }                    
+                    }
                     if (info.lastKicked == 0) {
                         ctx.error("Player not kicked", Utils.escapeEverything(info.lastName) + " is not kicked");
                         return;
@@ -363,8 +358,8 @@ public class Moderation implements MiniMod {
         handler.register("lookup", "<player>",
                 data -> {
                     data.category = "Moderation";
-                    data.roles = new long []{ Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
-                    data.aliases = new String[] { "l" };
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                    data.aliases = new String[]{"l"};
                     data.help = "Lookup information about a player (by name, IP, UUID)";
                 },
                 ctx -> {
@@ -377,29 +372,29 @@ public class Moderation implements MiniMod {
                     EmbedBuilder eb = new EmbedBuilder()
                             .setColor(DiscordPalette.INFO)
                             .setTitle("Lookup: " + Utils.escapeEverything(info.lastName));
-                    
+
                     eb.addField("Names", info.names.toString(" / "));
-                            
+
                     if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.MOD_BOT.getId()) {
                         eb.addField("IPs", info.ips.toString(" / "))
-                            .addInlineField("UUID", info.id)
-                            .addInlineField("Last IP", info.lastIP);
+                                .addInlineField("UUID", info.id)
+                                .addInlineField("Last IP", info.lastIP);
                     }
-                    
+
                     eb
-                        .addField("Last name", info.lastName)
-                        .addField("Times kicked", info.timesKicked + "")
-                        .addField("NetServer banned", info.banned ? "Yes" : "No");
-                    
-                    var pd =Database.getPlayerData(info.id);
+                            .addField("Last name", info.lastName)
+                            .addField("Times kicked", info.timesKicked + "")
+                            .addField("NetServer banned", info.banned ? "Yes" : "No");
+
+                    var pd = Database.getPlayerData(info.id);
                     if (pd != null) {
                         eb.addInlineField("Rank", Rank.all[pd.rank].name)
-                            .addInlineField("Playtime", pd.playTime + " min")
-                            .addInlineField("Games", pd.gamesPlayed + "")
-                            .addInlineField("Buildings built", pd.buildingsBuilt + "")
-                            .addInlineField("Banned", pd.banned ? "Forever" : (pd.bannedUntil != 0 ? "Until " + Instant.ofEpochSecond(pd.bannedUntil).toString() : "No"))
-                            .addInlineField("Ban Reason", pd.banReason == null || pd.banReason.equals("") ? "None" : pd.banReason);
-                        
+                                .addInlineField("Playtime", pd.playTime + " min")
+                                .addInlineField("Games", pd.gamesPlayed + "")
+                                .addInlineField("Buildings built", pd.buildingsBuilt + "")
+                                .addInlineField("Banned", pd.banned ? "Forever" : (pd.bannedUntil != 0 ? "Until " + Instant.ofEpochSecond(pd.bannedUntil).toString() : "No"))
+                                .addInlineField("Ban Reason", pd.banReason == null || pd.banReason.equals("") ? "None" : pd.banReason);
+
                         if (pd.discord != 0) {
                             eb.addField("Discord", "<@" + pd.discord + ">");
                         }
@@ -412,8 +407,8 @@ public class Moderation implements MiniMod {
         handler.register("rename", "<player> <name...>",
                 data -> {
                     data.category = "Moderation";
-                    data.roles = new long [] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
-                    data.aliases = new String[] {"r"};
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                    data.aliases = new String[]{"r"};
                 },
                 ctx -> {
                     Player p = Query.findPlayerEntity(ctx.args.get("player"));
@@ -437,21 +432,21 @@ public class Moderation implements MiniMod {
                     data.help = "Request an appeal";
                 },
                 ctx -> {
-                    ctx.author().addRole(DiscordVars.api.getRoleById(Roles.APPEAL).get()).join();   
-                    
+                    ctx.author().addRole(DiscordVars.api.getRoleById(Roles.APPEAL).get()).join();
+
                     new MessageBuilder()
-                        .addEmbed(
-                            new EmbedBuilder()
-                                .setColor(DiscordPalette.WARN)
-                                .setTitle("Use the following format to appeal")
-                                .addField("1. Names", "All names that you've used in game")
-                                .addField("2. Screenshot", "Send a screenshot of your ban screen")
-                                .addField("3. Reason", "Explain what you did and why you want to get unbanned")
-                        )
-                        .setContent("<@" + ctx.author().getId() + ">")
-                        .send(Channels.APPEAL)
-                        .join();
-                    
+                            .addEmbed(
+                                    new EmbedBuilder()
+                                            .setColor(DiscordPalette.WARN)
+                                            .setTitle("Use the following format to appeal")
+                                            .addField("1. Names", "All names that you've used in game")
+                                            .addField("2. Screenshot", "Send a screenshot of your ban screen")
+                                            .addField("3. Reason", "Explain what you did and why you want to get unbanned")
+                            )
+                            .setContent("<@" + ctx.author().getId() + ">")
+                            .send(Channels.APPEAL)
+                            .join();
+
                     ctx.success("Successfully requested an appeal", "Head over to <#" + Channels.APPEAL.getIdAsString() + ">");
                 }
         );
@@ -459,59 +454,59 @@ public class Moderation implements MiniMod {
 
     @Override
     public void registerCommands(CommandHandler handler) {
-        Utils.registerRankCommand(handler, "freeze", "<player> [reason...]", Rank.APPRENTICE, 
-            "Freeze a player. To unfreeze just use this command again.", (args, player) -> {
-            Player target = Query.findPlayerEntity(args[0]);
-            if (target == null) {
-                player.sendMessage(GameMsg.error("Mod", "Player not found."));
-                return;
-            }
+        Utils.registerRankCommand(handler, "freeze", "<player> [reason...]", Rank.APPRENTICE,
+                "Freeze a player. To unfreeze just use this command again.", (args, player) -> {
+                    Player target = Query.findPlayerEntity(args[0]);
+                    if (target == null) {
+                        player.sendMessage(GameMsg.error("Mod", "Player not found."));
+                        return;
+                    }
 
-            if (!frozen.contains(target.uuid())) {
-                frozen.add(target.uuid());
-            } else {
-                frozen.remove(target.uuid());
-            }
+                    if (!frozen.contains(target.uuid())) {
+                        frozen.add(target.uuid());
+                    } else {
+                        frozen.remove(target.uuid());
+                    }
 
-            String reason = args.length > 1 ? args[1] : null;
-            boolean isFrozen = frozen.contains(target.uuid());
-            player.sendMessage(
-                    GameMsg.custom("Mod", "cyan", "[cyan]Successfully " + (isFrozen ? "froze" : "thawed") + " " + Utils.escapeEverything(target)));
-            Call.infoMessage(target.con, "[cyan]You got " + (isFrozen ? "frozen" : "thawed") + " by a moderator. \n"
-                    + "[lightgray]" + (reason != null ? "Reason: [accent]" + reason : ""));
-            DiscordLog.moderation(isFrozen ? "Froze": "Thawed", Utils.escapeEverything(player.name), Vars.netServer.admins.getInfo(target.uuid()), reason, null);
-        });
+                    String reason = args.length > 1 ? args[1] : null;
+                    boolean isFrozen = frozen.contains(target.uuid());
+                    player.sendMessage(
+                            GameMsg.custom("Mod", "cyan", "[cyan]Successfully " + (isFrozen ? "froze" : "thawed") + " " + Utils.escapeEverything(target)));
+                    Call.infoMessage(target.con, "[cyan]You got " + (isFrozen ? "frozen" : "thawed") + " by a moderator. \n"
+                            + "[lightgray]" + (reason != null ? "Reason: [accent]" + reason : ""));
+                    DiscordLog.moderation(isFrozen ? "Froze" : "Thawed", Utils.escapeEverything(player.name), Vars.netServer.admins.getInfo(target.uuid()), reason, null);
+                });
 
         Utils.registerRankCommand(handler, "mute", "<player> [reason...]", Rank.APPRENTICE,
-            "Mute a player. To unmute just use this command again.", (args, player) -> {
-            Player target = Query.findPlayerEntity(args[0]);
-            if (target == null) {
-                player.sendMessage(GameMsg.error("Mod", "Player not found."));
-                return;
-            }
+                "Mute a player. To unmute just use this command again.", (args, player) -> {
+                    Player target = Query.findPlayerEntity(args[0]);
+                    if (target == null) {
+                        player.sendMessage(GameMsg.error("Mod", "Player not found."));
+                        return;
+                    }
 
-            if (!muted.contains(target.uuid())) {
-                muted.add(target.uuid());
-            } else {
-                muted.remove(target.uuid());
-            }
+                    if (!muted.contains(target.uuid())) {
+                        muted.add(target.uuid());
+                    } else {
+                        muted.remove(target.uuid());
+                    }
 
-            String reason = args.length > 1 ? args[1] : null;
-            boolean isMuted = muted.contains(target.uuid());            
-            player.sendMessage(GameMsg.custom("Mod", "cyan", "Successfully " + (isMuted ? "muted" : "unmuted") + " " + Utils.escapeEverything(target)));
-            Call.infoMessage(target.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" +
-                    "[lightgray]" + (args.length > 1 ? "Reason: [accent]" + args[1] : ""));
-            DiscordLog.moderation(isMuted ? "Muted": "Unmuted", Utils.escapeEverything(player.name), Vars.netServer.admins.getInfo(target.uuid()), reason, null);
-        });
+                    String reason = args.length > 1 ? args[1] : null;
+                    boolean isMuted = muted.contains(target.uuid());
+                    player.sendMessage(GameMsg.custom("Mod", "cyan", "Successfully " + (isMuted ? "muted" : "unmuted") + " " + Utils.escapeEverything(target)));
+                    Call.infoMessage(target.con, "[cyan]You got " + (isMuted ? "muted" : "unmuted") + " by a moderator.\n" +
+                            "[lightgray]" + (args.length > 1 ? "Reason: [accent]" + args[1] : ""));
+                    DiscordLog.moderation(isMuted ? "Muted" : "Unmuted", Utils.escapeEverything(player.name), Vars.netServer.admins.getInfo(target.uuid()), reason, null);
+                });
 
-        Utils.registerRankCommand(handler, "reset", "", Rank.APPRENTICE, 
-            "Set everyone's name back to the original name.", (args, player) -> {
-            for (Player p : Groups.player) {
-                Database.Player pd = Database.getPlayerData(p.uuid());
-                if (pd == null) continue;
-                p.name = Utils.formatName(Rank.all[pd.rank], "[#" + player.color.toString().substring(0, 6) + "]" + Vars.netServer.admins.getInfo(pd.uuid).lastName);
-            }
-            player.sendMessage("[cyan]Reset names!");
-        });
+        Utils.registerRankCommand(handler, "reset", "", Rank.APPRENTICE,
+                "Set everyone's name back to the original name.", (args, player) -> {
+                    for (Player p : Groups.player) {
+                        Database.Player pd = Database.getPlayerData(p.uuid());
+                        if (pd == null) continue;
+                        p.name = Utils.formatName(Rank.all[pd.rank], "[#" + player.color.toString().substring(0, 6) + "]" + Vars.netServer.admins.getInfo(pd.uuid).lastName);
+                    }
+                    player.sendMessage("[cyan]Reset names!");
+                });
     }
 }

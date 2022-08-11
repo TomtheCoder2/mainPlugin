@@ -238,7 +238,7 @@ public class Kick implements MiniMod {
                 return;
             }
 
-            Call.sendMessage(GameMsg.info("Kick", "Player [white]" + player.name + "[" + GameMsg.INFO +  "] has voted to " + (sign > 0 ? "kick" : "not kick") + " [white]" + target.name + "[" + GameMsg.INFO + "] " +
+            Call.sendMessage(GameMsg.info("Kick", "Player [white]" + player.name + "[" + GameMsg.INFO + "] has voted to " + (sign > 0 ? "kick" : "not kick") + " [white]" + target.name + "[" + GameMsg.INFO + "] " +
                     "(" + session.countVotes() + "/" + session.requiredVotes() + "). " +
                     "Type [" + GameMsg.CMD + "]/kick y[" + GameMsg.INFO + "] to kick and [" + GameMsg.CMD + "]/kick n[" + GameMsg.INFO + "] to not kick."));
 

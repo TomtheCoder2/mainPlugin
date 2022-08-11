@@ -19,7 +19,6 @@ import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
-import mindustry.plugin.utils.Utils;
 import mindustry.server.ServerControl;
 
 public final class RTV implements MiniMod {
@@ -150,21 +149,21 @@ public final class RTV implements MiniMod {
 
     @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
-        handler.register("changemap", "<map...>", 
-            data -> {
-                data.help = "Change map to the one specified";
-                data.roles = new long [] { Roles.ADMIN, Roles.MOD, Roles.APPRENTICE };
-                data.category = "Management";
-            },
-            ctx -> {
-                Map map = Query.findMap(ctx.args.get("map"));
-                if (map == null) {
-                    ctx.error("No such map", "Map '" + ctx.args.get("map")  + "' not found");
-                }
+        handler.register("changemap", "<map...>",
+                data -> {
+                    data.help = "Change map to the one specified";
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                    data.category = "Management";
+                },
+                ctx -> {
+                    Map map = Query.findMap(ctx.args.get("map"));
+                    if (map == null) {
+                        ctx.error("No such map", "Map '" + ctx.args.get("map") + "' not found");
+                    }
 
-                changeMap(map);
-                ctx.success("Changed map", "Forced game over and changed map to " + map.name());
-            }
+                    changeMap(map);
+                    ctx.success("Changed map", "Forced game over and changed map to " + map.name());
+                }
         );
     }
 

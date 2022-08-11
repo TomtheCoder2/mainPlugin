@@ -1,6 +1,6 @@
 package mindustry.plugin.minimods;
 
-import arc.struct.ObjectIntMap;
+import arc.Events;
 import arc.struct.ObjectSet;
 import arc.util.CommandHandler;
 import mindustry.Vars;
@@ -11,11 +11,16 @@ import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.utils.Cooldowns;
 import mindustry.plugin.utils.GameMsg;
-import arc.Events;
 
-/** Provides the /skipwave command */
+/**
+ * Provides the /skipwave command
+ */
 public class Skipwave implements MiniMod {
     private ObjectSet<String> votes = new ObjectSet<>();
+
+    private static int requiredVotes() {
+        return Groups.player.size() / 2 + 1;
+    }
 
     @Override
     public void registerEvents() {
@@ -31,10 +36,6 @@ public class Skipwave implements MiniMod {
         });
     }
 
-    private static int requiredVotes() {
-        return Groups.player.size() / 2 + 1;
-    }
-
     @Override
     public void registerCommands(CommandHandler handler) {
         Cooldowns.instance.set("skipwave", 5);
@@ -44,12 +45,16 @@ public class Skipwave implements MiniMod {
                 return;
             }
             Cooldowns.instance.run("skipwave", player.uuid());
-            
+
             boolean vote = true;
             if (args.length > 0) {
                 switch (args[0]) {
-                    case "y", "yes": vote = true; break;
-                    case "n", "no": vote = false; break;
+                    case "y", "yes":
+                        vote = true;
+                        break;
+                    case "n", "no":
+                        vote = false;
+                        break;
                     default:
                         player.sendMessage(GameMsg.error("Skipwave", "Second argument must be 'yes' or 'no'"));
                         return;
@@ -63,8 +68,8 @@ public class Skipwave implements MiniMod {
             }
 
             int totalVotes = votes.size;
-            Call.sendMessage(GameMsg.info("Skip", "[white]" + player.name() + "[" + GameMsg.INFO + "] has voted to " + 
-                (vote ? "skip" : "not skip") + " the wave " + "(" + totalVotes + "/" + requiredVotes() + "). Type [" + GameMsg.CMD + "]/skipwave[] to agree to skip the wave."));
+            Call.sendMessage(GameMsg.info("Skip", "[white]" + player.name() + "[" + GameMsg.INFO + "] has voted to " +
+                    (vote ? "skip" : "not skip") + " the wave " + "(" + totalVotes + "/" + requiredVotes() + "). Type [" + GameMsg.CMD + "]/skipwave[] to agree to skip the wave."));
             if (totalVotes >= requiredVotes()) {
                 Call.sendMessage(GameMsg.success("Skip", "Vote passed. Skipping wave."));
                 Vars.logic.runWave();

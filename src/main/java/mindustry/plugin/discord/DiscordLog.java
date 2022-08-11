@@ -4,19 +4,12 @@ import arc.struct.StringMap;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.net.Administration;
-import mindustry.plugin.database.Database;
-import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.utils.GameMsg;
-import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
-import org.javacord.api.entity.message.MessageAttachment;
-import org.javacord.api.entity.message.MessageAuthor;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 
-import java.awt.*;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -60,20 +53,20 @@ public class DiscordLog {
 
     public static void moderation(String action, String mod, Administration.PlayerInfo info, String reason, String additionalInfo) {
         EmbedBuilder eb = new EmbedBuilder()
-            .setColor(DiscordPalette.WARN)
-            .setTitle(action)
-            .addField("Moderator", mod)
-            .addField("Reason", reason == null || reason.equals("") ? "None" : reason);
+                .setColor(DiscordPalette.WARN)
+                .setTitle(action)
+                .addField("Moderator", mod)
+                .addField("Reason", reason == null || reason.equals("") ? "None" : reason);
         if (info != null) {
             eb.addField("Target UUID", info.id)
-            .addField("Target name", Utils.escapeEverything(info.lastName))
-            .addField("Target IP", info.lastIP);
+                    .addField("Target name", Utils.escapeEverything(info.lastName))
+                    .addField("Target IP", info.lastIP);
         }
         if (additionalInfo != null) {
             eb.setDescription(additionalInfo);
         }
         eb.setTimestampToNow();
-            
+
         Channels.LOG.sendMessage(eb);
     }
 

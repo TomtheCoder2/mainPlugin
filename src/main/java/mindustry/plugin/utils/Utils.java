@@ -5,13 +5,7 @@ import arc.Events;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
-import arc.util.Log;
 import arc.util.Strings;
-import arc.util.Structs;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mindustry.game.EventType;
 import mindustry.game.Team;
 import mindustry.gen.Groups;
@@ -37,8 +31,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static arc.util.Log.debug;
-import static mindustry.Vars.*;
+import static mindustry.Vars.maps;
+import static mindustry.Vars.state;
 //import java.sql.*;
 
 public class Utils {
@@ -47,24 +41,8 @@ public class Utils {
     public static Boolean verification = false;
     public static Pattern ipValidationPattern;
 
-
-    public static class Message {
-        public static String stat() {
-            return Core.settings.getString("statMessage");
-        }
-        public static String welcome() {
-            return Core.settings.getString("welcomeMessage");
-        }
-        public static String info() {
-            return Core.settings.getString("infoMessage");
-        }
-        public static String rules() {
-            return Core.settings.getString("rulesMessage");
-        }
-    }
-
     public static void init() {
-        
+
         // setup regex for ip validation
         // Regex for digit from 0 to 255.
         String zeroTo255
@@ -84,8 +62,6 @@ public class Utils {
         ipValidationPattern = Pattern.compile(regex);
     }
 
-    // region string modifiers
-
     /**
      * replace all color codes, ` and @
      *
@@ -94,6 +70,8 @@ public class Utils {
     public static String escapeCharacters(String string) {
         return escapeColorCodes(string.replaceAll("`", "").replaceAll("@", ""));
     }
+
+    // region string modifiers
 
     /**
      * Remove all color codes
@@ -124,7 +102,9 @@ public class Utils {
         return escapeEverything(player.name);
     }
 
-    /** Return the rank marker, which includes the player tag */
+    /**
+     * Return the rank marker, which includes the player tag
+     */
     public static String rankMarker(Rank rank) {
         if (rank.tag == null) return "";
         return "[accent]|[#" + rank.color.toString().substring(0, 6) + "]" + rank.tag + "[accent]|";
@@ -132,6 +112,7 @@ public class Utils {
 
     /**
      * Format a player name
+     *
      * @param name the player name, including color codes
      */
     public static String formatName(Rank rank, String name) {
@@ -139,16 +120,17 @@ public class Utils {
         return rankMarker(rank) + " [white]" + name;
     }
 
-    /** 
+    /**
      * Format a player name
      */
     public static String formatName(Rank rank, Player player) {
         if (rank.tag == null) return player.name;
         return rankMarker(rank) + " [#" + player.color().toString().substring(0, 6) + "]" + escapeRankTag(player.name);
     }
-    
 
-    /** Escape rank tag from a properly-formatted player's name */
+    /**
+     * Escape rank tag from a properly-formatted player's name
+     */
     public static String escapeRankTag(String name) {
         for (Rank rank : Rank.all) {
             String prefix = rankMarker(rank);
@@ -160,8 +142,6 @@ public class Utils {
         }
         return name;
     }
-
-
 
     /**
      * Check if a string is an IP.
@@ -220,8 +200,9 @@ public class Utils {
 
     /**
      * Change the current map
-     * @deprecated Anything that uses this should be in the RTV minimod
+     *
      * @param found map
+     * @deprecated Anything that uses this should be in the RTV minimod
      */
     @Deprecated
     public static void changeMap(Map found) {
@@ -258,6 +239,17 @@ public class Utils {
             throw new RuntimeException("unreachable");
         }
         maps.reload();
+    }
+
+    /**
+     * Format a number, adding "K" to the end if > 1000
+     */
+    public static String formatInt(int n) {
+        if (n > 1000) {
+            return String.format("%.1fK", n / 1000.0);
+        } else {
+            return Integer.toString(n);
+        }
     }
 
     // region discord
@@ -310,14 +302,16 @@ public class Utils {
 //    }
 
     /**
-     * Format a number, adding "K" to the end if > 1000
+     * Convert a long to formatted time.
+     *
+     * @param epoch the time in long.
+     * @return formatted time
      */
-    public static String formatInt(int n) {
-        if (n > 1000) {
-            return String.format("%.1fK", n / 1000.0);
-        } else {
-            return Integer.toString(n);
-        }
+    public static String epochToString(long epoch) {
+        Date date = new Date(epoch * 1000L);
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+        return format.format(date) + " UTC";
     }
 
 //    /**
@@ -381,18 +375,14 @@ public class Utils {
 //        return false;
 //    }
 
-
     /**
-     * Convert a long to formatted time.
-     *
-     * @param epoch the time in long.
-     * @return formatted time
+     * send the player not found message for discord commands
      */
-    public static String epochToString(long epoch) {
-        Date date = new Date(epoch * 1000L);
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
-        return format.format(date) + " UTC";
+    public static void playerNotFound(String name, EmbedBuilder eb, Context ctx) {
+        eb.setTitle("Command terminated");
+        eb.setDescription("Player `" + escapeEverything(name) + "` not found.");
+        eb.setColor(new Color(0xff0000));
+        ctx.channel().sendMessage(eb);
     }
 
 //    /**
@@ -405,16 +395,6 @@ public class Utils {
 //                .setColor(Pals.error);
 //        ctx.sendMessage(eb);
 //    }
-
-    /**
-     * send the player not found message for discord commands
-     */
-    public static void playerNotFound(String name, EmbedBuilder eb, Context ctx) {
-        eb.setTitle("Command terminated");
-        eb.setDescription("Player `" + escapeEverything(name) + "` not found.");
-        eb.setColor(new Color(0xff0000));
-        ctx.channel().sendMessage(eb);
-    }
 
     public static String hsvToRgb(double hue, float saturation, float value) {
 
@@ -434,6 +414,15 @@ public class Utils {
             default -> throw new RuntimeException("Something went wrong when converting from HSV to RGB. Input was " + hue + ", " + saturation + ", " + value);
         };
     }
+
+    public static String rgbToString(float r, float g, float b) {
+        String rs = Integer.toHexString((int) (r * 256));
+        String gs = Integer.toHexString((int) (g * 256));
+        String bs = Integer.toHexString((int) (b * 256));
+        return rs + gs + bs;
+    }
+
+
 
 //    /**
 //     * Get a png from map (InputStream)
@@ -515,11 +504,20 @@ public class Utils {
         }
     }*/
 
-    public static String rgbToString(float r, float g, float b) {
-        String rs = Integer.toHexString((int) (r * 256));
-        String gs = Integer.toHexString((int) (g * 256));
-        String bs = Integer.toHexString((int) (b * 256));
-        return rs + gs + bs;
+    public static void registerRankCommand(CommandHandler handler, String text, String params, int minRank, String description, CommandHandler.CommandRunner<Player> runner) {
+        handler.<Player>register(text, params, description, (args, player) -> {
+            int rank = 0;
+            var pd = Database.getPlayerData(player.uuid());
+            if (pd != null) {
+                rank = pd.rank;
+            }
+
+            if (rank >= minRank || player.admin) {
+                runner.accept(args, player);
+            } else {
+                player.sendMessage(GameMsg.noPerms(null));
+            }
+        });
     }
 
 
@@ -549,24 +547,9 @@ public class Utils {
 //        }
 //    }
 
-
-    public static void registerRankCommand(CommandHandler handler, String text, String params, int minRank, String description, CommandHandler.CommandRunner<Player> runner) {
-        handler.<Player>register(text, params, description, (args, player) -> {
-            int rank = 0;
-            var pd = Database.getPlayerData(player.uuid());
-            if (pd != null) {
-                rank = pd.rank;
-            }
-
-            if (rank >= minRank || player.admin) {
-                runner.accept(args, player);
-            } else {
-                player.sendMessage(GameMsg.noPerms(null));
-            }
-        });
-    }
-
-    /** Parses color in RRGGBB or RRGGBBAA format
+    /**
+     * Parses color in RRGGBB or RRGGBBAA format
+     *
      * @return the color, or {@code null} on failure
      */
     public static arc.graphics.Color parseColor(String rgb) {
@@ -698,6 +681,24 @@ public class Utils {
      */
     public void sendMessage(User user, String content) {
         user.openPrivateChannel().join().sendMessage(content);
+    }
+
+    public static class Message {
+        public static String stat() {
+            return Core.settings.getString("statMessage");
+        }
+
+        public static String welcome() {
+            return Core.settings.getString("welcomeMessage");
+        }
+
+        public static String info() {
+            return Core.settings.getString("infoMessage");
+        }
+
+        public static String rules() {
+            return Core.settings.getString("rulesMessage");
+        }
     }
 
 

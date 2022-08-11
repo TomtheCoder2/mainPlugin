@@ -24,17 +24,15 @@ import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import mindustry.ui.Menus;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.postgresql.translation.messages_sr;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Communication implements MiniMod {
     private Announcement announcement = null;
     private Seq<String> screenMessages = new Seq<>();
-    
+
     private static void showAnnouncement(Announcement msg, Player target) {
         int id = Menus.registerMenu((player, selection) -> {
             String action = msg.buttons[selection].action;
@@ -220,7 +218,7 @@ public class Communication implements MiniMod {
 
         handler.register("screenmessage", "<add|remove|list> [message...]",
                 data -> {
-                    data.roles = new long[] { Roles.APPRENTICE, Roles.MOD, Roles.ADMIN };
+                    data.roles = new long[]{Roles.APPRENTICE, Roles.MOD, Roles.ADMIN};
                     data.category = "Communication";
                     data.help = "Show a persistent screen message on the side";
                 },
@@ -228,8 +226,8 @@ public class Communication implements MiniMod {
                     switch (ctx.args.get("add|remove|list")) {
                         case "list":
                             EmbedBuilder eb = new EmbedBuilder()
-                                .setTitle("Active Screen Messages")
-                                .setColor(DiscordPalette.INFO);
+                                    .setTitle("Active Screen Messages")
+                                    .setColor(DiscordPalette.INFO);
                             if (screenMessages.size == 0) {
                                 eb.setDescription("None");
                             }
@@ -246,13 +244,13 @@ public class Communication implements MiniMod {
                             if (idstr == null || !Strings.canParseInt(idstr)) {
                                 ctx.error("Invalid ID", "ID must be a number");
                                 return;
-                            }                            
+                            }
                             int id = Strings.parseInt(idstr);
                             if (id >= screenMessages.size || id < 0) {
                                 ctx.error("Invalid ID", "ID is out of range");
                                 return;
                             }
-                            
+
                             String message = screenMessages.get(id);
                             screenMessages.remove(id);
                             ctx.success("Successfully removed message " + id, "```\n" + message + "\n```");

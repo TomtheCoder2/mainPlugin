@@ -42,7 +42,7 @@ public class Events implements MiniMod {
                 data -> {
                     data.help = "Update event IP & port";
                     data.category = "Management";
-                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                 },
                 ctx -> {
                     if (!ctx.args.containsKey("ipaddr")) {

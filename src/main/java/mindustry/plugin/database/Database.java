@@ -1,10 +1,13 @@
 package mindustry.plugin.database;
 
 import arc.struct.Seq;
-import arc.util.Log;
 import mindustry.plugin.utils.Utils;
 
+import java.security.MessageDigest;
 import java.sql.*;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Base64;
 
 public final class Database {
     /**
@@ -26,6 +29,27 @@ public final class Database {
         Database.playerTable = playerTable;
     }
 
+    public static void setHash() {
+        System.out.println("reset all hashes...");
+        // search for the uuid
+        String sql = "SELECT * "
+                + "FROM " + playerTable + " ";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Player pd = Player.fromSQL(rs);
+                System.out.println("processing: " + pd.uuid);
+                setPlayerData(pd);
+            }
+            rs.close();
+        } catch (SQLException ex) {
+//            //Log.debug(ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
     /**
      * Retrieves data for a given mindustry player, or null if not found.
      *
@@ -33,11 +57,11 @@ public final class Database {
      */
     public static Player getPlayerData(String uuid) {
         // search for the uuid
-        String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink "
+        String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
                 + "FROM " + playerTable + " "
                 + "WHERE uuid = ?";
         try {
-            Log.debug("get player data of @, conn: @", uuid, conn.isClosed());
+            //Log.debug("get player data of @, conn: @", uuid, conn.isClosed());
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, uuid);
 
@@ -49,7 +73,36 @@ public final class Database {
             }
             rs.close();
         } catch (SQLException ex) {
-            Log.debug(ex.getMessage());
+            //Log.debug(ex.getMessage());
+        }
+
+        return getPlayerDataByHash(uuid);
+    }
+
+    /**
+     * Retrieves data for a given mindustry player, or null if not found.
+     *
+     * @param hid the hashed uuid of the player
+     */
+    private static Player getPlayerDataByHash(String hid) {
+        // search for the uuid
+        String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
+                + "FROM " + playerTable + " "
+                + "WHERE hid = ?";
+        try {
+            //Log.debug("get player data of @, conn: @", uuid, conn.isClosed());
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, hid);
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Player pd = Player.fromSQL(rs);
+                rs.close();
+                return pd;
+            }
+            rs.close();
+        } catch (SQLException ex) {
+            //Log.debug(ex.getMessage());
         }
 
         return null;
@@ -61,8 +114,8 @@ public final class Database {
      * @param id the discord ID of the player
      */
     public static Player getDiscordData(long id) {
-        String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink"
-                + " FROM " + playerTable + " "
+        String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
+                + "FROM " + playerTable + " "
                 + "WHERE discordLink = ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -76,7 +129,7 @@ public final class Database {
             }
             rs.close();
         } catch (SQLException ex) {
-            Log.err(ex.getMessage());
+            ex.printStackTrace();
         }
 
         return null;
@@ -86,17 +139,17 @@ public final class Database {
      * Retrieves all players that are banned in any way
      */
     public static Player[] bans() {
-        String sql = "SELECT * FROM playerdata WHERE banned = true OR bannedUntil <> 0";
+        String sql = "SELECT * FROM playerdata WHERE banned = true OR bannedUntil > " + Instant.now().getEpochSecond();
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             Seq<Player> players = new Seq<>();
             while (rs.next()) {
-                players.add(Player.fromSQL(rs));                
+                players.add(Player.fromSQL(rs));
             }
             return players.toArray(Player.class);
-        } catch(SQLException e) {
-            Log.err(e.getMessage());
+        } catch (SQLException e) {
+            //Log.err(e.getMessage());
             return null;
         }
     }
@@ -109,8 +162,8 @@ public final class Database {
     public static void setPlayerData(Player pd) {
         if (getPlayerData(pd.uuid) == null) {
             // define all variables
-            String sql = "INSERT INTO " + playerTable + "(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink) "
-                    + "VALUES(?, ?,?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + playerTable + "(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid) "
+                    + "VALUES(?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 // set all variables
@@ -124,12 +177,13 @@ public final class Database {
                 pstmt.setLong(8, pd.bannedUntil);
                 pstmt.setString(9, pd.banReason);
                 pstmt.setLong(10, pd.discord);
+                pstmt.setString(11, hash(pd.uuid));
 
                 // send the data
                 int affectedRows = pstmt.executeUpdate();
-                Log.info("player insert affected rows: " + affectedRows);
+                //Log.info("player insert affected rows: " + affectedRows);
             } catch (SQLException ex) {
-                Log.err(ex.getMessage());
+                ex.printStackTrace();
             }
         } else {
             String sql = "UPDATE " + playerTable + " "
@@ -141,7 +195,8 @@ public final class Database {
                     + "banned = ?, "
                     + "bannedUntil = ?, "
                     + "banReason = ?, "
-                    + "discordLink = ? "
+                    + "discordLink = ?, "
+                    + "hid = ? "
                     + "WHERE uuid = ?";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -155,12 +210,13 @@ public final class Database {
                 pstmt.setLong(7, pd.bannedUntil);
                 pstmt.setString(8, pd.banReason);
                 pstmt.setLong(9, pd.discord);
-                pstmt.setString(10, pd.uuid);
+                pstmt.setString(10, hash(pd.uuid));
+                pstmt.setString(11, pd.uuid);
 
                 int affectedrows = pstmt.executeUpdate();
-                Log.info("player update affected rows: " + affectedrows);
+                //Log.info("player update affected rows: " + affectedrows);
             } catch (SQLException ex) {
-                Log.err(ex.getMessage());
+                ex.printStackTrace();
             }
         }
     }
@@ -188,16 +244,18 @@ public final class Database {
                 int stat = rs.getInt(column);
                 rankings.add(new PlayerRank(uuid, stat));
             }
-            Log.info("ranking: " + rankings.size);
+            //Log.info("ranking: " + rankings.size);
             return rankings.toArray(PlayerRank.class);
         } catch (SQLException ex) {
-            Log.err(ex.getMessage());
+            ex.printStackTrace();
         }
 
         return null;
     }
 
-    /** Rank all maps based on {@link Database.Map#positiveRating positiveRating} - {@link Database.Map#negativeRating negativeRating} */
+    /**
+     * Rank all maps based on {@link Database.Map#positiveRating positiveRating} - {@link Database.Map#negativeRating negativeRating}
+     */
     public static Map[] rankMapRatings(int limit, int offset) {
         String sql = "SELECT * FROM mapdata ORDER BY positiverating DESC LIMIT ? OFFSET ?";
         try {
@@ -211,10 +269,10 @@ public final class Database {
                 Map map = Map.fromSQL(rs);
                 maps.add(map);
             }
-            maps.sort(m -> (float)m.positiveRating / (float)m.negativeRating);
+            maps.sort(m -> (float) m.positiveRating / (float) m.negativeRating);
             return maps.toArray(Map.class);
         } catch (SQLException ex) {
-            Log.err(ex.getMessage());
+            ex.printStackTrace();
         }
         return null;
     }
@@ -244,7 +302,7 @@ public final class Database {
             }
             return ranking.toArray(MapRank.class);
         } catch (SQLException ex) {
-            Log.err(ex.getMessage());
+            ex.printStackTrace();
         }
         return null;
     }
@@ -268,7 +326,7 @@ public final class Database {
                 return null;
             }
         } catch (SQLException ex) {
-            Log.debug(ex.getMessage());
+            //Log.debug(ex.getMessage());
         }
         return null;
     }
@@ -278,7 +336,7 @@ public final class Database {
      */
     public static void setMapData(Map md) {
         String name = Utils.escapeEverything(md.name).replaceAll("\\W", "_");
-        Log.info("setting map data for " + name);
+        //Log.info("setting map data for " + name);
         if (getMapData(name) == null) {
             String sql = "INSERT INTO mapdata(name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -292,9 +350,9 @@ public final class Database {
                 pstmt.setLong(5 + 1, md.playTime);
                 pstmt.setLong(6 + 1, md.shortestGame);
                 int rows = pstmt.executeUpdate();
-                Log.info("map insert rows: " + rows);
+                //Log.info("map insert rows: " + rows);
             } catch (SQLException ex) {
-                Log.err(ex.getMessage());
+                ex.printStackTrace();
             }
         } else {
             String sql = "UPDATE mapdata SET " +
@@ -316,15 +374,28 @@ public final class Database {
                 pstmt.setLong(6, md.shortestGame);
                 pstmt.setString(7, name);
                 int rows = pstmt.executeUpdate();
-                Log.info("map update rows: " + rows);
+                //Log.info("map update rows: " + rows);
             } catch (SQLException ex) {
-                Log.err(ex.getMessage());
+                ex.printStackTrace();
             }
         }
     }
 
+    public static String hash(String s) {
+        try {
+            s = s.replace("=", "");
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.update(s.getBytes());
+            return Base64.getEncoder().encodeToString(messageDigest.digest());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static class Player implements Cloneable {
         public String uuid;
+        public String hid;
         public int rank;
 
         /**
@@ -356,6 +427,7 @@ public final class Database {
         public Player(String uuid, int rank) {
             this.uuid = uuid;
             this.rank = rank;
+            this.hid = hash(uuid);
         }
 
         public static Player fromSQL(ResultSet rs) throws SQLException {
@@ -373,7 +445,10 @@ public final class Database {
             pd.bannedUntil = rs.getLong("bannedUntil");
             pd.banReason = rs.getString("banReason");
 
-            pd.discord = rs.getLong("discordLink");
+            if (rs.getBytes("discordLink") != null && rs.getBytes("discordLink").length != 0) {
+                pd.discord = rs.getLong("discordLink");
+            }
+            pd.hid = rs.getString("hid");
 
             return pd;
         }

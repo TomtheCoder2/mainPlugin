@@ -199,21 +199,21 @@ public class DiscordRegistrar {
                     cmdRoles.contains(Roles.MOD) &&
                     cmdRoles.contains(Roles.ADMIN)) && channel == Channels.BOT) {
                 Context ctx = new Context(event, null);
-                ctx.error("Lack of permission", "Please use a another channel.");
+                ctx.error("Lack of permission", "Please use a another channel: <#" + Channels.APPRENTICE_BOT.getIdAsString() + ">, <#" + Channels.MOD_BOT.getIdAsString() + "> or <#" + Channels.ADMIN_BOT.getIdAsString() + ">");
                 return;
             }
             if ((cmdRoles.contains(Roles.MOD) &&
                     cmdRoles.contains(Roles.ADMIN) &&
                     !cmdRoles.contains(Roles.APPRENTICE)) && channel == Channels.APPRENTICE_BOT) {
                 Context ctx = new Context(event, null);
-                ctx.error("Lack of permission", "Please use a another channel.");
+                ctx.error("Lack of permission", "Please use a another channel: <#" + Channels.MOD_BOT.getIdAsString() + "> or <#" + Channels.ADMIN_BOT.getIdAsString() + ">");
                 return;
             }
             if ((!cmdRoles.contains(Roles.MOD) &&
                     cmdRoles.contains(Roles.ADMIN) &&
                     !cmdRoles.contains(Roles.APPRENTICE)) && channel == Channels.MOD_BOT) {
                 Context ctx = new Context(event, null);
-                ctx.error("Lack of permission", "Please use a another channel.");
+                ctx.error("Lack of permission", "Please use a another channel: <#" + Channels.ADMIN_BOT.getIdAsString() + ">");
                 return;
             }
         }

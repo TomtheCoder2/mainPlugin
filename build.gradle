@@ -1,7 +1,6 @@
 apply plugin: "java"
 apply plugin: 'kotlin'
 
-
 version '1.0'
 
 sourceCompatibility = 16
@@ -42,7 +41,8 @@ dependencies {
     implementation("net.dv8tion:JDA:4.3.0_277")
 //    implementation 'org.postgresql:postgresql:42.2.24.jre7'
     // http://mvnrepository.com/artifact/postgresql/postgresql
-    compileOnly group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4'
+//    implementation group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4'
+    implementation 'org.postgresql:postgresql:42.4.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j:2.17.1'
     runtimeOnly 'ch.qos.logback:logback-classic:1.2.11'

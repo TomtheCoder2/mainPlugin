@@ -1,18 +1,8 @@
 package mindustry.plugin.utils;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.InflaterInputStream;
-
 import arc.Core;
-import arc.files.Fi;
 import arc.graphics.Color;
 import arc.graphics.Pixmap;
-import arc.graphics.g2d.Draw;
-import arc.scene.ui.Image;
 import arc.util.Log;
 import arc.util.io.CounterInputStream;
 import arc.util.io.Reads;
@@ -21,25 +11,28 @@ import mindustry.content.Blocks;
 import mindustry.game.Team;
 import mindustry.io.MapIO;
 import mindustry.io.SaveIO;
-import mindustry.io.SaveVersion;
 import mindustry.maps.Map;
-import mindustry.world.Block;
-import mindustry.world.CachedTile;
-import mindustry.world.ColorMapper;
-import mindustry.world.Tile;
-import mindustry.world.Tiles;
-import mindustry.world.WorldContext;
+import mindustry.world.*;
 import mindustry.world.blocks.environment.Floor;
 
-/** Renders maps and schematics to images. Requires certain data files, such as {@code block_colors.png} */
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.zip.InflaterInputStream;
+
+/**
+ * Renders maps and schematics to images. Requires certain data files, such as {@code block_colors.png}
+ */
 public class ContentServer {
     static {
         Pixmap pixmap = new Pixmap(Core.settings.getDataDirectory().child("pheonix/block_colors.png"));
-        for(int i = 0; i < pixmap.width; i++){
-            if(Vars.content.blocks().size > i){
+        for (int i = 0; i < pixmap.width; i++) {
+            if (Vars.content.blocks().size > i) {
                 int color = pixmap.get(i, 0);
 
-                if(color == 0 || color == 255) continue;
+                if (color == 0 || color == 255) continue;
 
                 Block block = Vars.content.block(i);
                 block.mapColor.rgba8888(color);
@@ -72,27 +65,34 @@ public class ContentServer {
         return image;
     }
 
-    /** Renders the ongoing game */
+    /**
+     * Renders the ongoing game
+     */
     public static BufferedImage renderGame() {
         return renderTiles(Vars.world.tiles);
     }
 
-    /** Renders a map to an image
+    /**
+     * Renders a map to an image
+     *
      * @return the rendered image, or null if it failed
      */
     public static BufferedImage renderMap(Map map) {
-        return renderData(map.file.read(Vars.bufferSize)); 
+        return renderData(map.file.read(Vars.bufferSize));
     }
 
-    /** Renders a map given in raw bytes. May fail.
+    /**
+     * Renders a map given in raw bytes. May fail.
      */
     public static BufferedImage renderRaw(byte[] data) {
         return renderData(new ByteArrayInputStream(data));
     }
 
-    /** Renders an image given an input stream of a map file */
+    /**
+     * Renders an image given an input stream of a map file
+     */
     protected static BufferedImage renderData(InputStream s) {
-        try(InputStream is = new InflaterInputStream(s); CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)) {
+        try (InputStream is = new InflaterInputStream(s); CounterInputStream counter = new CounterInputStream(is); DataInputStream stream = new DataInputStream(counter)) {
             SaveIO.readHeader(stream);
             int version = stream.readInt();
             var ver = SaveIO.getSaveWriter(version);
@@ -118,11 +118,11 @@ public class ContentServer {
                     Block floor = Vars.content.block(floorID);
                     if (floor == null) floor = Blocks.stone;
                     Block overlay = Vars.content.block(oreID);
-                    
+
                     var color = (floor != null && floor instanceof Floor && floor.asFloor().wallOre && overlay != null) || (overlay != null && overlay.useColor) ? overlay.mapColor : floor.mapColor;
                     image[0].setRGB(x, height - y - 1, rgb(color));
 
-                    for (int j = i + 1; j < i + 1 +consecutives; j++) {
+                    for (int j = i + 1; j < i + 1 + consecutives; j++) {
                         int newx = j % width, newy = j / width;
                         image[0].setRGB(newx, height - newy - 1, rgb(color));
                     }
@@ -140,11 +140,11 @@ public class ContentServer {
 
                     byte packedCheck = in.readByte();
                     boolean hadEntity = (packedCheck & 1) != 0;
-                    boolean hadData = (packedCheck & 2) != 0;    
+                    boolean hadData = (packedCheck & 2) != 0;
 
                     boolean isCenter = true;
                     if (hadEntity) isCenter = in.readBoolean();
-                    
+
                     final Team[] team = new Team[1];
                     int consecutives = 0;
                     if (hadEntity) {
@@ -158,7 +158,7 @@ public class ContentServer {
                                         if (tile.build != null) tile.build.readAll(Reads.get(in2), revision);
                                         team[0] = tile.team();
                                     });
-                                } catch(Throwable e) {
+                                } catch (Throwable e) {
                                     throw new IOException("Failed to read tile entity of block: " + block, e);
                                 }
                             } else {
@@ -168,7 +168,7 @@ public class ContentServer {
                     } else if (hadData) {
                         stream.readByte();
                     } else {
-                        consecutives =  stream.readUnsignedByte();
+                        consecutives = stream.readUnsignedByte();
                     }
 
                     for (int j = i; j < i + 1 + consecutives; j++) {
@@ -179,14 +179,14 @@ public class ContentServer {
                             // not much importance, but this ignores wall ores
                             image[0].setRGB(newx, height - newy - 1, rgb(block.mapColor));
                         }
-    
+
                     }
 
                     i += consecutives;
                 }
             });
             return image[0];
-        } catch(Exception e) {
+        } catch (Exception e) {
             Log.err(e);
             return null;
         }

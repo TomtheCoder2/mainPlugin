@@ -3,11 +3,9 @@ package mindustry.plugin.minimods;
 import arc.Events;
 import arc.graphics.Color;
 import arc.struct.ObjectMap;
-import arc.struct.ObjectSet;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Log;
-import arc.util.Reflect;
 import arc.util.Structs;
 import arc.util.Timer;
 import mindustry.Vars;
@@ -15,13 +13,13 @@ import mindustry.ai.types.MinerAI;
 import mindustry.content.Blocks;
 import mindustry.content.Items;
 import mindustry.content.UnitTypes;
-import mindustry.entities.Units;
-import mindustry.entities.abilities.Ability;
 import mindustry.entities.units.UnitController;
 import mindustry.game.EventType;
 import mindustry.game.Team;
-import mindustry.game.Teams;
-import mindustry.gen.*;
+import mindustry.gen.Call;
+import mindustry.gen.Groups;
+import mindustry.gen.Player;
+import mindustry.gen.Unit;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.DiscordVars;
@@ -32,23 +30,15 @@ import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
 import mindustry.type.UnitType;
-import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.defense.BuildTurret;
 import mindustry.world.blocks.defense.turrets.BaseTurret;
-import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.PointDefenseTurret;
 import mindustry.world.blocks.defense.turrets.Turret;
 import mindustry.world.blocks.storage.CoreBlock;
 import mindustry.world.meta.Env;
-
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
-import java.io.IOException;
-import java.lang.instrument.ClassDefinition;
-import java.lang.instrument.Instrumentation;
-import java.lang.instrument.UnmodifiableClassException;
-import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,6 +46,90 @@ import java.sql.SQLException;
 public class Pets implements MiniMod {
     ObjectMap<String, Seq<String>> spawnedPets = new ObjectMap<>();
 
+    protected static int maxPets(int rank) {
+        if (rank <= 1) {
+            return 0;
+        } else if (rank <= 3) {
+            return 1;
+        } else if (rank == 4) {
+            return 2;
+        } else {
+            return 3;
+        }
+    }
+
+    protected static int tierOf(UnitType type) {
+        if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela || type == UnitTypes.arkyid) {
+            return 4;
+        } else if (type == UnitTypes.fortress || type == UnitTypes.quasar || type == UnitTypes.spiroct || type == UnitTypes.zenith || type == UnitTypes.mega) {
+            return 3;
+        } else if (type == UnitTypes.mace || type == UnitTypes.pulsar || type == UnitTypes.atrax || type == UnitTypes.horizon || type == UnitTypes.poly) {
+            return 2;
+        } else if (type == UnitTypes.dagger || type == UnitTypes.nova || type == UnitTypes.crawler || type == UnitTypes.flare || type == UnitTypes.mono) {
+            return 1;
+        }
+        return -1;
+    }
+
+    protected static int maxTier(int rank) {
+        if (rank <= 1) {
+            return 0;
+        } else if (rank == 2) {
+            return 1;
+        } else if (rank <= 4) {
+            return 2;
+        } else if (rank == 5) {
+            return 3;
+        } else {
+            return 4;
+        }
+    }
+
+    protected static Item[] possibleFoods(UnitType type) {
+        if (type == UnitTypes.crawler) {
+            return new Item[]{Items.coal};
+        } else if (type == UnitTypes.quasar || type == UnitTypes.pulsar) {
+            return new Item[]{Items.beryllium, Items.titanium, Items.thorium};
+        } else if (type.flying && type != UnitTypes.quad) {
+            return new Item[]{Items.copper, Items.lead, Items.titanium, Items.thorium};
+        } else {
+            return new Item[]{Items.copper, Items.lead, Items.titanium};
+        }
+    }
+
+    protected static int rank(PetDatabase.Pet pet) {
+        var items = possibleFoods(pet.species);
+        long min = Long.MAX_VALUE;
+        for (var item : items) {
+            long value = switch (item.name) {
+                case "coal" -> pet.eatenCoal;
+                case "copper" -> pet.eatenCopper;
+                case "lead" -> pet.eatenLead;
+                case "titanium" -> pet.eatenTitanium;
+                case "thorium" -> pet.eatenThorium;
+                case "beryllium" -> pet.eatenBeryllium;
+                default -> 0;
+            };
+            if (value < min) {
+                min = value;
+            }
+        }
+
+
+        if (min > 1000000) {
+            return 5;
+        } else if (min > 100000) {
+            return 4;
+        } else if (min > 10000) {
+            return 3;
+        } else if (min > 1000) {
+            return 2;
+        } else if (min > 500) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 
     /**
      * Creates a team if one does not already exist
@@ -88,7 +162,6 @@ public class Pets implements MiniMod {
         return bestTeam;
     }
 
-
     @Override
     public void registerEvents() {
         for (UnitType unit : Vars.content.units()) {
@@ -103,7 +176,7 @@ public class Pets implements MiniMod {
             for (var unit : Vars.content.units()) {
                 unit.envDisabled = (unit.envDisabled & ~Env.scorching);
                 unit.envRequired = (unit.envRequired & ~Env.terrestrial);
-                unit.envEnabled = (unit.envEnabled  | Env.scorching);
+                unit.envEnabled = (unit.envEnabled | Env.scorching);
             }
         });
     }
@@ -286,7 +359,7 @@ public class Pets implements MiniMod {
                     if (pd == null) {
                         ctx.error("Not in database", "You have not linked your discord account. Use /redeem to link.");
                         return;
-                    }                    
+                    }
 
                     String name = ctx.args.get("name");
                     var pets = PetDatabase.getPets(pd.uuid);
@@ -334,91 +407,6 @@ public class Pets implements MiniMod {
         );
     }
 
-    protected static int maxPets(int rank) {
-        if (rank <= 1) {
-            return 0;
-        } else if (rank <= 3) {
-            return 1;
-        } else if (rank == 4) {
-            return 2;
-        } else {
-            return 3;
-        }
-    }
-
-    protected static int tierOf(UnitType type) {
-        if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela || type == UnitTypes.arkyid) {
-            return 4;
-        } else if (type == UnitTypes.fortress || type == UnitTypes.quasar || type == UnitTypes.spiroct || type == UnitTypes.zenith || type == UnitTypes.mega) {
-            return 3;
-        } else if (type == UnitTypes.mace || type == UnitTypes.pulsar || type == UnitTypes.atrax || type == UnitTypes.horizon || type == UnitTypes.poly) {
-            return 2;
-        } else if (type == UnitTypes.dagger || type == UnitTypes.nova || type == UnitTypes.crawler || type == UnitTypes.flare || type == UnitTypes.mono) {
-            return 1;
-        }
-        return -1;
-    }
-
-    protected static int maxTier(int rank) {
-        if (rank <= 1) {
-            return 0;
-        } else if (rank == 2) {
-            return 1;
-        } else if (rank <= 4) {
-            return 2;
-        } else if (rank == 5) {
-            return 3;
-        } else {
-            return 4;
-        }
-    }
-
-    protected static Item[] possibleFoods (UnitType type) {
-        if (type == UnitTypes.crawler) {
-            return new Item[] { Items.coal };
-        } else if (type == UnitTypes.quasar || type == UnitTypes.pulsar) {
-            return new Item[] { Items.beryllium, Items.titanium, Items.thorium };
-        } else if (type.flying && type != UnitTypes.quad) {
-            return  new Item[] { Items.copper, Items.lead, Items.titanium, Items.thorium };
-        } else {
-            return  new Item[] { Items.copper, Items.lead, Items.titanium };
-        }
-    }
-
-    protected static int rank(PetDatabase.Pet pet) {
-        var items = possibleFoods(pet.species);
-        long min = Long.MAX_VALUE;
-        for (var item : items) {
-            long value = switch(item.name) {
-                case "coal" -> pet.eatenCoal;
-                case "copper" -> pet.eatenCopper;
-                case "lead" -> pet.eatenLead;
-                case "titanium" -> pet.eatenTitanium;
-                case "thorium" -> pet.eatenThorium;
-                case "beryllium" -> pet.eatenBeryllium;
-                default -> 0;
-            };
-            if (value < min) {
-                min = value;
-            }
-        }
-
-
-        if        (min > 1000000) {
-            return 5;
-        } else if (min > 100000) {
-            return 4;
-        } else if (min > 10000) {
-            return 3;
-        } else if (min > 1000) {
-            return 2;
-        } else if (min > 500) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
     class PetController implements UnitController {
         final String uuid;
         final Player player;
@@ -431,6 +419,15 @@ public class Pets implements MiniMod {
         int maxVel = 250;
         int rank = 0;
         Unit unit;
+        long prevTime = System.currentTimeMillis();
+        boolean hasLabel = false;
+        boolean isEating = false;
+        // mining subset of eating
+        Tile mining = null;
+        // for friends
+        float friendRotDir = 0;
+        private int itemsEaten = 0;
+        private long lastAction = 0;
 
         public PetController(Player player, String name, Color color, Team unitTeam, int rank) {
             this.player = player;
@@ -457,8 +454,8 @@ public class Pets implements MiniMod {
             pets.remove(name);
 
             if (player.con != null && player.con.isConnected()) {
-                player.sendMessage(GameMsg.custom("Pet", "yellow", "Your pet [#" + color.toString().substring(0,6) + "]" + name + "[yellow] died! " +
-                    "Make sure you are spawning any ground pets on empty tiles."
+                player.sendMessage(GameMsg.custom("Pet", "yellow", "Your pet [#" + color.toString().substring(0, 6) + "]" + name + "[yellow] died! " +
+                        "Make sure you are spawning any ground pets on empty tiles."
                 ));
             }
         }
@@ -466,17 +463,19 @@ public class Pets implements MiniMod {
         private Unit closePet() {
             for (Unit unit : Groups.unit) {
                 if (isPet(unit)
-                    && unit.dst(this.unit) <= 15 * Vars.tilesize
-                    && unit.type == this.unit.type
-                    && unit != this.unit
-                    && petOwner(unit) != uuid) {
+                        && unit.dst(this.unit) <= 15 * Vars.tilesize
+                        && unit.type == this.unit.type
+                        && unit != this.unit
+                        && petOwner(unit) != uuid) {
                     return unit;
                 }
             }
             return null;
         }
 
-        /** Returns whether the pet is near a turret or friendly unit */
+        /**
+         * Returns whether the pet is near a turret or friendly unit
+         */
         private boolean isNearDanger() {
             for (var data : Vars.state.teams.active) {
                 if (data.turretTree == null) {
@@ -487,10 +486,10 @@ public class Pets implements MiniMod {
                     if (!(turret.block() instanceof BaseTurret)) {
                         Log.warn("a turret that isn't a turret: " + turret.getClass().getCanonicalName());
                     }
-                    BaseTurret bt = (BaseTurret)turret.block();
+                    BaseTurret bt = (BaseTurret) turret.block();
                     boolean targetAir = true;
                     if (bt instanceof Turret) {
-                        targetAir = ((Turret)bt).targetAir;
+                        targetAir = ((Turret) bt).targetAir;
                     }
                     if (bt instanceof PointDefenseTurret || bt instanceof BuildTurret) {
                         targetAir = false;
@@ -498,7 +497,7 @@ public class Pets implements MiniMod {
 
                     if (targetAir && unit.dst(turret) <= bt.range + Vars.tilesize) {
                         shouldHide[0] = true;
-                    } 
+                    }
                 });
                 if (shouldHide[0]) {
                     return true;
@@ -507,14 +506,14 @@ public class Pets implements MiniMod {
 
             for (Unit enemyUnit : Groups.unit) {
                 if (enemyUnit.team() == player.team() && !enemyUnit.isPlayer() &&
-                    !(enemyUnit.controller() instanceof PetController) && 
-                    !(enemyUnit.controller() instanceof MinerAI) && // exclude mono
-                    enemyUnit.type.targetAir &&
-                    enemyUnit.type != UnitTypes.mega && enemyUnit.type != UnitTypes.poly) { // exclude mega & poly
-                        if (unit.dst(enemyUnit) <= enemyUnit.range() + Vars.tilesize) {
-                            return true;
-                        }
+                        !(enemyUnit.controller() instanceof PetController) &&
+                        !(enemyUnit.controller() instanceof MinerAI) && // exclude mono
+                        enemyUnit.type.targetAir &&
+                        enemyUnit.type != UnitTypes.mega && enemyUnit.type != UnitTypes.poly) { // exclude mega & poly
+                    if (unit.dst(enemyUnit) <= enemyUnit.range() + Vars.tilesize) {
+                        return true;
                     }
+                }
             }
 
             return false;
@@ -525,7 +524,7 @@ public class Pets implements MiniMod {
         }
 
         private String petOwner(Unit unit) {
-            PetController controller = (PetController)unit.controller();
+            PetController controller = (PetController) unit.controller();
             return controller.uuid;
         }
 
@@ -542,15 +541,6 @@ public class Pets implements MiniMod {
             }
             return closestCore;
         }
-
-        long prevTime = System.currentTimeMillis();
-        boolean hasLabel = false;
-        boolean isEating = false;
-        // mining subset of eating
-        Tile mining = null;
-
-        // for friends
-        float friendRotDir = 0;
 
         @Override
         public void updateUnit() {
@@ -595,8 +585,8 @@ public class Pets implements MiniMod {
             var core = closeCore(targetx, targety);
             if (core != null) {
                 double thetaCore = core.angleTo(targetx, targety) * Math.PI / 180;
-                targetx = core.x + 12 * (float)Vars.tilesize * (float)Math.cos(thetaCore);
-                targety = core.y + 12 * (float)Vars.tilesize * (float)Math.sin(thetaCore);
+                targetx = core.x + 12 * (float) Vars.tilesize * (float) Math.cos(thetaCore);
+                targety = core.y + 12 * (float) Vars.tilesize * (float) Math.sin(thetaCore);
             }
 
             float vx = 10f * (targetx - unit.x);
@@ -625,9 +615,9 @@ public class Pets implements MiniMod {
                         }
 
                         if (friendRotDir > 0) {
-                            unit.rotation += 2*360 * dt / 1000;
+                            unit.rotation += 2 * 360 * dt / 1000;
                         } else {
-                            unit.rotation -= 2*360 * dt / 1000;
+                            unit.rotation -= 2 * 360 * dt / 1000;
                         }
                     }
                 } else {
@@ -641,7 +631,7 @@ public class Pets implements MiniMod {
             // labels
             boolean isStill = Math.abs(vx) < 2 && Math.abs(vy) < 2;
             if (!hasLabel && isStill) {
-                Call.label(Utils.formatName(Rank.all[rank], "[#" + color.toString().substring(0, 6) + "]" + name), 1f, unit.x, unit.y + unit.hitSize()/2 + Vars.tilesize);
+                Call.label(Utils.formatName(Rank.all[rank], "[#" + color.toString().substring(0, 6) + "]" + name), 1f, unit.x, unit.y + unit.hitSize() / 2 + Vars.tilesize);
                 hasLabel = true;
                 Timer.schedule(() -> {
                     hasLabel = false;
@@ -651,8 +641,6 @@ public class Pets implements MiniMod {
             handleFood(isStill, dt);
         }
 
-        private int itemsEaten = 0;
-        private long lastAction = 0;
         protected void handleFood(boolean isStill, long dt) {
             // food
             if (!isEating && !unit.hasItem() && isStill) {
@@ -660,13 +648,13 @@ public class Pets implements MiniMod {
                 int startY = unit.tileY() - 5;
                 Seq<Tile> tiles = new Seq<>();
                 for (int x = startX; x < startX + 10; x++) {
-                    for (int y = startY; y < startY + 10; y++) {                        
+                    for (int y = startY; y < startY + 10; y++) {
                         Tile tile = Vars.world.tiles.get(x, y);
                         if (tile == null) continue;
                         if (
-                            (tile.drop() != null && Structs.contains(possibleFoods(unit.type), tile.drop()) && tile.block() == Blocks.air) ||
-                            (tile.wallDrop() != null && Structs.contains(possibleFoods(unit.type), tile.wallDrop()))
-                            ) {
+                                (tile.drop() != null && Structs.contains(possibleFoods(unit.type), tile.drop()) && tile.block() == Blocks.air) ||
+                                        (tile.wallDrop() != null && Structs.contains(possibleFoods(unit.type), tile.wallDrop()))
+                        ) {
                             tiles.add(tile);
                         }
                     }
@@ -696,7 +684,7 @@ public class Pets implements MiniMod {
                 }
 
                 // if mine is too far away, skip to eating
-                if (mining != null && (mining.x - unit.tileX())*(mining.x - unit.tileX()) + (mining.y - unit.tileY())*(mining.y - unit.tileY()) >= 10*10) {
+                if (mining != null && (mining.x - unit.tileX()) * (mining.x - unit.tileX()) + (mining.y - unit.tileY()) * (mining.y - unit.tileY()) >= 10 * 10) {
                     mining = null;
                     if (unit.stack != null) {
                         itemsEaten = unit.stack.amount;
@@ -720,7 +708,7 @@ public class Pets implements MiniMod {
 
                     if (unit.stack.amount == 0) {
                         var item = unit.stack.item;
-                        unit.clearItem();                       
+                        unit.clearItem();
                         isEating = false;
 
                         // update database
@@ -736,7 +724,7 @@ public class Pets implements MiniMod {
                             pet.eatenCopper += amount;
                         } else if (item == Items.lead) {
                             pet.eatenLead += amount;
-                        } else if (item == Items.titanium) { 
+                        } else if (item == Items.titanium) {
                             pet.eatenTitanium += amount;
                         } else if (item == Items.thorium) {
                             pet.eatenThorium += amount;
@@ -853,7 +841,7 @@ class PetDatabase {
         public String name;
         public UnitType species;
         public Color color;
-        
+
         public long eatenCoal;
         public long eatenCopper;
         public long eatenLead;

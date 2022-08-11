@@ -13,9 +13,7 @@ import mindustry.plugin.utils.Cooldowns;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
-
 import org.javacord.api.entity.message.MessageBuilder;
-import org.javacord.api.entity.message.embed.Embed;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 
@@ -84,10 +82,10 @@ public class Report implements MiniMod {
                 }
 
                 EmbedBuilder eb = new EmbedBuilder().setTitle("Potential Griefer Online")
-                    .addField("Name", Utils.escapeEverything(found.name))
-                    .setColor(DiscordPalette.ERROR)
-                    .setFooter("Reported by: " + Utils.escapeEverything(player.name));
-                
+                        .addField("Name", Utils.escapeEverything(found.name))
+                        .setColor(DiscordPalette.ERROR)
+                        .setFooter("Reported by: " + Utils.escapeEverything(player.name));
+
                 if (args.length > 1) {
                     eb.addField("Reason", args[1]);
                 }

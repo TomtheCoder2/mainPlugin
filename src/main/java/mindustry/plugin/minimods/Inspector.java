@@ -103,7 +103,7 @@ public class Inspector implements MiniMod {
                                 + (player.admin ? " [sky]" + info.destroyedBy : "") + "[white]";
                     }
                 }
-    
+
                 Call.infoPopup(player.con, s, 1f, Align.bottomRight, 0, 0, 400, 0);
             }
         }, 1f, 1f);

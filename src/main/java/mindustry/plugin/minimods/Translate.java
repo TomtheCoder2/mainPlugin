@@ -216,6 +216,7 @@ class TranslateThread extends Thread {
 
 class TranslateApi {
     private final static String SERVER = "http://172.104.253.198:5000";
+
     /**
      * Translates a piece of text
      */
