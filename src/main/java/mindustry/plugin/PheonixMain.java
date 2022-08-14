@@ -172,10 +172,11 @@ public class PheonixMain extends Plugin {
         Channels.MOD_BOT.addMessageCreateListener(registrar::dispatchEvent);
 
         // Log startup
-        Channels.LOG.sendMessage(new EmbedBuilder()
+        var eb = new EmbedBuilder()
             .setTitle("Starting Server")
-            .setColor(DiscordPalette.ERROR)
-        );
+            .setColor(DiscordPalette.ERROR);
+        Channels.LOG.sendMessage(eb);
+        Channels.COLONEL_LOG.sendMessage(eb);
 
         Utils.init();
         EffectHelper.init();
