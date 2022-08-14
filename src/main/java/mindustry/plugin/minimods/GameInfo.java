@@ -4,6 +4,7 @@ import arc.Core;
 import arc.Events;
 import arc.files.Fi;
 import arc.struct.Seq;
+import arc.util.CommandHandler;
 import arc.util.Log;
 import mindustry.Vars;
 import mindustry.content.Items;
@@ -15,11 +16,13 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.io.SaveIO;
 import mindustry.plugin.MiniMod;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
 import mindustry.plugin.utils.ContentServer;
+import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
 import mindustry.world.modules.ItemModule;
@@ -53,6 +56,23 @@ public class GameInfo implements MiniMod {
     }
 
     @Override
+    public void registerCommands(CommandHandler handler) {
+        handler.<Player>register("players", "Display all players and their ids", (args, player) -> {
+            StringBuilder builder = new StringBuilder();
+            builder.append("[orange]List of players: \n");
+            for (Player p : Groups.player) {
+                if (p.admin) {
+                    builder.append("[accent]");
+                } else {
+                    builder.append("[lightgray]");
+                }
+                builder.append(p.name).append("[accent] : ").append(Utils.calculatePhash(p.uuid())).append("\n");
+            }
+            player.sendMessage(builder.toString());
+        });
+    }
+
+    @Override
     public void registerDiscordCommands(DiscordRegistrar handler) {
         handler.register("players", "",
                 data -> {
@@ -64,9 +84,12 @@ public class GameInfo implements MiniMod {
                     eb.setTitle("Players: " + Groups.player.size());
                     String desc = "```\n";
                     for (Player p : Groups.player) {
-                        desc += String.format("%-9d : %s", p.id(), escapeEverything(p.name()));
-                        if (p.admin) {
-                            desc += " (admin)";
+                        var pd = Database.getPlayerData(p.uuid());
+                        String phash = pd != null ? pd.phash : Utils.calculatePhash(p.uuid());
+
+                        desc += String.format("%-13s : %s", phash, escapeEverything(p.name()));
+                        if (pd != null && pd.rank != 0) {
+                            desc += " (" + Rank.all[pd.rank].name + ")";
                         }
                         desc += "\n";
                     }
@@ -87,7 +110,10 @@ public class GameInfo implements MiniMod {
                 ctx -> {
                     StringBuilder desc = new StringBuilder();
                     for (Player p : Groups.player) {
-                        desc.append(String.format("`%-9d : %-24s : %-16s :` %s%s\n", p.id, p.uuid(), p.con.address, Utils.escapeEverything(p.name), p.admin ? " (admin)" : ""));
+                        var pd = Database.getPlayerData(p.uuid());
+                        String phash = pd != null ? pd.phash : Utils.calculatePhash(p.uuid());
+                        desc.append(String.format("`%-13s : %-24s : %-16s :` %s%s\n", phash, p.uuid(), p.con.address, Utils.escapeEverything(p.name), 
+                            pd != null && pd.rank != 0 ? " ("  + Rank.all[pd.rank].name + ")" : ""));
                     }
                     ctx.sendEmbed(DiscordPalette.INFO, "Players online: " + Groups.player.size(), desc.toString());
                 }

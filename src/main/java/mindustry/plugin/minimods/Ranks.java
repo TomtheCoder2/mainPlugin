@@ -244,19 +244,6 @@ public class Ranks implements MiniMod {
 
     @Override
     public void registerCommands(CommandHandler handler) {
-        handler.<Player>register("players", "Display all players and their ids", (args, player) -> {
-            StringBuilder builder = new StringBuilder();
-            builder.append("[orange]List of players: \n");
-            for (Player p : Groups.player) {
-                if (p.admin) {
-                    builder.append("[accent]");
-                } else {
-                    builder.append("[lightgray]");
-                }
-                builder.append(p.name).append("[accent] : ").append(p.id).append("\n");
-            }
-            player.sendMessage(builder.toString());
-        });
 
         handler.<Player>register("ranks", "Show all ranks.", (args, player) -> { // self info
             StringBuilder sb = new StringBuilder("[accent]Ranks\n");
