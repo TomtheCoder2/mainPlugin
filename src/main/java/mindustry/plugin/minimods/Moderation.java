@@ -381,12 +381,16 @@ public class Moderation implements MiniMod {
                                 .addInlineField("Last IP", info.lastIP);
                     }
 
-                    eb
-                            .addField("Last name", info.lastName)
-                            .addField("Times kicked", info.timesKicked + "")
-                            .addField("NetServer banned", info.banned ? "Yes" : "No");
-
                     var pd = Database.getPlayerData(info.id);
+                    if (pd != null) {
+                        eb.addField("Phash", pd.phash);
+                    }
+
+                    eb
+                        .addField("Last name", info.lastName)
+                        .addField("Times kicked", info.timesKicked + "")
+                        .addField("NetServer banned", info.banned ? "Yes" : "No");
+
                     if (pd != null) {
                         eb.addInlineField("Rank", Rank.all[pd.rank].name)
                                 .addInlineField("Playtime", pd.playTime + " min")

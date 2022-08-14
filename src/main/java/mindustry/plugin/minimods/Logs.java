@@ -10,8 +10,6 @@ import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
-import static mindustry.plugin.database.Database.hash;
-
 /**
  * Logs player actions, such as player join &amp; leave and suspicious activity
  */
