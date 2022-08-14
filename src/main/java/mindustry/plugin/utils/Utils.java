@@ -23,10 +23,12 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.TimeZone;
@@ -696,7 +698,13 @@ public class Utils {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA3-256");
             messageDigest.update(bytes);
             byte[] hash = messageDigest.digest();
-            return Base64.getEncoder().encodeToString(hash).substring(0, 13).replace("+", "-").replace("/", "=").replace("=", "");
+
+            var base91 = new Base91();
+            byte[] obuf = new byte[2056];
+            int len = base91.encode(hash, hash.length, obuf);
+            obuf = Arrays.copyOfRange(obuf, 0, len);
+
+            return new String(obuf);
         } catch (Exception e) {
             e.printStackTrace();
         }
