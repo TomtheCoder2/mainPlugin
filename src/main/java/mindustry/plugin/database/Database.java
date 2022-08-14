@@ -3,11 +3,9 @@ package mindustry.plugin.database;
 import arc.struct.Seq;
 import mindustry.plugin.utils.Utils;
 
-import java.security.MessageDigest;
 import java.sql.*;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Base64;
 
 public final class Database {
     /**
@@ -29,7 +27,9 @@ public final class Database {
         Database.playerTable = playerTable;
     }
 
-    public static void setHash() {
+    /** Resets all phashes. 
+     * @return the number of rows affected. */
+    public static int resetPhashes() {
         System.out.println("reset all hashes...");
         // search for the uuid
         String sql = "SELECT * "
@@ -38,15 +38,20 @@ public final class Database {
             PreparedStatement pstmt = conn.prepareStatement(sql);
 
             ResultSet rs = pstmt.executeQuery();
+            int n = 0;
             while (rs.next()) {
                 Player pd = Player.fromSQL(rs);
                 System.out.println("processing: " + pd.uuid);
+                pd.phash = Utils.calculatePhash(pd.uuid);
                 setPlayerData(pd);
+                n += 1;
             }
             rs.close();
+            return n;
         } catch (SQLException ex) {
 //            //Log.debug(ex.getMessage());
             ex.printStackTrace();
+            return 0;
         }
     }
 
@@ -76,15 +81,15 @@ public final class Database {
             //Log.debug(ex.getMessage());
         }
 
-        return getPlayerDataByHash(uuid);
+        return null;
     }
 
     /**
      * Retrieves data for a given mindustry player, or null if not found.
      *
-     * @param hid the hashed uuid of the player
+     * @param phash the phash of the player
      */
-    private static Player getPlayerDataByHash(String hid) {
+    private static Player getPlayerDataByPhash(String phash) {
         // search for the uuid
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
                 + "FROM " + playerTable + " "
@@ -92,7 +97,7 @@ public final class Database {
         try {
             //Log.debug("get player data of @, conn: @", uuid, conn.isClosed());
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, hid);
+            pstmt.setString(1, phash);
 
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
@@ -177,7 +182,7 @@ public final class Database {
                 pstmt.setLong(8, pd.bannedUntil);
                 pstmt.setString(9, pd.banReason);
                 pstmt.setLong(10, pd.discord);
-                pstmt.setString(11, hash(pd.uuid));
+                pstmt.setString(11, pd.phash);
 
                 // send the data
                 int affectedRows = pstmt.executeUpdate();
@@ -210,7 +215,7 @@ public final class Database {
                 pstmt.setLong(7, pd.bannedUntil);
                 pstmt.setString(8, pd.banReason);
                 pstmt.setLong(9, pd.discord);
-                pstmt.setString(10, hash(pd.uuid));
+                pstmt.setString(10, pd.phash);
                 pstmt.setString(11, pd.uuid);
 
                 int affectedrows = pstmt.executeUpdate();
@@ -381,21 +386,11 @@ public final class Database {
         }
     }
 
-    public static String hash(String s) {
-        try {
-            s = s.replace("=", "");
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-            messageDigest.update(s.getBytes());
-            return Base64.getEncoder().encodeToString(messageDigest.digest());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public static class Player implements Cloneable {
         public String uuid;
-        public String hid;
+
+        /** The Phash of the player. This should always be equal to {@code Utils.calculatePhash(uuid)} */
+        public String phash;
         public int rank;
 
         /**
@@ -427,13 +422,20 @@ public final class Database {
         public Player(String uuid, int rank) {
             this.uuid = uuid;
             this.rank = rank;
-            this.hid = hash(uuid);
+            this.phash = Utils.calculatePhash(uuid);
+        }
+
+        public Player(String uuid, int rank, String phash) {
+            this.uuid = uuid;
+            this.rank = rank;
+            this.phash = phash;
         }
 
         public static Player fromSQL(ResultSet rs) throws SQLException {
             String uuid = rs.getString("uuid");
             int rank = rs.getInt("rank");
-            Player pd = new Player(uuid, rank);
+            String phash = rs.getString("hid");
+            Player pd = new Player(uuid, rank, phash);
 
             pd.verified = rs.getBoolean("verified");
 
@@ -448,7 +450,6 @@ public final class Database {
             if (rs.getBytes("discordLink") != null && rs.getBytes("discordLink").length != 0) {
                 pd.discord = rs.getLong("discordLink");
             }
-            pd.hid = rs.getString("hid");
 
             return pd;
         }

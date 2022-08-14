@@ -23,9 +23,11 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URISyntaxException;
+import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
@@ -681,6 +683,24 @@ public class Utils {
      */
     public void sendMessage(User user, String content) {
         user.openPrivateChannel().join().sendMessage(content);
+    }
+
+    /** Calculates the Phash for a given UUID.
+     * Intentionally long name to indicate that computational expensiveness.
+     * @param uuid the UUID
+     * @return the Phash
+     */
+    public static String calculatePhash(String uuid) {
+        try {
+            byte[] bytes = Base64.getDecoder().decode(uuid);
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA3-256");
+            messageDigest.update(bytes);
+            byte[] hash = messageDigest.digest();
+            return Base64.getEncoder().encodeToString(hash).substring(0, 13).replace("+", "-").replace("/", "-").replace("=", "");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static class Message {

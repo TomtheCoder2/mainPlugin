@@ -9,5 +9,6 @@ CREATE TABLE playerdata
     banned BOOLEAN,
     bannedUntil BIGINT,
     banReason VARCHAR,
-    discordLink BIGINT
+    discordLink BIGINT,
+    hid VARCHAR
 )

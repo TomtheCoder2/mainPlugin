@@ -50,14 +50,14 @@ public class Logs implements MiniMod {
             if (joinPlayers.size != 0) {
                 StringBuilder sb = new StringBuilder();
                 for (JoinPlayerInfo player : joinPlayers) {
-                    sb.append("`" + player.uuid + "` | `" + hash(player.uuid) + "` | `" + player.id + "` | `" + player.ip + "`: " + Utils.escapeEverything(player.name) + "\n");
+                    sb.append("`" + player.uuid + "` | `" + Utils.calculatePhash(player.uuid) + "` | `" + player.id + "` | `" + player.ip + "`: " + Utils.escapeEverything(player.name) + "\n");
                 }
                 eb.addField("Joined", sb.toString());
             }
             if (leftPlayers.size != 0) {
                 StringBuilder sb = new StringBuilder();
                 for (JoinPlayerInfo player : leftPlayers) {
-                    sb.append("`" + player.uuid + "` | `" + hash(player.uuid) + "` | `" + player.id + "` | `" + player.ip + "`: " + Utils.escapeEverything(player.name) + "\n");
+                    sb.append("`" + player.uuid + "` | `" + Utils.calculatePhash(player.uuid) + "` | `" + player.id + "` | `" + player.ip + "`: " + Utils.escapeEverything(player.name) + "\n");
                 }
                 eb.addField("Left", sb.toString());
             }

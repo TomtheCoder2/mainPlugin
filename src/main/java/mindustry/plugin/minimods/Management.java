@@ -18,6 +18,7 @@ import mindustry.maps.MapException;
 import mindustry.net.Administration;
 import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
@@ -385,6 +386,19 @@ public class Management implements MiniMod {
                     Core.settings.put(settingName, message);
                     Core.settings.autosave();
                     ctx.success("Set `" + settingName + "`", "```\n" + message + "\n```");
+                }
+        );
+
+        handler.register("phash", "", 
+                data -> {
+                    data.category = "Management";
+                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                    data.help = "Re-calculate all Phashes.";
+                },
+                ctx -> {
+                    ctx.channel().type();
+                    int n = Database.resetPhashes();
+                    ctx.success("Success", "Successfully reset " + n + " phashes");
                 }
         );
     }
