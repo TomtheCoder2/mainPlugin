@@ -56,7 +56,7 @@ public final class Database {
     }
 
     /**
-     * Retrieves data for a given mindustry player, or null if not found.
+     * Retrieves data for a given mindustry player, or null if not found for the given UUID.
      *
      * @param uuid the mindustry UUID of the player
      */
@@ -81,7 +81,7 @@ public final class Database {
             //Log.debug(ex.getMessage());
         }
 
-        return getPlayerDataByPcalculatePcalculatePhash(uuid);
+        return null;
     }
 
     /**
@@ -89,7 +89,7 @@ public final class Database {
      *
      * @param phash the phash of the player
      */
-    public static Player getPlayerDataByPcalculatePcalculatePhash(String phash) {
+    public static Player getPlayerDataByPhash(String phash) {
         // search for the uuid
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
                 + "FROM " + playerTable + " "

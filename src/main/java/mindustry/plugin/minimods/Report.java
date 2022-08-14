@@ -83,6 +83,7 @@ public class Report implements MiniMod {
 
                 EmbedBuilder eb = new EmbedBuilder().setTitle("Potential Griefer Online")
                         .addField("Name", Utils.escapeEverything(found.name))
+                        .addField("Phash", Utils.calculatePhash(found.uuid()))
                         .setColor(DiscordPalette.ERROR)
                         .setFooter("Reported by: " + Utils.escapeEverything(player.name));
 

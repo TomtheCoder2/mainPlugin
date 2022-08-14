@@ -48,7 +48,7 @@ public class DiscordLog {
             eb.addField("Additional Information", information);
         }
         Channels.LOG.sendMessage(eb);
-        Call.sendMessage(GameMsg.custom("Cheat", "yellow", mod.getDiscriminatedName() + " has used the " + action + " cheat!"));
+//        Call.sendMessage(GameMsg.custom("Cheat", "yellow", mod.getDiscriminatedName() + " has used the " + action + " cheat!"));
     }
 
     public static void moderation(String action, String mod, Administration.PlayerInfo info, String reason, String additionalInfo) {

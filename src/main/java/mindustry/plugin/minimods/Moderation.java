@@ -382,10 +382,7 @@ public class Moderation implements MiniMod {
                     if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.MOD_BOT.getId()) {
                         eb.addField("IPs", info.ips.toString(" / "))
                                 .addInlineField("UUID", info.id)
-                                .addInlineField("Hashed UUID", calculatePhash(info.id))
                                 .addInlineField("Last IP", info.lastIP);
-                    } else {
-                        eb.addInlineField("Hashed UUID", calculatePhash(info.id));
                     }
 
                     var pd = Database.getPlayerData(info.id);

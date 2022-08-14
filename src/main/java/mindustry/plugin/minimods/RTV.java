@@ -190,9 +190,9 @@ public final class RTV implements MiniMod {
 
         public Session(String map) {
             this.map = map;
-            this.endTime = System.currentTimeMillis() + endTime;
+            this.endTime = System.currentTimeMillis() + VOTE_TIME;
 
-            Timer.schedule(new Task(this), this.endTime / 1000);
+            Timer.schedule(new Task(this), (this.endTime - System.currentTimeMillis()) / 1000);
         }
 
         /**

@@ -20,6 +20,7 @@ import mindustry.plugin.utils.*;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.util.logging.FallbackLoggerConfiguration;
 import org.json.JSONObject;
@@ -165,10 +166,21 @@ public class PheonixMain extends Plugin {
             }
         });
 
+        // Initialize discord stuff
         Channels.BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.ADMIN_BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.APPRENTICE_BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.MOD_BOT.addMessageCreateListener(registrar::dispatchEvent);
+
+        // Log startup
+        var startupEmbed = new EmbedBuilder()
+            .setTitle("Starting Server")
+            .setColor(DiscordPalette.ERROR);
+        var startupMessage = new MessageBuilder() 
+            .setEmbed(startupEmbed)
+            .setContent("<@426133274692419615>");
+        Channels.COLONEL_LOG.sendMessage(startupEmbed);
+        startupMessage.send(Channels.LOG);
 
         Utils.init();
         EffectHelper.init();
