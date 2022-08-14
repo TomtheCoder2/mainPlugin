@@ -107,12 +107,6 @@ public class Query {
             var res = netServer.admins.searchNames(target);
             info = res.size == 0 ? null : res.first();
         }
-        if (info == null) {
-            Database.Player p = getPlayerData(target);
-            if (p != null) {
-                return findPlayerInfo(p.uuid);
-            }
-        }
         return info;
     }
 }
