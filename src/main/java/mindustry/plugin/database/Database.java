@@ -1,6 +1,7 @@
 package mindustry.plugin.database;
 
 import arc.struct.Seq;
+import arc.util.Log;
 import mindustry.plugin.utils.Utils;
 
 import java.sql.*;
@@ -14,6 +15,10 @@ public final class Database {
     public static Connection conn;
     private static String playerTable;
 
+    private static String authURL;
+    private static String authUser;
+    private static String authPassword;
+
     /**
      * Connect to the PostgreSQL Server
      */
@@ -25,11 +30,29 @@ public final class Database {
         }
         conn = DriverManager.getConnection(url, user, password);
         Database.playerTable = playerTable;
+
+        authURL = url;
+        authUser = user;
+        authPassword = password;
+    }
+
+    /** Reconnect, if the SQL connection was closed */
+    protected static void reconnect() {
+        try {
+            if (conn.isClosed()) {
+                conn = DriverManager.getConnection(authURL, authUser, authPassword);
+            }
+        } catch(SQLException e) {
+            Log.err("Error reconnnecting");
+            e.printStackTrace();
+        }
     }
 
     /** Resets all phashes. 
      * @return the number of rows affected. */
     public static int resetPhashes() {
+        reconnect();
+
         System.out.println("reset all hashes...");
         // search for the uuid
         String sql = "SELECT * "
@@ -61,6 +84,8 @@ public final class Database {
      * @param uuid the mindustry UUID of the player
      */
     public static Player getPlayerData(String uuid) {
+        reconnect();
+
         // search for the uuid
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
                 + "FROM " + playerTable + " "
@@ -90,6 +115,8 @@ public final class Database {
      * @param phash the phash of the player
      */
     public static Player getPlayerDataByPhash(String phash) {
+        reconnect();
+
         // search for the uuid
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
                 + "FROM " + playerTable + " "
@@ -119,6 +146,8 @@ public final class Database {
      * @param id the discord ID of the player
      */
     public static Player getDiscordData(long id) {
+        reconnect();
+
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
                 + "FROM " + playerTable + " "
                 + "WHERE discordLink = ?";
@@ -144,6 +173,8 @@ public final class Database {
      * Retrieves all players that are banned in any way
      */
     public static Player[] bans() {
+        reconnect();
+
         String sql = "SELECT * FROM playerdata WHERE banned = true OR bannedUntil > " + Instant.now().getEpochSecond();
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -165,6 +196,8 @@ public final class Database {
      * @param pd player Data
      */
     public static void setPlayerData(Player pd) {
+        reconnect();
+
         if (getPlayerData(pd.uuid) == null) {
             // define all variables
             String sql = "INSERT INTO " + playerTable + "(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid) "
@@ -233,6 +266,8 @@ public final class Database {
      * @return the ranking, or null if no players are found
      */
     public static PlayerRank[] rankPlayers(int limit, String column, int offset) {
+        reconnect();
+
         if (!column.matches("[A-Za-z0-9]+")) return null;
         String sql = "SELECT uuid, " + column + " " +
                 "FROM " + playerTable + " " +
@@ -262,6 +297,8 @@ public final class Database {
      * Rank all maps based on {@link Database.Map#positiveRating positiveRating} - {@link Database.Map#negativeRating negativeRating}
      */
     public static Map[] rankMapRatings(int limit, int offset) {
+        reconnect();
+
         String sql = "SELECT * FROM mapdata ORDER BY positiverating DESC LIMIT ? OFFSET ?";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -289,6 +326,8 @@ public final class Database {
      * @return the ranking, or null if none are found
      */
     public static MapRank[] rankMaps(int limit, String column, int offset) {
+        reconnect();
+    
         if (!column.matches("[A-Za-z0-9]+")) return null;
         String sql = "SELECT name, " + column + " " +
                 "FROM mapdata " +
@@ -316,6 +355,8 @@ public final class Database {
      * Retrieves map data for a given map
      */
     public static Map getMapData(String name) {
+        reconnect();
+
         name = Utils.escapeEverything(name).replaceAll("\\W", "");
         String sql = "SELECT name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame "
                 + "FROM mapdata "
@@ -340,6 +381,8 @@ public final class Database {
      * Sets map data for a given map
      */
     public static void setMapData(Map md) {
+        reconnect();
+
         String name = Utils.escapeEverything(md.name).replaceAll("\\W", "_");
         //Log.info("setting map data for " + name);
         if (getMapData(name) == null) {
