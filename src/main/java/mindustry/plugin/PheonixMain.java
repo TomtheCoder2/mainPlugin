@@ -165,10 +165,17 @@ public class PheonixMain extends Plugin {
             }
         });
 
+        // Initialize discord stuff
         Channels.BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.ADMIN_BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.APPRENTICE_BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.MOD_BOT.addMessageCreateListener(registrar::dispatchEvent);
+
+        // Log startup
+        Channels.LOG.sendMessage(new EmbedBuilder()
+            .setTitle("Starting Server")
+            .setColor(DiscordPalette.ERROR)
+        );
 
         Utils.init();
         EffectHelper.init();
