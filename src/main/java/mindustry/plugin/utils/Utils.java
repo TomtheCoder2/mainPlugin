@@ -696,7 +696,7 @@ public class Utils {
             MessageDigest messageDigest = MessageDigest.getInstance("SHA3-256");
             messageDigest.update(bytes);
             byte[] hash = messageDigest.digest();
-            return Base64.getEncoder().encodeToString(hash).substring(0, 13).replace("+", "-").replace("/", "-").replace("=", "");
+            return Base64.getEncoder().encodeToString(hash).substring(0, 13).replace("+", "-").replace("/", "=").replace("=", "");
         } catch (Exception e) {
             e.printStackTrace();
         }
