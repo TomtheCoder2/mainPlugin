@@ -61,6 +61,27 @@ jar {
         configurations.runtimeClasspath.findAll { !it.name.endsWith('pom') }.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
+//
+//jar {
+//    version = null
+//    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+//    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//
+//    from {
+//        configurations.runtimeClasspath.findAll { !it.name.endsWith('pom') }.collect { it.isDirectory() ? it : zipTree(it) }
+//    }
+//    archiveName 'UpdateDatabase.jar'
+//
+//    doFirst {
+//        manifest(({
+//            if (!configurations.runtimeClasspath.isEmpty()) {
+//                attributes(
+//                        'Class-Path': configurations.runtimeClasspath.collect { it.toURI().toString() }.join(' '),
+//                        'Main-Class': 'mindustry.plugin.database.UpdateDatabase')
+//            }
+//        } as groovy.lang.Closure<?>))
+//    }
+//}
 buildscript {
     ext.kotlin_version = '1.6.0'
     repositories {

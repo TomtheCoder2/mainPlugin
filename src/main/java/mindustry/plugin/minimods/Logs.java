@@ -10,6 +10,9 @@ import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
+import static mindustry.plugin.utils.Utils.calculatePhash;
+import static mindustry.plugin.utils.Utils.calculatePhash;
+
 /**
  * Logs player actions, such as player join &amp; leave and suspicious activity
  */
@@ -44,6 +47,9 @@ public class Logs implements MiniMod {
             EmbedBuilder eb = new EmbedBuilder()
                     .setTitle("Player Join & Leave Log")
                     .setColor(DiscordPalette.INFO);
+            EmbedBuilder colonel_eb = new EmbedBuilder()
+                    .setTitle("Player Join & Leave Log")
+                    .setColor(DiscordPalette.INFO);
 
             if (joinPlayers.size != 0) {
                 StringBuilder sb = new StringBuilder();
@@ -51,19 +57,30 @@ public class Logs implements MiniMod {
                     sb.append("`" + player.uuid + "` | `" + Utils.calculatePhash(player.uuid) + "` | `" + player.id + "` | `" + player.ip + "`: " + Utils.escapeEverything(player.name) + "\n");
                 }
                 eb.addField("Joined", sb.toString());
+                sb = new StringBuilder();
+                for (JoinPlayerInfo player : joinPlayers) {
+                    sb.append("`" + Utils.calculatePhash(player.uuid) + "` | `" + player.id + "`: " + Utils.escapeEverything(player.name) + "\n");
+                }
+                colonel_eb.addField("Joined", sb.toString());
             }
             if (leftPlayers.size != 0) {
                 StringBuilder sb = new StringBuilder();
                 for (JoinPlayerInfo player : leftPlayers) {
-                    sb.append("`" + player.uuid + "` | `" + Utils.calculatePhash(player.uuid) + "` | `" + player.id + "` | `" + player.ip + "`: " + Utils.escapeEverything(player.name) + "\n");
+                    sb.append("`" + player.uuid + "` | `" + calculatePhash(player.uuid) + "` | `" + player.id + "` | `" + player.ip + "`: " + Utils.escapeEverything(player.name) + "\n");
                 }
                 eb.addField("Left", sb.toString());
+                sb = new StringBuilder();
+                for (JoinPlayerInfo player : joinPlayers) {
+                    sb.append("`" + calculatePhash(player.uuid) + "` | `" + player.id + "`: " + Utils.escapeEverything(player.name) + "\n");
+                }
+                colonel_eb.addField("Left", sb.toString());
             }
 
             joinPlayers.clear();
             leftPlayers.clear();
 
             Channels.LOG.sendMessage(eb);
+            Channels.COLONEL_LOG.sendMessage(colonel_eb);
         }, 30, 30);
 
         String[] slurs = new String[]{
