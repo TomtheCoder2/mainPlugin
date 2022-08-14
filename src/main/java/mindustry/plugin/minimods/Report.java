@@ -92,7 +92,7 @@ public class Report implements MiniMod {
 
                 new MessageBuilder()
                         .setEmbed(eb)
-                        .setContent("<@&" + Roles.MOD + "> <@&" + Roles.APPRENTICE + ">")
+                        .setContent("<@&" + Roles.RI ">
                         .send(Channels.GR_REPORT);
                 Call.sendMessage(found.name + "[sky] is reported to discord.");
             }
