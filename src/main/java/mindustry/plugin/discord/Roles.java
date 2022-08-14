@@ -14,6 +14,8 @@ public class Roles {
     public static long ACTIVE_PLAYER;
     public static long DEV;
     public static long MVP;
+    /** Report investigator */
+    public static long RI;
 
     public static void load(DiscordApi api, JSONObject data) {
         ADMIN = Long.parseLong(data.getString("admin"));
@@ -25,5 +27,6 @@ public class Roles {
         ACTIVE_PLAYER = Long.parseLong(data.getString("active_player"));
         MVP = Long.parseLong(data.getString("mvp"));
         DEV = Long.parseLong(data.getString("dev"));
+        RI = Long.parseLong(data.getString("ri"));
     }
 }
