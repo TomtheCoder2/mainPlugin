@@ -81,6 +81,7 @@ public class Logs implements MiniMod {
 
             Channels.LOG.sendMessage(eb);
             Channels.COLONEL_LOG.sendMessage(colonel_eb);
+            System.gc();
         }, 30, 30);
 
         String[] slurs = new String[]{
