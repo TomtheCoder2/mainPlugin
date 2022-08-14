@@ -89,7 +89,7 @@ public final class Database {
      *
      * @param phash the phash of the player
      */
-    private static Player getPlayerDataByPhash(String phash) {
+    public static Player getPlayerDataByPhash(String phash) {
         // search for the uuid
         String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
                 + "FROM " + playerTable + " "

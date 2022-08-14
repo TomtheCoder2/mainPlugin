@@ -8,6 +8,7 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.maps.Map;
 import mindustry.net.Administration;
+import mindustry.plugin.database.Database;
 
 import static mindustry.Vars.netServer;
 
@@ -50,11 +51,16 @@ public class Query {
     }
 
     /**
-     * Find a player by name, id, uuid, or ip
+     * Find a player by name, id, phash, uuid, or ip
      *
      * @param identifier the name, id, uuid, con or address
      */
     public static Player findPlayerEntity(String identifier) {
+        var pd = Database.getPlayerDataByPhash(identifier);
+        if (pd != null) {
+            identifier = pd.uuid;
+        }
+
         Player found = null;
         for (Player player : Groups.player) {
             if (player == null) return null; // how does that even happen wtf
@@ -73,9 +79,14 @@ public class Query {
     }
 
     /**
-     * Get player info by uuid, name, or IP
+     * Get player info by uuid, name, phash, or IP
      */
     public static Administration.PlayerInfo findPlayerInfo(String target) {
+        var pd = Database.getPlayerDataByPhash(target);
+        if (pd != null) {
+            target = pd.uuid;
+        }
+
         Administration.PlayerInfo info = null;
         Player player = findPlayerEntity(target);
         if (player != null) {
