@@ -42,6 +42,7 @@ public class Logs implements MiniMod {
         });
 
         Timer.schedule(() -> {
+            System.gc();
             if (joinPlayers.size == 0 && leftPlayers.size == 0) return;
 
             EmbedBuilder eb = new EmbedBuilder()
