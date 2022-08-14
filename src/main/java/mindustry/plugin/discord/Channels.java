@@ -21,6 +21,7 @@ public class Channels {
 
     public static TextChannel LOG;
     public static TextChannel ERROR_LOG;
+    public static TextChannel COLONEL_LOG;
 
     public static TextChannel BOT;
     public static TextChannel MOD_BOT;
@@ -45,6 +46,7 @@ public class Channels {
 
         LOG = getChannel(api, obj.getString("log"));
         ERROR_LOG = getChannel(api, obj.getString("error_log"));
+        COLONEL_LOG = getChannel(api, obj.getString("colonel_log"));
 
         BOT = getChannel(api, obj.getString("bot"));
         MOD_BOT = getChannel(api, obj.getString("mod_bot"));

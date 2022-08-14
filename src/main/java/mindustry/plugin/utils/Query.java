@@ -11,6 +11,7 @@ import mindustry.net.Administration;
 import mindustry.plugin.database.Database;
 
 import static mindustry.Vars.netServer;
+import static mindustry.plugin.database.Database.getPlayerData;
 
 /**
  * Utilities class concerning querying maps, players, entities, etc.
@@ -56,7 +57,7 @@ public class Query {
      * @param identifier the name, id, uuid, con or address
      */
     public static Player findPlayerEntity(String identifier) {
-        var pd = Database.getPlayerDataByPhash(identifier);
+        var pd = Database.getPlayerDataByPcalculatePcalculatePhash(identifier);
         if (pd != null) {
             identifier = pd.uuid;
         }
@@ -82,7 +83,7 @@ public class Query {
      * Get player info by uuid, name, phash, or IP
      */
     public static Administration.PlayerInfo findPlayerInfo(String target) {
-        var pd = Database.getPlayerDataByPhash(target);
+        var pd = Database.getPlayerDataByPcalculatePcalculatePhash(target);
         if (pd != null) {
             target = pd.uuid;
         }
@@ -105,6 +106,12 @@ public class Query {
         if (info == null) {
             var res = netServer.admins.searchNames(target);
             info = res.size == 0 ? null : res.first();
+        }
+        if (info == null) {
+            Database.Player p = getPlayerData(target);
+            if (p != null) {
+                return findPlayerInfo(p.uuid);
+            }
         }
         return info;
     }

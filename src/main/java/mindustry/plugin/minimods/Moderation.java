@@ -26,6 +26,8 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import java.time.Instant;
 import java.util.ArrayList;
 
+import static mindustry.plugin.utils.Utils.calculatePhash;
+
 
 /**
  * Manages mutes, freezes, bans, and other moderation-related commands
@@ -368,7 +370,9 @@ public class Moderation implements MiniMod {
                         ctx.error("No such player", ctx.args.get("player") + " is not in the database");
                         return;
                     }
-
+                    if (info.names.size == 0) {
+                        ctx.error("Unknown Player", "Could not find player " + ctx.args.get("player"));
+                    }
                     EmbedBuilder eb = new EmbedBuilder()
                             .setColor(DiscordPalette.INFO)
                             .setTitle("Lookup: " + Utils.escapeEverything(info.lastName));
@@ -378,7 +382,10 @@ public class Moderation implements MiniMod {
                     if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.MOD_BOT.getId()) {
                         eb.addField("IPs", info.ips.toString(" / "))
                                 .addInlineField("UUID", info.id)
+                                .addInlineField("Hashed UUID", calculatePhash(info.id))
                                 .addInlineField("Last IP", info.lastIP);
+                    } else {
+                        eb.addInlineField("Hashed UUID", calculatePhash(info.id));
                     }
 
                     var pd = Database.getPlayerData(info.id);
@@ -387,9 +394,9 @@ public class Moderation implements MiniMod {
                     }
 
                     eb
-                        .addField("Last name", info.lastName)
-                        .addField("Times kicked", info.timesKicked + "")
-                        .addField("NetServer banned", info.banned ? "Yes" : "No");
+                            .addField("Last name", info.lastName)
+                            .addField("Times kicked", info.timesKicked + "")
+                            .addField("NetServer banned", info.banned ? "Yes" : "No");
 
                     if (pd != null) {
                         eb.addInlineField("Rank", Rank.all[pd.rank].name)

@@ -138,7 +138,7 @@ public class PheonixMain extends Plugin {
             }
         } catch (Exception e) {
             Log.err("Couldn't read settings.json file.");
-            Log.err(e.toString());
+            e.printStackTrace();
             return;
         }
 
