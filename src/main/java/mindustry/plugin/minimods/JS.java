@@ -53,8 +53,10 @@ public class JS implements MiniMod {
                     data.help = "Run JS code";
                 },
                 ctx -> {
-                    String res = mods.getScripts().runConsole(ctx.args.get("code"));
-                    ctx.success("Ran code", "Output:\n```\n" + res + "\n```");
+                    Core.app.post(() -> {
+                        String res = mods.getScripts().runConsole(ctx.args.get("code"));
+                        ctx.success("Ran code", "Output:\n```\n" + res + "\n```");    
+                    });
                 }
         );
     }
