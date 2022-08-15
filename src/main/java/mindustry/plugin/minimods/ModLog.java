@@ -1,6 +1,7 @@
 package mindustry.plugin.minimods;
 
 import arc.struct.Seq;
+import arc.struct.Sort;
 import arc.util.Log;
 import arc.util.Timer;
 import mindustry.gen.Groups;
@@ -69,6 +70,16 @@ public class ModLog implements MiniMod {
                     } else {
                         entries = ModDatabase.queryEntries(info.id, (short) ctx.args.getInt("year"));
                     }
+
+                    new Sort().sort(entries, (a, b) -> {
+                        if (a.year != b.year) {
+                            return a.year - b.year;
+                        }
+                        if (a.month != b.month) {
+                            return a.month - b.month;
+                        }
+                        return a.day - b.day;
+                    });
 
                     StringBuilder sb = new StringBuilder();
                     long total = 0;
