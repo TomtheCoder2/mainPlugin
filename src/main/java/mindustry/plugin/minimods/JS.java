@@ -1,5 +1,6 @@
 package mindustry.plugin.minimods;
 
+import arc.Core;
 import arc.util.CommandHandler;
 import arc.util.Strings;
 import arc.util.Timer;
