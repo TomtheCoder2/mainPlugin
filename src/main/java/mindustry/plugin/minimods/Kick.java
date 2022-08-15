@@ -119,6 +119,7 @@ public class Kick implements MiniMod {
 
     @Override
     public void registerCommands(CommandHandler handler) {
+        Cooldowns.instance.set("votekick", 5);
         handler.<Player>register("votekick", "[player...]", "votekick a player.", (args, player) -> {
             if (!Cooldowns.instance.canRun("votekick", player.uuid())) {
                 player.sendMessage(GameMsg.ratelimit("Kick", "votekick"));
