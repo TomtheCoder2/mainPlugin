@@ -18,6 +18,7 @@ import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.utils.Cooldowns;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
+import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
@@ -166,6 +167,11 @@ public class Kick implements MiniMod {
 
             if (found == null) {
                 player.sendMessage(GameMsg.error("Kick", "No player [orange]" + args[0] + "[scarlet] found."));
+            }
+
+            var pd = Database.getPlayerData(found.uuid());
+            if (pd != null && pd.rank >= Rank.APPRENTICE) {
+                player.sendMessage(GameMsg.error("Kick", "Can't kick a mod."));
             }
 
             if (found == player) {
