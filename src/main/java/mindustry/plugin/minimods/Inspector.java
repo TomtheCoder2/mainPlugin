@@ -69,8 +69,8 @@ public class Inspector implements MiniMod {
         });
 
         Events.on(EventType.WorldLoadEvent.class, event -> {
-            tileInfos.clear(0);
-            activeTiles.clear(0);
+            tileInfos.clear(51);
+            activeTiles.clear(51);
         });
 
         Events.on(EventType.TapEvent.class, event -> {
