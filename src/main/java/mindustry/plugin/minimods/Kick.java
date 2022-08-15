@@ -15,6 +15,7 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
+import mindustry.plugin.utils.Cooldowns;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
@@ -118,6 +119,12 @@ public class Kick implements MiniMod {
     @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("votekick", "[player...]", "votekick a player.", (args, player) -> {
+            if (!Cooldowns.instance.canRun("votekick", player.uuid())) {
+                player.sendMessage(GameMsg.ratelimit("Kick", "votekick"));
+                return;
+            }
+            Cooldowns.instance.run("votekick", player.uuid());
+
 //               CustomLog.debug("vk @.", args[0]);
             if (!Administration.Config.enableVotekick.bool()) {
                 player.sendMessage(GameMsg.error("Kick", "Votekicking is disabled on this server."));
@@ -191,10 +198,16 @@ public class Kick implements MiniMod {
 
             Call.sendMessage(GameMsg.info("Kick", "Plaintiff [white]" + player.name + "[" + GameMsg.INFO + "] has voted to kick defendent [white]" + found.name + "[" + GameMsg.INFO + "] " +
                     "(1/" + session.requiredVotes() + "). " +
-                    "Type [" + GameMsg.CMD + "]/kick y[" + GameMsg.INFO + "] to agree and [" + GameMsg.CMD + "]/kick n[" + GameMsg.INFO + "] to disagree."));
+                    "Type [" + GameMsg.CMD + "]/vote y[" + GameMsg.INFO + "] to agree and [" + GameMsg.CMD + "]/vote n[" + GameMsg.INFO + "] to disagree."));
         });
 
         handler.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Or cancel the current kick.", (arg, player) -> {
+            if (!Cooldowns.instance.canRun("votekick", player.uuid())) {
+                player.sendMessage(GameMsg.ratelimit("Kick", "vote"));
+                return;
+            }
+            Cooldowns.instance.run("votekick", player.uuid());
+
             if (session == null) {
                 player.sendMessage("[scarlet]Nobody is being voted on.");
                 return;
@@ -240,7 +253,7 @@ public class Kick implements MiniMod {
 
             Call.sendMessage(GameMsg.info("Kick", "Player [white]" + player.name + "[" + GameMsg.INFO + "] has voted to " + (sign > 0 ? "kick" : "not kick") + " [white]" + target.name + "[" + GameMsg.INFO + "] " +
                     "(" + session.countVotes() + "/" + session.requiredVotes() + "). " +
-                    "Type [" + GameMsg.CMD + "]/kick y[" + GameMsg.INFO + "] to kick and [" + GameMsg.CMD + "]/kick n[" + GameMsg.INFO + "] to not kick."));
+                    "Type [" + GameMsg.CMD + "]/vote y[" + GameMsg.INFO + "] to kick and [" + GameMsg.CMD + "]/vote n[" + GameMsg.INFO + "] to not kick."));
 
             session.addVote(player.uuid(), sign);
         });
