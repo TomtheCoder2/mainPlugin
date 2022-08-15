@@ -180,9 +180,6 @@ public class Kick implements MiniMod {
             } else if (found.team() != player.team()) {
                 player.sendMessage(GameMsg.error("Kick", "Can't kick players on opposing teams."));
                 return;
-            } else if (found.uuid().equals("VA8X0BlqyTsAAAAAFkLMBg==")) {
-                player.sendMessage(GameMsg.error("Kick", "[cyan]Nautilus[scarlet] is god!!! HOW DARE YOU KICK"));
-                return;
             }
 
             if (System.currentTimeMillis() - previousVoteTime < VOTE_COOLDOWN) {
