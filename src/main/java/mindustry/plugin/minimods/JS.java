@@ -49,7 +49,7 @@ public class JS implements MiniMod {
 
         handler.register("js", "<code>",
                 data -> {
-                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                     data.category = "Moderation";
                     data.help = "Run JS code";
                 },
