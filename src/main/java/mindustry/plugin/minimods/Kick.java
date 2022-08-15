@@ -198,7 +198,7 @@ public class Kick implements MiniMod {
             session.plaintiff = player.uuid();
             session.endTime = System.currentTimeMillis() + VOTE_TIME;
             session.addVote(player.uuid(), 1);
-            Timer.schedule(new VoteSession.Task(session), VOTE_TIME);
+            Timer.schedule(new VoteSession.Task(session), VOTE_TIME / 1000);
 
             Call.sendMessage(GameMsg.info("Kick", "Plaintiff [white]" + player.name + "[" + GameMsg.INFO + "] has voted to kick defendent [white]" + found.name + "[" + GameMsg.INFO + "] " +
                     "(1/" + session.requiredVotes() + "). " +
@@ -255,11 +255,10 @@ public class Kick implements MiniMod {
                 return;
             }
 
+            session.addVote(player.uuid(), sign);
             Call.sendMessage(GameMsg.info("Kick", "Player [white]" + player.name + "[" + GameMsg.INFO + "] has voted to " + (sign > 0 ? "kick" : "not kick") + " [white]" + target.name + "[" + GameMsg.INFO + "] " +
                     "(" + session.countVotes() + "/" + session.requiredVotes() + "). " +
                     "Type [" + GameMsg.CMD + "]/vote y[" + GameMsg.INFO + "] to kick and [" + GameMsg.CMD + "]/vote n[" + GameMsg.INFO + "] to not kick."));
-
-            session.addVote(player.uuid(), sign);
         });
 
     }
@@ -341,7 +340,7 @@ public class Kick implements MiniMod {
                 }
 
                 if (session.endTime > System.currentTimeMillis()) {
-                    Timer.schedule(new Task(session), session.endTime - System.currentTimeMillis());
+                    Timer.schedule(new Task(session), (session.endTime - System.currentTimeMillis()) / 1000);
                     return;
                 }
 
