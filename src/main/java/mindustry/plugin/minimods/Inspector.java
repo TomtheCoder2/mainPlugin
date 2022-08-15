@@ -22,7 +22,7 @@ public class Inspector implements MiniMod {
      * Players with inspector enabled
      */
     private final ObjectSet<String> players = new ObjectSet<>();
-    private final IntMap<TileInfo> tileInfos = new IntMap<>();
+    private final ObjectMap<Integer, TileInfo> tileInfos = new ObjectMap<>();
     private final ObjectMap<String, Integer> activeTiles = new ObjectMap<>();
 
     @Override

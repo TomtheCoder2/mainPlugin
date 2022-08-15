@@ -61,11 +61,17 @@ public class Pets implements MiniMod {
     protected static int tierOf(UnitType type) {
         if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela) {
             return 4;
-        } else if (type == UnitTypes.fortress || type == UnitTypes.quasar || type == UnitTypes.spiroct || type == UnitTypes.zenith || type == UnitTypes.mega) {
+        } else if (type == UnitTypes.fortress || type == UnitTypes.quasar || type == UnitTypes.spiroct || type == UnitTypes.zenith || type == UnitTypes.mega ||
+            type == UnitTypes.precept || type == UnitTypes.anthicus || type == UnitTypes.obviate
+        ) {
             return 3;
-        } else if (type == UnitTypes.mace || type == UnitTypes.pulsar || type == UnitTypes.atrax || type == UnitTypes.horizon || type == UnitTypes.poly) {
+        } else if (type == UnitTypes.mace || type == UnitTypes.pulsar || type == UnitTypes.atrax || type == UnitTypes.horizon || type == UnitTypes.poly ||
+            type == UnitTypes.locus || type == UnitTypes.cleroi || type == UnitTypes.avert
+            ) {
             return 2;
-        } else if (type == UnitTypes.dagger || type == UnitTypes.nova || type == UnitTypes.crawler || type == UnitTypes.flare || type == UnitTypes.mono) {
+        } else if (type == UnitTypes.dagger || type == UnitTypes.nova || type == UnitTypes.crawler || type == UnitTypes.flare || type == UnitTypes.mono ||
+                type == UnitTypes.elude || type == UnitTypes.merui || type == UnitTypes.stell
+            ) {
             return 1;
         }
         return -1;
