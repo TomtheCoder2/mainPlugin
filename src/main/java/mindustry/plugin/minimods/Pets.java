@@ -44,6 +44,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Pets implements MiniMod {
+    /** Pets that are currently spawned. Continuously read by controllers, which despawn their unit if it is not in this list. */
     ObjectMap<String, Seq<String>> spawnedPets = new ObjectMap<>();
 
     protected static int maxPets(int rank) {
@@ -221,6 +222,20 @@ public class Pets implements MiniMod {
             alreadySpawned.add(pet.name);
             spawnedPets.put(player.uuid(), alreadySpawned);
             player.sendMessage(GameMsg.success("Pet", "Pet [#" + pet.color.toString().substring(0, 6) + "]" + pet.name + "[green] successfully spawned!"));
+        });
+
+        handler.<Player>register("despawn", "<name...>", "Despawns a pet", (args, player) -> {
+            var spawned = spawnedPets.get(player.uuid());
+            if (spawned == null) {
+                player.sendMessage(GameMsg.error("Pet", args[0] + " [" + GameMsg.ERROR + "] is not currently spawned"));
+                return;
+            }
+            if (!spawned.contains(args[0])) {
+                player.sendMessage(GameMsg.error("Pet", args[0] + " [" + GameMsg.ERROR + "] is not currently spawned"));
+                return;
+            }
+            spawned.remove(args[0]);
+            player.sendMessage(GameMsg.info("Pet", args[0] + " [" + GameMsg.INFO + "] was despawned"));
         });
     }
 
@@ -407,6 +422,12 @@ public class Pets implements MiniMod {
                         return;
                     }
 
+                    // if pet is still alive, despawn it
+                    var spawned = spawnedPets.get(pd.uuid);
+                    if (spawned != null) {
+                        spawned.remove(pet.name);
+                    }
+
                     PetDatabase.removePet(pd.uuid, pet.name);
                     ctx.success("Success", "Successfully deleted " + pet.name);
                 }
@@ -553,6 +574,15 @@ public class Pets implements MiniMod {
             if (unit == null) return;
             if (!Groups.player.contains(p -> p == player)) {
                 Log.warn("pet owner disconnected :(");
+                Call.unitDespawn(unit);
+            }
+
+            // despawn pet if not in spawnedPets list
+            var pets = spawnedPets.get(player.uuid());
+            if (pets == null) {
+                Call.unitDespawn(unit);
+            }
+            if (!pets.contains(name)) {
                 Call.unitDespawn(unit);
             }
 
