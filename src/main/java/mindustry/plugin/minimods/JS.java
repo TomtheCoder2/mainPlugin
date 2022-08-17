@@ -1,5 +1,6 @@
 package mindustry.plugin.minimods;
 
+import arc.Core;
 import arc.util.CommandHandler;
 import arc.util.Strings;
 import arc.util.Timer;
@@ -48,13 +49,15 @@ public class JS implements MiniMod {
 
         handler.register("js", "<code>",
                 data -> {
-                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                     data.category = "Moderation";
                     data.help = "Run JS code";
                 },
                 ctx -> {
-                    String res = mods.getScripts().runConsole(ctx.args.get("code"));
-                    ctx.success("Ran code", "Output:\n```\n" + res + "\n```");
+                    Core.app.post(() -> {
+                        String res = mods.getScripts().runConsole(ctx.args.get("code"));
+                        ctx.success("Ran code", "Output:\n```\n" + res + "\n```");    
+                    });
                 }
         );
     }

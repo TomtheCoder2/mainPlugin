@@ -1,6 +1,7 @@
 package mindustry.plugin.minimods;
 
 import arc.Events;
+import arc.struct.IntMap;
 import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.util.Align;
@@ -21,8 +22,8 @@ public class Inspector implements MiniMod {
      * Players with inspector enabled
      */
     private final ObjectSet<String> players = new ObjectSet<>();
-    private final ObjectMap<Pos, TileInfo> tileInfos = new ObjectMap<>();
-    private final ObjectMap<String, Pos> activeTiles = new ObjectMap<>();
+    private final ObjectMap<Integer, TileInfo> tileInfos = new ObjectMap<>();
+    private final ObjectMap<String, Integer> activeTiles = new ObjectMap<>();
 
     @Override
     public void registerCommands(CommandHandler handler) {
@@ -46,7 +47,7 @@ public class Inspector implements MiniMod {
             String playerName = event.builder.isPlayer() ? event.builder.getPlayer().name : ("unit " + event.builder.type.name);
             String playerUUID = event.builder.isPlayer() ? event.builder.getPlayer().uuid() : null;
 
-            TileInfo info = tileInfos.get(new Pos(event.tile), new TileInfo());
+            TileInfo info = tileInfos.get(idxFor(event.tile.x, event.tile.y), new TileInfo());
             if (!event.breaking) { // construction
                 info.placedBy = playerUUID;
                 info.placedByName = playerName;
@@ -55,28 +56,28 @@ public class Inspector implements MiniMod {
                 info.destroyedBy = playerUUID;
                 info.destroyedByName = playerName;
             }
-            tileInfos.put(new Pos(event.tile), info);
+            tileInfos.put(idxFor(event.tile.x, event.tile.y), info);
         });
 
         Events.on(EventType.ConfigEvent.class, event -> {
             if (event.tile == null || event.player == null) return;
 
-            TileInfo info = tileInfos.get(new Pos(event.tile.tile), new TileInfo());
+            TileInfo info = tileInfos.get(idxFor(event.tile.tile.x, event.tile.tile.y), new TileInfo());
             info.configuredBy = event.player.uuid();
             info.configuredByName = event.player.name;
-            tileInfos.put(new Pos(event.tile.tile), info);
+            tileInfos.put(idxFor(event.tile.tile.x, event.tile.tile.y), info);
         });
 
         Events.on(EventType.WorldLoadEvent.class, event -> {
-            tileInfos.clear();
-            activeTiles.clear();
+            tileInfos.clear(51);
+            activeTiles.clear(51);
         });
 
         Events.on(EventType.TapEvent.class, event -> {
             if (event.tile == null) return;
             if (!players.contains(event.player.uuid())) return;
 
-            activeTiles.put(event.player.uuid(), new Pos(event.tile));
+            activeTiles.put(event.player.uuid(), idxFor(event.tile.x, event.tile.y));
         });
 
         Timer.schedule(() -> {
@@ -85,7 +86,7 @@ public class Inspector implements MiniMod {
                 Player player = Groups.player.find(x -> x.uuid().equals(entry.key));
                 if (player == null) continue;
 
-                Tile tile = Vars.world.tile(entry.value.x, entry.value.y);
+                Tile tile = Vars.world.tile(entry.value % Vars.world.width(), entry.value / Vars.world.width());
                 if (tile == null) continue;
 
                 String s = "[accent]" + tile.block().name + "[white] ([orange]" + tile.x + "[white], [orange]" + tile.y + "[white])";
@@ -109,27 +110,8 @@ public class Inspector implements MiniMod {
         }, 1f, 1f);
     }
 
-    private static class Pos {
-        public int x;
-        public int y;
-
-        public Pos(Tile tile) {
-            x = tile.x;
-            y = tile.y;
-        }
-
-        @Override
-        public int hashCode() {
-            return this.x * 31 + this.y;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof Pos)) return false;
-            Pos p = (Pos) o;
-            return this.x == p.x && this.y == p.y;
-        }
+    private static int idxFor(int x, int y) {
+        return y * Vars.world.width() + x;
     }
 
     private static class TileInfo {

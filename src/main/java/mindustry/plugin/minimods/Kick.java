@@ -15,8 +15,10 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
+import mindustry.plugin.utils.Cooldowns;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
+import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
@@ -117,7 +119,14 @@ public class Kick implements MiniMod {
 
     @Override
     public void registerCommands(CommandHandler handler) {
+        Cooldowns.instance.set("votekick", 5);
         handler.<Player>register("votekick", "[player...]", "votekick a player.", (args, player) -> {
+            if (!Cooldowns.instance.canRun("votekick", player.uuid())) {
+                player.sendMessage(GameMsg.ratelimit("Kick", "votekick"));
+                return;
+            }
+            Cooldowns.instance.run("votekick", player.uuid());
+
 //               CustomLog.debug("vk @.", args[0]);
             if (!Administration.Config.enableVotekick.bool()) {
                 player.sendMessage(GameMsg.error("Kick", "Votekicking is disabled on this server."));
@@ -161,6 +170,11 @@ public class Kick implements MiniMod {
                 player.sendMessage(GameMsg.error("Kick", "No player [orange]" + args[0] + "[scarlet] found."));
             }
 
+            var pd = Database.getPlayerData(found.uuid());
+            if (pd != null && pd.rank >= Rank.APPRENTICE) {
+                player.sendMessage(GameMsg.error("Kick", "Can't kick a mod."));
+            }
+
             if (found == player) {
                 player.sendMessage(GameMsg.error("Kick", "Can't kick yourself."));
                 return;
@@ -173,9 +187,6 @@ public class Kick implements MiniMod {
             } else if (found.team() != player.team()) {
                 player.sendMessage(GameMsg.error("Kick", "Can't kick players on opposing teams."));
                 return;
-            } else if (found.uuid().equals("VA8X0BlqyTsAAAAAFkLMBg==")) {
-                player.sendMessage(GameMsg.error("Kick", "[cyan]Nautilus[scarlet] is god!!! HOW DARE YOU KICK"));
-                return;
             }
 
             if (System.currentTimeMillis() - previousVoteTime < VOTE_COOLDOWN) {
@@ -187,14 +198,20 @@ public class Kick implements MiniMod {
             session.plaintiff = player.uuid();
             session.endTime = System.currentTimeMillis() + VOTE_TIME;
             session.addVote(player.uuid(), 1);
-            Timer.schedule(new VoteSession.Task(session), VOTE_TIME);
+            Timer.schedule(new VoteSession.Task(session), VOTE_TIME / 1000);
 
             Call.sendMessage(GameMsg.info("Kick", "Plaintiff [white]" + player.name + "[" + GameMsg.INFO + "] has voted to kick defendent [white]" + found.name + "[" + GameMsg.INFO + "] " +
                     "(1/" + session.requiredVotes() + "). " +
-                    "Type [" + GameMsg.CMD + "]/kick y[" + GameMsg.INFO + "] to agree and [" + GameMsg.CMD + "]/kick n[" + GameMsg.INFO + "] to disagree."));
+                    "Type [" + GameMsg.CMD + "]/vote y[" + GameMsg.INFO + "] to agree and [" + GameMsg.CMD + "]/vote n[" + GameMsg.INFO + "] to disagree."));
         });
 
         handler.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Or cancel the current kick.", (arg, player) -> {
+            if (!Cooldowns.instance.canRun("votekick", player.uuid())) {
+                player.sendMessage(GameMsg.ratelimit("Kick", "vote"));
+                return;
+            }
+            Cooldowns.instance.run("votekick", player.uuid());
+
             if (session == null) {
                 player.sendMessage("[scarlet]Nobody is being voted on.");
                 return;
@@ -238,11 +255,10 @@ public class Kick implements MiniMod {
                 return;
             }
 
+            session.addVote(player.uuid(), sign);
             Call.sendMessage(GameMsg.info("Kick", "Player [white]" + player.name + "[" + GameMsg.INFO + "] has voted to " + (sign > 0 ? "kick" : "not kick") + " [white]" + target.name + "[" + GameMsg.INFO + "] " +
                     "(" + session.countVotes() + "/" + session.requiredVotes() + "). " +
-                    "Type [" + GameMsg.CMD + "]/kick y[" + GameMsg.INFO + "] to kick and [" + GameMsg.CMD + "]/kick n[" + GameMsg.INFO + "] to not kick."));
-
-            session.addVote(player.uuid(), sign);
+                    "Type [" + GameMsg.CMD + "]/vote y[" + GameMsg.INFO + "] to kick and [" + GameMsg.CMD + "]/vote n[" + GameMsg.INFO + "] to not kick."));
         });
 
     }
@@ -324,7 +340,7 @@ public class Kick implements MiniMod {
                 }
 
                 if (session.endTime > System.currentTimeMillis()) {
-                    Timer.schedule(new Task(session), session.endTime - System.currentTimeMillis());
+                    Timer.schedule(new Task(session), (session.endTime - System.currentTimeMillis()) / 1000);
                     return;
                 }
 

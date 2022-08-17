@@ -22,6 +22,7 @@ import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
@@ -44,6 +45,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Pets implements MiniMod {
+    /** Pets that are currently spawned. Continuously read by controllers, which despawn their unit if it is not in this list. */
     ObjectMap<String, Seq<String>> spawnedPets = new ObjectMap<>();
 
     protected static int maxPets(int rank) {
@@ -59,13 +61,19 @@ public class Pets implements MiniMod {
     }
 
     protected static int tierOf(UnitType type) {
-        if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela || type == UnitTypes.arkyid) {
+        if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela) {
             return 4;
-        } else if (type == UnitTypes.fortress || type == UnitTypes.quasar || type == UnitTypes.spiroct || type == UnitTypes.zenith || type == UnitTypes.mega) {
+        } else if (type == UnitTypes.fortress || type == UnitTypes.quasar || type == UnitTypes.spiroct || type == UnitTypes.zenith || type == UnitTypes.mega ||
+            type == UnitTypes.precept || type == UnitTypes.anthicus || type == UnitTypes.obviate
+        ) {
             return 3;
-        } else if (type == UnitTypes.mace || type == UnitTypes.pulsar || type == UnitTypes.atrax || type == UnitTypes.horizon || type == UnitTypes.poly) {
+        } else if (type == UnitTypes.mace || type == UnitTypes.pulsar || type == UnitTypes.atrax || type == UnitTypes.horizon || type == UnitTypes.poly ||
+            type == UnitTypes.locus || type == UnitTypes.cleroi || type == UnitTypes.avert
+            ) {
             return 2;
-        } else if (type == UnitTypes.dagger || type == UnitTypes.nova || type == UnitTypes.crawler || type == UnitTypes.flare || type == UnitTypes.mono) {
+        } else if (type == UnitTypes.dagger || type == UnitTypes.nova || type == UnitTypes.crawler || type == UnitTypes.flare || type == UnitTypes.mono ||
+                type == UnitTypes.elude || type == UnitTypes.merui || type == UnitTypes.stell
+            ) {
             return 1;
         }
         return -1;
@@ -216,6 +224,20 @@ public class Pets implements MiniMod {
             spawnedPets.put(player.uuid(), alreadySpawned);
             player.sendMessage(GameMsg.success("Pet", "Pet [#" + pet.color.toString().substring(0, 6) + "]" + pet.name + "[green] successfully spawned!"));
         });
+
+        handler.<Player>register("despawn", "<name...>", "Despawns a pet", (args, player) -> {
+            var spawned = spawnedPets.get(player.uuid());
+            if (spawned == null) {
+                player.sendMessage(GameMsg.error("Pet", args[0] + "[" + GameMsg.ERROR + "] is not currently spawned"));
+                return;
+            }
+            if (!spawned.contains(args[0])) {
+                player.sendMessage(GameMsg.error("Pet", args[0] + "[" + GameMsg.ERROR + "] is not currently spawned"));
+                return;
+            }
+            spawned.remove(args[0]);
+            player.sendMessage(GameMsg.info("Pet", args[0] + "[" + GameMsg.INFO + "] was despawned"));
+        });
     }
 
     private boolean spawnPet(PetDatabase.Pet pet, Player player) {
@@ -290,6 +312,39 @@ public class Pets implements MiniMod {
                 }
         );
 
+        handler.register("pets", "",
+                data -> {
+                    data.help = "Show list of pets";
+                    data.category = "Pets";
+                },
+                ctx -> {
+                    Database.Player pd = Database.getDiscordData(ctx.author().getId());
+                    if (pd == null) {
+                        ctx.error("Not in database", "You have not linked your discord account. Use /redeem to link.");
+                        return;
+                    }
+                    
+                    var pets = PetDatabase.getPets(pd.uuid);
+                    if (pets == null || pets.length == 0) {
+                        ctx.sendEmbed(DiscordPalette.INFO, "No pets", "You don't own any pets");
+                        return;
+                    }
+
+                    var info = Vars.netServer.admins.getInfoOptional(pd.uuid);
+                    var name = info == null ? "unknown" : info.lastName;
+
+                    var eb = new EmbedBuilder()
+                        .setTitle(Utils.escapeEverything(name) + "'s Pets")
+                        .setColor(DiscordPalette.INFO);
+
+                    for (var pet : pets) {
+                        eb.addField(pet.name, pet.species.localizedName + " (" + Rank.all[rank(pet)].name + ")");
+                    }
+
+                    ctx.sendEmbed(eb);
+                }
+        );
+
         handler.register("pet", "<name...>",
                 data -> {
                     data.help = "Show pet information";
@@ -311,7 +366,7 @@ public class Pets implements MiniMod {
                     }
 
                     String ownerName = "unknown";
-                    var info = Vars.netServer.admins.getInfo(pd.uuid);
+                    var info = Vars.netServer.admins.getInfoOptional(pd.uuid);
                     if (info != null) {
                         ownerName = Utils.escapeEverything(info.lastName);
                     }
@@ -399,6 +454,12 @@ public class Pets implements MiniMod {
                     if (pet == null) {
                         ctx.error("No such pet", "You don't have a pet named '" + name + "'");
                         return;
+                    }
+
+                    // if pet is still alive, despawn it
+                    var spawned = spawnedPets.get(pd.uuid);
+                    if (spawned != null) {
+                        spawned.remove(pet.name);
                     }
 
                     PetDatabase.removePet(pd.uuid, pet.name);
@@ -547,6 +608,15 @@ public class Pets implements MiniMod {
             if (unit == null) return;
             if (!Groups.player.contains(p -> p == player)) {
                 Log.warn("pet owner disconnected :(");
+                Call.unitDespawn(unit);
+            }
+
+            // despawn pet if not in spawnedPets list
+            var pets = spawnedPets.get(player.uuid());
+            if (pets == null) {
+                Call.unitDespawn(unit);
+            }
+            if (!pets.contains(name)) {
                 Call.unitDespawn(unit);
             }
 

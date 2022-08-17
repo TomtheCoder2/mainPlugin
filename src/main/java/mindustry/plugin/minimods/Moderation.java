@@ -25,6 +25,9 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
 import static mindustry.plugin.utils.Utils.calculatePhash;
@@ -388,7 +391,8 @@ public class Moderation implements MiniMod {
                     eb.addField("Names", info.names.toString(" / "));
 
                     if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.MOD_BOT.getId()) {
-                        eb.addField("IPs", info.ips.toString(" / "))
+                        // if there are too many IPs, take last 1024 / 18 IPs
+                        eb.addField("IPs", info.ips.toString(" / ").length() > 1000 ? StreamSupport.stream(info.ips.spliterator(), false).skip(info.ips.size - (1024 / 18) > 0 ? info.ips.size - (1024 / 18) : 0).collect(Collectors.joining(" / ")) : info.ips.toString(" / "))
                                 .addInlineField("UUID", info.id)
                                 .addInlineField("Last IP", info.lastIP);
                     }

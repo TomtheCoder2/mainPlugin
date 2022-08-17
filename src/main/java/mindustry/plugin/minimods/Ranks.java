@@ -183,6 +183,8 @@ public class Ranks implements MiniMod {
             } else if (selection == 1) {
                 md.negativeRating += 1;
                 player.sendMessage("Successfully gave a [red]negative [white]feedback for " + mapName + "[white]!");
+            } else if (selection == 2) {
+                player.sendMessage("Successfully skipped voting for " + mapName + "[white]!");
             } else {
                 return;
             }
@@ -207,10 +209,10 @@ public class Ranks implements MiniMod {
             }
             Call.menu(player.con, id,
                     "Rate this map! [pink]" + mapName,
-                    "Do you like this map? Vote [green]yes [white]or [scarlet]no:",
+                    "Do you like this map? Vote [green]yes [white]or [scarlet]no[white]:",
                     new String[][]{
-                            new String[]{"[green]Yes", "[scarlet]No"},
-                            new String[]{"Close"}
+                            new String[]{"[green]Yes", "[scarlet]No", "Skip"},
+                            new String[]{"Later"}
                     }
             );
         }

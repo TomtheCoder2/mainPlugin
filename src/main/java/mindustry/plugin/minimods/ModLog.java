@@ -1,6 +1,7 @@
 package mindustry.plugin.minimods;
 
 import arc.struct.Seq;
+import arc.struct.Sort;
 import arc.util.Log;
 import arc.util.Timer;
 import mindustry.gen.Groups;
@@ -12,6 +13,8 @@ import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
+
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.sql.ResultSet;
@@ -70,20 +73,37 @@ public class ModLog implements MiniMod {
                         entries = ModDatabase.queryEntries(info.id, (short) ctx.args.getInt("year"));
                     }
 
+                    new Sort().sort(entries, (a, b) -> {
+                        if (a.year != b.year) {
+                            return a.year - b.year;
+                        }
+                        if (a.month != b.month) {
+                            return a.month - b.month;
+                        }
+                        return a.day - b.day;
+                    });
+
                     StringBuilder sb = new StringBuilder();
+                    StringBuilder csv = new StringBuilder("Year,Month,Day,Minutes\n");
                     long total = 0;
                     for (var entry : entries) {
                         sb.append(String.format("`%04d-%02d-%02d` %s\n", entry.year, entry.month, entry.day, formatMinutes(entry.minutes)));
+                        csv.append(entry.year + "," + entry.month + "," + entry.day + "," + entry.minutes + "\n");
                         total += entry.minutes;
                     }
 
-                    ctx.sendEmbed(new EmbedBuilder()
-                            .setColor(DiscordPalette.INFO)
-                            .setTitle("Mod Log: " + Utils.escapeEverything(info.lastName))
-                            .setDescription(sb.toString())
-                            .addInlineField("Total", formatMinutes(total))
-                            .addInlineField("Days", entries.length + "")
-                            .addInlineField("Average", formatMinutes(entries.length == 0 ? 0 : (total / entries.length)))
+                    ctx.reply(
+                        new MessageBuilder()
+                            .setEmbed(    
+                                new EmbedBuilder()
+                                        .setColor(DiscordPalette.INFO)
+                                        .setTitle("Mod Log: " + Utils.escapeEverything(info.lastName))
+                                        .setDescription(sb.toString())
+                                        .addInlineField("Total", formatMinutes(total))
+                                        .addInlineField("Days", entries.length + "")
+                                        .addInlineField("Average", formatMinutes(entries.length == 0 ? 0 : (total / entries.length)))
+                            )
+                            .addAttachment(csv.toString().getBytes(), "modlog-" + Utils.escapeEverything(info.lastName).replaceAll("[^A-Za-z0-9_]", "") + ".csv")
                     );
                 }
         );
