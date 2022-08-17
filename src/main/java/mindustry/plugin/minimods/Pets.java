@@ -228,15 +228,15 @@ public class Pets implements MiniMod {
         handler.<Player>register("despawn", "<name...>", "Despawns a pet", (args, player) -> {
             var spawned = spawnedPets.get(player.uuid());
             if (spawned == null) {
-                player.sendMessage(GameMsg.error("Pet", args[0] + " [" + GameMsg.ERROR + "] is not currently spawned"));
+                player.sendMessage(GameMsg.error("Pet", args[0] + "[" + GameMsg.ERROR + "] is not currently spawned"));
                 return;
             }
             if (!spawned.contains(args[0])) {
-                player.sendMessage(GameMsg.error("Pet", args[0] + " [" + GameMsg.ERROR + "] is not currently spawned"));
+                player.sendMessage(GameMsg.error("Pet", args[0] + "[" + GameMsg.ERROR + "] is not currently spawned"));
                 return;
             }
             spawned.remove(args[0]);
-            player.sendMessage(GameMsg.info("Pet", args[0] + " [" + GameMsg.INFO + "] was despawned"));
+            player.sendMessage(GameMsg.info("Pet", args[0] + "[" + GameMsg.INFO + "] was despawned"));
         });
     }
 
@@ -327,6 +327,7 @@ public class Pets implements MiniMod {
                     var pets = PetDatabase.getPets(pd.uuid);
                     if (pets == null || pets.length == 0) {
                         ctx.sendEmbed(DiscordPalette.INFO, "No pets", "You don't own any pets");
+                        return;
                     }
 
                     var info = Vars.netServer.admins.getInfoOptional(pd.uuid);
