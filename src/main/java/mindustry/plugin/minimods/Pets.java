@@ -22,6 +22,7 @@ import mindustry.gen.Player;
 import mindustry.gen.Unit;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
@@ -311,6 +312,38 @@ public class Pets implements MiniMod {
                 }
         );
 
+        handler.register("pets", "",
+                data -> {
+                    data.help = "Show list of pets";
+                    data.category = "Pets";
+                },
+                ctx -> {
+                    Database.Player pd = Database.getDiscordData(ctx.author().getId());
+                    if (pd == null) {
+                        ctx.error("Not in database", "You have not linked your discord account. Use /redeem to link.");
+                        return;
+                    }
+                    
+                    var pets = PetDatabase.getPets(pd.uuid);
+                    if (pets == null || pets.length == 0) {
+                        ctx.sendEmbed(DiscordPalette.INFO, "No pets", "You don't own any pets");
+                    }
+
+                    var info = Vars.netServer.admins.getInfoOptional(pd.uuid);
+                    var name = info == null ? "unknown" : info.lastName;
+
+                    var eb = new EmbedBuilder()
+                        .setTitle(Utils.escapeEverything(name) + "'s Pets")
+                        .setColor(DiscordPalette.INFO);
+
+                    for (var pet : pets) {
+                        eb.addField(pet.name, pet.species.localizedName + " (" + Rank.all[rank(pet)].name + ")");
+                    }
+
+                    ctx.sendEmbed(eb);
+                }
+        );
+
         handler.register("pet", "<name...>",
                 data -> {
                     data.help = "Show pet information";
@@ -332,7 +365,7 @@ public class Pets implements MiniMod {
                     }
 
                     String ownerName = "unknown";
-                    var info = Vars.netServer.admins.getInfo(pd.uuid);
+                    var info = Vars.netServer.admins.getInfoOptional(pd.uuid);
                     if (info != null) {
                         ownerName = Utils.escapeEverything(info.lastName);
                     }
