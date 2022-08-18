@@ -1,15 +1,18 @@
 package mindustry.plugin.discord;
 
 import arc.struct.StringMap;
-import mindustry.gen.Call;
+import arc.util.Log;
 import mindustry.gen.Groups;
 import mindustry.net.Administration;
-import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Utils;
+import org.javacord.api.entity.message.MessageAttachment;
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 
+import java.io.File;
 import java.time.Instant;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -68,6 +71,35 @@ public class DiscordLog {
         eb.setTimestampToNow();
 
         Channels.LOG.sendMessage(eb);
+    }
+
+    public static void moderationLogColonel(String action, String mod, Administration.PlayerInfo info, String reason, String additionalInfo, List<MessageAttachment> images) {
+        EmbedBuilder eb = new EmbedBuilder()
+                .setColor(DiscordPalette.WARN)
+                .setTitle(action)
+                .addField("Moderator", mod)
+                .addField("Reason", reason == null || reason.equals("") ? "None" : reason);
+        if (info != null) {
+            eb.addField("Target hashed UUID", Utils.calculatePhash(info.id))
+                    .addField("Target name", Utils.escapeEverything(info.lastName));
+        }
+        if (additionalInfo != null) {
+            eb.setDescription(additionalInfo);
+        }
+        eb.setTimestampToNow();
+        MessageBuilder mb = new MessageBuilder();
+        try {
+            eb.setImage(images.get(0).downloadAsInputStream());
+            for (MessageAttachment i : images) {
+                if (images.get(0) == i) continue;
+                mb.addAttachment(i.downloadAsInputStream(), "image_" + i.getFileName());
+            }
+        } catch (Exception e) {
+            Log.info("Could not load images.");
+            e.printStackTrace();
+        }
+        mb.addEmbed(eb);
+        mb.send(Channels.COLONEL_LOG);
     }
 
     public static void moderation(String action, User mod, Administration.PlayerInfo info, String reason, String additionalInfo) {

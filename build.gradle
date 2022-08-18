@@ -1,8 +1,24 @@
+buildscript {
+    ext.kotlin_version = '1.6.0'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+}
 apply plugin: "java"
 apply plugin: 'kotlin'
-
+apply plugin: 'application'
 version '1.0'
-
+javafx {
+    version = "18.0.2"
+    modules = ['javafx.controls']
+}
 sourceCompatibility = 16
 
 repositories {
@@ -22,6 +38,7 @@ ext {
 
 dependencies {
     implementation 'org.jsoup:jsoup:1.14.3'
+    implementation 'junit:junit:4.13.1'
     compileOnly("com.github.Anuken.Arc:arc-core:$arcVersion")
     compileOnly("com.github.Anuken.Mindustry:core:$arcVersion")
     compileOnly "com.github.Anuken.Mindustry:server:$arcVersion"
@@ -44,12 +61,15 @@ dependencies {
 //    implementation group: 'postgresql', name: 'postgresql', version: '9.0-801.jdbc4'
     implementation 'org.postgresql:postgresql:42.4.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j:2.17.1'
-    runtimeOnly 'ch.qos.logback:logback-classic:1.2.11'
+//    runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j:2.17.1'
+//    runtimeOnly 'ch.qos.logback:logback-classic:1.2.11'
 
     // https://mvnrepository.com/artifact/com.github.kevinsawicki/http-request
     implementation group: 'com.github.kevinsawicki', name: 'http-request', version: '6.0'
 
+    implementation 'org.openjfx:javafx-controls:20-ea+1'
+//    implementation 'org.openjfx:javafx-swing:20-ea+1'
+    implementation 'org.openjfx:javafx-swing:11-ea+24'
 
 }
 
@@ -61,7 +81,7 @@ jar {
         configurations.runtimeClasspath.findAll { !it.name.endsWith('pom') }.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
-//
+
 //jar {
 //    version = null
 //    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
@@ -70,27 +90,19 @@ jar {
 //    from {
 //        configurations.runtimeClasspath.findAll { !it.name.endsWith('pom') }.collect { it.isDirectory() ? it : zipTree(it) }
 //    }
-//    archiveName 'UpdateDatabase.jar'
+//    archiveName 'PlotTest.jar'
 //
 //    doFirst {
 //        manifest(({
 //            if (!configurations.runtimeClasspath.isEmpty()) {
 //                attributes(
 //                        'Class-Path': configurations.runtimeClasspath.collect { it.toURI().toString() }.join(' '),
-//                        'Main-Class': 'mindustry.plugin.database.UpdateDatabase')
+//                        'Main-Class': 'mindustry.plugin.utils.plot.SkillMatchBar')
 //            }
 //        } as groovy.lang.Closure<?>))
 //    }
 //}
-buildscript {
-    ext.kotlin_version = '1.6.0'
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
+
 compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"

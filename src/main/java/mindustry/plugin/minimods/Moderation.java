@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
 import static mindustry.plugin.utils.Utils.calculatePhash;
 
 
@@ -148,6 +149,11 @@ public class Moderation implements MiniMod {
                     data.aliases = new String[]{"b", "banish"};
                 },
                 ctx -> {
+                    System.out.println(ctx.event.getMessageAttachments().size() );
+                    if (ctx.event.getMessageAttachments().size() < 1) {
+                        ctx.error("Missing Attachment(s)", "Please provide a picture as evidence for the ban");
+                        return;
+                    }
                     Administration.PlayerInfo info = Query.findPlayerInfo(ctx.args.get("player"));
                     if (info == null) {
                         ctx.error("Error", "Player " + ctx.args.get("player") + " not found.");
@@ -185,7 +191,9 @@ public class Moderation implements MiniMod {
                         player.con.kick(Packets.KickReason.banned);
                     }
 
-                    DiscordLog.moderation("Banned", ctx.author(), Vars.netServer.admins.getInfo(player.uuid()), reason, null);
+                    DiscordLog.moderation("Banned", ctx.author(), Vars.netServer.admins.getInfo(pd.uuid), reason, null);
+
+                    moderationLogColonel("Banned", "<@" + ctx.author().getId() + ">", Vars.netServer.admins.getInfo(pd.uuid), reason, null, ctx.event.getMessage().getAttachments());
                 }
         );
 
