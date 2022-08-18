@@ -20,6 +20,8 @@ import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
+
+import org.javacord.api.entity.channel.AutoArchiveDuration;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
@@ -446,7 +448,7 @@ public class Moderation implements MiniMod {
                 ctx -> {
                     ctx.author().addRole(DiscordVars.api.getRoleById(Roles.APPEAL).get()).join();
 
-                    new MessageBuilder()
+                    var msg = new MessageBuilder()
                             .addEmbed(
                                     new EmbedBuilder()
                                             .setColor(DiscordPalette.WARN)
@@ -458,6 +460,7 @@ public class Moderation implements MiniMod {
                             .setContent("<@" + ctx.author().getId() + ">")
                             .send(Channels.APPEAL)
                             .join();
+                    msg.createThread("Appeal: " + ctx.author().getDisplayName(DiscordVars.server()), AutoArchiveDuration.THREE_DAYS);
 
                     ctx.success("Successfully requested an appeal", "Head over to <#" + Channels.APPEAL.getIdAsString() + ">");
                 }
