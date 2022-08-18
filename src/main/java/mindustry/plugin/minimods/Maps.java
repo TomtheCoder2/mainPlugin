@@ -189,6 +189,7 @@ public class Maps implements MiniMod {
                                     Button.danger("map-reject", "Reject"),
                                     Button.secondary("map-discuss", "Discuss")
                             )
+                            .setContent("<@&" + Roles.MAP_SUBMISSIONS + ">")
                             .send(Channels.MAP_SUBMISSIONS)
                             .join();
 
