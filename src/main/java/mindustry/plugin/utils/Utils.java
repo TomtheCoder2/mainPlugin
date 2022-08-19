@@ -717,7 +717,7 @@ public class Utils {
         }
 
         public static String rules() {
-            return Core.settings.getString("rulesMessage");
+            return Core.settings.getString("ruleMessage");
         }
     }
 
