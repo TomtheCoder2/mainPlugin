@@ -208,9 +208,8 @@ public class PheonixMain extends Plugin {
                     "IgruhaOrg",
                     "андрей",
                     "THIS IS MY KINGDOM CUM, THIS IS MY CUM",
-                    "HITLER"
-                    "nekonya HOI"
-                        
+                    "HITLER",
+                    "nekonya HOI"                        
             };
             if (Structs.contains(bannedNames, s -> s.equals(escapeEverything(player.name)))) {
                 player.con.kick("[scarlet]Please change your name.");
