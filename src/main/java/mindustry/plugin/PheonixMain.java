@@ -177,8 +177,7 @@ public class PheonixMain extends Plugin {
             .setTitle("Starting Server")
             .setColor(DiscordPalette.ERROR);
         var startupMessage = new MessageBuilder() 
-            .setEmbed(startupEmbed)
-            .setContent("<@426133274692419615>");
+            .setEmbed(startupEmbed);
         Channels.COLONEL_LOG.sendMessage(startupEmbed);
         startupMessage.send(Channels.LOG);
 
