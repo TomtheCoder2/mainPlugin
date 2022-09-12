@@ -61,10 +61,16 @@ public class Kick implements MiniMod {
     private static void kick(VoteSession session) {
         Player target = Groups.player.find(x -> x.uuid().equals(session.target));
         Player plaintiff = Groups.player.find(x -> x.uuid().equals(session.plaintiff));
-        if (target != null) {
-            target.con.kick("Votekicked by " + plaintiff.name);
+        String plaintiffName = "";
+        if (plaintiff == null) {
+            plaintiffName = Utils.calculatePhash(session.plaintiff);
+        } else {
+            plaintiffName = plaintiff.name;
         }
-        String plaintiffName = "#" + session.plaintiff.substring(0, 4);
+        if (target != null) {
+            target.con.kick("Votekicked by " + plaintiffName);
+        }
+        plaintiffName = "#" + session.plaintiff.substring(0, 4);
         if (plaintiff != null) {
             plaintiffName = plaintiff.name;
         }
@@ -188,7 +194,6 @@ public class Kick implements MiniMod {
                 player.sendMessage(GameMsg.error("Kick", "Can't kick players on opposing teams."));
                 return;
             }
-
             if (System.currentTimeMillis() - previousVoteTime < VOTE_COOLDOWN) {
                 player.sendMessage(GameMsg.error("Kick", "You must wait " +
                         (System.currentTimeMillis() - previousVoteTime - VOTE_COOLDOWN) / 1000 + " seconds until the next votekick."));
@@ -200,7 +205,7 @@ public class Kick implements MiniMod {
             session.addVote(player.uuid(), 1);
             Timer.schedule(new VoteSession.Task(session), VOTE_TIME / 1000);
 
-            Call.sendMessage(GameMsg.info("Kick", "Plaintiff [white]" + player.name + "[" + GameMsg.INFO + "] has voted to kick defendent [white]" + found.name + "[" + GameMsg.INFO + "] " +
+            Call.sendMessage(GameMsg.info("Kick", "Plaintiff [white]" + player.name + "[" + GameMsg.INFO + "] has voted to kick defendant [white]" + found.name + "[" + GameMsg.INFO + "] " +
                     "(1/" + session.requiredVotes() + "). " +
                     "Type [" + GameMsg.CMD + "]/vote y[" + GameMsg.INFO + "] to agree and [" + GameMsg.CMD + "]/vote n[" + GameMsg.INFO + "] to disagree."));
         });

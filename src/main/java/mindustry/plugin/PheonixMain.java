@@ -174,11 +174,11 @@ public class PheonixMain extends Plugin {
 
         // Log startup
         var startupEmbed = new EmbedBuilder()
-            .setTitle("Starting Server")
-            .setColor(DiscordPalette.ERROR);
-        var startupMessage = new MessageBuilder() 
-            .setEmbed(startupEmbed)
-            .setContent("<@426133274692419615>");
+                .setTitle("Starting Server")
+                .setColor(DiscordPalette.ERROR);
+        var startupMessage = new MessageBuilder()
+                .setEmbed(startupEmbed)
+                .setContent("<@426133274692419615>");
         Channels.COLONEL_LOG.sendMessage(startupEmbed);
         startupMessage.send(Channels.LOG);
 
@@ -241,10 +241,10 @@ public class PheonixMain extends Plugin {
                 Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
                 player.name = Utils.formatName(rank, player);
 
-                // Give Marshals admin
-                if (pd.rank == Rank.all.length - 1) {
-                    player.admin = true;
-                }
+//                // Give Marshals admin
+//                if (pd.rank == Rank.all.length - 1) {
+//                    player.admin = true;
+//                }
             } else { // not in database
                 info("New player connected: " + Strings.stripColors(event.player.name));
                 Database.setPlayerData(new Database.Player(player.uuid(), 0));
@@ -385,6 +385,28 @@ public class PheonixMain extends Plugin {
         for (MiniMod mod : minimods) {
             mod.registerServerCommands(handler);
         }
+
+
+        Vars.netServer.addPacketHandler("playerdata_by_id", (player, identifier) -> {
+            var p = Groups.player.getByID(Integer.parseInt(identifier));
+            if (p == null) return;
+            var target = Database.getPlayerData(p.uuid());
+            if (target == null) return;
+
+            JSONObject data = new JSONObject();
+
+            data.put("id", p.id);
+            data.put("name", p.name);
+            data.put("realName", p.name);
+            data.put("playercode", target.phash);
+            data.put("rank", target.rank);
+            data.put("buildings", target.buildingsBuilt);
+            data.put("games", target.gamesPlayed);
+            data.put("frozen", false);
+            data.put("muted", false);
+
+            Call.clientPacketReliable(player.con, "playerdata", data.toString());
+        });
     }
 
     //register commands that player can invoke in-game

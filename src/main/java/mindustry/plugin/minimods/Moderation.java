@@ -27,6 +27,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -39,8 +40,8 @@ import static mindustry.plugin.utils.Utils.calculatePhash;
  * Manages mutes, freezes, bans, and other moderation-related commands
  */
 public class Moderation implements MiniMod {
-    private final ObjectSet<String> frozen = new ObjectSet<>();
-    private final ObjectSet<String> muted = new ObjectSet<>();
+    public final ObjectSet<String> frozen = new ObjectSet<>();
+    public final ObjectSet<String> muted = new ObjectSet<>();
 
     @Override
     public void registerEvents() {
@@ -237,6 +238,15 @@ public class Moderation implements MiniMod {
                 ctx -> {
                     String ip = ctx.args.get("ip");
                     Vars.netServer.admins.banPlayerIP(ip);
+                    Player p = null;
+                    for (Player pl : Groups.player) {
+                        if (Objects.equals(ip, pl.ip())) {
+                            p = pl;
+                        }
+                    }
+                    if (p != null) {
+                        p.kick("You are banned on this server.");
+                    }
                     ctx.success("Banned IP", "Banned " + ip);
                     DiscordLog.moderation("Ban IP", ctx.author(), null, ctx.args.get("reason"), "IP: " + ip);
                 }

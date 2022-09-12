@@ -29,8 +29,11 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
 
 import java.awt.*;
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
+
+import static mindustry.plugin.utils.plot.PlotTest2.savePlot;
 
 public class Management implements MiniMod {
     @Override
@@ -49,6 +52,9 @@ public class Management implements MiniMod {
                     final long endTime = System.currentTimeMillis() + time;
                     scanTPS[0] = () -> {
                         if (System.currentTimeMillis() > endTime) {
+                            // create plot data
+                            String path_tps = savePlot(data.tpsMeasurements.toArray(), "tps", "TPS");
+                            String path_memory = savePlot(data.memMeasurements.toArray(), "memory", "Memory Usage");
                             ctx.reply(new MessageBuilder()
                                     .addEmbed(
                                             new EmbedBuilder()
@@ -66,6 +72,8 @@ public class Management implements MiniMod {
                                                                     "Max: " + (data.maxMem() / 1024) + " kB\n"
                                                     ))
                                     .addAttachment(data.csv().getBytes(), "data.csv")
+                                    .addAttachment(new File(path_tps))
+                                    .addAttachment(new File(path_memory))
                             );
                         } else {
                             data.step();
@@ -389,10 +397,10 @@ public class Management implements MiniMod {
                 }
         );
 
-        handler.register("phash", "", 
+        handler.register("phash", "",
                 data -> {
                     data.category = "Management";
-                    data.roles = new long[] { Roles.ADMIN, Roles.MOD };
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                     data.help = "Re-calculate all Phashes.";
                 },
                 ctx -> {

@@ -156,7 +156,7 @@ public class Maps implements MiniMod {
                         return;
                     }
 
-                    StringMap meta = null;
+                    StringMap meta;
                     try {
                         CounterInputStream counter = new CounterInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
                         DataInput stream = new DataInputStream(counter);
