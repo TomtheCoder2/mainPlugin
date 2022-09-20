@@ -403,6 +403,7 @@ public class PheonixMain extends Plugin {
             data.put("games", target.gamesPlayed);
             data.put("frozen", false);
             data.put("muted", false);
+            data.put("playtime", target.playTime);
 
             Call.clientPacketReliable(player.con, "playerdata", data.toString());
         });
