@@ -15,7 +15,7 @@ public class Rank {
             new Rank("\uE865", "Soldier", new Color(0xb29d35ff)),  // 1
             new Rank("\uE861", "Corporal", new Color(0xb28835ff)), // 2
             new Rank("\uE804", "Brigadier", new Color(0xb27435ff)),// 3
-            new Rank("\uE826", "Sargeant", new Color(0xb25f35ff)), // 4
+            new Rank("\uE826", "Sergeant", new Color(0xb25f35ff)), // 4
             new Rank("\uE806", "Major", new Color(0xb23b23ff)),    // 5
             new Rank("\uE810", "Lieutenant", new Color(0x991e1eff), "", "Be decorated by General/Marshal"),     // 6
             new Rank("\uE811", "Captain", new Color(0x7f192aff), "Map creator / coder", "Create maps or code for the server"), // 7
