@@ -1,6 +1,7 @@
 package mindustry.plugin.minimods;
 
 import arc.Core;
+import arc.files.Fi;
 import arc.struct.IntSeq;
 import arc.struct.LongSeq;
 import arc.util.Http;
@@ -13,6 +14,7 @@ import mindustry.game.Gamemode;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.io.SaveIO;
 import mindustry.maps.Map;
 import mindustry.maps.MapException;
 import mindustry.net.Administration;
@@ -33,6 +35,9 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+import static arc.util.Log.err;
+import static arc.util.Log.info;
+import static mindustry.Vars.*;
 import static mindustry.plugin.utils.plot.PlotTest2.savePlot;
 
 public class Management implements MiniMod {
@@ -104,6 +109,80 @@ public class Management implements MiniMod {
                             .addInlineField("Pre-GC usage", pre + " MB")
                             .addInlineField("Post-GC usage", post + " MB")
                     );
+                }
+        );
+
+        handler.register("saves", "",
+                data -> {
+                    data.help = "List all saves";
+                    data.roles = new long[]{Roles.APPRENTICE, Roles.MOD, Roles.ADMIN};
+                    data.category = "Management";
+                },
+                ctx -> {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    eb.setTitle("Save files: ");
+                    var sb = new StringBuilder();
+                    for (Fi file : saveDirectory.list()) {
+                        if (file.extension().equals(saveExtension)) {
+                            sb.append(Strings.format("| @\n", file.nameWithoutExtension()));
+                        }
+                    }
+                    eb.setDescription(sb.toString());
+                    ctx.sendEmbed(eb);
+                }
+        );
+
+        handler.register("save", "<slot>",
+                data -> {
+                    data.help = "Save the current map to a slot";
+                    data.roles = new long[]{Roles.APPRENTICE, Roles.MOD, Roles.ADMIN};
+                    data.category = "Management";
+                },
+                ctx -> {
+                    EmbedBuilder eb = new EmbedBuilder();
+                    if (!state.is(GameState.State.playing)) {
+                        ctx.error("Not hosting.","Host a game first.");
+                        return;
+                    }
+
+                    Fi file = saveDirectory.child(ctx.args.get("slot") + "." + saveExtension);
+
+                    Core.app.post(() -> {
+                        SaveIO.save(file);
+                        eb.setTitle(Strings.format("Saved to @.", file));
+                        ctx.sendEmbed(eb);
+                    });
+                }
+        );
+
+        handler.register("load", "<slot>",
+                data -> {
+                    data.help = "Load a save";
+                    data.roles = new long[]{Roles.APPRENTICE, Roles.MOD, Roles.ADMIN};
+                    data.category = "Management";
+                },
+                ctx -> {
+                    net.closeServer();
+                    state.set(GameState.State.menu);
+
+                    Fi file = saveDirectory.child(ctx.args.get("slot") + "." + saveExtension);
+
+                    if (!SaveIO.isSaveValid(file)) {
+                        ctx.error("Invalid", "No (valid) save data found for slot.");
+                        return;
+                    }
+
+                    Core.app.post(() -> {
+                        try {
+                            SaveIO.load(file);
+                            state.rules.sector = null;
+                            ctx.sendEmbed(Color.green, "Save loaded.", "");
+                            state.set(GameState.State.playing);
+                            netServer.openServer();
+                        } catch (Throwable t) {
+                            ctx.error("Failed to load save.", "Outdated or corrupt file.");
+                        }
+                    });
                 }
         );
 
