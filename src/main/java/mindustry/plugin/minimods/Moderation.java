@@ -1,8 +1,8 @@
 package mindustry.plugin.minimods;
 
-import arc.Core;
 import arc.Events;
 import arc.struct.ObjectSet;
+import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Strings;
 import mindustry.Vars;
@@ -20,20 +20,16 @@ import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
-
 import org.javacord.api.entity.channel.AutoArchiveDuration;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
-import static mindustry.plugin.utils.Utils.calculatePhash;
 
 
 /**
@@ -96,23 +92,6 @@ public class Moderation implements MiniMod {
                 }
         );
 
-        // TODO: this should be in communication
-        handler.register("banword", "[add/remove] [word]",
-                data -> {
-                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
-                    data.help = "Ban a bad word.";
-                    data.category = "Moderation";
-                },
-                ctx -> {
-                    ArrayList<String> bannedWords = (ArrayList<String>) Core.settings.get("bannedWords", ArrayList.class);
-                    if (ctx.args.size > 2) {
-                        switch (ctx.args.get("add/remove")) {
-                            // TODO: maybe make database idk
-                        }
-                    }
-                }
-        );
-
         handler.register("freeze", "<player> [reason...]",
                 data -> {
                     data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
@@ -150,7 +129,7 @@ public class Moderation implements MiniMod {
                     data.aliases = new String[]{"b", "banish"};
                 },
                 ctx -> {
-                    System.out.println(ctx.event.getMessageAttachments().size() );
+                    System.out.println(ctx.event.getMessageAttachments().size());
                     if (ctx.event.getMessageAttachments().size() < 1) {
                         ctx.error("Missing Attachment(s)", "Please provide a picture as evidence for the ban");
                         return;
@@ -455,6 +434,63 @@ public class Moderation implements MiniMod {
                     p.sendMessage("Your name was changed to [orange]" + p.name + "[white] by a moderator");
                     ctx.success("Renamed player", "Renamed " + oldName + " to " + Strings.stripColors(p.name));
                     DiscordLog.moderation("Rename", ctx.author(), p.getInfo(), null, "Old: " + oldName + "\nNew: " + Strings.stripColors(p.name));
+                }
+        );
+
+        handler.register("bannedwords", "<add|list|update|remove> [words...]",
+                data -> {
+                    data.category = "Moderation";
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
+                    data.help = "Add or list banned words";
+                    data.aliases = new String[]{"bw"};
+                },
+                ctx -> {
+                    String mode = ctx.args.get("add|list|update|remove");
+                    if (Objects.equals(mode, "list")) {
+                        ctx.success("Banned words", Database.bannedWords.toString("\n"));
+                        return;
+                    } else if (Objects.equals(mode, "add")) {
+                        String words = ctx.args.get("words");
+                        if (words == null) {
+                            ctx.error("No words", "You must specify words to add");
+                            return;
+                        }
+                        String[] split = words.split(" ");
+                        for (String s : split) {
+                            if (Database.bannedWords.contains(s)) {
+                                ctx.error("Word already banned", s + " is already banned");
+                                return;
+                            }
+                        }
+                        Database.bannedWords.addAll(split);
+                        Database.updateBannedWordsDatabase();
+                        ctx.success("Added banned words", "Added `" + words + "` to the banned words list");
+                        DiscordLog.moderation("Banned words", ctx.author(), null, "Added `" + words + "`", null);
+                    } else if (Objects.equals(mode, "update")) {
+                        Database.updateBannedWordsDatabase();
+                        Database.updateBannedWordsClient();
+                        ctx.success("Updated banned words", "Updated the banned words list");
+                        DiscordLog.moderation("Banned words", ctx.author(), null, "Updated", null);
+                    } else if (Objects.equals(mode, "remove")) {
+                        String words = ctx.args.get("words");
+                        if (words == null) {
+                            ctx.error("No words", "You must specify words to remove");
+                            return;
+                        }
+                        String[] split = words.split(" ");
+                        for (String s : split) {
+                            if (!Database.bannedWords.contains(s)) {
+                                ctx.error("Word not banned", s + " is not banned");
+                                return;
+                            }
+                        }
+                        Database.bannedWords.removeAll(new Seq<>(split));
+                        Database.removeBannedWordDatabase(split);
+                        ctx.success("Removed banned words", "Removed `" + words + "` from the banned words list");
+                        DiscordLog.moderation("Banned words", ctx.author(), null, "Removed `" + words + "`", null);
+                    } else {
+                        ctx.error("Invalid mode", "Mode must be either `add`, `update` or `list`");
+                    }
                 }
         );
 

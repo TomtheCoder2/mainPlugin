@@ -26,8 +26,12 @@ import mindustry.ui.Menus;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import static mindustry.plugin.database.Database.bannedWords;
+import static mindustry.plugin.utils.Utils.escapeFoosCharacters;
 
 public class Communication implements MiniMod {
     private Announcement announcement = null;
@@ -64,13 +68,19 @@ public class Communication implements MiniMod {
             if (event.message.charAt(0) != '/') {
                 Player player = event.player;
                 assert player != null;
-                StringBuilder sb = new StringBuilder(event.message);
-                for (int i = event.message.length() - 1; i >= 0; i--) {
-                    if (sb.charAt(i) >= 0xF80 && sb.charAt(i) <= 0x107F) {
-                        sb.deleteCharAt(i);
+                String message = escapeFoosCharacters(event.message);
+                for (String bw : bannedWords) {
+                    if (message.toLowerCase().contains(bw)) {
+                        // create random string of length bw.length consisting of ['@', '#', '$', '%', '^', '&', '*', '!']
+                        StringBuilder rep = new StringBuilder();
+                        ArrayList<Character> chars = new ArrayList<>(Arrays.asList('@', '#', '$', '%', '^', '&', '*', '!'));
+                        for (int i = 0; i < bw.length(); i++) {
+                            rep.append(chars.get((int) (Math.random() * chars.size())));
+                        }
+                        message = message.replace(bw, rep);
                     }
                 }
-                Channels.CHAT.sendMessage("**" + Utils.escapeEverything(event.player.name) + "**: " + sb);
+                Channels.CHAT.sendMessage("**" + Utils.escapeEverything(event.player.name) + "**: " + message);
             }
         });
 
@@ -325,6 +335,7 @@ public class Communication implements MiniMod {
             // send the other player a message, using [lightgray] for gray text color and [] to reset color
             other.sendMessage("[orange][[[gray]whisper from [#ffd37f]" + Strings.stripColors(player.name) + "[orange]]: [gray]" + args[1]);
             player.sendMessage("[orange][[[gray]whisper to [#ffd37f]" + Strings.stripColors(other.name) + "[orange]]: [gray]" + args[1]);
+            Logs.logWhisper(player, other, args[1]);
         });
 
         handler.removeCommand("t");

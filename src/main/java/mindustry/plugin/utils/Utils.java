@@ -95,6 +95,16 @@ public class Utils {
         return Strings.stripColors(escapeRankTag(name));
     }
 
+    public static String escapeFoosCharacters(String message) {
+        StringBuilder sb = new StringBuilder(message);
+        for (int i = message.length() - 1; i >= 0; i--) {
+            if (sb.charAt(i) >= 0xF80 && sb.charAt(i) <= 0x107F) {
+                sb.deleteCharAt(i);
+            }
+        }
+        return sb.toString();
+    }
+
     /**
      * remove rank symbols & colors
      *

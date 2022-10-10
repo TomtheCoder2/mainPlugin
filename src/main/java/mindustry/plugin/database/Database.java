@@ -6,15 +6,14 @@ import mindustry.plugin.utils.Utils;
 
 import java.sql.*;
 import java.time.Instant;
-import java.util.Arrays;
 
 public final class Database {
     /**
      * SQL connection. Should never be null after initialization.
      */
     public static Connection conn;
+    public static Seq<String> bannedWords = new Seq<>();
     private static String playerTable;
-
     private static String authURL;
     private static String authUser;
     private static String authPassword;
@@ -36,20 +35,25 @@ public final class Database {
         authPassword = password;
     }
 
-    /** Reconnect, if the SQL connection was closed */
+    /**
+     * Reconnect, if the SQL connection was closed
+     */
     protected static void reconnect() {
         try {
             if (conn.isClosed()) {
                 conn = DriverManager.getConnection(authURL, authUser, authPassword);
             }
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             Log.err("Error reconnnecting");
             e.printStackTrace();
         }
     }
 
-    /** Resets all phashes. 
-     * @return the number of rows affected. */
+    /**
+     * Resets all phashes.
+     *
+     * @return the number of rows affected.
+     */
     public static int resetPhashes() {
         reconnect();
 
@@ -75,6 +79,64 @@ public final class Database {
 //            //Log.debug(ex.getMessage());
             ex.printStackTrace();
             return 0;
+        }
+    }
+
+    /**
+     * Update bannedWords seq
+     */
+    public static void updateBannedWordsClient() {
+        reconnect();
+        bannedWords.clear();
+        String sql = "SELECT * "
+                + "FROM banned_words ";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                bannedWords.add(rs.getString("word"));
+            }
+            rs.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * update the database with local banned words
+     */
+    public static void updateBannedWordsDatabase() {
+        reconnect();
+        // insert all banned words
+        // but with only one statement
+        StringBuilder sql = new StringBuilder("INSERT INTO banned_words (word) VALUES ");
+        for (String word : bannedWords) {
+            sql.append("('").append(word).append("'), ");
+        }
+        sql = new StringBuilder(sql.substring(0, sql.length() - 2));
+        sql.append(" ON CONFLICT DO NOTHING");
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString());
+            pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void removeBannedWordDatabase(String[] words) {
+        reconnect();
+        StringBuilder sql = new StringBuilder("DELETE FROM banned_words WHERE word IN (");
+        for (String word : words) {
+            sql.append("'").append(word).append("', ");
+        }
+        sql = new StringBuilder(sql.substring(0, sql.length() - 2));
+        sql.append(")");
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql.toString());
+            pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -327,7 +389,7 @@ public final class Database {
      */
     public static MapRank[] rankMaps(int limit, String column, int offset) {
         reconnect();
-    
+
         if (!column.matches("[A-Za-z0-9]+")) return null;
         String sql = "SELECT name, " + column + " " +
                 "FROM mapdata " +
@@ -432,7 +494,9 @@ public final class Database {
     public static class Player implements Cloneable {
         public String uuid;
 
-        /** The Phash of the player. This should always be equal to {@code Utils.calculatePhash(uuid)} */
+        /**
+         * The Phash of the player. This should always be equal to {@code Utils.calculatePhash(uuid)}
+         */
         public String phash;
         public int rank;
 

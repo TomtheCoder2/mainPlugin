@@ -33,6 +33,7 @@ import static arc.util.Log.err;
 import static arc.util.Log.info;
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.state;
+import static mindustry.plugin.database.Database.updateBannedWordsClient;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
 public class PheonixMain extends Plugin {
@@ -195,6 +196,7 @@ public class PheonixMain extends Plugin {
             Log.info("Everything's loaded !");
         });
 
+        updateBannedWordsClient();
 
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;
@@ -251,7 +253,9 @@ public class PheonixMain extends Plugin {
                 Rank rank = Rank.all[0];
                 Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
             }
-
+            // send message to everyone: x has joined y times and has been kicked z times
+            var info = Query.findPlayerInfo(player.uuid());
+            Call.sendMessage(player.name + "[accent] has joined [scarlet]" + info.timesJoined + "[accent] times and has been kicked [scarlet]" + info.timesKicked + "[accent] times.");
             Call.infoMessage(player.con, Utils.Message.welcome());
 
 //

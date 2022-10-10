@@ -2,26 +2,59 @@ package mindustry.plugin.minimods;
 
 import arc.Events;
 import arc.struct.Seq;
+import arc.util.Strings;
 import arc.util.Timer;
+import mindustry.Vars;
 import mindustry.game.EventType;
+import mindustry.gen.Call;
+import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordPalette;
+import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
-import static mindustry.plugin.utils.Utils.calculatePhash;
-import static mindustry.plugin.utils.Utils.calculatePhash;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static mindustry.plugin.database.Database.bannedWords;
+import static mindustry.plugin.database.Database.updateBannedWordsClient;
+import static mindustry.plugin.utils.Utils.*;
 
 /**
  * Logs player actions, such as player join &amp; leave and suspicious activity
  */
 public class Logs implements MiniMod {
+    static StringBuilder whisperLog = new StringBuilder();
     Seq<JoinPlayerInfo> leftPlayers = new Seq<>();
     Seq<JoinPlayerInfo> joinPlayers = new Seq<>();
 
+    public static void logWhisper(Player sender, Player target, String message) {
+        var formattedMessage = Strings.format("@: `@` -> @: `@`: `@`\n", escapeEverything(sender.name), calculatePhash(sender.uuid()), escapeEverything(target.name), calculatePhash(target.uuid()), message);
+        // check if the whisperLog message is longer 4096  chars
+        if (whisperLog.toString().length() + formattedMessage.length() > 4096) {
+            // send message in logs
+            Channels.LOG.sendMessage(new EmbedBuilder()
+                    .setTitle("Whisper Log")
+                    .setColor(DiscordPalette.INFO)
+                    .setDescription(whisperLog.toString())
+            );
+            // clear the whisperLog
+            whisperLog = new StringBuilder();
+        }
+        // add the message to the whisperLog
+        whisperLog.append(formattedMessage);
+    }
+
     public void registerEvents() {
         Events.on(EventType.PlayerLeave.class, event -> {
+            Database.Player pd = Database.getPlayerData(event.player.uuid());
+            if (pd != null) {
+                Rank rank = Rank.all[pd.rank];
+                Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + event.player.name + "[accent] left the battlefield!");
+            }
             JoinPlayerInfo data = new JoinPlayerInfo();
             data.name = event.player.name;
             data.uuid = event.player.uuid();
@@ -82,6 +115,7 @@ public class Logs implements MiniMod {
 
             Channels.LOG.sendMessage(eb);
             Channels.COLONEL_LOG.sendMessage(colonel_eb);
+            updateBannedWordsClient();
             System.gc();
         }, 30, 30);
 
@@ -94,24 +128,42 @@ public class Logs implements MiniMod {
                 "dyke",
                 "tranny", "trannie"
         };
-        Events.on(EventType.PlayerChatEvent.class, event -> {
-            if (event.player == null) return;
 
-            Seq<String> usedSlurs = new Seq<>();
-            for (String slur : slurs) {
-                if (event.message.toLowerCase().contains(slur)) {
-                    usedSlurs.add(slur);
+        Events.on(EventType.ServerLoadEvent.class, event -> {
+            Vars.netServer.admins.addChatFilter((player, message) -> {
+                if (player == null) return message;
+
+                Seq<String> usedSlurs = new Seq<>();
+                for (String slur : slurs) {
+                    if (message.toLowerCase().contains(slur)) {
+                        usedSlurs.add(slur);
+                        message = message.replace(slur, "$@#!");
+                    }
                 }
-            }
-            if (usedSlurs.size == 0) return;
+                // same thing bannedWords
+                for (String bw : bannedWords) {
+                    if (message.toLowerCase().contains(bw)) {
+                        usedSlurs.add(bw);
+                        // create random string of length bw.length consisting of ['@', '#', '$', '%', '^', '&', '*', '!']
+                        StringBuilder rep = new StringBuilder();
+                        ArrayList<Character> chars = new ArrayList<>(Arrays.asList('@', '#', '$', '%', '^', '&', '*', '!'));
+                        for (int i = 0; i < bw.length(); i++) {
+                            rep.append(chars.get((int) (Math.random() * chars.size())));
+                        }
+                        message = message.replace(bw, rep);
+                    }
+                }
+                if (usedSlurs.size == 0) return message;
 
-            Channels.LOG.sendMessage(new EmbedBuilder()
-                    .setColor(DiscordPalette.WARN)
-                    .setTitle("Slur usage")
-                    .addInlineField("Player", Utils.escapeEverything(event.player.name) + "\n`" + event.player.uuid() + "`")
-                    .addInlineField("Slurs", usedSlurs.toString(", "))
-                    .addField("Message", event.message)
-            );
+                Channels.LOG.sendMessage(new EmbedBuilder()
+                        .setColor(DiscordPalette.WARN)
+                        .setTitle("Slur usage")
+                        .addInlineField("Player", Utils.escapeEverything(player.name) + "\n`" + player.uuid() + "`")
+                        .addInlineField("Slurs", usedSlurs.toString(", "))
+                        .addField("Message", escapeFoosCharacters(message))
+                );
+                return message;
+            });
         });
     }
 
