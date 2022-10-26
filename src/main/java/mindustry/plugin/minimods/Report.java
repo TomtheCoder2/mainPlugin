@@ -41,7 +41,7 @@ public class Report implements MiniMod {
         });
 
         Cooldowns.instance.set("gr", 5 * 60);
-        handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/gr' to get a list of ids)", (args, player) -> {
+        handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/Players' to get a list of ids)", (args, player) -> {
             if (!Cooldowns.instance.canRun("gr", player.uuid())) {
                 player.sendMessage(GameMsg.ratelimit("Mod", "gr"));
                 return;
