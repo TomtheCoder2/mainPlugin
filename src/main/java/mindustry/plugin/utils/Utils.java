@@ -160,8 +160,9 @@ public class Utils {
             if (name.startsWith(prefix)) name = name.substring(prefix.length());
             if (name.startsWith(" ")) name = name.substring(1);
         }
+        System.out.println(name);
         // some regex magic to remove all color codes
-        name = name.replaceAll("\\[accent]\\|.\\[accent]\\|", "");
+        name = name.replaceAll("\\[accent]\\|\\[#.{7}.\\[accent\\]\\|", "");
         return name;
     }
 

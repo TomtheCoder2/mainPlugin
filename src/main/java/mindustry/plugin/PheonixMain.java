@@ -211,7 +211,7 @@ public class PheonixMain extends Plugin {
                     "THIS IS MY KINGDOM CUM, THIS IS MY CUM",
                     "HITLER"
             };
-            if (Structs.contains(bannedNames, s -> s.equals(escapeEverything(player.name)))) {
+            if (Structs.contains(bannedNames, s -> s.toLowerCase().equals(escapeEverything(player.name.toLowerCase())))) {
                 player.con.kick("[scarlet]Please change your name.");
                 return;
             }
