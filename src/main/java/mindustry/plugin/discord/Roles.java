@@ -14,7 +14,9 @@ public class Roles {
     public static long ACTIVE_PLAYER;
     public static long DEV;
     public static long MVP;
-    /** Report investigator */
+    /**
+     * Report investigator
+     */
     public static long RI;
 
     public static void load(DiscordApi api, JSONObject data) {

@@ -10,7 +10,6 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 
-import java.io.File;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;

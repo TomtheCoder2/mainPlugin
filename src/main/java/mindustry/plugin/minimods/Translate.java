@@ -129,7 +129,7 @@ public class Translate implements MiniMod {
         handler.<Player>register("translate", "<lang>", "Translate chat", (args, player) -> {
             String lang = args[0];
             if (!langs.contains(lang)) {
-                player.sendMessage(GameMsg.error("TR", "Language must be a two-letter country code (" + langs.toString(", ") +  ")"));
+                player.sendMessage(GameMsg.error("TR", "Language must be a two-letter country code (" + langs.toString(", ") + ")"));
                 return;
             }
 

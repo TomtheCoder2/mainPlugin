@@ -35,7 +35,7 @@ import static mindustry.plugin.utils.Utils.escapeFoosCharacters;
 
 public class Communication implements MiniMod {
     private Announcement announcement = null;
-    private Seq<String> screenMessages = new Seq<>();
+    private final Seq<String> screenMessages = new Seq<>();
 
     private static void showAnnouncement(Announcement msg, Player target) {
         int id = Menus.registerMenu((player, selection) -> {

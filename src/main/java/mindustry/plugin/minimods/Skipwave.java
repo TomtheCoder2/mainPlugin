@@ -16,7 +16,7 @@ import mindustry.plugin.utils.GameMsg;
  * Provides the /skipwave command
  */
 public class Skipwave implements MiniMod {
-    private ObjectSet<String> votes = new ObjectSet<>();
+    private final ObjectSet<String> votes = new ObjectSet<>();
 
     private static int requiredVotes() {
         return Groups.player.size() / 2 + 1;

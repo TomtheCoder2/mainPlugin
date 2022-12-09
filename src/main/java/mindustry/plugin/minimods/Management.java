@@ -35,8 +35,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
-import static arc.util.Log.err;
-import static arc.util.Log.info;
 import static mindustry.Vars.*;
 import static mindustry.plugin.utils.plot.PlotTest2.savePlot;
 
@@ -141,7 +139,7 @@ public class Management implements MiniMod {
                 ctx -> {
                     EmbedBuilder eb = new EmbedBuilder();
                     if (!state.is(GameState.State.playing)) {
-                        ctx.error("Not hosting.","Host a game first.");
+                        ctx.error("Not hosting.", "Host a game first.");
                         return;
                     }
 
@@ -278,7 +276,7 @@ public class Management implements MiniMod {
                             return;
                         }
 
-                        ctx.success("Success", "Setting **" + name + "** is currently (`" + o.getClass().getSimpleName() + "`) " + o.toString());
+                        ctx.success("Success", "Setting **" + name + "** is currently (`" + o.getClass().getSimpleName() + "`) " + o);
                         return;
                     }
 
@@ -304,7 +302,7 @@ public class Management implements MiniMod {
                     }
                     Core.settings.put(name, value);
 
-                    ctx.success("Success", "Setting **" + name + "** was set to (`" + value.getClass().getSimpleName() + "`) " + value.toString());
+                    ctx.success("Success", "Setting **" + name + "** was set to (`" + value.getClass().getSimpleName() + "`) " + value);
                 }
         );
 
@@ -492,7 +490,7 @@ public class Management implements MiniMod {
 
     private static class TestData {
         private IntSeq tpsMeasurements = new IntSeq();
-        private LongSeq memMeasurements = new LongSeq();
+        private final LongSeq memMeasurements = new LongSeq();
 
         public TestData() {
             tpsMeasurements = new IntSeq();
@@ -520,7 +518,6 @@ public class Management implements MiniMod {
 
         public long avgMem() {
             if (memMeasurements.size == 0) return 0;
-            ;
             return Arrays.stream(memMeasurements.items).limit(memMeasurements.size).sum() / memMeasurements.size;
         }
 

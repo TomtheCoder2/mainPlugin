@@ -2,10 +2,14 @@ package mindustry.plugin.database;
 
 import arc.struct.Seq;
 import arc.util.Log;
+import mindustry.plugin.utils.SubRank;
 import mindustry.plugin.utils.Utils;
 
 import java.sql.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public final class Database {
     /**
@@ -38,7 +42,7 @@ public final class Database {
     /**
      * Reconnect, if the SQL connection was closed
      */
-    protected static void reconnect() {
+    private static void reconnect() {
         try {
             if (conn.isClosed()) {
                 conn = DriverManager.getConnection(authURL, authUser, authPassword);
@@ -149,7 +153,7 @@ public final class Database {
         reconnect();
 
         // search for the uuid
-        String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
+        String sql = "SELECT * "
                 + "FROM " + playerTable + " "
                 + "WHERE uuid = ?";
         try {
@@ -180,7 +184,7 @@ public final class Database {
         reconnect();
 
         // search for the uuid
-        String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
+        String sql = "SELECT * "
                 + "FROM " + playerTable + " "
                 + "WHERE hid = ?";
         try {
@@ -210,7 +214,7 @@ public final class Database {
     public static Player getDiscordData(long id) {
         reconnect();
 
-        String sql = "SELECT uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid "
+        String sql = "SELECT * "
                 + "FROM " + playerTable + " "
                 + "WHERE discordLink = ?";
         try {
@@ -262,8 +266,8 @@ public final class Database {
 
         if (getPlayerData(pd.uuid) == null) {
             // define all variables
-            String sql = "INSERT INTO " + playerTable + "(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid) "
-                    + "VALUES(?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + playerTable + "(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid, subranks) "
+                    + "VALUES(?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 // set all variables
@@ -278,6 +282,7 @@ public final class Database {
                 pstmt.setString(9, pd.banReason);
                 pstmt.setLong(10, pd.discord);
                 pstmt.setString(11, pd.phash);
+                pstmt.setArray(12, conn.createArrayOf("integer", pd.subranks.toArray()));
 
                 // send the data
                 int affectedRows = pstmt.executeUpdate();
@@ -296,7 +301,8 @@ public final class Database {
                     + "bannedUntil = ?, "
                     + "banReason = ?, "
                     + "discordLink = ?, "
-                    + "hid = ? "
+                    + "hid = ?, "
+                    + "subranks = ? "
                     + "WHERE uuid = ?";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -311,7 +317,8 @@ public final class Database {
                 pstmt.setString(8, pd.banReason);
                 pstmt.setLong(9, pd.discord);
                 pstmt.setString(10, pd.phash);
-                pstmt.setString(11, pd.uuid);
+                pstmt.setArray(11, conn.createArrayOf("INTEGER", pd.subranks.toArray()));
+                pstmt.setString(12, pd.uuid);
 
                 int affectedrows = pstmt.executeUpdate();
                 //Log.info("player update affected rows: " + affectedrows);
@@ -499,6 +506,7 @@ public final class Database {
          */
         public String phash;
         public int rank;
+        public ArrayList<Integer> subranks;
 
         /**
          * For VPN-checking
@@ -557,6 +565,9 @@ public final class Database {
             if (rs.getBytes("discordLink") != null && rs.getBytes("discordLink").length != 0) {
                 pd.discord = rs.getLong("discordLink");
             }
+
+            // retrieve subranks
+            pd.subranks = rs.getArray("subranks") == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList((Integer[]) rs.getArray("subranks").getArray()));
 
             return pd;
         }

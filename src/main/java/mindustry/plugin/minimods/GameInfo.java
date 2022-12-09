@@ -112,8 +112,8 @@ public class GameInfo implements MiniMod {
                     for (Player p : Groups.player) {
                         var pd = Database.getPlayerData(p.uuid());
                         String phash = pd != null ? pd.phash : Utils.calculatePhash(p.uuid());
-                        desc.append(String.format("`%-13s : %-24s : %-16s :` %s%s\n", phash, p.uuid(), p.con.address, Utils.escapeEverything(p.name), 
-                            pd != null && pd.rank != 0 ? " ("  + Rank.all[pd.rank].name + ")" : ""));
+                        desc.append(String.format("`%-13s : %-24s : %-16s :` %s%s\n", phash, p.uuid(), p.con.address, Utils.escapeEverything(p.name),
+                                pd != null && pd.rank != 0 ? " (" + Rank.all[pd.rank].name + ")" : ""));
                     }
                     ctx.sendEmbed(DiscordPalette.INFO, "Players online: " + Groups.player.size(), desc.toString());
                 }

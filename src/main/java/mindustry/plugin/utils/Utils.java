@@ -122,6 +122,14 @@ public class Utils {
         return "[accent]|[#" + rank.color.toString().substring(0, 6) + "]" + rank.tag + "[accent]|";
     }
 
+    public static String subRankMarker(ArrayList<Integer> ranks) {
+        StringBuilder sb = new StringBuilder();
+        for (Integer rank : ranks) {
+            sb.append("[accent]|[#" + SubRank.all[rank].color.toString().substring(0, 6) + "]" + SubRank.all[rank].tag + "[accent]|");
+        }
+        return sb.toString();
+    }
+
     /**
      * Format a player name
      *
@@ -135,9 +143,9 @@ public class Utils {
     /**
      * Format a player name
      */
-    public static String formatName(Rank rank, Player player) {
-        if (rank.tag == null) return player.name;
-        return rankMarker(rank) + " [#" + player.color().toString().substring(0, 6) + "]" + escapeRankTag(player.name);
+    public static String formatName(Database.Player pd, Player player) {
+        if (Rank.all[pd.rank].tag == null) return player.name;
+        return rankMarker(Rank.all[pd.rank]) + subRankMarker(pd.subranks) + " [#" + player.color().toString().substring(0, 6) + "]" + escapeRankTag(player.name);
     }
 
     /**
@@ -152,6 +160,8 @@ public class Utils {
             if (name.startsWith(prefix)) name = name.substring(prefix.length());
             if (name.startsWith(" ")) name = name.substring(1);
         }
+        // some regex magic to remove all color codes
+        name = name.replaceAll("\\[accent]\\|.\\[accent]\\|", "");
         return name;
     }
 
@@ -423,7 +433,8 @@ public class Utils {
             case 3 -> rgbToString(p, q, value);
             case 4 -> rgbToString(t, p, value);
             case 5 -> rgbToString(value, p, q);
-            default -> throw new RuntimeException("Something went wrong when converting from HSV to RGB. Input was " + hue + ", " + saturation + ", " + value);
+            default ->
+                    throw new RuntimeException("Something went wrong when converting from HSV to RGB. Input was " + hue + ", " + saturation + ", " + value);
         };
     }
 
@@ -433,7 +444,6 @@ public class Utils {
         String bs = Integer.toHexString((int) (b * 256));
         return rs + gs + bs;
     }
-
 
 
 //    /**
@@ -686,17 +696,9 @@ public class Utils {
     }
 
     /**
-     * Send message without response handling
-     *
-     * @param user    User to dm
-     * @param content message
-     */
-    public void sendMessage(User user, String content) {
-        user.openPrivateChannel().join().sendMessage(content);
-    }
-
-    /** Calculates the Phash for a given UUID.
+     * Calculates the Phash for a given UUID.
      * Intentionally long name to indicate that computational expensiveness.
+     *
      * @param uuid the UUID
      * @return the Phash
      */
@@ -711,6 +713,16 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Send message without response handling
+     *
+     * @param user    User to dm
+     * @param content message
+     */
+    public void sendMessage(User user, String content) {
+        user.openPrivateChannel().join().sendMessage(content);
     }
 
     public static class Message {

@@ -45,7 +45,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Pets implements MiniMod {
-    /** Pets that are currently spawned. Continuously read by controllers, which despawn their unit if it is not in this list. */
+    /**
+     * Pets that are currently spawned. Continuously read by controllers, which despawn their unit if it is not in this list.
+     */
     ObjectMap<String, Seq<String>> spawnedPets = new ObjectMap<>();
 
     protected static int maxPets(int rank) {
@@ -64,16 +66,16 @@ public class Pets implements MiniMod {
         if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela) {
             return 4;
         } else if (type == UnitTypes.fortress || type == UnitTypes.quasar || type == UnitTypes.spiroct || type == UnitTypes.zenith || type == UnitTypes.mega ||
-            type == UnitTypes.precept || type == UnitTypes.anthicus || type == UnitTypes.obviate
+                type == UnitTypes.precept || type == UnitTypes.anthicus || type == UnitTypes.obviate
         ) {
             return 3;
         } else if (type == UnitTypes.mace || type == UnitTypes.pulsar || type == UnitTypes.atrax || type == UnitTypes.horizon || type == UnitTypes.poly ||
-            type == UnitTypes.locus || type == UnitTypes.cleroi || type == UnitTypes.avert
-            ) {
+                type == UnitTypes.locus || type == UnitTypes.cleroi || type == UnitTypes.avert
+        ) {
             return 2;
         } else if (type == UnitTypes.dagger || type == UnitTypes.nova || type == UnitTypes.crawler || type == UnitTypes.flare || type == UnitTypes.mono ||
                 type == UnitTypes.elude || type == UnitTypes.merui || type == UnitTypes.stell
-            ) {
+        ) {
             return 1;
         }
         return -1;
@@ -323,7 +325,7 @@ public class Pets implements MiniMod {
                         ctx.error("Not in database", "You have not linked your discord account. Use /redeem to link.");
                         return;
                     }
-                    
+
                     var pets = PetDatabase.getPets(pd.uuid);
                     if (pets == null || pets.length == 0) {
                         ctx.sendEmbed(DiscordPalette.INFO, "No pets", "You don't own any pets");
@@ -334,8 +336,8 @@ public class Pets implements MiniMod {
                     var name = info == null ? "unknown" : info.lastName;
 
                     var eb = new EmbedBuilder()
-                        .setTitle(Utils.escapeEverything(name) + "'s Pets")
-                        .setColor(DiscordPalette.INFO);
+                            .setTitle(Utils.escapeEverything(name) + "'s Pets")
+                            .setColor(DiscordPalette.INFO);
 
                     for (var pet : pets) {
                         eb.addField(pet.name, pet.species.localizedName + " (" + Rank.all[rank(pet)].name + ")");

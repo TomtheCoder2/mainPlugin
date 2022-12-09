@@ -56,7 +56,7 @@ public class JS implements MiniMod {
                 ctx -> {
                     Core.app.post(() -> {
                         String res = mods.getScripts().runConsole(ctx.args.get("code"));
-                        ctx.success("Ran code", "Output:\n```\n" + res + "\n```");    
+                        ctx.success("Ran code", "Output:\n```\n" + res + "\n```");
                     });
                 }
         );
@@ -93,14 +93,13 @@ public class JS implements MiniMod {
             }
             switch (arg[0]) {
                 case "true", "t" -> {
-                    enableJS(arg.length > 1 ? Integer.parseInt(arg[1]) * 60 : 10 * 60, player.name);
+                    enableJS(arg.length > 1 ? Integer.parseInt(arg[1]) * 60L : 10 * 60, player.name);
                 }
                 case "false", "f" -> {
                     disableJS(player.name);
                 }
                 default -> {
                     player.sendMessage(GameMsg.error("JS", "First argument must be 'true' or 'false'"));
-                    return;
                 }
             }
         });

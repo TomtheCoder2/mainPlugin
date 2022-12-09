@@ -20,15 +20,13 @@ import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
-import mindustry.plugin.utils.GameMsg;
-import mindustry.plugin.utils.Query;
-import mindustry.plugin.utils.Rank;
-import mindustry.plugin.utils.Utils;
+import mindustry.plugin.utils.*;
 import mindustry.ui.Menus;
 import mindustry.world.Block;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
@@ -408,10 +406,97 @@ public class Ranks implements MiniMod {
                     pd.rank = rank;
                     Database.setPlayerData(pd);
 
-                    target.name = Utils.formatName(Rank.all[pd.rank], target);
+                    target.name = Utils.formatName(pd, target);
                     ctx.success("Rank set", Utils.escapeEverything(target) + "'s rank is now set to " + Rank.all[rank].name);
 
                     DiscordLog.moderation("Set rank", ctx.author(), Vars.netServer.admins.getInfo(pd.uuid), null, "Rank: " + Rank.all[rank].name + " (" + rank + ")");
+                }
+        );
+
+        handler.register("subrank", "<list|add|remove> <player> [rank]",
+                data -> {
+                    data.help = "Set a player's in-game subrank \nList of all ranks:" + Arrays.toString(SubRank.all);
+                    data.roles = new long[]{Roles.MOD, Roles.ADMIN};
+                    data.category = "Management";
+                },
+                ctx -> {
+                    Player target = Query.findPlayerEntity(ctx.args.get("player"));
+                    if (target == null) {
+                        ctx.error("Player not found", ctx.args.get("player") + " is not online");
+                        return;
+                    }
+
+                    var pd = Database.getPlayerData(target.uuid());
+                    if (pd == null) {
+                        // player not found
+                        ctx.error("Player not found", "Player data not found for " + Utils.escapeEverything(target));
+                        return;
+                    }
+
+                    String action = ctx.args.get("list|add|remove");
+                    String rankQuery;
+                    int rank = -1;
+                    if (!Objects.equals(action, "list")) {
+                        rankQuery = ctx.args.get("rank");
+                        for (int i = 0; i < SubRank.all.length; i++) {
+                            if (Integer.toString(i).equals(rankQuery) || SubRank.all[i].name.equalsIgnoreCase(rankQuery)) {
+                                rank = i;
+                            }
+                        }
+                        if (rank == -1) {
+                            ctx.error("Invalid rank", rankQuery + " is not a valid rank");
+                            return;
+                        }
+                    }
+                    switch (action) {
+                        case "list" -> {
+                            if (pd.subranks.isEmpty()) {
+                                ctx.error("No subranks", Utils.escapeEverything(target) + " has no subranks");
+                                return;
+                            }
+
+                            StringBuilder table = new StringBuilder("```\n");
+                            table.append(String.format("%3s %-10s\n", "", "Subrank"));
+                            for (int i = 0; i < pd.subranks.size(); i++) {
+                                table.append(String.format("%3s %-10s\n", i + 1, SubRank.all[pd.subranks.get(i)].name));
+                            }
+                            table.append("```");
+
+                            ctx.sendEmbed(new EmbedBuilder()
+                                    .setColor(DiscordPalette.INFO)
+                                    .setTitle("Subranks for " + Utils.escapeEverything(target))
+                                    .setDescription(table.toString())
+                            );
+                        }
+                        case "add" -> {
+                            if (pd.subranks.contains(rank)) {
+                                ctx.error("Subrank already exists", Utils.escapeEverything(target) + " already has the subrank " + SubRank.all[rank].name);
+                                return;
+                            }
+
+                            pd.subranks.add(rank);
+                            Database.setPlayerData(pd);
+
+                            target.name = Utils.formatName(pd, target);
+                            ctx.success("Subrank added", Utils.escapeEverything(target) + " now has the subrank " + SubRank.all[rank].name);
+
+                            DiscordLog.moderation("Added subrank", ctx.author(), Vars.netServer.admins.getInfo(pd.uuid), null, "Subrank: " + SubRank.all[rank].name + " (" + rank + ")");
+                        }
+                        case "remove" -> {
+                            if (!pd.subranks.contains(rank)) {
+                                ctx.error("Subrank not found", Utils.escapeEverything(target) + " does not have the subrank " + SubRank.all[rank].name);
+                                return;
+                            }
+
+                            pd.subranks.remove((Integer) rank);
+                            Database.setPlayerData(pd);
+
+                            target.name = Utils.formatName(pd, target);
+                            ctx.success("Subrank removed", Utils.escapeEverything(target) + " no longer has the subrank " + SubRank.all[rank].name);
+
+                            DiscordLog.moderation("Removed subrank", ctx.author(), Vars.netServer.admins.getInfo(pd.uuid), null, "Subrank: " + SubRank.all[rank].name + " (" + rank + ")");
+                        }
+                    }
                 }
         );
 
@@ -440,6 +525,8 @@ public class Ranks implements MiniMod {
                     pd.playTime = playtime;
                     pd.buildingsBuilt = buildingsbuilt;
                     pd.gamesPlayed = gamesplayed;
+
+                    Database.setPlayerData(pd);
 
                     ctx.success("Set player stats", "Play time: " + playtime + " min\nBuildings built: " + buildingsbuilt + "\nGames played: " + gamesplayed);
                 }

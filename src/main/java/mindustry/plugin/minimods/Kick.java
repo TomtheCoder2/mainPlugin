@@ -15,11 +15,7 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
-import mindustry.plugin.utils.Cooldowns;
-import mindustry.plugin.utils.GameMsg;
-import mindustry.plugin.utils.Query;
-import mindustry.plugin.utils.Rank;
-import mindustry.plugin.utils.Utils;
+import mindustry.plugin.utils.*;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.awt.*;

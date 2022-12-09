@@ -1,7 +1,6 @@
 package mindustry.plugin.minimods;
 
 import arc.Events;
-import arc.struct.IntMap;
 import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.util.Align;

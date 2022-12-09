@@ -11,7 +11,6 @@ import mindustry.net.Administration;
 import mindustry.plugin.database.Database;
 
 import static mindustry.Vars.netServer;
-import static mindustry.plugin.database.Database.getPlayerData;
 
 /**
  * Utilities class concerning querying maps, players, entities, etc.

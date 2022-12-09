@@ -175,10 +175,10 @@ public class PheonixMain extends Plugin {
 
         // Log startup
         var startupEmbed = new EmbedBuilder()
-            .setTitle("Starting Server")
-            .setColor(DiscordPalette.ERROR);
-        var startupMessage = new MessageBuilder() 
-            .setEmbed(startupEmbed);
+                .setTitle("Starting Server")
+                .setColor(DiscordPalette.ERROR);
+        var startupMessage = new MessageBuilder()
+                .setEmbed(startupEmbed);
         Channels.COLONEL_LOG.sendMessage(startupEmbed);
         startupMessage.send(Channels.LOG);
 
@@ -240,12 +240,12 @@ public class PheonixMain extends Plugin {
 
                 Rank rank = Rank.all[pd.rank];
                 Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
-                player.name = Utils.formatName(rank, player);
+                player.name = Utils.formatName(pd, player);
 
-                // Give Marshals admin
-                if (pd.rank == Rank.all.length - 1) {
-                    player.admin = true;
-                }
+//                // Give Marshals admin
+//                if (pd.rank == Rank.all.length - 1) {
+//                    player.admin = true;
+//                }
             } else { // not in database
                 info("New player connected: " + Strings.stripColors(event.player.name));
                 Database.setPlayerData(new Database.Player(player.uuid(), 0));
