@@ -538,12 +538,14 @@ public final class Database {
             this.uuid = uuid;
             this.rank = rank;
             this.phash = Utils.calculatePhash(uuid);
+            this.subranks = new ArrayList<>();
         }
 
         public Player(String uuid, int rank, String phash) {
             this.uuid = uuid;
             this.rank = rank;
             this.phash = phash;
+            this.subranks = new ArrayList<>();
         }
 
         public static Player fromSQL(ResultSet rs) throws SQLException {
