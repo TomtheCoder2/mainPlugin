@@ -4,7 +4,7 @@ import arc.graphics.Color;
 
 public class SubRank {
     public static final SubRank[] all = new SubRank[]{
-            new SubRank("", "Default", Color.valueOf("ffffff"), "Default sub-rank"),
+            new SubRank("\UE808", "Default", Color.valueOf("ffffff"), "Default sub-rank"),
             new SubRank("\uE88E","Watcher", new Color(0x00e500ff), "Obtainable by reporting 20 griefers")
     };
 
