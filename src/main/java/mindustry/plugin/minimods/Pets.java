@@ -61,9 +61,21 @@ public class Pets implements MiniMod {
             return 3;
         }
     }
-
+    protected static int maxTier(int rank) {
+        if (rank <= 1) {
+            return 0;
+        } else if (rank == 2) {
+            return 1;
+        } else if (rank <= 4) {
+            return 2;
+        } else if (rank == 5) {
+            return 3;
+        } else {
+            return 4;
+        }
+    }
     protected static int tierOf(UnitType type) {
-        if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela) {
+        if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela || type == UnitTypes.alpha || type == UnitTypes.beta || type == UnitTypes.gamma) {
             return 4;
         } else if (type == UnitTypes.fortress || type == UnitTypes.quasar || type == UnitTypes.spiroct || type == UnitTypes.zenith || type == UnitTypes.mega ||
                 type == UnitTypes.precept || type == UnitTypes.anthicus || type == UnitTypes.obviate
@@ -80,21 +92,6 @@ public class Pets implements MiniMod {
         }
         return -1;
     }
-
-    protected static int maxTier(int rank) {
-        if (rank <= 1) {
-            return 0;
-        } else if (rank == 2) {
-            return 1;
-        } else if (rank <= 4) {
-            return 2;
-        } else if (rank == 5) {
-            return 3;
-        } else {
-            return 4;
-        }
-    }
-
     protected static Item[] possibleFoods(UnitType type) {
         if (type == UnitTypes.crawler) {
             return new Item[]{Items.coal};
