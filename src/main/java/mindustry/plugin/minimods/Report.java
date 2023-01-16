@@ -16,6 +16,8 @@ import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
+import java.util.Objects;
+
 
 public class Report implements MiniMod {
     @Override
@@ -78,6 +80,10 @@ public class Report implements MiniMod {
 
                 if (found.team() != player.team()) {
                     player.sendMessage("[scarlet]Only players on your team can be reported.");
+                    return;
+                }
+                if (Objects.equals(found.uuid(), player.uuid())){
+                    player.sendMessage("[scarlet]You can't report yourself anymore");
                     return;
                 }
 
