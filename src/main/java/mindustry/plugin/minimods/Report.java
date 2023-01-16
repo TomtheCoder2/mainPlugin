@@ -16,6 +16,8 @@ import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
+import java.util.Objects;
+
 
 public class Report implements MiniMod {
     @Override
@@ -80,6 +82,10 @@ public class Report implements MiniMod {
                     player.sendMessage("[scarlet]Only players on your team can be reported.");
                     return;
                 }
+                if (Objects.equals(found.uuid(), player.uuid())){
+                    player.sendMessage("[scarlet]You can't report yourself anymore");
+                    return;
+                }
 
                 EmbedBuilder eb = new EmbedBuilder().setTitle("Potential Griefer Online")
                         .addField("Name", Utils.escapeEverything(found.name))
@@ -93,7 +99,7 @@ public class Report implements MiniMod {
 
                 new MessageBuilder()
                         .setEmbed(eb)
-                        .setContent("<@&" + Roles.RI + ">")
+                        .setContent("<@&" + Roles.APPEAL + ">")
                         .send(Channels.GR_REPORT);
                 Call.sendMessage(found.name + "[sky] is reported to discord.");
             }
