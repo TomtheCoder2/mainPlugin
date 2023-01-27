@@ -27,6 +27,7 @@ import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
+import mindustry.plugin.utils.SubRank;
 import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
@@ -268,6 +269,10 @@ public class Pets implements MiniMod {
                     Database.Player pd = Database.getDiscordData(ctx.author().getId());
                     if (pd == null) {
                         ctx.error("Not in database", "You have not linked your discord account. Type **" + DiscordVars.prefix + "redeem** to link.");
+                        return;
+                    }
+                    if (ctx.args.get("name").length() >30){
+                        ctx.error("Pet name is to long","Please choose a shorter name for your pet");
                         return;
                     }
 
