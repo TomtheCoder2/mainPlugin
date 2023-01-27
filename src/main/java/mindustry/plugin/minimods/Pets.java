@@ -27,7 +27,6 @@ import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Rank;
-import mindustry.plugin.utils.SubRank;
 import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
 import mindustry.type.ItemStack;
