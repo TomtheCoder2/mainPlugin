@@ -172,11 +172,13 @@ public class Kick implements MiniMod {
 
             if (found == null) {
                 player.sendMessage(GameMsg.error("Kick", "No player [orange]" + args[0] + "[scarlet] found."));
+                return;
             }
 
             var pd = Database.getPlayerData(found.uuid());
             if (pd != null && pd.rank >= Rank.APPRENTICE) {
                 player.sendMessage(GameMsg.error("Kick", "Can't kick a mod."));
+                return;
             }
 
             if (found == player) {
@@ -327,8 +329,11 @@ public class Kick implements MiniMod {
          */
         public void clear() {
             canceled = true;
-            if (Kick.this.session == this)
+            if (Kick.this.session == this) {
+                // unfreeze the player
+                frozen.remove(target);
                 Kick.this.session = null;
+            }
         }
 
         public static class Task extends Timer.Task {

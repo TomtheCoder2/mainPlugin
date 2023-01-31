@@ -67,7 +67,7 @@ public class Mods implements MiniMod {
         );
 
 
-        handler.register("uploadmod", "[.zip]", d -> {
+        handler.register("uploadmod", "[.zip|jar]", d -> {
             d.help = "Upload mod (include .zip file in message)";
             d.category = "Mods";
             d.roles = new long[]{Roles.ADMIN};
@@ -75,22 +75,26 @@ public class Mods implements MiniMod {
         }, ctx -> {
             Seq<MessageAttachment> ml = new Seq<>();
             for (MessageAttachment ma : ctx.event.getMessageAttachments()) {
-                if (ma.getFileName().split("\\.")[ma.getFileName().split("\\.").length - 1].trim().equals("zip")) {
+                if (ma.getFileName().split("\\.")[ma.getFileName().split("\\.").length - 1].trim().equals("zip") ||
+                        ma.getFileName().split("\\.")[ma.getFileName().split("\\.").length - 1].trim().equals("jar")) {
                     ml.add(ma);
                 }
             }
-            if (ml.size != 1) {
-                ctx.error("Error", "Must have exactly one valid .zip file!");
-                return;
-            } else if (Core.settings.getDataDirectory().child("mods").child(ml.get(0).getFileName()).exists()) {
-                ctx.error("Error", "Already a mod with this name!");
+            if (ml.size == 0) {
+                ctx.error("Error", "Must have min one valid .zip|.jar file!");
                 return;
             }
+            for (MessageAttachment ma : ml) {
 
-            CompletableFuture<byte[]> cf = ml.get(0).downloadAsByteArray();
-            Fi fh = Core.settings.getDataDirectory().child("mods").child(ml.get(0).getFileName());
+                if (Core.settings.getDataDirectory().child("mods").child(ma.getFileName()).exists()) {
+                    ctx.error("Error", "Already a mod with this name!");
+                    return;
+                }
 
-            try {
+                CompletableFuture<byte[]> cf = ma.downloadAsByteArray();
+                Fi fh = Core.settings.getDataDirectory().child("mods").child(ma.getFileName());
+
+                try {
 //                byte[] data = cf.get();
 //                        if (!SaveIO.isSaveValid(new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data))))) {
 //                            eb.setTitle("Mod upload terminated.");
@@ -99,17 +103,22 @@ public class Mods implements MiniMod {
 //                            ctx.sendMessage(eb);
 //                            return;
 //                        }
-                fh.writeBytes(cf.get(), false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                    fh.writeBytes(cf.get(), false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-            Vars.maps.reload();
+                Vars.maps.reload();
+                EmbedBuilder eb = new EmbedBuilder();
+                eb.setTitle("Mod upload completed. (" + ma.getFileName() + ")");
+                ctx.sendEmbed(eb);
+            }
             EmbedBuilder eb = new EmbedBuilder();
-            eb.setTitle("Mod upload completed.");
-            eb.setDescription(ml.get(0).getFileName() + " was added successfully into the mod folder!\n" +
-                    "Restart the server (`<restart <server>`) to activate the mod!");
+//            eb.setDescription(ml.get(0).getFileName() + " was added successfully into the mod folder!\n" +
+//                    "Restart the server (`<restart <server>`) to activate the mod!");
+            eb.setTitle("Server restart now");
             ctx.sendEmbed(eb);
+            System.exit(0);
         });
 
         handler.register("removemod", "<modname/id...>", d -> {
