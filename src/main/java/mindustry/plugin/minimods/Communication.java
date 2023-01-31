@@ -65,6 +65,9 @@ public class Communication implements MiniMod {
     @Override
     public void registerEvents() {
         Events.on(EventType.PlayerChatEvent.class, event -> {
+            if (event.message.startsWith("/t")) {
+                event.message.replace("/t", "<T> ");
+            }
             if (event.message.charAt(0) != '/') {
                 Player player = event.player;
                 assert player != null;
