@@ -22,8 +22,6 @@ import mindustry.world.blocks.defense.turrets.ItemTurret;
 import mindustry.world.blocks.defense.turrets.LiquidTurret;
 import mindustry.world.blocks.defense.turrets.PowerTurret;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import mindustry.world.blocks.defense.turrets.Turret;
-import mindustry.content.UnitTypes;
 
 import java.lang.reflect.Field;
 

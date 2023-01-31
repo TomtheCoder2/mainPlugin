@@ -2,14 +2,12 @@ package mindustry.plugin.database;
 
 import arc.struct.Seq;
 import arc.util.Log;
-import mindustry.plugin.utils.SubRank;
 import mindustry.plugin.utils.Utils;
 
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public final class Database {
     /**

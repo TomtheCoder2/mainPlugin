@@ -32,9 +32,23 @@ package mindustry.plugin.utils;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 public class Base91 {
-    private int ebq, en, dbq, dn, dv;
     public final byte[] enctab;
     private final byte[] dectab;
+    private int ebq, en, dbq, dn, dv;
+
+    public Base91() {
+        int i;
+        String ts = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;<=>?@[]^_`{|}~\"";
+
+        enctab = ts.getBytes();
+        dectab = new byte[256];
+        for (i = 0; i < 256; ++i)
+            dectab[i] = -1;
+        for (i = 0; i < 91; ++i)
+            dectab[enctab[i]] = (byte) i;
+        encReset();
+        decReset();
+    }
 
     public int encode(byte[] ib, int n, byte[] ob) {
         int i, c = 0;
@@ -113,19 +127,5 @@ public class Base91 {
         dbq = 0;
         dn = 0;
         dv = -1;
-    }
-
-    public Base91() {
-        int i;
-        String ts = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;<=>?@[]^_`{|}~\"";
-
-        enctab = ts.getBytes();
-        dectab = new byte[256];
-        for (i = 0; i < 256; ++i)
-            dectab[i] = -1;
-        for (i = 0; i < 91; ++i)
-            dectab[enctab[i]] = (byte) i;
-        encReset();
-        decReset();
     }
 }

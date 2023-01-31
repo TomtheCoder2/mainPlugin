@@ -34,8 +34,8 @@ import static mindustry.plugin.database.Database.bannedWords;
 import static mindustry.plugin.utils.Utils.escapeFoosCharacters;
 
 public class Communication implements MiniMod {
-    private Announcement announcement = null;
     private final Seq<String> screenMessages = new Seq<>();
+    private Announcement announcement = null;
 
     private static void showAnnouncement(Announcement msg, Player target) {
         int id = Menus.registerMenu((player, selection) -> {

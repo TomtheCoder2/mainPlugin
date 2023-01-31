@@ -489,8 +489,8 @@ public class Management implements MiniMod {
     }
 
     private static class TestData {
-        private IntSeq tpsMeasurements = new IntSeq();
         private final LongSeq memMeasurements = new LongSeq();
+        private IntSeq tpsMeasurements = new IntSeq();
 
         public TestData() {
             tpsMeasurements = new IntSeq();

@@ -82,7 +82,7 @@ public class Report implements MiniMod {
                     player.sendMessage("[scarlet]Only players on your team can be reported.");
                     return;
                 }
-                if (Objects.equals(found.uuid(), player.uuid())){
+                if (Objects.equals(found.uuid(), player.uuid())) {
                     player.sendMessage("[scarlet]You can't report yourself anymore");
                     return;
                 }

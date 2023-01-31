@@ -24,6 +24,10 @@ public class Inspector implements MiniMod {
     private final ObjectMap<Integer, TileInfo> tileInfos = new ObjectMap<>();
     private final ObjectMap<String, Integer> activeTiles = new ObjectMap<>();
 
+    private static int idxFor(int x, int y) {
+        return y * Vars.world.width() + x;
+    }
+
     @Override
     public void registerCommands(CommandHandler handler) {
         handler.<Player>register("inspector", "", "Toggle inspector", (args, player) -> {
@@ -107,10 +111,6 @@ public class Inspector implements MiniMod {
                 Call.infoPopup(player.con, s, 1f, Align.bottomRight, 0, 0, 400, 0);
             }
         }, 1f, 1f);
-    }
-
-    private static int idxFor(int x, int y) {
-        return y * Vars.world.width() + x;
     }
 
     private static class TileInfo {
