@@ -4,10 +4,7 @@ import arc.Events;
 import arc.graphics.Color;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
-import arc.util.CommandHandler;
-import arc.util.Log;
-import arc.util.Structs;
-import arc.util.Timer;
+import arc.util.*;
 import mindustry.Vars;
 import mindustry.ai.types.MinerAI;
 import mindustry.content.Blocks;
@@ -61,6 +58,7 @@ public class Pets implements MiniMod {
             return 3;
         }
     }
+
     protected static int maxTier(int rank) {
         if (rank <= 1) {
             return 0;
@@ -74,6 +72,7 @@ public class Pets implements MiniMod {
             return 4;
         }
     }
+
     protected static int tierOf(UnitType type) {
         if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela || type == UnitTypes.alpha || type == UnitTypes.beta || type == UnitTypes.gamma) {
             return 4;
@@ -92,6 +91,7 @@ public class Pets implements MiniMod {
         }
         return -1;
     }
+
     protected static Item[] possibleFoods(UnitType type) {
         if (type == UnitTypes.crawler) {
             return new Item[]{Items.coal};
@@ -270,8 +270,8 @@ public class Pets implements MiniMod {
                         ctx.error("Not in database", "You have not linked your discord account. Type **" + DiscordVars.prefix + "redeem** to link.");
                         return;
                     }
-                    if (ctx.args.get("name").length() >100){
-                        ctx.error("Pet name is to long","Please choose a shorter name for your pet");
+                    if (Strings.stripColors(ctx.args.get("name")).length() > 30) {
+                        ctx.error("Pet name is to long", "Please choose a shorter name for your pet");
                         return;
                     }
 
