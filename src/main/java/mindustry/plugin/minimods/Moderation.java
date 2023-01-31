@@ -36,7 +36,7 @@ import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
  * Manages mutes, freezes, bans, and other moderation-related commands
  */
 public class Moderation implements MiniMod {
-    public final ObjectSet<String> frozen = new ObjectSet<>();
+    public static final ObjectSet<String> frozen = new ObjectSet<>();
     public final ObjectSet<String> muted = new ObjectSet<>();
 
     @Override

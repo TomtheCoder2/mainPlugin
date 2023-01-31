@@ -21,6 +21,8 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import java.awt.*;
 import java.time.Instant;
 
+import static mindustry.plugin.minimods.Moderation.frozen;
+
 /**
  * Manages vote kicking
  */
@@ -204,6 +206,9 @@ public class Kick implements MiniMod {
             Call.sendMessage(GameMsg.info("Kick", "Plaintiff [white]" + player.name + "[" + GameMsg.INFO + "] has voted to kick defendant [white]" + found.name + "[" + GameMsg.INFO + "] " +
                     "(1/" + session.requiredVotes() + "). " +
                     "Type [" + GameMsg.CMD + "]/vote y[" + GameMsg.INFO + "] to agree and [" + GameMsg.CMD + "]/vote n[" + GameMsg.INFO + "] to disagree."));
+
+            // freeze the player
+            frozen.add(found.uuid());
         });
 
         handler.<Player>register("vote", "<y/n/c>", "Vote to kick the current player. Or cancel the current kick.", (arg, player) -> {
@@ -357,6 +362,8 @@ public class Kick implements MiniMod {
                 } else {
                     Call.sendMessage(GameMsg.info("Kick", "Vote for [white]" + target.name + "[" + GameMsg.INFO + "] failed."));
                     DiscordLog.moderation("Votekick", plaintiffName + " `" + session.plaintiff + "`", target.getInfo(), null, "Failed");
+                    // unfreeze player
+                    frozen.remove(session.target);
                     session.clear();
                 }
 
