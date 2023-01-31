@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
+import static mindustry.plugin.utils.Utils.split;
 
 
 /**
@@ -378,8 +379,8 @@ public class Moderation implements MiniMod {
                     EmbedBuilder eb = new EmbedBuilder()
                             .setColor(DiscordPalette.INFO)
                             .setTitle("Lookup: " + Utils.escapeEverything(info.lastName));
-
-                    eb.addField("Names", info.names.toString(" / "));
+                    
+                    eb.addField("Names", split(info.names.toString(" / "), 1024)[0]);
 
                     if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.MOD_BOT.getId()) {
                         // if there are too many IPs, take last 1024 / 18 IPs

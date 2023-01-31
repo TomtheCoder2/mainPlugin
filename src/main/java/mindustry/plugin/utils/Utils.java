@@ -43,6 +43,10 @@ public class Utils {
     public static Boolean verification = false;
     public static Pattern ipValidationPattern;
 
+    public static String[] split(String str, int chunkSize) {
+        return str.split("(?<=\\G.{" + chunkSize + "})");
+    }
+
     public static void init() {
 
         // setup regex for ip validation
