@@ -270,7 +270,7 @@ public class Pets implements MiniMod {
                         ctx.error("Not in database", "You have not linked your discord account. Type **" + DiscordVars.prefix + "redeem** to link.");
                         return;
                     }
-                    if (Strings.stripColors(ctx.args.get("name")).length() > 30) {
+                    if (Strings.stripColors(ctx.args.get("name")).length() > 30 && ctx.args.get("name").length() > 300) {
                         ctx.error("Pet name is to long", "Please choose a shorter name for your pet");
                         return;
                     }
