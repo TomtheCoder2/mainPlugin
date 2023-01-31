@@ -351,7 +351,7 @@ public class PheonixMain extends Plugin {
     }
 
     public void updateDiscordStatus() {
-        if (Vars.state.is(GameState.State.playing)) {
+        if (Vars.state.is(GameState.State.playing) || Vars.state.is(GameState.State.paused)) {
             DiscordVars.api.updateActivity(
                     Utils.escapeColorCodes(Vars.state.map.name()) +
                             " with " + Groups.player.size() +
