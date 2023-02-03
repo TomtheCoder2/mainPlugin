@@ -65,7 +65,8 @@ public class Communication implements MiniMod {
     @Override
     public void registerEvents() {
         Events.on(EventType.PlayerChatEvent.class, event -> {
-            if (event.message.startsWith("/t")) {
+            // we don't want to leak infos when we are in pvp game mode
+            if (event.message.startsWith("/t") && !Vars.state.rules.pvp) {
                 event.message.replace("/t", "<T> ");
             }
             if (event.message.charAt(0) != '/') {
