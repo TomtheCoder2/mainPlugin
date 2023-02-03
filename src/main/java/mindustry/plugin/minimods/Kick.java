@@ -22,6 +22,7 @@ import java.awt.*;
 import java.time.Instant;
 
 import static mindustry.plugin.minimods.Moderation.frozen;
+import static mindustry.plugin.minimods.Ranks.warned;
 
 /**
  * Manages vote kicking
@@ -134,6 +135,11 @@ public class Kick implements MiniMod {
 //               CustomLog.debug("vk @.", args[0]);
             if (!Administration.Config.enableVotekick.bool()) {
                 player.sendMessage(GameMsg.error("Kick", "Votekicking is disabled on this server."));
+                return;
+            }
+
+            if (warned.contains(player.uuid())) {
+                player.sendMessage(GameMsg.error("Kick", "You can't votekick other players, because you are flagged as a potential griefer!"));
                 return;
             }
 

@@ -34,6 +34,7 @@ import static arc.util.Log.info;
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.state;
 import static mindustry.plugin.database.Database.updateBannedWordsClient;
+import static mindustry.plugin.minimods.Ranks.newPlayers;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
 public class PheonixMain extends Plugin {
@@ -246,12 +247,16 @@ public class PheonixMain extends Plugin {
 //                if (pd.rank == Rank.all.length - 1) {
 //                    player.admin = true;
 //                }
+                if (pd.playTime < 60) {
+                    newPlayers.put(player.uuid(), new Utils.Pair<>(pd.playTime, pd.buildingsBuilt));
+                }
             } else { // not in database
                 info("New player connected: " + Strings.stripColors(event.player.name));
                 Database.setPlayerData(new Database.Player(player.uuid(), 0));
 
                 Rank rank = Rank.all[0];
                 Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
+                newPlayers.put(player.uuid(), new Utils.Pair<>(0, 0));
             }
             // send message to everyone: x has joined y times and has been kicked z times
             var info = Query.findPlayerInfo(player.uuid());

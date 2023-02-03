@@ -5,6 +5,7 @@ import arc.struct.ObjectSet;
 import arc.struct.Seq;
 import arc.util.CommandHandler;
 import arc.util.Strings;
+import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
@@ -39,6 +40,7 @@ import static mindustry.plugin.utils.Utils.split;
 public class Moderation implements MiniMod {
     public static final ObjectSet<String> frozen = new ObjectSet<>();
     public final ObjectSet<String> muted = new ObjectSet<>();
+    private final ObjectSet<String> warnedFrozen = new ObjectSet<>();
 
     @Override
     public void registerEvents() {
@@ -54,8 +56,12 @@ public class Moderation implements MiniMod {
             Vars.netServer.admins.addActionFilter(action -> {
                 assert action.player != null;
                 boolean isFrozen = frozen.contains(action.player.uuid());
-                if (isFrozen) {
+                if (isFrozen && !warnedFrozen.contains(action.player.uuid())) {
                     action.player.sendMessage("[cyan]You are frozen! Ask a mod to unfreeze you.");
+                    warnedFrozen.add(action.player.uuid());
+                    // remove the warning after 30 seconds
+                    String uuid = action.player.uuid();
+                    Timer.schedule(() -> warnedFrozen.remove(uuid), 30);
                 }
                 return !isFrozen;
             });
@@ -379,7 +385,7 @@ public class Moderation implements MiniMod {
                     EmbedBuilder eb = new EmbedBuilder()
                             .setColor(DiscordPalette.INFO)
                             .setTitle("Lookup: " + Utils.escapeEverything(info.lastName));
-                    
+
                     eb.addField("Names", split(info.names.toString(" / "), 1024)[0]);
 
                     if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.MOD_BOT.getId()) {

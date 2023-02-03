@@ -16,6 +16,7 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
+import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
@@ -23,17 +24,23 @@ import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.*;
 import mindustry.ui.Menus;
 import mindustry.world.Block;
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.util.Arrays;
 import java.util.Objects;
 
+import static mindustry.plugin.minimods.Moderation.frozen;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
 /**
  * Manages player ranks and other player information.
  */
 public class Ranks implements MiniMod {
+    /**
+     * Uuid of players that have less than 60 minutes of playtime.
+     */
+    public static final ObjectMap<String, Utils.Pair<Integer, Integer>> newPlayers = new ObjectMap<>();
     private final static String promotionMessage = """
             [sky]%player%, you have been promoted to [sky]<%rank%>[]!
             [#4287f5]You reached a playtime of - %playtime% minutes!
@@ -52,10 +59,15 @@ public class Ranks implements MiniMod {
             Blocks.underflowGate,
             Blocks.overflowGate
     };
+    public static final ObjectSet<String> warned = new ObjectSet<>();
     /**
      * Number of buildings built that have not been stored to the database.
      */
     private final ObjectMap<String, Integer> buildingsBuiltCache = new ObjectMap<>();
+    /**
+     * For auto ban system
+     */
+    private final ObjectMap<String, Integer> buildingsDestroyedCache = new ObjectMap<>();
     /**
      * Who has already rated the map
      */
@@ -125,12 +137,57 @@ public class Ranks implements MiniMod {
         Events.on(EventType.BlockBuildEndEvent.class, event -> {
             try {
                 if (event.unit.getPlayer() == null) return;
-                if (event.breaking) return;
-
                 String uuid = event.unit.getPlayer().uuid();
+
+
                 if (event.tile.block() != null) {
-                    if (!Arrays.asList(excludedBlocks).contains(event.tile.block())) {
+                    if (!event.breaking) {
+                        // this will increase the buildingsbuilt stats but its more important to stop griefing
+//                    if (!Arrays.asList(excludedBlocks).contains(event.tile.block())) {
                         buildingsBuiltCache.put(uuid, buildingsBuiltCache.get(uuid, 0) + 1);
+//                    }
+                    } else {
+
+                        buildingsDestroyedCache.put(uuid, buildingsDestroyedCache.get(uuid, 0) + 1);
+                    }
+
+                    // check if its suspicious
+                    if (newPlayers.containsKey(uuid)) {
+                        if (buildingsBuiltCache.get(uuid, 0) < buildingsDestroyedCache.get(uuid, 0)) {
+                            int warnThreshold = (buildingsBuiltCache.get(uuid, 0) + newPlayers.get(uuid).second) * newPlayers.get(uuid).first / 2;
+                            if (buildingsDestroyedCache.get(uuid, 0) > warnThreshold) {
+                                // freeze for 15 seconds
+                                frozen.add(uuid);
+                                Timer.schedule(() -> frozen.remove(uuid), 15);
+                                if (!warned.contains(uuid)) {
+                                    warned.add(uuid);
+
+                                    // warn mods
+                                    EmbedBuilder eb = new EmbedBuilder().setTitle("Potential Griefer Online (Auto Ban System)")
+                                            .addField("Name", Utils.escapeEverything(event.unit.getPlayer().name))
+                                            .addField("Phash", Utils.calculatePhash(uuid))
+                                            .setColor(DiscordPalette.WARN)
+                                            .setFooter("Reported by: Auto Ban System");
+                                    new MessageBuilder()
+                                            .setEmbed(eb)
+                                            .setContent("<@&" + Roles.RI + ">")
+                                            .send(Channels.GR_REPORT);
+
+                                    // send a message to all players online
+                                    for (Player p : Groups.player) {
+                                        if (p == event.unit.getPlayer()) continue;
+                                        p.sendMessage("[scarlet][Anti-griefer-system] Warning! Potential grieffer found on the server, keep an eye on \"" + event.unit.getPlayer().name + "\"[scarlet]!" + (p.admin ? " [orange]Their UUID is " + uuid : ""));
+                                    }
+                                    // warn player
+                                    event.unit.getPlayer().sendMessage("[scarlet]You are deconstructing too fast, to avoid mass grief you have been frozen for [cyan]15 seconds.[] This action will be reported to the moderators.");
+                                    // log in console
+                                    Log.info("[Anti-griefer-system] Warning! Potential grieffer found on the server, keep an eye on \"" + event.unit.getPlayer().name + "\"[scarlet]!" + " Their UUID is " + uuid);
+
+                                    // remove from warned after 5 minutes
+                                    Timer.schedule(() -> warned.remove(uuid), 5 * 60);
+                                }
+                            }
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -154,6 +211,13 @@ public class Ranks implements MiniMod {
                     pd.playTime += elapsedTimeMin;
                     pd.buildingsBuilt += buildingsBuiltCache.get(player.uuid(), 0);
                     Database.setPlayerData(pd);
+                    if (newPlayers.containsKey(player.uuid())) {
+                        if (newPlayers.get(player.uuid()).first + elapsedTimeMin >= 60) {
+                            newPlayers.remove(player.uuid());
+                        } else {
+                            newPlayers.put(player.uuid(), new Utils.Pair<>(newPlayers.get(player.uuid()).first + elapsedTimeMin, pd.buildingsBuilt));
+                        }
+                    }
                 }
 
                 timeStart = System.currentTimeMillis();
