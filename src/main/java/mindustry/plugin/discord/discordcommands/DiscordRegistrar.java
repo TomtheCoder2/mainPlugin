@@ -100,6 +100,10 @@ public class DiscordRegistrar {
         commands.put(cmdData.name, cmdEntry);
         if (cmdData.aliases != null) {
             for (String alias : cmdData.aliases) {
+                // warn if alias is already used
+                if (commands.containsKey(alias)) {
+                    System.out.println("WARNING: alias '" + alias + "' is already used by command '" + commands.get(alias).data.name + "'");
+                }
                 commands.put(alias, cmdEntry);
             }
         }

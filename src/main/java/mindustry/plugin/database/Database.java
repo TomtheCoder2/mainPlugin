@@ -1,5 +1,6 @@
 package mindustry.plugin.database;
 
+import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Log;
 import mindustry.plugin.utils.Utils;
@@ -8,6 +9,10 @@ import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static mindustry.Vars.netServer;
+import static mindustry.plugin.utils.Utils.escapeEverything;
 
 public final class Database {
     /**
@@ -254,6 +259,94 @@ public final class Database {
         }
     }
 
+    // Save a name change
+    public static void saveName(String uuid, String name) {
+        try {
+            reconnect();
+            String sql = "INSERT INTO names (uuid, name) VALUES (?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, uuid);
+            pstmt.setString(2, escapeEverything(name));
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Save a list of names
+    public static void saveNames(String uuid, String[] names) {
+        try {
+            reconnect();
+            String sql = "INSERT INTO names (uuid, name) VALUES (?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            for (String name : names) {
+                pstmt.setString(1, uuid);
+                pstmt.setString(2, escapeEverything(name));
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Save a list of names for multiple players
+    public static void saveNames(ObjectMap<String, Seq<String>> names) {
+        try {
+            reconnect();
+            String sql = "INSERT INTO names (uuid, name) VALUES (?, ?)";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            for (String uuid : names.keys()) {
+                for (String name : names.get(uuid)) {
+                    pstmt.setString(1, uuid);
+                    pstmt.setString(2, escapeEverything(name));
+                    pstmt.addBatch();
+                }
+            }
+            pstmt.executeBatch();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Get all names of a player
+    public static Seq<String> getNames(String uuid) {
+        try {
+            reconnect();
+            String sql = "SELECT name FROM names WHERE uuid = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, uuid);
+            ResultSet rs = pstmt.executeQuery();
+            Seq<String> names = new Seq<>();
+            while (rs.next()) {
+                names.add(rs.getString("name"));
+            }
+            return names;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Get all uuids of a name
+    public static Seq<String> getUUIDs(String name) {
+        try {
+            reconnect();
+            String sql = "SELECT uuid FROM names WHERE name ~* ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, name);
+            ResultSet rs = pstmt.executeQuery();
+            Seq<String> uuids = new Seq<>();
+            while (rs.next()) {
+                uuids.add(rs.getString("uuid"));
+            }
+            return uuids;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /**
      * Set player data
      *
@@ -424,7 +517,7 @@ public final class Database {
     public static Map getMapData(String name) {
         reconnect();
 
-        name = Utils.escapeEverything(name).replaceAll("\\W", "");
+        name = escapeEverything(name).replaceAll("\\W", "");
         String sql = "SELECT name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame "
                 + "FROM mapdata "
                 + "WHERE name = ?";
@@ -450,7 +543,7 @@ public final class Database {
     public static void setMapData(Map md) {
         reconnect();
 
-        String name = Utils.escapeEverything(md.name).replaceAll("\\W", "_");
+        String name = escapeEverything(md.name).replaceAll("\\W", "_");
         //Log.info("setting map data for " + name);
         if (getMapData(name) == null) {
             String sql = "INSERT INTO mapdata(name, positiverating, negativerating, highscoretime, highscorewaves, playtime, shortestGame) "
@@ -494,6 +587,72 @@ public final class Database {
                 ex.printStackTrace();
             }
         }
+    }
+
+    // go through all players and save all their names
+    public static int saveAllNames() {
+        AtomicInteger n = new AtomicInteger();
+        // start new thread
+        new Thread(() -> {
+            reconnect();
+
+            System.out.println("save all names...");
+            // search for the uuid
+            String sql = "SELECT * "
+                    + "FROM " + playerTable + " ORDER BY uuid DESC;";
+            try {
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+
+                ResultSet rs = pstmt.executeQuery();
+
+                ObjectMap<String, Seq<String>> data = new ObjectMap<>();
+                while (rs.next()) {
+                    Player pd = Player.fromSQL(rs);
+//                System.out.println("processing: " + pd.uuid);
+                    var info = netServer.admins.getInfo(pd.uuid);
+                    if (info == null) {
+                        System.out.println("no info found for " + pd.uuid);
+                        continue;
+                    }
+
+                    StringBuilder sb = new StringBuilder(pd.uuid + ": names: ");
+                    for (var name : info.names) {
+                        if (name != null && !name.equals("")) {
+                            sb.append(name).append(", ");
+//                        saveName(pd.uuid, name);
+                            data.put(pd.uuid, info.names);
+                        }
+                    }
+//                System.out.println(sb);
+                    if (n.get() % 100 == 0) {
+                        System.out.println("processed " + n + " players");
+                    }
+                    if (n.get() % 1000 == 0) {
+                        System.out.println("saving names...");
+                        saveNames(data);
+                        data.clear();
+                    }
+                    n.getAndIncrement();
+                }
+                System.out.println("saving names...");
+                saveNames(data);
+                rs.close();
+                // and then delete all duplicates with this command
+                sql = "DELETE FROM\n" +
+                        "    names a\n" +
+                        "    USING names b\n" +
+                        "WHERE\n" +
+                        "        a.id > b.id\n" +
+                        "  AND a.uuid = b.uuid AND a.name = b.name;";
+                pstmt = conn.prepareStatement(sql);
+                pstmt.executeUpdate();
+
+            } catch (SQLException ex) {
+//            //Log.debug(ex.getMessage());
+                ex.printStackTrace();
+            }
+        }).start();
+        return n.get();
     }
 
     public static class Player implements Cloneable {

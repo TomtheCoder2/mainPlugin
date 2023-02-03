@@ -30,6 +30,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import java.util.Arrays;
 import java.util.Objects;
 
+import static java.lang.Math.max;
 import static mindustry.plugin.minimods.Moderation.frozen;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
@@ -105,9 +106,9 @@ public class Ranks implements MiniMod {
             if (md == null) {
                 md = new Database.Map(mapName);
             }
-            md.highscoreWaves = Math.max(md.highscoreWaves, Vars.state.stats.wavesLasted);
+            md.highscoreWaves = max(md.highscoreWaves, Vars.state.stats.wavesLasted);
             long mapTime = ((System.currentTimeMillis() - mapStartTime) / 1000) / 60;
-            md.highscoreTime = Math.max(md.highscoreTime, mapTime);
+            md.highscoreTime = max(md.highscoreTime, mapTime);
             if (md.shortestGame != 0) {
                 md.shortestGame = Math.min(md.shortestGame, mapTime);
             } else {
@@ -154,7 +155,7 @@ public class Ranks implements MiniMod {
                     // check if its suspicious
                     if (newPlayers.containsKey(uuid)) {
                         if (buildingsBuiltCache.get(uuid, 0) < buildingsDestroyedCache.get(uuid, 0)) {
-                            int warnThreshold = (buildingsBuiltCache.get(uuid, 0) + newPlayers.get(uuid).second) * newPlayers.get(uuid).first / 2;
+                            int warnThreshold = max(10, (buildingsBuiltCache.get(uuid, 0) + newPlayers.get(uuid).second) * newPlayers.get(uuid).first / 2);
                             if (buildingsDestroyedCache.get(uuid, 0) > warnThreshold) {
                                 // freeze for 15 seconds
                                 frozen.add(uuid);
@@ -176,6 +177,7 @@ public class Ranks implements MiniMod {
                                     // send a message to all players online
                                     for (Player p : Groups.player) {
                                         if (p == event.unit.getPlayer()) continue;
+                                        if (warned.contains(p.uuid())) continue;
                                         p.sendMessage("[scarlet][Anti-griefer-system] Warning! Potential grieffer found on the server, keep an eye on \"" + event.unit.getPlayer().name + "\"[scarlet]!" + (p.admin ? " [orange]Their UUID is " + uuid : ""));
                                     }
                                     // warn player
@@ -184,7 +186,11 @@ public class Ranks implements MiniMod {
                                     Log.info("[Anti-griefer-system] Warning! Potential grieffer found on the server, keep an eye on \"" + event.unit.getPlayer().name + "\"[scarlet]!" + " Their UUID is " + uuid);
 
                                     // remove from warned after 5 minutes
-                                    Timer.schedule(() -> warned.remove(uuid), 5 * 60);
+                                    Timer.schedule(() -> {
+                                        if (warned.contains(uuid)) {
+                                            warned.remove(uuid);
+                                        }
+                                    }, 5 * 60);
                                 }
                             }
                         }
@@ -194,6 +200,13 @@ public class Ranks implements MiniMod {
                 Log.err("There was an error while saving block status: ");
                 e.printStackTrace();
             }
+        });
+
+        Events.on(EventType.PlayerLeave.class, event -> {
+            // remove from new players
+            newPlayers.remove(event.player.uuid());
+            // also from warned
+            warned.remove(event.player.uuid());
         });
 
         Timer.schedule(new Timer.Task() {

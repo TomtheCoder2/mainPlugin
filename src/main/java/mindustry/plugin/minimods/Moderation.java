@@ -26,11 +26,16 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static mindustry.plugin.database.Database.getNames;
+import static mindustry.plugin.database.Database.getUUIDs;
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
+import static mindustry.plugin.utils.Utils.escapeEverything;
 import static mindustry.plugin.utils.Utils.split;
 
 
@@ -366,7 +371,7 @@ public class Moderation implements MiniMod {
                 }
         );
 
-        handler.register("lookup", "<player>",
+        handler.register("lookup", "<player...>",
                 data -> {
                     data.category = "Moderation";
                     data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
@@ -374,6 +379,26 @@ public class Moderation implements MiniMod {
                     data.help = "Lookup information about a player (by name, IP, UUID)";
                 },
                 ctx -> {
+                    var uuids = getUUIDs(ctx.args.get("player"));
+                    if (uuids != null && uuids.size > 1) {
+                        EmbedBuilder eb = new EmbedBuilder();
+                        eb.setTitle("Multiple Players Found");
+                        eb.setColor(DiscordPalette.INFO);
+                        StringBuilder sb = new StringBuilder();
+                        List<String> uuids_list  = new ArrayList<>();
+                        for (var uuid : uuids) {
+                            var info = Vars.netServer.admins.getInfo(uuid);
+                            if (info == null) continue;
+                            if (uuids_list.contains(uuid)) continue;
+                            sb.append(String.format("%s (`%s`) - %s\n", escapeEverything(info.lastName), uuid, info.lastIP));
+                            uuids_list.add(uuid);
+                        }
+//                        System.out.println("before splitting: " + sb.toString().length());
+//                        System.out.println("after splitting: " + split(sb.toString(), 3000)[0].length());
+                        eb.setDescription("Multiple players were found with the given name. Please specify the UUID or IP of the player you want to lookup.\n\n" + split(sb.toString(), 3000)[0]);
+                        ctx.channel().sendMessage(eb);
+                        return;
+                    }
                     var info = Query.findPlayerInfo(ctx.args.get("player"));
                     if (info == null) {
                         ctx.error("No such player", ctx.args.get("player") + " is not in the database");
@@ -386,7 +411,12 @@ public class Moderation implements MiniMod {
                             .setColor(DiscordPalette.INFO)
                             .setTitle("Lookup: " + Utils.escapeEverything(info.lastName));
 
-                    eb.addField("Names", split(info.names.toString(" / "), 1024)[0]);
+                    Seq<String> names = new Seq<>();
+                    for (var name : info.names) {
+                        names.addUnique(Utils.escapeEverything(name));
+                    }
+                    eb.addField("Names", split(names.toString(" / "), 1024)[0]);
+                    eb.addField("Names (Database)", split(Objects.requireNonNull(getNames(info.id)).toString(" / "), 1024)[0]);
 
                     if (ctx.channel().getId() == Channels.ADMIN_BOT.getId() || ctx.channel().getId() == Channels.MOD_BOT.getId()) {
                         // if there are too many IPs, take last 1024 / 18 IPs

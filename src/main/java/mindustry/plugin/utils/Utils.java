@@ -33,6 +33,7 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.Math.min;
 import static mindustry.Vars.maps;
 import static mindustry.Vars.state;
 //import java.sql.*;
@@ -44,7 +45,13 @@ public class Utils {
     public static Pattern ipValidationPattern;
 
     public static String[] split(String str, int chunkSize) {
-        return str.split("(?<=\\G.{" + chunkSize + "})");
+//        return str.split("(?<=\\G.{" + chunkSize + "})");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < min(str.length(), chunkSize); i++) {
+            sb.append(str.charAt(i));
+        }
+        assert sb.length() == min(str.length(), chunkSize);
+        return new String[]{sb.toString()};
     }
 
     public static void init() {

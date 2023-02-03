@@ -56,8 +56,8 @@ public class Management implements MiniMod {
                     scanTPS[0] = () -> {
                         if (System.currentTimeMillis() > endTime) {
                             // create plot data
-                            String path_tps = savePlot(data.tpsMeasurements.toArray(), "tps", "TPS");
-                            String path_memory = savePlot(data.memMeasurements.toArray(), "memory", "Memory Usage");
+//                            String path_tps = savePlot(data.tpsMeasurements.toArray(), "tps", "TPS");
+//                            String path_memory = savePlot(data.memMeasurements.toArray(), "memory", "Memory Usage");
                             ctx.reply(new MessageBuilder()
                                     .addEmbed(
                                             new EmbedBuilder()
@@ -75,8 +75,8 @@ public class Management implements MiniMod {
                                                                     "Max: " + (data.maxMem() / 1024) + " kB\n"
                                                     ))
                                     .addAttachment(data.csv().getBytes(), "data.csv")
-                                    .addAttachment(new File(path_tps))
-                                    .addAttachment(new File(path_memory))
+//                                    .addAttachment(new File(path_tps))
+//                                    .addAttachment(new File(path_memory))
                             );
                         } else {
                             data.step();
@@ -484,6 +484,20 @@ public class Management implements MiniMod {
                     ctx.channel().type();
                     int n = Database.resetPhashes();
                     ctx.success("Success", "Successfully reset " + n + " phashes");
+                }
+        );
+
+        handler.register("setNames", "",
+                data -> {
+                    data.category = "Management";
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
+                    data.help = "Save all names in the names database. *IMPORTANT*: Only use this if you know what you're doing.";
+                    data.aliases = new String[]{"saveNames", "sn"};
+                },
+                ctx -> {
+                    ctx.channel().type();
+                    int n = Database.saveAllNames();
+                    ctx.success("Success", "Successfully set " + n + " names");
                 }
         );
     }

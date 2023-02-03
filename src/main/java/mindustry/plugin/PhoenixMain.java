@@ -33,11 +33,11 @@ import static arc.util.Log.err;
 import static arc.util.Log.info;
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.state;
-import static mindustry.plugin.database.Database.updateBannedWordsClient;
+import static mindustry.plugin.database.Database.*;
 import static mindustry.plugin.minimods.Ranks.newPlayers;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
-public class PheonixMain extends Plugin {
+public class PhoenixMain extends Plugin {
     //    public static final File prefsFile = new File("prefs.properties");
 //    public static Net net = new Net();
 //    public static Prefs prefs = new Prefs(prefsFile);
@@ -69,7 +69,7 @@ public class PheonixMain extends Plugin {
     );
 
     // register event handlers and create variables in the constructor
-    public PheonixMain() {
+    public PhoenixMain() {
         info("Starting Discord Plugin...");
         info(lennyFace);
 
@@ -262,6 +262,13 @@ public class PheonixMain extends Plugin {
             var info = Query.findPlayerInfo(player.uuid());
             Call.sendMessage(player.name + "[accent] has joined [scarlet]" + info.timesJoined + "[accent] times and has been kicked [scarlet]" + info.timesKicked + "[accent] times.");
             Call.infoMessage(player.con, Utils.Message.welcome());
+
+            // update names database
+            // first check if current name is already in the database
+            if (!Objects.requireNonNull(getNames(player.uuid())).contains(player.name)) {
+                // add name to database
+                saveName(player.uuid(), player.name);
+            }
 
 //
 //            CompletableFuture.runAsync(() -> {
