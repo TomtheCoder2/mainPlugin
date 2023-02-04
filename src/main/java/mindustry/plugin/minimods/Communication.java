@@ -1,5 +1,6 @@
 package mindustry.plugin.minimods;
 
+import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
 import arc.util.Align;
@@ -32,8 +33,10 @@ import java.util.stream.Collectors;
 
 import static mindustry.plugin.database.Database.bannedWords;
 import static mindustry.plugin.utils.Utils.escapeFoosCharacters;
+import static mindustry.plugin.utils.Utils.getArrayListFromString;
 
 public class Communication implements MiniMod {
+    public static ArrayList<String> autoScreenMessages = new ArrayList<>();
     private final Seq<String> screenMessages = new Seq<>();
     private Announcement announcement = null;
 
@@ -91,6 +94,12 @@ public class Communication implements MiniMod {
         Timer.schedule(() -> {
             int ypos = 300;
             for (String message : screenMessages) {
+                Call.infoPopup(message, 10f, Align.topRight, ypos, 0, 0, 0);
+                ypos += message.split("\n").length * 20;
+                ypos += 20;
+            }
+
+            for (String message : autoScreenMessages) {
                 Call.infoPopup(message, 10f, Align.topRight, ypos, 0, 0, 0);
                 ypos += message.split("\n").length * 20;
                 ypos += 20;
@@ -281,6 +290,64 @@ public class Communication implements MiniMod {
                             ctx.success("Successfully added message", ":)");
                             break;
                     }
+                }
+        );
+
+        handler.register("autoscreenmessage", "<add|list|remove> [message...]",
+                data -> {
+                    data.category = "Communication";
+                    data.aliases = new String[]{"asm"};
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
+                    data.help = "Add, remove or list screen messages that are set automatically after the server restarts";
+                },
+                ctx -> {
+                    autoScreenMessages = getArrayListFromString(Core.settings.getString("autoscreenmessages", "[]"));
+                    switch (ctx.args.get("add|list|remove")) {
+                        case "list":
+                            EmbedBuilder eb = new EmbedBuilder()
+                                    .setTitle("Active Screen Messages")
+                                    .setColor(DiscordPalette.INFO);
+                            if (autoScreenMessages.size() == 0) {
+                                eb.setDescription("None");
+                            }
+
+                            int i = 0;
+                            for (String message : autoScreenMessages) {
+                                eb.addField(i + "", "```\n" + message + "\n```");
+                                i++;
+                            }
+                            ctx.sendEmbed(eb);
+                            break;
+                        case "remove":
+                            String idstr = ctx.args.get("message");
+                            if (idstr == null || !Strings.canParseInt(idstr)) {
+                                ctx.error("Invalid ID", "ID must be a number");
+                                return;
+                            }
+                            int id = Strings.parseInt(idstr);
+                            if (id >= autoScreenMessages.size() || id < 0) {
+                                ctx.error("Invalid ID", "ID is out of range");
+                                return;
+                            }
+
+                            String message = autoScreenMessages.get(id);
+                            autoScreenMessages.remove(id);
+                            ctx.success("Successfully removed message " + id, "```\n" + message + "\n```");
+                            break;
+                        case "add":
+                            message = ctx.args.get("message");
+                            if (message == null) {
+                                ctx.error("Must provide message", ":(");
+                                return;
+                            }
+                            message = message.replace("\\n ", "\n").replace("\\n", "\n");
+
+                            autoScreenMessages.add(message);
+                            ctx.success("Successfully added message", ":)");
+                            break;
+                    }
+                    Core.settings.put("autoscreenmessages", autoScreenMessages.toString());
+                    Core.settings.autosave();
                 }
         );
 

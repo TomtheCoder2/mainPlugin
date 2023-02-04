@@ -31,12 +31,10 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
 
 import java.awt.*;
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static mindustry.Vars.*;
-import static mindustry.plugin.utils.plot.PlotTest2.savePlot;
 
 public class Management implements MiniMod {
     @Override
@@ -59,22 +57,22 @@ public class Management implements MiniMod {
 //                            String path_tps = savePlot(data.tpsMeasurements.toArray(), "tps", "TPS");
 //                            String path_memory = savePlot(data.memMeasurements.toArray(), "memory", "Memory Usage");
                             ctx.reply(new MessageBuilder()
-                                    .addEmbed(
-                                            new EmbedBuilder()
-                                                    .setColor(Color.YELLOW)
-                                                    .setTitle("Stability Test Results")
-                                                    .addInlineField("TPS",
-                                                            "Min: " + data.minTPS() + "\n" +
-                                                                    "Avg: " + data.avgTPS() + "\n" +
-                                                                    "Median: " + data.medTPS() + "\n" +
-                                                                    "Max: " + data.maxTPS() + "\n"
-                                                    )
-                                                    .addInlineField("Memory",
-                                                            "Min: " + (data.minMem() / 1024) + " kB\n" +
-                                                                    "Avg: " + (data.avgMem() / 1024) + " kB\n" +
-                                                                    "Max: " + (data.maxMem() / 1024) + " kB\n"
-                                                    ))
-                                    .addAttachment(data.csv().getBytes(), "data.csv")
+                                            .addEmbed(
+                                                    new EmbedBuilder()
+                                                            .setColor(Color.YELLOW)
+                                                            .setTitle("Stability Test Results")
+                                                            .addInlineField("TPS",
+                                                                    "Min: " + data.minTPS() + "\n" +
+                                                                            "Avg: " + data.avgTPS() + "\n" +
+                                                                            "Median: " + data.medTPS() + "\n" +
+                                                                            "Max: " + data.maxTPS() + "\n"
+                                                            )
+                                                            .addInlineField("Memory",
+                                                                    "Min: " + (data.minMem() / 1024) + " kB\n" +
+                                                                            "Avg: " + (data.avgMem() / 1024) + " kB\n" +
+                                                                            "Max: " + (data.maxMem() / 1024) + " kB\n"
+                                                            ))
+                                            .addAttachment(data.csv().getBytes(), "data.csv")
 //                                    .addAttachment(new File(path_tps))
 //                                    .addAttachment(new File(path_memory))
                             );
@@ -487,7 +485,7 @@ public class Management implements MiniMod {
                 }
         );
 
-        handler.register("setNames", "",
+        handler.register("setnames", "",
                 data -> {
                     data.category = "Management";
                     data.roles = new long[]{Roles.ADMIN, Roles.MOD};

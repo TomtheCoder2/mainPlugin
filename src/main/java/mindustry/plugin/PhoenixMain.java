@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import static arc.util.Log.err;
@@ -36,6 +37,9 @@ import static mindustry.Vars.state;
 import static mindustry.plugin.database.Database.*;
 import static mindustry.plugin.minimods.Ranks.newPlayers;
 import static mindustry.plugin.utils.Utils.escapeEverything;
+
+import static mindustry.plugin.minimods.Communication.autoScreenMessages;
+import static mindustry.plugin.utils.Utils.getArrayListFromString;
 
 public class PhoenixMain extends Plugin {
     //    public static final File prefsFile = new File("prefs.properties");
@@ -200,6 +204,8 @@ public class PhoenixMain extends Plugin {
         });
 
         updateBannedWordsClient();
+
+        autoScreenMessages = getArrayListFromString(Core.settings.getString("autoscreenmessages", "[]"));
 
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;

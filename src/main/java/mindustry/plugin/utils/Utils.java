@@ -26,10 +26,7 @@ import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,6 +49,12 @@ public class Utils {
         }
         assert sb.length() == min(str.length(), chunkSize);
         return new String[]{sb.toString()};
+    }
+
+    public static ArrayList<String> getArrayListFromString(String str) {
+        String replace = str.replace("[", "");
+        String replace1 = replace.replace("]", "");
+        return new ArrayList<>(Arrays.asList(replace1.split(",")));
     }
 
     public static void init() {
