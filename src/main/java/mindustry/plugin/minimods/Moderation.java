@@ -384,12 +384,12 @@ public class Moderation implements MiniMod {
                         eb.setTitle("Multiple Players Found");
                         eb.setColor(DiscordPalette.INFO);
                         StringBuilder sb = new StringBuilder();
-                        List<String> uuids_list  = new ArrayList<>();
+                        List<String> uuids_list = new ArrayList<>();
                         for (var uuid : uuids) {
                             var info = Vars.netServer.admins.getInfo(uuid);
                             if (info == null) continue;
                             if (uuids_list.contains(uuid)) continue;
-                            sb.append(String.format("%s (`%s`) - %s\n", escapeEverything(info.lastName), calculatePhash(uuid), info.lastIP));
+                            sb.append(String.format("%s (`%s`)" + (ctx.channel() == Channels.APPRENTICE_BOT ? "" : " - %s") + "\n", escapeEverything(info.lastName), calculatePhash(uuid), (ctx.channel() == Channels.APPRENTICE_BOT ? "" : info.lastIP)));
                             uuids_list.add(uuid);
                         }
 //                        System.out.println("before splitting: " + sb.toString().length());

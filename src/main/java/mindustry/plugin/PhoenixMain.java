@@ -174,6 +174,8 @@ public class PhoenixMain extends Plugin {
         Channels.APPRENTICE_BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.MOD_BOT.addMessageCreateListener(registrar::dispatchEvent);
 
+//        Channels.ADMIN_BOT.addMessageEditListener(registrar::dispatchEvent);
+
         // Log startup
         var startupEmbed = new EmbedBuilder()
                 .setTitle("Starting Server")

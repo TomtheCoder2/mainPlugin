@@ -9,6 +9,8 @@ import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.utils.Config;
+import net.dv8tion.jda.api.events.message.GenericMessageEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
