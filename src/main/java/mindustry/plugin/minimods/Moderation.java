@@ -378,37 +378,8 @@ public class Moderation implements MiniMod {
                     data.help = "Lookup information about a player (by name, IP, UUID)";
                 },
                 ctx -> {
-                    var uuids = getUUIDs(ctx.args.get("player"));
-                    if (uuids != null && uuids.size > 1) {
-                        EmbedBuilder eb = new EmbedBuilder();
-                        eb.setTitle("Multiple Players Found");
-                        eb.setColor(DiscordPalette.INFO);
-                        StringBuilder sb = new StringBuilder();
-                        List<String> uuids_list = new ArrayList<>();
-                        for (var uuid : uuids) {
-                            var info = Vars.netServer.admins.getInfo(uuid);
-                            if (info == null) continue;
-                            if (uuids_list.contains(uuid)) continue;
-                            sb.append(String.format("%s (`%s`)" + (ctx.channel() == Channels.APPRENTICE_BOT ? "" : " - %s") + "\n", escapeEverything(info.lastName), calculatePhash(uuid), (ctx.channel() == Channels.APPRENTICE_BOT ? "" : info.lastIP)));
-                            uuids_list.add(uuid);
-                        }
-//                        System.out.println("before splitting: " + sb.toString().length());
-//                        System.out.println("after splitting: " + split(sb.toString(), 3000)[0].length());
-                        eb.setDescription("Multiple players were found with the given name. Please specify the UUID or IP of the player you want to lookup.\n\n" + split(sb.toString(), 3000)[0]);
-                        ctx.channel().sendMessage(eb);
-                        return;
-                    }
-                    var info = Query.findPlayerInfo(ctx.args.get("player"));
-                    if (info == null && uuids != null && uuids.size == 1) {
-                        info = Vars.netServer.admins.getInfo(uuids.first());
-                    }
-                    if (info == null) {
-                        ctx.error("No such player", ctx.args.get("player") + " is not in the database");
-                        return;
-                    }
-                    if (info.names.size == 0) {
-                        ctx.error("Unknown Player", "Could not find player " + ctx.args.get("player"));
-                    }
+                    var info = Query.findPlayerDiscord(ctx.args.get("player"), ctx);
+                    if (info == null) return;
                     EmbedBuilder eb = new EmbedBuilder()
                             .setColor(DiscordPalette.INFO)
                             .setTitle("Lookup: " + Utils.escapeEverything(info.lastName));

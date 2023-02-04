@@ -319,7 +319,7 @@ public final class Database {
             ResultSet rs = pstmt.executeQuery();
             Seq<String> names = new Seq<>();
             while (rs.next()) {
-                names.add(rs.getString("name"));
+                names.addUnique(rs.getString("name"));
             }
             return names;
         } catch (SQLException e) {
@@ -653,6 +653,23 @@ public final class Database {
             }
         }).start();
         return n.get();
+    }
+
+    public static void deleteAllDuplicateNames() {
+        try {
+            reconnect();
+            // and then delete all duplicates with this command
+            var sql = "DELETE FROM\n" +
+                    "    names a\n" +
+                    "    USING names b\n" +
+                    "WHERE\n" +
+                    "        a.id > b.id\n" +
+                    "  AND a.uuid = b.uuid AND a.name = b.name;";
+            var pstmt = conn.prepareStatement(sql);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static class Player implements Cloneable {

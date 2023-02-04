@@ -207,6 +207,9 @@ public class PhoenixMain extends Plugin {
 
         autoScreenMessages = getArrayListFromString(Core.settings.getString("autoscreenmessages", "[]"));
 
+        // delete all duplicate names
+        Database.deleteAllDuplicateNames();
+
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;
             String[] bannedNames = new String[]{
