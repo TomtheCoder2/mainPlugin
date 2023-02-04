@@ -35,8 +35,7 @@ import java.util.stream.StreamSupport;
 import static mindustry.plugin.database.Database.getNames;
 import static mindustry.plugin.database.Database.getUUIDs;
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
-import static mindustry.plugin.utils.Utils.escapeEverything;
-import static mindustry.plugin.utils.Utils.split;
+import static mindustry.plugin.utils.Utils.*;
 
 
 /**
@@ -390,7 +389,7 @@ public class Moderation implements MiniMod {
                             var info = Vars.netServer.admins.getInfo(uuid);
                             if (info == null) continue;
                             if (uuids_list.contains(uuid)) continue;
-                            sb.append(String.format("%s (`%s`) - %s\n", escapeEverything(info.lastName), uuid, info.lastIP));
+                            sb.append(String.format("%s (`%s`) - %s\n", escapeEverything(info.lastName), calculatePhash(uuid), info.lastIP));
                             uuids_list.add(uuid);
                         }
 //                        System.out.println("before splitting: " + sb.toString().length());
@@ -400,6 +399,9 @@ public class Moderation implements MiniMod {
                         return;
                     }
                     var info = Query.findPlayerInfo(ctx.args.get("player"));
+                    if (info == null && uuids != null && uuids.size == 1) {
+                        info = Vars.netServer.admins.getInfo(uuids.first());
+                    }
                     if (info == null) {
                         ctx.error("No such player", ctx.args.get("player") + " is not in the database");
                         return;
