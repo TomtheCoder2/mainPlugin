@@ -115,6 +115,8 @@ public class Query {
             StringBuilder sb = new StringBuilder();
             List<String> uuids_list = new ArrayList<>();
             for (var uuid : uuids) {
+                if (uuid == null) continue;
+                if (uuid.equals("")) continue;
                 var info = Vars.netServer.admins.getInfo(uuid);
                 if (info == null) continue;
                 if (uuids_list.contains(uuid)) continue;

@@ -42,6 +42,7 @@ public class Ranks implements MiniMod {
      * Uuid of players that have less than 60 minutes of playtime.
      */
     public static final ObjectMap<String, Utils.Pair<Integer, Integer>> newPlayers = new ObjectMap<>();
+    public static final ObjectSet<String> warned = new ObjectSet<>();
     private final static String promotionMessage = """
             [sky]%player%, you have been promoted to [sky]<%rank%>[]!
             [#4287f5]You reached a playtime of - %playtime% minutes!
@@ -60,7 +61,40 @@ public class Ranks implements MiniMod {
             Blocks.underflowGate,
             Blocks.overflowGate
     };
-    public static final ObjectSet<String> warned = new ObjectSet<>();
+    /**
+     * Boulder
+     * Snow Boulder
+     * Shale Boulder
+     * Sand Boulder
+     * Dacite Boulder
+     * Basalt Boulder
+     * Carbon Boulder
+     * Ferric Boulder
+     * Beryllic Boulder
+     * Yellow stone Boulder
+     * Crystaline Boulder
+     * Red Ice Boulder
+     * Rhyolite Boulder
+     * Red stone Boulder
+     * Boulder Boulder
+     */
+    private final static Block[] excludedBlocksAntiGriefSystem = new Block[]{
+            Blocks.boulder,
+            Blocks.snowBoulder,
+            Blocks.shaleBoulder,
+            Blocks.sandBoulder,
+            Blocks.daciteBoulder,
+            Blocks.basaltBoulder,
+            Blocks.carbonBoulder,
+            Blocks.ferricBoulder,
+            Blocks.beryllicBoulder,
+            Blocks.yellowStoneBoulder,
+            Blocks.crystallineBoulder,
+            Blocks.redIceBoulder,
+            Blocks.rhyoliteBoulder,
+            Blocks.redStoneBoulder,
+
+    };
     /**
      * Number of buildings built that have not been stored to the database.
      */
@@ -148,8 +182,9 @@ public class Ranks implements MiniMod {
                         buildingsBuiltCache.put(uuid, buildingsBuiltCache.get(uuid, 0) + 1);
 //                    }
                     } else {
-
-                        buildingsDestroyedCache.put(uuid, buildingsDestroyedCache.get(uuid, 0) + 1);
+                        if (!Arrays.asList(excludedBlocksAntiGriefSystem).contains(event.tile.block())) {
+                            buildingsDestroyedCache.put(uuid, buildingsDestroyedCache.get(uuid, 0) + 1);
+                        }
                     }
 
                     // check if its suspicious
