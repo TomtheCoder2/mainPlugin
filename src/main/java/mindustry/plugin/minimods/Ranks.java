@@ -213,12 +213,12 @@ public class Ranks implements MiniMod {
                                     for (Player p : Groups.player) {
                                         if (p == event.unit.getPlayer()) continue;
                                         if (warned.contains(p.uuid())) continue;
-                                        p.sendMessage("[scarlet][Anti-griefer-system] Warning! Potential grieffer found on the server, keep an eye on \"" + event.unit.getPlayer().name + "\"[scarlet]!" + (p.admin ? " [orange]Their UUID is " + uuid : ""));
+                                        p.sendMessage("[scarlet][Anti-griefer-system] Warning! Potential griefer found on the server, keep an eye on \"" + event.unit.getPlayer().name + "\"[scarlet]!" + (p.admin ? " [orange]Their UUID is " + uuid : ""));
                                     }
                                     // warn player
                                     event.unit.getPlayer().sendMessage("[scarlet]You are deconstructing too fast, to avoid mass grief you have been frozen for [cyan]15 seconds.[] This action will be reported to the moderators.");
                                     // log in console
-                                    Log.info("[Anti-griefer-system] Warning! Potential grieffer found on the server, keep an eye on \"" + event.unit.getPlayer().name + "\"[scarlet]!" + " Their UUID is " + uuid);
+                                    Log.info("[Anti-griefer-system] Warning! Potential griefer found on the server, keep an eye on \"" + event.unit.getPlayer().name + "\"[scarlet]!" + " Their UUID is " + uuid);
 
                                     // remove from warned after 5 minutes
                                     Timer.schedule(() -> {
