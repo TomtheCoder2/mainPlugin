@@ -19,6 +19,8 @@ public class Roles {
      */
     public static long RI;
 
+    public static long Auto;
+
     public static void load(DiscordApi api, JSONObject data) {
         ADMIN = Long.parseLong(data.getString("admin"));
         MOD = Long.parseLong(data.getString("mod"));
@@ -30,5 +32,6 @@ public class Roles {
         MVP = Long.parseLong(data.getString("mvp"));
         DEV = Long.parseLong(data.getString("dev"));
         RI = Long.parseLong(data.getString("ri"));
+        Auto = Long.parseLong(data.getString("Auto"));
     }
 }

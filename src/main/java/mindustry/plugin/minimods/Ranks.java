@@ -206,7 +206,7 @@ public class Ranks implements MiniMod {
                                             .setFooter("Reported by: Auto Ban System");
                                     new MessageBuilder()
                                             .setEmbed(eb)
-                                            .setContent("<@&" + Roles.RI + ">")
+                                            .setContent("<@&" + Roles.Auto + ">")
                                             .send(Channels.GR_REPORT);
 
                                     // send a message to all players online
