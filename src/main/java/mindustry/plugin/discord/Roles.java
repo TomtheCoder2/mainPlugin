@@ -32,6 +32,6 @@ public class Roles {
         MVP = Long.parseLong(data.getString("mvp"));
         DEV = Long.parseLong(data.getString("dev"));
         RI = Long.parseLong(data.getString("ri"));
-        Auto = Long.parseLong(data.getString("Auto"));
+        Auto = Long.parseLong(data.getString("auto"));
     }
 }

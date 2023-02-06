@@ -14,23 +14,25 @@ import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.net.Packets;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
-import mindustry.plugin.discord.Channels;
-import mindustry.plugin.discord.DiscordLog;
-import mindustry.plugin.discord.DiscordPalette;
-import mindustry.plugin.discord.Roles;
+import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.*;
 import mindustry.ui.Menus;
 import mindustry.world.Block;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.MessageFlag;
+import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Objects;
 
 import static java.lang.Math.max;
+import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
 import static mindustry.plugin.minimods.Moderation.frozen;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
@@ -43,6 +45,7 @@ public class Ranks implements MiniMod {
      */
     public static final ObjectMap<String, Utils.Pair<Integer, Integer>> newPlayers = new ObjectMap<>();
     public static final ObjectSet<String> warned = new ObjectSet<>();
+    public static final ObjectSet<String> normalPlayers = new ObjectSet<>();
     private final static String promotionMessage = """
             [sky]%player%, you have been promoted to [sky]<%rank%>[]!
             [#4287f5]You reached a playtime of - %playtime% minutes!
@@ -169,11 +172,89 @@ public class Ranks implements MiniMod {
             promoteRanks();
         });
 
+        DiscordVars.api.addButtonClickListener(event -> {
+            var msg = event.getButtonInteraction().getMessage();
+            var eb = msg.getEmbeds().get(0);
+            switch (event.getButtonInteraction().getCustomId()) {
+                case "ban" -> {
+                    event.getInteraction().respondLater(true)
+                            .thenAccept(updater -> {
+                                System.out.println(eb.getFields());
+                                if (eb.getFields().size() < 2) return;
+                                String phash = eb.getFields().get(1).getValue();
+                                System.out.println(phash);
+                                // ban phash
+                                var pd = Database.getPlayerDataByPhash(phash);
+                                if (pd == null) {
+                                    msg.createUpdater()
+                                            .setEmbed(
+                                                    eb.toBuilder()
+                                                            .setFooter("Player not found")
+                                                            .setColor(DiscordPalette.ERROR))
+                                            .removeAllComponents()
+                                            .applyChanges();
+                                    return;
+                                }
+                                pd.banReason = "Banned by Auto-Ban-system (confirmed by " + event.getInteraction().getUser().getDiscriminatedName() + ")";
+                                // ban for 10080 minutes (7 days)
+                                pd.bannedUntil = Instant.now().getEpochSecond() + 10080 * 60;
+                                Database.setPlayerData(pd);
+                                // kick player
+                                for (Player p : Groups.player) {
+                                    if (p.uuid().equals(pd.uuid)) {
+                                        p.con.kick(Packets.KickReason.banned);
+                                    }
+                                }
+                                msg.createUpdater()
+                                        .setEmbed(
+                                                eb.toBuilder()
+                                                        .setFooter("Banned")
+                                                        .addField("Status", "Banned", true)
+                                                        .setColor(DiscordPalette.ERROR))
+                                        .removeAllComponents()
+                                        .applyChanges();
+                                // log to colonel and normal logs
+                                moderationLogColonel("Banned", "Auto-Ban-system", Vars.netServer.admins.getInfo(pd.uuid), "Auto-Ban-system", null, null);
+                                DiscordLog.moderation("Banned", "Auto-Ban-system", Vars.netServer.admins.getInfo(pd.uuid), "Auto-Ban-system", null);
+                                updater.setContent("Banned " + escapeEverything(Query.findPlayerInfo(pd.uuid).lastName) + ".").update();
+                            });
+                }
+                case "normal" -> {
+                    msg.createUpdater()
+                            .setEmbed(
+                                    eb.toBuilder()
+                                            .setFooter("Normal")
+                                            .addField("Status", "Normal", true)
+                                            .setColor(DiscordPalette.SUCCESS)
+                            )
+                            .removeAllComponents()
+                            .applyChanges();
+
+                    if (eb.getFields().size() < 1) return;
+                    String phash = eb.getFields().get(1).getValue();
+                    var pd = Database.getPlayerDataByPhash(phash);
+                    if (pd != null) {
+                        normalPlayers.add(pd.uuid);
+                        // and unfreeze
+                        frozen.remove(pd.uuid);
+                        event.getInteraction().createImmediateResponder()
+                                .setContent("Set status of player " + escapeEverything(Query.findPlayerInfo(pd.uuid).lastName) + " to normal.")
+                                .setFlags(MessageFlag.EPHEMERAL).respond();
+                    }
+                }
+                case "report-discuss" -> {
+                    msg.createThread(eb.getTitle().orElse("Report") + " Discussion", 60);
+                    event.getInteraction().createImmediateResponder()
+                            .setContent("Created discussion thread for " + eb.getTitle().orElse("") + ".")
+                            .setFlags(MessageFlag.EPHEMERAL).respond();
+                }
+            }
+        });
+
         Events.on(EventType.BlockBuildEndEvent.class, event -> {
             try {
                 if (event.unit.getPlayer() == null) return;
                 String uuid = event.unit.getPlayer().uuid();
-
 
                 if (event.tile.block() != null) {
                     if (!event.breaking) {
@@ -188,7 +269,7 @@ public class Ranks implements MiniMod {
                     }
 
                     // check if its suspicious
-                    if (newPlayers.containsKey(uuid)) {
+                    if (newPlayers.containsKey(uuid) && !normalPlayers.contains(uuid)) {
                         if (buildingsBuiltCache.get(uuid, 0) < buildingsDestroyedCache.get(uuid, 0)) {
                             int warnThreshold = max(10, (buildingsBuiltCache.get(uuid, 0) + newPlayers.get(uuid).second) * newPlayers.get(uuid).first / 2);
                             if (buildingsDestroyedCache.get(uuid, 0) > warnThreshold) {
@@ -207,6 +288,11 @@ public class Ranks implements MiniMod {
                                     new MessageBuilder()
                                             .setEmbed(eb)
                                             .setContent("<@&" + Roles.Auto + ">")
+                                            .addActionRow(
+                                                    Button.danger("ban", "Banish"),
+                                                    Button.success("normal", "Normal"),
+                                                    Button.secondary("report-discuss", "Report Discussion")
+                                            )
                                             .send(Channels.GR_REPORT);
 
                                     // send a message to all players online
@@ -220,12 +306,12 @@ public class Ranks implements MiniMod {
                                     // log in console
                                     Log.info("[Anti-griefer-system] Warning! Potential griefer found on the server, keep an eye on \"" + event.unit.getPlayer().name + "\"[scarlet]!" + " Their UUID is " + uuid);
 
-                                    // remove from warned after 5 minutes
+                                    // remove from warned after 10 minutes
                                     Timer.schedule(() -> {
                                         if (warned.contains(uuid)) {
                                             warned.remove(uuid);
                                         }
-                                    }, 5 * 60);
+                                    }, 10 * 60);
                                 }
                             }
                         }

@@ -87,15 +87,17 @@ public class DiscordLog {
         }
         eb.setTimestampToNow();
         MessageBuilder mb = new MessageBuilder();
-        try {
-            eb.setImage(images.get(0).downloadAsInputStream());
-            for (MessageAttachment i : images) {
-                if (images.get(0) == i) continue;
-                mb.addAttachment(i.downloadAsInputStream(), "image_" + i.getFileName());
+        if (images != null) {
+            try {
+                eb.setImage(images.get(0).downloadAsInputStream());
+                for (MessageAttachment i : images) {
+                    if (images.get(0) == i) continue;
+                    mb.addAttachment(i.downloadAsInputStream(), "image_" + i.getFileName());
+                }
+            } catch (Exception e) {
+                Log.info("Could not load images.");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            Log.info("Could not load images.");
-            e.printStackTrace();
         }
         mb.addEmbed(eb);
         mb.send(Channels.COLONEL_LOG);
