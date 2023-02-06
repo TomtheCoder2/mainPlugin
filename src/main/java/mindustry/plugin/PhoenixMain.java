@@ -246,7 +246,7 @@ public class PhoenixMain extends Plugin {
             // check for ban & give name
             if (pd != null) {
                 if (pd.banned || pd.bannedUntil > Instant.now().getEpochSecond()) {
-                    player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason + "\n[white] If you what to appeal join our discord server: [cyan]" + DiscordVars.invite);
+                    player.con.kick("[scarlet]You are banned.[accent] Reason:\n" + pd.banReason + "\n[white] If you want to appeal join our discord server: [cyan]" + DiscordVars.invite);
                     return;
                 }
 
