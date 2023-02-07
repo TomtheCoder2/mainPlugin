@@ -181,7 +181,7 @@ public class DiscordRegistrar {
         if (!event.getMessage().getContent().startsWith(prefix)) {
             return;
         }
-        String[] args = event.getMessage().getContent().split("\\s+");
+        String[] args = event.getMessage().getContent().split("\\ +");
         String command = args[0].substring(prefix.length());
         CommandEntry entry = commands.get(command);
         if (entry == null) {

@@ -380,6 +380,7 @@ public class Communication implements MiniMod {
                             Player p = Query.findPlayerEntity(target);
                             if (p == null) {
                                 ctx.error("No such player", "'" + target + "' is not a player or a team");
+                                return;
                             }
                             Call.infoMessage(p.con, message);
                             ctx.success("Sent Message", "Sent message to player " + Utils.escapeEverything(p.name()));
