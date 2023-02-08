@@ -195,7 +195,12 @@ public class Ranks implements MiniMod {
                                             .applyChanges();
                                     return;
                                 }
-                                pd.banReason = "Banned by Auto-Ban-system (confirmed by " + event.getInteraction().getUser().getDiscriminatedName() + ")";
+                                // get player who reported him by the footer
+                                String reporter = "";
+                                if (eb.getFooter().isPresent()) {
+                                    reporter = eb.getFooter().get().getText().get().replace("Reported by: ", "");
+                                }
+                                pd.banReason = "Banned by " + reporter + " (confirmed by " + event.getInteraction().getUser().getDiscriminatedName() + ")";
                                 // ban for 10080 minutes (7 days)
                                 pd.bannedUntil = Instant.now().getEpochSecond() + 10080 * 60;
                                 Database.setPlayerData(pd);
@@ -214,8 +219,8 @@ public class Ranks implements MiniMod {
                                         .removeAllComponents()
                                         .applyChanges();
                                 // log to colonel and normal logs
-                                moderationLogColonel("Banned", "Auto-Ban-system", Vars.netServer.admins.getInfo(pd.uuid), "Auto-Ban-system", null, null);
-                                DiscordLog.moderation("Banned", "Auto-Ban-system", Vars.netServer.admins.getInfo(pd.uuid), "Auto-Ban-system", null);
+                                moderationLogColonel("Banned", pd.banReason, Vars.netServer.admins.getInfo(pd.uuid), pd.banReason, null, null);
+                                DiscordLog.moderation("Banned", pd.banReason, Vars.netServer.admins.getInfo(pd.uuid), pd.banReason, null);
                                 updater.setContent("Banned " + escapeEverything(Query.findPlayerInfo(pd.uuid).lastName) + ".").update();
                             });
                 }
@@ -234,6 +239,8 @@ public class Ranks implements MiniMod {
                     String phash = eb.getFields().get(1).getValue();
                     var pd = Database.getPlayerDataByPhash(phash);
                     if (pd != null) {
+                        pd.verified = true;
+                        Database.setPlayerData(pd);
                         normalPlayers.add(pd.uuid);
                         // and unfreeze
                         frozen.remove(pd.uuid);
@@ -344,14 +351,16 @@ public class Ranks implements MiniMod {
                     }
                     pd.playTime += elapsedTimeMin;
                     pd.buildingsBuilt += buildingsBuiltCache.get(player.uuid(), 0);
-                    Database.setPlayerData(pd);
                     if (newPlayers.containsKey(player.uuid())) {
                         if (newPlayers.get(player.uuid()).first + elapsedTimeMin >= 60) {
                             newPlayers.remove(player.uuid());
+                            pd.verified = true;
                         } else {
                             newPlayers.put(player.uuid(), new Utils.Pair<>(newPlayers.get(player.uuid()).first + elapsedTimeMin, pd.buildingsBuilt));
+                            pd.verified = false;
                         }
                     }
+                    Database.setPlayerData(pd);
                 }
 
                 timeStart = System.currentTimeMillis();

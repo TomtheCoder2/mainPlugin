@@ -259,14 +259,22 @@ public class PhoenixMain extends Plugin {
 //                    player.admin = true;
 //                }
                 if (pd.playTime < 60) {
+                    pd.verified = false;
                     newPlayers.put(player.uuid(), new Utils.Pair<>(pd.playTime, pd.buildingsBuilt));
+                } else {
+                    pd.verified = true;
                 }
+                Database.setPlayerData(pd);
             } else { // not in database
                 info("New player connected: " + Strings.stripColors(event.player.name));
-                Database.setPlayerData(new Database.Player(player.uuid(), 0));
+                pd = new Database.Player(player.uuid(), 0);
+                Database.setPlayerData(pd);
+
 
                 Rank rank = Rank.all[0];
                 Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
+                pd.verified = false;
+                Database.setPlayerData(pd);
                 newPlayers.put(player.uuid(), new Utils.Pair<>(0, 0));
             }
             // send message to everyone: x has joined y times and has been kicked z times

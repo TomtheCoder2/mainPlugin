@@ -14,6 +14,7 @@ import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
+import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.util.Objects;
@@ -100,6 +101,11 @@ public class Report implements MiniMod {
                 new MessageBuilder()
                         .setEmbed(eb)
                         .setContent("<@&" + Roles.RI + ">")
+                        .addActionRow(
+                                Button.danger("ban", "Banish"),
+                                Button.success("normal", "Normal"),
+                                Button.secondary("report-discuss", "Report Discussion")
+                        )
                         .send(Channels.GR_REPORT);
                 Call.sendMessage(found.name + "[sky] is reported to discord.");
             }
