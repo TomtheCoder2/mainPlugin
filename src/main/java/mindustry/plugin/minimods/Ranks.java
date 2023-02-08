@@ -451,7 +451,6 @@ public class Ranks implements MiniMod {
 
     @Override
     public void registerCommands(CommandHandler handler) {
-
         handler.<Player>register("ranks", "Show all ranks.", (args, player) -> { // self info
             StringBuilder sb = new StringBuilder("[accent]Ranks\n");
             for (int i = 0; i < Rank.all.length; i++) {

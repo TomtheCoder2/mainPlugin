@@ -20,6 +20,7 @@ import mindustry.plugin.utils.*;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.util.logging.FallbackLoggerConfiguration;
@@ -27,7 +28,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Objects;
 
 import static arc.util.Log.err;
@@ -35,11 +35,12 @@ import static arc.util.Log.info;
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.state;
 import static mindustry.plugin.database.Database.*;
+import static mindustry.plugin.discord.Channels.LIVE_LOG;
+import static mindustry.plugin.minimods.Communication.autoScreenMessages;
 import static mindustry.plugin.minimods.Ranks.newPlayers;
 import static mindustry.plugin.utils.Utils.escapeEverything;
-
-import static mindustry.plugin.minimods.Communication.autoScreenMessages;
 import static mindustry.plugin.utils.Utils.getArrayListFromString;
+import static mindustry.plugin.minimods.Logs.live_log_message;
 
 public class PhoenixMain extends Plugin {
     //    public static final File prefsFile = new File("prefs.properties");
@@ -198,10 +199,24 @@ public class PhoenixMain extends Plugin {
         DiscordVars.api.updateActivity("Loading...");
         Timer.schedule(this::updateDiscordStatus, 30, 60);
 
-        Events.on(EventType.ServerLoadEvent.class, event -> {
-//            contentHandler = new ContentHandler();
-            Log.info("Everything's loaded !");
-        });
+        try {
+            live_log_message = LIVE_LOG.sendMessage(new EmbedBuilder()
+                    .setTitle("Server started")
+                    .setDescription("Logging everything here, update every 30s.")
+                    .setColor(DiscordPalette.SUCCESS)
+                    .setTimestampToNow()
+            ).get().getId();
+            // get all old messages from this bot in LIVE_LOG channel and delete them
+            Channels.LIVE_LOG.getMessages(100).thenAccept(messages -> {
+                for (Message message : messages) {
+                    if (message.getAuthor().isYourself() && message.getId() != live_log_message) {
+                        message.delete();
+                    }
+                }
+            });
+        } catch (Exception e) {
+            err(e);
+        }
 
         updateBannedWordsClient();
 
@@ -209,6 +224,11 @@ public class PhoenixMain extends Plugin {
 
         // delete all duplicate names
         Database.deleteAllDuplicateNames();
+        Events.on(EventType.ServerLoadEvent.class, event -> {
+//            contentHandler = new ContentHandler();
+            updateDiscordStatus();
+            Log.info("Everything's loaded !");
+        });
 
         Events.on(EventType.PlayerJoin.class, event -> {
             Player player = event.player;

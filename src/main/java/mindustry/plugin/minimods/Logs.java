@@ -21,12 +21,14 @@ import java.util.Arrays;
 
 import static mindustry.plugin.database.Database.bannedWords;
 import static mindustry.plugin.database.Database.updateBannedWordsClient;
+import static mindustry.plugin.discord.Channels.LIVE_LOG;
 import static mindustry.plugin.utils.Utils.*;
 
 /**
  * Logs player actions, such as player join &amp; leave and suspicious activity
  */
 public class Logs implements MiniMod {
+    public static long live_log_message = 0;
     static StringBuilder whisperLog = new StringBuilder();
     Seq<JoinPlayerInfo> leftPlayers = new Seq<>();
     Seq<JoinPlayerInfo> joinPlayers = new Seq<>();
@@ -104,17 +106,31 @@ public class Logs implements MiniMod {
                 }
                 eb.addField("Left", sb.toString());
                 sb = new StringBuilder();
-                for (JoinPlayerInfo player : joinPlayers) {
+                for (JoinPlayerInfo player : leftPlayers) {
                     sb.append("`" + calculatePhash(player.uuid) + "` | `" + player.id + "`: " + Utils.escapeEverything(player.name) + "\n");
                 }
                 colonel_eb.addField("Left", sb.toString());
             }
+            if (leftPlayers.size != 0 || joinPlayers.size != 0) {
+                joinPlayers.clear();
+                leftPlayers.clear();
 
-            joinPlayers.clear();
-            leftPlayers.clear();
-
-            Channels.LOG.sendMessage(eb);
-            Channels.COLONEL_LOG.sendMessage(colonel_eb);
+                Channels.LOG.sendMessage(eb);
+                Channels.COLONEL_LOG.sendMessage(colonel_eb);
+                try {
+                    LIVE_LOG.getMessageById(live_log_message).thenAccept(message -> {
+                        message.edit(colonel_eb);
+                    });
+                } catch (Exception e) {
+                    // someone deleted the message!!
+                    try {
+                        Channels.LIVE_LOG.sendMessage(colonel_eb).thenAccept(message -> {
+                            live_log_message = message.getId();
+                        });
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
             updateBannedWordsClient();
             System.gc();
         }, 30, 30);

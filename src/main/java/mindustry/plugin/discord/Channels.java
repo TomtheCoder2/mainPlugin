@@ -27,6 +27,7 @@ public class Channels {
     public static TextChannel MOD_BOT;
     public static TextChannel APPRENTICE_BOT;
     public static TextChannel ADMIN_BOT;
+    public static TextChannel LIVE_LOG;
 
     /**
      * Retrieves a text channel. Panics if it does not exist.
@@ -52,5 +53,6 @@ public class Channels {
         MOD_BOT = getChannel(api, obj.getString("mod_bot"));
         APPRENTICE_BOT = getChannel(api, obj.getString("apprentice_bot"));
         ADMIN_BOT = getChannel(api, obj.getString("admin_bot"));
+        LIVE_LOG = getChannel(api, obj.getString("live_log"));
     }
 }
