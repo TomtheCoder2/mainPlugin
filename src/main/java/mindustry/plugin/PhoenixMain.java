@@ -48,6 +48,7 @@ public class PhoenixMain extends Plugin {
 //    public static Prefs prefs = new Prefs(prefsFile);
 //    public GetMap map = new GetMap();
     private static final String lennyFace = "( \u0361\u00B0 \u035C\u0296 \u0361\u00B0)";
+//    public static ContentHandler contentHandler;
 
     protected Seq<MiniMod> minimods = Seq.with(
             new mindustry.plugin.minimods.Communication(),
@@ -226,7 +227,11 @@ public class PhoenixMain extends Plugin {
         Database.deleteAllDuplicateNames();
         Events.on(EventType.ServerLoadEvent.class, event -> {
 //            contentHandler = new ContentHandler();
-            updateDiscordStatus();
+//            contentHandler = new ContentHandler();
+            DiscordVars.api.updateActivity(
+                    Strings.stripColors(Vars.state.map.name()) +
+                            " with " + Groups.player.size() +
+                            (netServer.admins.getPlayerLimit() == 0 ? "" : "/" + netServer.admins.getPlayerLimit()) + " players");
             Log.info("Everything's loaded !");
         });
 
