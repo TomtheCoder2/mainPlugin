@@ -161,77 +161,82 @@ public class Logs implements MiniMod {
 
         Events.on(EventType.ServerLoadEvent.class, event -> {
             Vars.netServer.admins.addChatFilter((player, message) -> {
-                if (player == null) return message;
+                try {
+                    if (player == null) return message;
 
-                Seq<String> usedSlurs = new Seq<>();
-                for (String slur : slurs) {
-                    if (message.toLowerCase().contains(slur)) {
-                        usedSlurs.add(slur);
-                        message = message.replace(slur, "$@#!");
-                    }
-                }
-                // list of numbers that resemble a letter
-                HashMap<String, String> numberLetters = new HashMap<>();
-                numberLetters.put("1", "i");
-                numberLetters.put("2", "to");
-                numberLetters.put("3", "e");
-                numberLetters.put("4", "a");
-                numberLetters.put("5", "r");
-                numberLetters.put("6", "b");
-                numberLetters.put("7", "t");
-                numberLetters.put("8", "g");
-                numberLetters.put("9", "g");
-                numberLetters.put("0", "o");
-                numberLetters.put("!", "i");
-                numberLetters.put("@", "a");
-                numberLetters.put("#", "h");
-                numberLetters.put("$", "s");
-                numberLetters.put("&", "a");
-                numberLetters.put("*", "x");
-                numberLetters.put("(", "c");
-
-
-                // same thing bannedWords
-                for (String bw : bannedWords) {
-                    var mLower = message.toLowerCase().replace(" ", "");
-                    for (String number : numberLetters.keySet()) {
-                        if (mLower.contains(number)) {
-                            mLower = mLower.replace(number, numberLetters.get(number));
+                    Seq<String> usedSlurs = new Seq<>();
+                    for (String slur : slurs) {
+                        if (message.toLowerCase().contains(slur)) {
+                            usedSlurs.add(slur);
+                            message = message.replace(slur, "$@#!");
                         }
                     }
-                    if (mLower.contains(bw.toLowerCase())) {
-                        usedSlurs.add(bw);
-                        // now we need to find the position of the banned word in the message
-                        // but the problem is that the message contains eg "$hit" but the banned word is "shit"
-                        var index = mLower.indexOf(bw.toLowerCase());
-                        var length = bw.length();
-                        var randomString = genRandomString(length);
-                        StringBuilder finalMessage = new StringBuilder();
-                        for (int i = 0; i < message.length(); i++) {
-                            if (i >= index && i < index + length) {
-                                if (message.charAt(i) == ' ') length++;
-                                if (length > randomString.length()) {
-                                    finalMessage.append(genRandomString(1));
-                                } else {
-                                    finalMessage.append(randomString.charAt(i - index));
-                                }
-                            } else {
-                                finalMessage.append(message.charAt(i));
+                    // list of numbers that resemble a letter
+                    HashMap<String, String> numberLetters = new HashMap<>();
+                    numberLetters.put("1", "i");
+                    numberLetters.put("2", "to");
+                    numberLetters.put("3", "e");
+                    numberLetters.put("4", "a");
+                    numberLetters.put("5", "r");
+                    numberLetters.put("6", "b");
+                    numberLetters.put("7", "t");
+                    numberLetters.put("8", "g");
+                    numberLetters.put("9", "g");
+                    numberLetters.put("0", "o");
+                    numberLetters.put("!", "i");
+                    numberLetters.put("@", "a");
+                    numberLetters.put("#", "h");
+                    numberLetters.put("$", "s");
+                    numberLetters.put("&", "a");
+                    numberLetters.put("*", "x");
+                    numberLetters.put("(", "c");
+
+
+                    // same thing bannedWords
+                    for (String bw : bannedWords) {
+                        var mLower = message.toLowerCase().replace(" ", "");
+                        for (String number : numberLetters.keySet()) {
+                            if (mLower.contains(number)) {
+                                mLower = mLower.replace(number, numberLetters.get(number));
                             }
                         }
-                        message = finalMessage.toString();
+                        if (mLower.contains(bw.toLowerCase())) {
+                            usedSlurs.add(bw);
+                            // now we need to find the position of the banned word in the message
+                            // but the problem is that the message contains eg "$hit" but the banned word is "shit"
+                            var index = mLower.indexOf(bw.toLowerCase());
+                            var length = bw.length();
+                            var randomString = genRandomString(length);
+                            StringBuilder finalMessage = new StringBuilder();
+                            for (int i = 0; i < message.length(); i++) {
+                                if (i >= index && i < index + length) {
+                                    if (message.charAt(i) == ' ') length++;
+                                    if (length > randomString.length()) {
+                                        finalMessage.append(genRandomString(1));
+                                    } else {
+                                        finalMessage.append(randomString.charAt(i - index));
+                                    }
+                                } else {
+                                    finalMessage.append(message.charAt(i));
+                                }
+                            }
+                            message = finalMessage.toString();
+                        }
                     }
-                }
-                if (usedSlurs.size == 0) return message;
+                    if (usedSlurs.size == 0) return message;
 
-                Channels.LOG.sendMessage(new EmbedBuilder()
-                        .setColor(DiscordPalette.WARN)
-                        .setTitle("Slur usage")
-                        .addInlineField("Player", Utils.escapeEverything(player.name) + "\n`" + player.uuid() + "`")
-                        .addInlineField("Slurs", usedSlurs.toString(", "))
-                        .addField("Message", escapeFoosCharacters(message))
-                );
-                return message;
+                    Channels.LOG.sendMessage(new EmbedBuilder()
+                            .setColor(DiscordPalette.WARN)
+                            .setTitle("Slur usage")
+                            .addInlineField("Player", Utils.escapeEverything(player.name) + "\n`" + player.uuid() + "`")
+                            .addInlineField("Slurs", usedSlurs.toString(", "))
+                            .addField("Message", escapeFoosCharacters(message))
+                    );
+                    return message;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return message;
+                }
             });
         });
     }
