@@ -115,6 +115,8 @@ public class Logs implements MiniMod {
                 joinPlayers.clear();
                 leftPlayers.clear();
 
+                colonel_eb.setTimestampToNow();
+                eb.setTimestampToNow();
                 Channels.LOG.sendMessage(eb);
                 Channels.COLONEL_LOG.sendMessage(colonel_eb);
                 try {

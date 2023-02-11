@@ -24,6 +24,7 @@ import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
+import mindustry.plugin.utils.ContentServer;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -31,10 +32,12 @@ import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.json.JSONObject;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static mindustry.Vars.*;
+import static mindustry.plugin.PhoenixMain.contentHandler;
 
 public class Management implements MiniMod {
     @Override
@@ -498,6 +501,32 @@ public class Management implements MiniMod {
                     ctx.success("Success", "Successfully set " + n + " names");
                 }
         );
+
+        handler.register("schem", "<schematic>", data -> {
+                    data.category = "Management";
+                    data.help = "Render a schematic";
+                },
+                ctx -> {
+                    ctx.channel().type();
+                    String schematic = ctx.args.get("schematic");
+                    if (schematic == null) {
+                        ctx.error("Invalid schematic", "Please provide a schematic.");
+                        return;
+                    }
+                    BufferedImage image;
+                    try {
+                        image = contentHandler.previewSchematic(contentHandler.parseSchematic(schematic));
+                    } catch (Exception e) {
+                        ctx.error("Invalid schematic", "Please provide a valid schematic.");
+                        e.printStackTrace();
+                        return;
+                    }
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("Schematic Preview")
+                            .setColor(DiscordPalette.INFO)
+                            .setImage(image);
+                    ctx.sendEmbed(eb);
+                });
     }
 
     private static class TestData {

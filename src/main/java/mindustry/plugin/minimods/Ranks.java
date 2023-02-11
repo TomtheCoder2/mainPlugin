@@ -22,18 +22,27 @@ import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.*;
 import mindustry.ui.Menus;
 import mindustry.world.Block;
+import mindustry.world.Tile;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import static arc.util.Log.debug;
 import static java.lang.Math.max;
+import static mindustry.Vars.world;
+import static mindustry.plugin.database.Database.getNames;
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
 import static mindustry.plugin.minimods.Moderation.frozen;
+import static mindustry.plugin.utils.Utils.convertToSchemImage;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 
 /**
@@ -46,6 +55,7 @@ public class Ranks implements MiniMod {
     public static final ObjectMap<String, Utils.Pair<Integer, Integer>> newPlayers = new ObjectMap<>();
     public static final ObjectSet<String> warned = new ObjectSet<>();
     public static final ObjectSet<String> normalPlayers = new ObjectSet<>();
+    public static final ObjectSet<SimpleBuild> deconstructionStarted = new ObjectSet<>();
     private final static String promotionMessage = """
             [sky]%player%, you have been promoted to [sky]<%rank%>[]!
             [#4287f5]You reached a playtime of - %playtime% minutes!
@@ -96,7 +106,6 @@ public class Ranks implements MiniMod {
             Blocks.redIceBoulder,
             Blocks.rhyoliteBoulder,
             Blocks.redStoneBoulder,
-
     };
     /**
      * Number of buildings built that have not been stored to the database.
@@ -105,7 +114,7 @@ public class Ranks implements MiniMod {
     /**
      * For auto ban system
      */
-    private final ObjectMap<String, Integer> buildingsDestroyedCache = new ObjectMap<>();
+    private final ObjectMap<String, ObjectSet<SimpleBuild>> buildingsDestroyedCache = new ObjectMap<>();
     /**
      * Who has already rated the map
      */
@@ -250,13 +259,51 @@ public class Ranks implements MiniMod {
                     }
                 }
                 case "report-discuss" -> {
-                    msg.createThread(eb.getTitle().orElse("Report") + " Discussion", 60);
+                    if (eb.getFields().size() < 1) return;
+                    String phash = eb.getFields().get(1).getValue();
+                    // get the name of the player
+                    var pd = Database.getPlayerDataByPhash(phash);
+                    if (pd == null) return;
+                    var name = Objects.requireNonNull(getNames(pd.uuid)).get(0);
+                    msg.createThread(name, 60);
                     event.getInteraction().createImmediateResponder()
-                            .setContent("Created discussion thread for " + eb.getTitle().orElse("") + ".")
+                            .setContent("Created discussion thread for " + name + ".")
                             .setFlags(MessageFlag.EPHEMERAL).respond();
                 }
             }
         });
+
+        // the problem is that the blocks where the deconstruction has already started have to be saved, else the name cant be know after the deconstruction of the block
+        Events.on(EventType.TilePreChangeEvent.class, event -> {
+            try {
+                if (event.tile.build == null) return;
+//                debug("TilePreChangeEvent, block: " + event.tile.build.block().localizedName + ", name: " + event.tile.block().name);
+                deconstructionStarted.add(new SimpleBuild(event.tile.build.block().localizedName, event.tile.x, event.tile.y, (byte) event.tile.build.rotation, event.tile.build.config(), event.tile.build.block.isMultiblock()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        // clear the deconstructionStarted map after game over, so there are no problems with the next game and no memory leak
+        Events.on(EventType.GameOverEvent.class, event -> {
+            deconstructionStarted.clear();
+        });
+
+        Events.on(EventType.WorldLoadEvent.class, event -> {
+            try {
+                // then iterate over all tiles and save them in this list
+                for (Tile tile : world.tiles) {
+                    if (tile.build != null) {
+                        if (tile.build.team.isAI()) continue;
+                        deconstructionStarted.add(new SimpleBuild(tile.build.block().localizedName, tile.x, tile.y, (byte) tile.build.rotation, tile.build.config(), tile.build.block.isMultiblock()));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        ExecutorService es = Executors.newSingleThreadExecutor();
 
         Events.on(EventType.BlockBuildEndEvent.class, event -> {
             try {
@@ -265,43 +312,50 @@ public class Ranks implements MiniMod {
 
                 if (event.tile.block() != null) {
                     if (!event.breaking) {
+                        var tile = event.tile;
                         // this will increase the buildingsbuilt stats but its more important to stop griefing
 //                    if (!Arrays.asList(excludedBlocks).contains(event.tile.block())) {
                         buildingsBuiltCache.put(uuid, buildingsBuiltCache.get(uuid, 0) + 1);
+                        deconstructionStarted.add(new SimpleBuild(tile.build.block().localizedName, tile.x, tile.y, (byte) tile.build.rotation, tile.build.config(), tile.build.block.isMultiblock()));
 //                    }
                     } else {
                         if (!Arrays.asList(excludedBlocksAntiGriefSystem).contains(event.tile.block())) {
-                            buildingsDestroyedCache.put(uuid, buildingsDestroyedCache.get(uuid, 0) + 1);
+                            var cache = buildingsDestroyedCache.get(uuid, new ObjectSet<>());
+                            // if the deconstruction has already started, the name of the block has to be saved
+//                            debug(deconstructionStarted);
+                            // search event.tile in deconstructionStarted
+                            var found = false;
+                            for (SimpleBuild build : deconstructionStarted) {
+                                if (build.x == event.tile.x && build.y == event.tile.y) {
+                                    // if the tile is found, save the name of the block
+                                    debug("DS: Building destroyed: " + deconstructionStarted.get(build));
+                                    cache.add(deconstructionStarted.get(build));
+                                    buildingsDestroyedCache.put(uuid, cache);
+                                    deconstructionStarted.remove(build);
+                                    found = true;
+                                }
+                            }
+                            if (!found) {
+                                debug("Building destroyed: " + event.tile.block().localizedName);
+                                cache.add(new SimpleBuild(event.tile.block().localizedName, event.tile.x, event.tile.y, (byte) event.tile.build.rotation, event.tile.build.config(), event.tile.build.block.isMultiblock()));
+                            }
+                            buildingsDestroyedCache.put(uuid, cache);
                         }
                     }
+//                    System.out.println("buildingsDestroyedCache.get(uuid, new HashMap<>()).size() = " + buildingsDestroyedCache.get(uuid, new ObjectMap<>()).size);
 
                     // check if its suspicious
                     if (newPlayers.containsKey(uuid) && !normalPlayers.contains(uuid)) {
-                        if (buildingsBuiltCache.get(uuid, 0) < buildingsDestroyedCache.get(uuid, 0)) {
-                            int warnThreshold = max(10, (buildingsBuiltCache.get(uuid, 0) + newPlayers.get(uuid).second) * newPlayers.get(uuid).first / 2);
-                            if (buildingsDestroyedCache.get(uuid, 0) > warnThreshold) {
+                        if (buildingsBuiltCache.get(uuid, 0) < buildingsDestroyedCache.get(uuid, new ObjectSet<>()).size) {
+                            int warnThreshold = max(10, (buildingsBuiltCache.get(uuid, 0) + newPlayers.get(uuid).second / 5) * newPlayers.get(uuid).first / 2);
+                            debug("calculation of warnThreshold: " + warnThreshold + " = max(10, (" + buildingsBuiltCache.get(uuid, 0) + " + " + newPlayers.get(uuid).second / 5 + ") * " + newPlayers.get(uuid).first / 2 + ")");
+                            debug("Warn threshold: " + warnThreshold + ", buildings destroyed: " + buildingsDestroyedCache.get(uuid, new ObjectSet<>()).size);
+                            if (buildingsDestroyedCache.get(uuid, new ObjectSet<>()).size > warnThreshold) {
                                 // freeze for 15 seconds
                                 frozen.add(uuid);
                                 Timer.schedule(() -> frozen.remove(uuid), 15);
                                 if (!warned.contains(uuid)) {
                                     warned.add(uuid);
-
-                                    // warn mods
-                                    EmbedBuilder eb = new EmbedBuilder().setTitle("Potential Griefer Online (Auto Ban System)")
-                                            .addField("Name", Utils.escapeEverything(event.unit.getPlayer().name))
-                                            .addField("Phash", Utils.calculatePhash(uuid))
-                                            .setColor(DiscordPalette.WARN)
-                                            .setFooter("Reported by: Auto Ban System");
-                                    new MessageBuilder()
-                                            .setEmbed(eb)
-                                            .setContent("<@&" + Roles.Auto + ">")
-                                            .addActionRow(
-                                                    Button.danger("ban", "Banish"),
-                                                    Button.success("normal", "Normal"),
-                                                    Button.secondary("report-discuss", "Report Discussion")
-                                            )
-                                            .send(Channels.GR_REPORT);
-
                                     // send a message to all players online
                                     for (Player p : Groups.player) {
                                         if (p == event.unit.getPlayer()) continue;
@@ -312,13 +366,92 @@ public class Ranks implements MiniMod {
                                     event.unit.getPlayer().sendMessage("[scarlet]You are deconstructing too fast, to avoid mass grief you have been frozen for [cyan]15 seconds.[] This action will be reported to the moderators.");
                                     // log in console
                                     Log.info("[Anti-griefer-system] Warning! Potential griefer found on the server, keep an eye on \"" + event.unit.getPlayer().name + "\"[scarlet]!" + " Their UUID is " + uuid);
+                                    // run in a thread cause it takes a while
+                                    var t = new Thread(() -> {
+                                        System.out.println("Future started");
+                                        try {
 
-                                    // remove from warned after 10 minutes
-                                    Timer.schedule(() -> {
-                                        if (warned.contains(uuid)) {
-                                            warned.remove(uuid);
+                                            // render image of the destroyed blocks
+                                            var schemImage = convertToSchemImage(buildingsDestroyedCache.get(uuid, new ObjectSet<>()));
+                                            if (schemImage == null) {
+                                                Log.info("[Anti-griefer-system] Error while rendering image of the destroyed blocks");
+                                                return;
+                                            }
+                                            var minX = schemImage.minX;
+                                            var minY = schemImage.minY;
+                                            var maxX = schemImage.maxX;
+                                            var maxY = schemImage.maxY;
+
+                                            var n = 5;
+                                            // get all blocks in range minX - n to maxX + n and minY - n to maxY + n
+                                            // this will be the after picture
+                                            var blocks = new ObjectSet<SimpleBuild>();
+                                            for (int x = minX - n; x < maxX + n; x++) {
+                                                for (int y = minY - n; y < maxY + n; y++) {
+                                                    var tile = world.tile(x, y);
+                                                    if (tile != null && tile.build != null) {
+                                                        blocks.add(new SimpleBuild(tile.build.block().localizedName, tile.x, tile.y, (byte) tile.build.rotation, tile.build.config(), tile.build.block.isMultiblock()));
+                                                    }
+                                                }
+                                            }
+                                            var schemAfterImage = convertToSchemImage(blocks);
+                                            if (schemAfterImage == null) {
+                                                // something went terribly wrong
+                                                Log.err("[Anti-griefer-system] Something went terribly wrong while rendering the schem image");
+                                                return;
+                                            }
+                                            var afterImage = schemAfterImage.image;
+
+                                            // now we add the destroyed blocks to get the before picture
+                                            blocks.addAll(buildingsDestroyedCache.get(uuid, new ObjectSet<>()));
+                                            var schemBeforeImage = convertToSchemImage(blocks);
+                                            if (schemBeforeImage == null) {
+                                                // something went wrong
+                                                Log.err("[Anti-griefer-system] Something went wrong while rendering the schem image");
+                                                return;
+                                            }
+                                            var beforeImage = schemBeforeImage.image;
+
+                                            // now we combine the before and after image to get one single image and a line between the two
+                                            var combinedImage = new BufferedImage(max(beforeImage.getWidth(), afterImage.getWidth()), beforeImage.getHeight() + afterImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                                            var g = combinedImage.createGraphics();
+                                            g.drawImage(beforeImage, 0, 0, null);
+                                            g.drawImage(afterImage, 0, beforeImage.getHeight(), null);
+                                            g.setColor(Color.RED);
+                                            g.drawLine(0, beforeImage.getHeight() - 10, combinedImage.getWidth(), beforeImage.getHeight() - 10);
+                                            g.dispose();
+
+
+                                            // warn mods
+                                            EmbedBuilder eb = new EmbedBuilder().setTitle("Potential Griefer Online (Auto Ban System)")
+                                                    .addField("Name", Utils.escapeEverything(event.unit.getPlayer().name))
+                                                    .addField("Phash", Utils.calculatePhash(uuid))
+                                                    .addField("Coords", "Player: **" + event.unit.getPlayer().tileX() + "**, **" + event.unit.getPlayer().tileY() + "**\n" +
+                                                            "Buildings: from **" + minX + "**, **" + minY + "** to **" + (maxX + minX) + "**, **" + (maxY + minY) + "**")
+                                                    .setColor(DiscordPalette.WARN)
+                                                    .setImage(combinedImage)
+                                                    .setFooter("Reported by: Auto Ban Syscttem");
+                                            new MessageBuilder()
+                                                    .setEmbed(eb)
+                                                    .setContent("<@&" + Roles.Auto + ">")
+                                                    .addActionRow(
+                                                            Button.danger("ban", "Banish"),
+                                                            Button.success("normal", "Normal"),
+                                                            Button.secondary("report-discuss", "Report Discussion")
+                                                    )
+                                                    .send(Channels.GR_REPORT);
+
+                                            // remove from warned after 10 minutes
+                                            Timer.schedule(() -> {
+                                                if (warned.contains(uuid)) {
+                                                    warned.remove(uuid);
+                                                }
+                                            }, 10 * 60);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
                                         }
-                                    }, 10 * 60);
+                                    });
+                                    t.start();
                                 }
                             }
                         }
@@ -350,13 +483,13 @@ public class Ranks implements MiniMod {
                         pd = new Database.Player(player.uuid(), 0);
                     }
                     pd.playTime += elapsedTimeMin;
-                    pd.buildingsBuilt += buildingsBuiltCache.get(player.uuid(), 0);
+                    pd.buildingsBuilt += buildingsBuiltCache.get(pd.uuid, 0);
                     if (newPlayers.containsKey(player.uuid())) {
                         if (newPlayers.get(player.uuid()).first + elapsedTimeMin >= 60) {
                             newPlayers.remove(player.uuid());
                             pd.verified = true;
                         } else {
-                            newPlayers.put(player.uuid(), new Utils.Pair<>(newPlayers.get(player.uuid()).first + elapsedTimeMin, pd.buildingsBuilt));
+                            newPlayers.put(player.uuid(), new Utils.Pair<>(pd.playTime, pd.buildingsBuilt));
                             pd.verified = false;
                         }
                     }
@@ -737,5 +870,43 @@ public class Ranks implements MiniMod {
                     ctx.success("Set player stats", "Play time: " + playtime + " min\nBuildings built: " + buildingsbuilt + "\nGames played: " + gamesplayed);
                 }
         );
+    }
+
+    public class SimpleBuild {
+        public String blockName;
+        public short x;
+        public short y;
+        public byte rotation;
+        public Object config;
+        public boolean isMultiblock;
+
+        public SimpleBuild(String blockName, short x, short y, byte rotation, Object config, boolean isMultiblock) {
+            this.blockName = blockName;
+            this.x = x;
+            this.y = y;
+            this.rotation = rotation;
+            this.config = config;
+            this.isMultiblock = isMultiblock;
+        }
+
+        public SimpleBuild() {
+            this.blockName = "";
+            this.x = 0;
+            this.y = 0;
+            this.rotation = 0;
+            this.config = null;
+            this.isMultiblock = false;
+        }
+
+        @Override
+        public String toString() {
+            return "SimpleBuild{" +
+                    "blockName='" + blockName + '\'' +
+                    ", x=" + x +
+                    ", y=" + y +
+                    ", rotation=" + rotation +
+                    ", config=" + config +
+                    '}';
+        }
     }
 }

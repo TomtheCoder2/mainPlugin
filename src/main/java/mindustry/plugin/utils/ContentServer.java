@@ -3,11 +3,16 @@ package mindustry.plugin.utils;
 import arc.Core;
 import arc.graphics.Color;
 import arc.graphics.Pixmap;
+import arc.graphics.g2d.Draw;
+import arc.struct.Seq;
 import arc.util.Log;
 import arc.util.io.CounterInputStream;
 import arc.util.io.Reads;
+import arc.util.serialization.Base64Coder;
 import mindustry.Vars;
 import mindustry.content.Blocks;
+import mindustry.entities.units.BuildPlan;
+import mindustry.game.Schematic;
 import mindustry.game.Team;
 import mindustry.io.MapIO;
 import mindustry.io.SaveIO;
@@ -21,6 +26,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.InflaterInputStream;
+
+import static mindustry.game.Schematics.read;
 
 /**
  * Renders maps and schematics to images. Requires certain data files, such as {@code block_colors.png}
@@ -185,9 +192,11 @@ public class ContentServer {
                     i += consecutives;
                 }
             });
+
             return image[0];
         } catch (Exception e) {
             Log.err(e);
+            System.gc();
             return null;
         }
     }

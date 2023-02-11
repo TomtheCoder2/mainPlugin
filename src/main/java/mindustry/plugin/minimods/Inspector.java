@@ -20,11 +20,11 @@ public class Inspector implements MiniMod {
     /**
      * Players with inspector enabled
      */
-    private final ObjectSet<String> players = new ObjectSet<>();
-    private final ObjectMap<Integer, TileInfo> tileInfos = new ObjectMap<>();
-    private final ObjectMap<String, Integer> activeTiles = new ObjectMap<>();
+    public static final ObjectSet<String> players = new ObjectSet<>();
+    public static final ObjectMap<Integer, TileInfo> tileInfos = new ObjectMap<>();
+    public static final ObjectMap<String, Integer> activeTiles = new ObjectMap<>();
 
-    private static int idxFor(int x, int y) {
+    public static int idxFor(int x, int y) {
         return y * Vars.world.width() + x;
     }
 

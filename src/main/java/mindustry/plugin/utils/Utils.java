@@ -3,10 +3,14 @@ package mindustry.plugin.utils;
 import arc.Core;
 import arc.Events;
 import arc.struct.ObjectMap;
+import arc.struct.ObjectSet;
 import arc.struct.Seq;
+import arc.struct.StringMap;
 import arc.util.CommandHandler;
 import arc.util.Strings;
+import mindustry.Vars;
 import mindustry.game.EventType;
+import mindustry.game.Schematic;
 import mindustry.game.Team;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
@@ -14,6 +18,7 @@ import mindustry.maps.Map;
 import mindustry.maps.Maps;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.discordcommands.Context;
+import mindustry.plugin.minimods.Ranks;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 
@@ -33,6 +38,7 @@ import java.util.regex.Pattern;
 import static java.lang.Math.min;
 import static mindustry.Vars.maps;
 import static mindustry.Vars.state;
+import static mindustry.plugin.PhoenixMain.contentHandler;
 //import java.sql.*;
 
 public class Utils {
@@ -729,6 +735,46 @@ public class Utils {
         return null;
     }
 
+    public static SchemImage convertToSchemImage(ObjectSet<Ranks.SimpleBuild> tiles) {
+        try {
+            // convert the list of destroyed blocks to a schematic
+            // first get max and min of x and y values
+            int minX = 200000, minY = 200000, maxX = 0, maxY = 0;
+            for (Ranks.SimpleBuild tile : tiles) {
+                if (tile.x < minX) minX = tile.x;
+                if (tile.y < minY) minY = tile.y;
+                if (tile.x > maxX) maxX = tile.x;
+                if (tile.y > maxY) maxY = tile.y;
+            }
+            minX -= 1;
+            minY -= 1;
+            maxX += 1;
+            maxY += 1;
+            // scale all the min and max values too
+            maxX -= minX;
+            maxY -= minY;
+            Seq<Schematic.Stile> stiles = new Seq<>();
+            for (Ranks.SimpleBuild build : tiles) {
+                // we first have to check if it's a multiblock, cause then we only need to specify the top left corner of the block, cause the block is larger than 1x1
+                if (build.isMultiblock) {
+
+                }
+
+                // (Block block, int x, int y, Object config, byte rotation
+                stiles.add(new Schematic.Stile(Vars.content.block(build.blockName), build.x - minX, build.y - minY, build.config, build.rotation));
+                // log the place where the block was placed in the schem
+//                                        Log.info("[Anti-griefer-system] " + event.unit.getPlayer().name + " destroyed " + building.block.localizedName + " at " + (tile.x - minX) + ", " + (tile.y - minY) + " rotation: " + building.rotation);
+            }
+            Schematic schematic = new Schematic(stiles, new StringMap(), maxX + 2, maxY + 2);
+            // render the image
+            BufferedImage image = contentHandler.previewSchematic(schematic);
+            return new SchemImage(image, minX, minY, maxX + minX, maxY + minY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     /**
      * Send message without response handling
      *
@@ -775,6 +821,22 @@ public class Utils {
 //        return null;
 //    }
 
+    public static class SchemImage {
+        public BufferedImage image;
+        public int minX;
+        public int minY;
+        public int maxX;
+        public int maxY;
+
+        public SchemImage(BufferedImage image, int minX, int minY, int maxX, int maxY) {
+            this.image = image;
+            this.minX = minX;
+            this.minY = minY;
+            this.maxX = maxX;
+            this.maxY = maxY;
+        }
+    }
+
     public static class Categories {
         public static final String moderation = "Moderation";
         public static final String management = "Management";
@@ -795,6 +857,26 @@ public class Utils {
         public Pair(T first, K second) {
             this.first = first;
             this.second = second;
+        }
+
+        @Override
+        public String toString() {
+            return "Pair{" +
+                    "first=" + first +
+                    ", second=" + second +
+                    '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Pair<?, ?> pair)) return false;
+            return first.equals(pair.first) && second.equals(pair.second);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(first, second);
         }
     }
 }
