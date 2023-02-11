@@ -457,7 +457,7 @@ public class Moderation implements MiniMod {
                 ctx -> {
                     String mode = ctx.args.get("add|list|update|remove");
                     if (Objects.equals(mode, "list")) {
-                        ctx.success("Banned words", Database.bannedWords.toString("\n"));
+                        ctx.success("Banned words", Database.bannedWords.toString(", "));
                     } else if (Objects.equals(mode, "add")) {
                         String words = ctx.args.get("words");
                         if (words == null) {

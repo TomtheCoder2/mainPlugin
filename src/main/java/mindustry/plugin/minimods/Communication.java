@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import static mindustry.plugin.database.Database.bannedWords;
+import static mindustry.plugin.minimods.Logs.genRandomString;
 import static mindustry.plugin.utils.Utils.escapeFoosCharacters;
 import static mindustry.plugin.utils.Utils.getArrayListFromString;
 
@@ -79,12 +80,7 @@ public class Communication implements MiniMod {
                 for (String bw : bannedWords) {
                     if (message.toLowerCase().contains(bw)) {
                         // create random string of length bw.length consisting of ['@', '#', '$', '%', '^', '&', '*', '!']
-                        StringBuilder rep = new StringBuilder();
-                        ArrayList<Character> chars = new ArrayList<>(Arrays.asList('@', '#', '$', '%', '^', '&', '*', '!'));
-                        for (int i = 0; i < bw.length(); i++) {
-                            rep.append(chars.get((int) (Math.random() * chars.size())));
-                        }
-                        message = message.replace(bw, rep);
+                        message = message.replace(bw, genRandomString(bw.length()));
                     }
                 }
                 Channels.CHAT.sendMessage("**" + Utils.escapeEverything(event.player.name) + "**: " + message);

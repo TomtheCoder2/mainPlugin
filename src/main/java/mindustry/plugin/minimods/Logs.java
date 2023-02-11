@@ -15,9 +15,11 @@ import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import static mindustry.plugin.database.Database.bannedWords;
 import static mindustry.plugin.database.Database.updateBannedWordsClient;
@@ -48,6 +50,16 @@ public class Logs implements MiniMod {
         }
         // add the message to the whisperLog
         whisperLog.append(formattedMessage);
+    }
+
+    @NotNull
+    static String genRandomString(int len) {
+        StringBuilder rep = new StringBuilder();
+        ArrayList<Character> chars = new ArrayList<>(Arrays.asList('@', '#', '$', '%', '^', '&', '*', '!'));
+        for (int i = 0; i < len; i++) {
+            rep.append(chars.get((int) (Math.random() * chars.size())));
+        }
+        return rep.toString();
     }
 
     public void registerEvents() {
@@ -158,17 +170,56 @@ public class Logs implements MiniMod {
                         message = message.replace(slur, "$@#!");
                     }
                 }
+                // list of numbers that resemble a letter
+                HashMap<String, String> numberLetters = new HashMap<>();
+                numberLetters.put("1", "i");
+                numberLetters.put("2", "to");
+                numberLetters.put("3", "e");
+                numberLetters.put("4", "a");
+                numberLetters.put("5", "r");
+                numberLetters.put("6", "b");
+                numberLetters.put("7", "t");
+                numberLetters.put("8", "g");
+                numberLetters.put("9", "g");
+                numberLetters.put("0", "o");
+                numberLetters.put("!", "i");
+                numberLetters.put("@", "a");
+                numberLetters.put("#", "h");
+                numberLetters.put("$", "s");
+                numberLetters.put("&", "a");
+                numberLetters.put("*", "x");
+                numberLetters.put("(", "c");
+
+
                 // same thing bannedWords
                 for (String bw : bannedWords) {
-                    if (message.toLowerCase().contains(bw)) {
-                        usedSlurs.add(bw);
-                        // create random string of length bw.length consisting of ['@', '#', '$', '%', '^', '&', '*', '!']
-                        StringBuilder rep = new StringBuilder();
-                        ArrayList<Character> chars = new ArrayList<>(Arrays.asList('@', '#', '$', '%', '^', '&', '*', '!'));
-                        for (int i = 0; i < bw.length(); i++) {
-                            rep.append(chars.get((int) (Math.random() * chars.size())));
+                    var mLower = message.toLowerCase().replace(" ", "");
+                    for (String number : numberLetters.keySet()) {
+                        if (mLower.contains(number)) {
+                            mLower = mLower.replace(number, numberLetters.get(number));
                         }
-                        message = message.replace(bw, rep);
+                    }
+                    if (mLower.contains(bw.toLowerCase())) {
+                        usedSlurs.add(bw);
+                        // now we need to find the position of the banned word in the message
+                        // but the problem is that the message contains eg "$hit" but the banned word is "shit"
+                        var index = mLower.indexOf(bw.toLowerCase());
+                        var length = bw.length();
+                        var randomString = genRandomString(length);
+                        StringBuilder finalMessage = new StringBuilder();
+                        for (int i = 0; i < message.length(); i++) {
+                            if (i >= index && i < index + length) {
+                                if (message.charAt(i) == ' ') length++;
+                                if (length > randomString.length()) {
+                                    finalMessage.append(genRandomString(1));
+                                } else {
+                                    finalMessage.append(randomString.charAt(i - index));
+                                }
+                            } else {
+                                finalMessage.append(message.charAt(i));
+                            }
+                        }
+                        message = finalMessage.toString();
                     }
                 }
                 if (usedSlurs.size == 0) return message;
