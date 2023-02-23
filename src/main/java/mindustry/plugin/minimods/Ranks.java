@@ -295,6 +295,7 @@ public class Ranks implements MiniMod {
                 for (Tile tile : world.tiles) {
                     if (tile.build != null) {
                         if (tile.build.team.isAI()) continue;
+                        if (!Arrays.asList(excludedBlocksAntiGriefSystem).contains(tile.block())) continue;
                         deconstructionStarted.add(new SimpleBuild(tile.build.block().localizedName, tile.x, tile.y, (byte) tile.build.rotation, tile.build.config(), tile.build.block.isMultiblock()));
                     }
                 }
@@ -337,7 +338,7 @@ public class Ranks implements MiniMod {
                             }
                             if (!found) {
                                 debug("Building destroyed: " + event.tile.block().localizedName);
-                                cache.add(new SimpleBuild(event.tile.block().localizedName, event.tile.x, event.tile.y, (byte) event.tile.build.rotation, event.tile.build.config(), event.tile.build.block.isMultiblock()));
+                                cache.add(new SimpleBuild(event.tile.block().localizedName, event.tile.x, event.tile.y, (byte) 0, null, false));
                             }
                             buildingsDestroyedCache.put(uuid, cache);
                         }

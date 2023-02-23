@@ -18,14 +18,11 @@ import mindustry.ctype.ContentType;
 import mindustry.entities.units.BuildPlan;
 import mindustry.game.Schematic;
 import mindustry.game.Schematics;
-import mindustry.world.Block;
-import mindustry.world.blocks.environment.OreBlock;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
 //@Deprecated
@@ -58,13 +55,13 @@ public class ContentHandler {
 
 
 //        String assets = "./assets/";
-        String assets = System.getProperty("user.dir") + "/assets/";
+        String assets = Config.assetsDir;
 //        Vars.state = new GameState();
 
-        TextureAtlasData data = new TextureAtlasData(new Fi(assets + "sprites/sprites.aatls"), new Fi(assets + "sprites"), false);
+        TextureAtlasData data = new TextureAtlasData(new Fi(assets + "/sprites/sprites.aatls"), new Fi(assets + "sprites"), false);
         Core.atlas = new TextureAtlas();
 
-        new Fi(System.getProperty("user.dir") + "/assets-raw/sprites_out").walk(f -> {
+        new Fi(assets.replace("/assets", "") + "/assets-raw/sprites_out").walk(f -> {
             if (f.extEquals("png")) {
                 imageFiles.put(f.nameWithoutExtension(), f);
             }

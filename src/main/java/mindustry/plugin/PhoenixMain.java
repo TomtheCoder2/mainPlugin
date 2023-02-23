@@ -116,6 +116,7 @@ public class PhoenixMain extends Plugin {
 
             JSONObject configData = data.getJSONObject("config");
             Config.previewSchem = configData.getBoolean("preview_schem");
+            Config.assetsDir = configData.getString("assets_dir");
             if (configData.has("map_rating")) {
                 Config.mapRating = configData.getBoolean("map_rating");
             }

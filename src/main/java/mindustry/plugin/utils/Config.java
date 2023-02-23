@@ -9,4 +9,5 @@ public class Config {
     public static String mapsURL;
     public static boolean previewSchem;
     public static boolean mapRating;
+    public static String assetsDir;
 }
