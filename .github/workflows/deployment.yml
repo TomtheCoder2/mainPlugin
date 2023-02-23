@@ -1,23 +1,27 @@
-name: Deployment
+name: JavaDeploy
 
-on: push
+on: [push, pull_request]
 
 jobs:
-  deploy:
+  buildJar:
+
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 16
-      uses: actions/setup-java@v1
-      with:
-        java-version: 16
-    - name: Create artifacts
-      run: |
-        ./gradlew jar -Pbuildversion=${RELEASE_VERSION:1}
-    - name: Upload artifact
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: build/libs/DiscordPlugin.jar
-        tag: ${{ github.ref }}
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew jar -Pbuildversion=${RELEASE_VERSION:1}
+
+      - name: Upload built jar file
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/libs/DiscordPlugin.jar
+          tag: ${{ github.ref }}
