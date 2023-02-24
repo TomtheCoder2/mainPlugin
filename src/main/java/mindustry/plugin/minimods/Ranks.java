@@ -899,6 +899,7 @@ public class Ranks implements MiniMod {
                     ctx.success("Set player stats", "Play time: " + playtime + " min\nBuildings built: " + buildingsbuilt + "\nGames played: " + gamesplayed);
                 }
         );
+        // todo: add a verify command
     }
 
     public static class SimpleBuild {

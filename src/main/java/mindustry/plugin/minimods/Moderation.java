@@ -26,16 +26,13 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static mindustry.plugin.database.Database.getNames;
-import static mindustry.plugin.database.Database.getUUIDs;
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
-import static mindustry.plugin.utils.Utils.*;
+import static mindustry.plugin.utils.Utils.split;
 
 
 /**
@@ -405,11 +402,12 @@ public class Moderation implements MiniMod {
 
                     eb
                             .addField("Last name", info.lastName)
-                            .addField("Times kicked", info.timesKicked + "")
-                            .addField("NetServer banned", info.banned ? "Yes" : "No");
+                            .addField("Times kicked", info.timesKicked + "", true)
+                            .addField("NetServer banned", info.banned ? "Yes" : "No", true);
 
                     if (pd != null) {
-                        eb.addInlineField("Rank", Rank.all[pd.rank].name)
+                        eb.addField("Verified", pd.verified ? "Yes" : "No", true)
+                                .addInlineField("Rank", Rank.all[pd.rank].name)
                                 .addInlineField("Playtime", pd.playTime + " min")
                                 .addInlineField("Games", pd.gamesPlayed + "")
                                 .addInlineField("Buildings built", pd.buildingsBuilt + "")
