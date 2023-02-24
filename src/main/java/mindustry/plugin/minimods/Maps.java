@@ -180,13 +180,13 @@ public class Maps implements MiniMod {
                             .setAuthor(ctx.author().getDisplayName(ctx.server()), ctx.author().getAvatar().getUrl().toString(), ctx.author().getAvatar().getUrl().toString())
                             .setColor(DiscordPalette.WARN)
                             .addInlineField("Size", meta.getInt("width") + "x" + meta.getInt("height"));
-                    try {
-                        eb.setImage(ContentServer.renderRaw(data));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        System.out.println("Failed to render map preview");
-                        return;
-                    }
+//                    try {
+//                        eb.setImage(ContentServer.renderRaw(data));
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        System.out.println("Failed to render map preview");
+//                        return;
+//                    }
                     new MessageBuilder()
                             .addEmbed(eb)
                             .addAttachment(data, "Map " + Strings.stripColors(meta.get("name")) + ".msav")
@@ -281,11 +281,11 @@ public class Maps implements MiniMod {
                                 .addInlineField("Shortest Game", md.shortestGame + " min")
                                 .addInlineField("Total Play Time", md.playTime + " min");
                     }
-                    try {
-                        eb.setImage(ContentServer.renderMap(found));
-                    } catch (Exception e) {
-                        System.out.println("Failed to render map");
-                    }
+//                    try {
+//                        eb.setImage(ContentServer.renderMap(found));
+//                    } catch (Exception e) {
+//                        System.out.println("Failed to render map");
+//                    }
 
                     ctx.reply(
                             new MessageBuilder()
