@@ -415,7 +415,7 @@ public class Management implements MiniMod {
         handler.register("admin", "<id|ip|name>",
                 data -> {
                     data.help = "Toggle admin status of a player";
-                    data.roles = new long[]{Roles.ADMIN};
+                    data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                     data.category = "Management";
                 },
                 ctx -> {
