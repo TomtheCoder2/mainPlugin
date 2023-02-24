@@ -120,6 +120,9 @@ public class PhoenixMain extends Plugin {
             if (configData.has("map_rating")) {
                 Config.mapRating = configData.getBoolean("map_rating");
             }
+            if (configData.has("beta")) {
+                Config.beta = configData.getBoolean("beta");
+            }
 
             // connect to database
             JSONObject databaseData = data.getJSONObject("database");

@@ -10,4 +10,5 @@ public class Config {
     public static boolean previewSchem;
     public static boolean mapRating;
     public static String assetsDir;
+    public static boolean beta;
 }

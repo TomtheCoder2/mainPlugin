@@ -27,7 +27,30 @@ repositories {
         name 'm2-dv8tion'
         url 'https://m2.dv8tion.net/releases'
     }
+    mavenLocal()
     mavenCentral()
+    maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
+    maven{ url 'https://jitpack.io' }
+    maven{
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+    mavenCentral()
+}
+
+allprojects{
+    repositories{
+        mavenLocal()
+        mavenCentral()
+        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven{ url 'https://jitpack.io' }
+        maven{
+            name 'm2-dv8tion'
+            url 'https://m2.dv8tion.net/releases'
+        }
+    }
 }
 
 ext {
@@ -38,9 +61,11 @@ ext {
 dependencies {
     implementation 'org.jsoup:jsoup:1.14.3'
     implementation 'junit:junit:4.13.1'
-    compileOnly("com.github.Anuken.Arc:arc-core:$arcVersion")
-    compileOnly("com.github.Anuken.Mindustry:core:$arcVersion")
+//    compileOnly("com.github.Anuken.Arc:arc-core:$arcVersion")
+//    compileOnly("com.github.Anuken.Mindustry:core:$arcVersion")
     compileOnly "com.github.Anuken.Mindustry:server:$arcVersion"
+    compileOnly "com.github.Anuken.Mindustry:core:v137"
+    compileOnly "com.github.Anuken.Arc:arc-core:dfcb21ce56"
 //    compileOnly("com.github.fuzzbuck.Mindustry:core:$mindustryVersion")
 //    compileOnly("com.github.fuzzbuck.Mindustry:server:$mindustryVersion")
     implementation group: 'org.json', name: 'json', version: '20210307'

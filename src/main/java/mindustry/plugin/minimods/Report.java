@@ -9,15 +9,14 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
-import mindustry.plugin.utils.Cooldowns;
-import mindustry.plugin.utils.GameMsg;
-import mindustry.plugin.utils.Query;
-import mindustry.plugin.utils.Utils;
+import mindustry.plugin.utils.*;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.component.Button;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.util.Objects;
+
+import static mindustry.plugin.minimods.Ranks.warnDiscord;
 
 
 public class Report implements MiniMod {
@@ -45,7 +44,7 @@ public class Report implements MiniMod {
 
         Cooldowns.instance.set("gr", 5 * 60);
         handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/Players' to get a list of ids)", (args, player) -> {
-            if (!Cooldowns.instance.canRun("gr", player.uuid())) {
+            if (!Config.beta && !Cooldowns.instance.canRun("gr", player.uuid())) {
                 player.sendMessage(GameMsg.ratelimit("Mod", "gr"));
                 return;
             }
@@ -83,7 +82,7 @@ public class Report implements MiniMod {
                     player.sendMessage("[scarlet]Only players on your team can be reported.");
                     return;
                 }
-                if (Objects.equals(found.uuid(), player.uuid())) {
+                if (!Config.beta && Objects.equals(found.uuid(), player.uuid())) {
                     player.sendMessage("[scarlet]You can't report yourself anymore");
                     return;
                 }
@@ -93,9 +92,10 @@ public class Report implements MiniMod {
                         .addField("Phash", Utils.calculatePhash(found.uuid()))
                         .setColor(DiscordPalette.ERROR)
                         .setFooter("Reported by: " + Utils.escapeEverything(player.name));
-
+                String reason = null;
                 if (args.length > 1) {
                     eb.addField("Reason", args[1]);
+                    reason = args[1];
                 }
 
                 new MessageBuilder()
@@ -105,8 +105,9 @@ public class Report implements MiniMod {
                                 Button.danger("ban", "Banish"),
                                 Button.success("normal", "Normal"),
                                 Button.secondary("report-discuss", "Report Discussion")
-                        )
-                        .send(Channels.GR_REPORT);
+                        );
+//                        .send(Channels.GR_REPORT);
+                warnDiscord(player, player.uuid(), Utils.escapeEverything(player.name), reason);
                 Call.sendMessage(found.name + "[sky] is reported to discord.");
             }
         });

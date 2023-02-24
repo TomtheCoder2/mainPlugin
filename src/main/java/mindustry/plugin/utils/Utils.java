@@ -2,23 +2,25 @@ package mindustry.plugin.utils;
 
 import arc.Core;
 import arc.Events;
-import arc.struct.ObjectMap;
-import arc.struct.ObjectSet;
-import arc.struct.Seq;
-import arc.struct.StringMap;
+import arc.struct.*;
 import arc.util.CommandHandler;
 import arc.util.Strings;
-import mindustry.Vars;
 import mindustry.game.EventType;
 import mindustry.game.Schematic;
+import mindustry.game.Schematics;
 import mindustry.game.Team;
+import mindustry.gen.Building;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
+import mindustry.input.Placement;
 import mindustry.maps.Map;
 import mindustry.maps.Maps;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.discordcommands.Context;
 import mindustry.plugin.minimods.Ranks;
+import mindustry.world.Block;
+import mindustry.world.blocks.ConstructBlock;
+import mindustry.world.blocks.storage.CoreBlock;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 
@@ -35,9 +37,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static arc.util.Log.debug;
 import static java.lang.Math.min;
-import static mindustry.Vars.maps;
-import static mindustry.Vars.state;
+import static mindustry.Vars.*;
 import static mindustry.plugin.PhoenixMain.contentHandler;
 //import java.sql.*;
 
@@ -739,7 +741,7 @@ public class Utils {
         try {
             // convert the list of destroyed blocks to a schematic
             // first get max and min of x and y values
-            int minX = 200000, minY = 200000, maxX = 0, maxY = 0;
+            int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = 0, maxY = 0;
             for (Ranks.SimpleBuild tile : tiles) {
                 if (tile.x < minX) minX = tile.x;
                 if (tile.y < minY) minY = tile.y;
@@ -754,25 +756,132 @@ public class Utils {
             maxX -= minX;
             maxY -= minY;
             Seq<Schematic.Stile> stiles = new Seq<>();
+            IntSet counted = new IntSet();
             for (Ranks.SimpleBuild build : tiles) {
                 // we first have to check if it's a multiblock, cause then we only need to specify the top left corner of the block, cause the block is larger than 1x1
                 if (build.isMultiblock) {
 
                 }
 
+                if (build.blockName.contains("build")) continue;
+//                debug("x: " + build.x + " y: " + build.y + " block: " + build.blockName);
                 // (Block block, int x, int y, Object config, byte rotation
-                stiles.add(new Schematic.Stile(Vars.content.block(build.blockName), build.x - minX, build.y - minY, build.config, build.rotation));
+//                stiles.add(new Schematic.Stile(Vars.content.block(build.blockName), build.x - minX, build.y - minY, build.config, build.rotation));
                 // log the place where the block was placed in the schem
+                Building tile = build.building;
+                Block realBlock = tile == null ? null : tile instanceof ConstructBlock.ConstructBuild cons ? cons.current : tile.block;
+
+                if (tile != null && !counted.contains(tile.pos()) && realBlock != null
+                        && (realBlock.isVisible() || realBlock instanceof CoreBlock)) {
+                    Object config = tile instanceof ConstructBlock.ConstructBuild cons ? cons.lastConfig : tile.config();
+
+                    stiles.add(new Schematic.Stile(realBlock, tile.tileX() - minX, tile.tileY() - minY, config, (byte) tile.rotation));
+                    counted.add(tile.pos());
+                }
 //                                        Log.info("[Anti-griefer-system] " + event.unit.getPlayer().name + " destroyed " + building.block.localizedName + " at " + (tile.x - minX) + ", " + (tile.y - minY) + " rotation: " + building.rotation);
             }
             Schematic schematic = new Schematic(stiles, new StringMap(), maxX + 2, maxY + 2);
-            // render the image
-            BufferedImage image = contentHandler.previewSchematic(schematic);
-            return new SchemImage(image, minX, minY, maxX + minX, maxY + minY);
+            debug(new Schematics().writeBase64(schematic));
+            try {
+                // render the image
+                BufferedImage image = contentHandler.previewSchematic(schematic);
+                return new SchemImage(image, minX, minY, maxX + minX, maxY + minY);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new SchemImage(null, minX, minY, maxX + minX, maxY + minY);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static Schematic create(int x, int y, int x2, int y2, Seq<Ranks.SimpleBuild> dBuilds) {
+        Placement.NormalizeResult result = Placement.normalizeArea(x, y, x2, y2, 0, false, maxSchematicSize);
+        x = result.x;
+        y = result.y;
+        x2 = result.x2;
+        y2 = result.y2;
+
+        int ox = x, oy = y, ox2 = x2, oy2 = y2;
+
+        Seq<Schematic.Stile> tiles = new Seq<>();
+
+        int minx = x2, miny = y2, maxx = x, maxy = y;
+        boolean found = false;
+        for (int cx = x; cx <= x2; cx++) {
+            for (int cy = y; cy <= y2; cy++) {
+                Building linked = world.build(cx, cy);
+                Block realBlock = linked == null ? null : linked instanceof ConstructBlock.ConstructBuild cons ? cons.current : linked.block;
+
+                if (linked != null && realBlock != null && (realBlock.isVisible() || realBlock instanceof CoreBlock)) {
+                    int top = realBlock.size / 2;
+                    int bot = realBlock.size % 2 == 1 ? -realBlock.size / 2 : -(realBlock.size - 1) / 2;
+                    minx = Math.min(linked.tileX() + bot, minx);
+                    miny = Math.min(linked.tileY() + bot, miny);
+                    maxx = Math.max(linked.tileX() + top, maxx);
+                    maxy = Math.max(linked.tileY() + top, maxy);
+                    found = true;
+                }
+            }
+        }
+
+        for (Ranks.SimpleBuild t : dBuilds) {
+            Building linked = t.building;
+            Block realBlock = linked == null ? null : linked instanceof ConstructBlock.ConstructBuild cons ? cons.current : linked.block;
+
+            if (linked != null && realBlock != null && (realBlock.isVisible() || realBlock instanceof CoreBlock)) {
+                int top = realBlock.size / 2;
+                int bot = realBlock.size % 2 == 1 ? -realBlock.size / 2 : -(realBlock.size - 1) / 2;
+                minx = Math.min(linked.tileX() + bot, minx);
+                miny = Math.min(linked.tileY() + bot, miny);
+                maxx = Math.max(linked.tileX() + top, maxx);
+                maxy = Math.max(linked.tileY() + top, maxy);
+                found = true;
+            }
+        }
+
+        if (found) {
+            x = minx;
+            y = miny;
+            x2 = maxx;
+            y2 = maxy;
+        } else {
+            return new Schematic(new Seq<>(), new StringMap(), 1, 1);
+        }
+
+        int width = x2 - x + 1, height = y2 - y + 1;
+        int offsetX = -x, offsetY = -y;
+        IntSet counted = new IntSet();
+        for (int cx = ox; cx <= ox2; cx++) {
+            for (int cy = oy; cy <= oy2; cy++) {
+                Building tile = world.build(cx, cy);
+                Block realBlock = tile == null ? null : tile instanceof ConstructBlock.ConstructBuild cons ? cons.current : tile.block;
+
+                if (tile != null && !counted.contains(tile.pos()) && realBlock != null
+                        && (realBlock.isVisible() || realBlock instanceof CoreBlock)) {
+                    Object config = tile instanceof ConstructBlock.ConstructBuild cons ? cons.lastConfig : tile.config();
+
+                    tiles.add(new Schematic.Stile(realBlock, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte) tile.rotation));
+                    counted.add(tile.pos());
+                }
+            }
+        }
+
+        for (Ranks.SimpleBuild b : dBuilds) {
+            Building tile = b.building;
+            Block realBlock = tile == null ? null : tile instanceof ConstructBlock.ConstructBuild cons ? cons.current : tile.block;
+
+            if (tile != null && !counted.contains(tile.pos()) && realBlock != null
+                    && (realBlock.isVisible() || realBlock instanceof CoreBlock)) {
+                Object config = tile instanceof ConstructBlock.ConstructBuild cons ? cons.lastConfig : tile.config();
+
+                tiles.add(new Schematic.Stile(realBlock, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte) tile.rotation));
+                counted.add(tile.pos());
+            }
+        }
+
+        return new Schematic(tiles, new StringMap(), width, height);
     }
 
     /**
