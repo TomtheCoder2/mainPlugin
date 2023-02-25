@@ -36,9 +36,11 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static arc.util.Log.debug;
 import static java.lang.Math.max;
+import static java.lang.Math.random;
 import static mindustry.Vars.world;
 import static mindustry.plugin.database.Database.getNames;
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
@@ -57,6 +59,8 @@ public class Ranks implements MiniMod {
     public static final ObjectSet<String> warned = new ObjectSet<>();
     public static final ObjectSet<String> normalPlayers = new ObjectSet<>();
     public static final ObjectSet<SimpleBuild> deconstructionStarted = new ObjectSet<>();
+    // creating a random key that gets appended to the button internal names for the discord interaction, so that its possible to run multiple servers with the same bot
+    private static final double randomKey = ThreadLocalRandom.current().nextInt(0, 1000 + 1);
     private final static String promotionMessage = """
             [sky]%player%, you have been promoted to [sky]<%rank%>[]!
             [#4287f5]You reached a playtime of - %playtime% minutes!
@@ -169,12 +173,15 @@ public class Ranks implements MiniMod {
                         // now we combine the before and after image to get one single image and a line between the two
                         combinedImage = new BufferedImage(max(beforeImage.getWidth(), afterImage.getWidth()), beforeImage.getHeight() + afterImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
                         var g = combinedImage.createGraphics();
+                        var lineThickness = 1f / 20f;
                         g.drawImage(beforeImage, 0, 0, null);
                         g.drawImage(afterImage, 0, beforeImage.getHeight(), null);
                         g.setColor(Color.RED);
-                        var lineThickness = 1f / 15f;
                         // create a line the separates the 2 images
                         g.fillRect(0, (int) (beforeImage.getHeight() - lineThickness / 2 * beforeImage.getHeight()), beforeImage.getWidth(), (int) (lineThickness * beforeImage.getHeight()));
+                        g.setFont(g.getFont().deriveFont(2.5f * lineThickness * beforeImage.getHeight()));
+                        g.drawString("Before", 0, g.getFontMetrics().getHeight());
+                        g.drawString("After", 0, beforeImage.getHeight() + g.getFontMetrics().getHeight());
                         g.dispose();
                     } else {
                         // something went terribly wrong
@@ -203,13 +210,14 @@ public class Ranks implements MiniMod {
                 if (reason != null) {
                     eb.addField("Reason", reason);
                 }
+                debug("randomKey: @", randomKey);
                 new MessageBuilder()
                         .setEmbed(eb)
                         .setContent("<@&" + Roles.Auto + ">")
                         .addActionRow(
-                                Button.danger("ban", "Banish"),
-                                Button.success("normal", "Normal"),
-                                Button.secondary("report-discuss", "Report Discussion")
+                                Button.danger("ban-" + randomKey, "Banish"),
+                                Button.success("normal-" + randomKey, "Normal"),
+                                Button.secondary("report-discuss-" + randomKey, "Report Discussion")
                         )
                         .send(Channels.GR_REPORT);
 
@@ -289,7 +297,7 @@ public class Ranks implements MiniMod {
         DiscordVars.api.addButtonClickListener(event -> {
             var msg = event.getButtonInteraction().getMessage();
             var eb = msg.getEmbeds().get(0);
-            switch (event.getButtonInteraction().getCustomId()) {
+            switch (event.getButtonInteraction().getCustomId().replace("-" + randomKey, "")) {
                 case "ban" -> {
                     event.getInteraction().respondLater(true)
                             .thenAccept(updater -> {
@@ -309,46 +317,53 @@ public class Ranks implements MiniMod {
                                             .applyChanges();
                                     return;
                                 }
+                                // check if there are message attachments
+                                BufferedImage image = null;
+                                try {
+                                    if (msg.getEmbeds().get(0).getImage().isPresent()) {
+                                        try {
+                                            image = msg.getEmbeds().get(0).getImage().get().downloadAsBufferedImage(msg.getApi()).get();
+                                            debug("Got image: @x@", image.getWidth(), image.getHeight());
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                debug("Banning: @", pd.uuid);
                                 // get player who reported him by the footer
                                 String reporter = "";
                                 if (eb.getFooter().isPresent()) {
                                     reporter = eb.getFooter().get().getText().get().replace("Reported by: ", "");
                                 }
-                                pd.banReason = "Banned by " + reporter + " (confirmed by " + event.getInteraction().getUser().getDiscriminatedName() + ")";
+                                reporter = reporter + " (confirmed by " + event.getInteraction().getUser().getDiscriminatedName() + ")";
+                                pd.banReason = "Banned by " + reporter;
                                 // ban for 10080 minutes (7 days)
                                 pd.bannedUntil = Instant.now().getEpochSecond() + 10080 * 60;
                                 Database.setPlayerData(pd);
                                 // kick player
                                 for (Player p : Groups.player) {
+                                    System.out.printf("checking: %s == %s\n", p.uuid(), pd.uuid);
                                     if (p.uuid().equals(pd.uuid)) {
-                                        p.con.kick(Packets.KickReason.banned);
+                                        p.kick(Packets.KickReason.banned);
                                     }
                                 }
                                 msg.createUpdater()
                                         .setEmbed(
                                                 eb.toBuilder()
-                                                        .setFooter("Banned")
+                                                        .setFooter("Banned by: " + reporter)
                                                         .addField("Status", "Banned", true)
                                                         .setColor(DiscordPalette.ERROR))
                                         .removeAllComponents()
                                         .applyChanges();
                                 // log to colonel and normal logs
-                                moderationLogColonel("Banned", pd.banReason, Vars.netServer.admins.getInfo(pd.uuid), pd.banReason, null, null);
-                                DiscordLog.moderation("Banned", pd.banReason, Vars.netServer.admins.getInfo(pd.uuid), pd.banReason, null);
-                                updater.setContent("Banned " + escapeEverything(Query.findPlayerInfo(pd.uuid).lastName) + ".").update();
+                                moderationLogColonel("Banned", reporter, Vars.netServer.admins.getInfo(pd.uuid), pd.banReason, null, null, image);
+                                DiscordLog.moderation("Banned", reporter, Vars.netServer.admins.getInfo(pd.uuid), pd.banReason, null);
+                                updater.addEmbed(new EmbedBuilder().setTitle("Banned " + escapeEverything(Query.findPlayerInfo(pd.uuid).lastName)).setTimestampToNow().setColor(DiscordPalette.ERROR)).update();
                             });
                 }
                 case "normal" -> {
-                    msg.createUpdater()
-                            .setEmbed(
-                                    eb.toBuilder()
-                                            .setFooter("Normal")
-                                            .addField("Status", "Normal", true)
-                                            .setColor(DiscordPalette.SUCCESS)
-                            )
-                            .removeAllComponents()
-                            .applyChanges();
-
                     if (eb.getFields().size() < 1) return;
                     String phash = eb.getFields().get(1).getValue();
                     var pd = Database.getPlayerDataByPhash(phash);
@@ -358,9 +373,26 @@ public class Ranks implements MiniMod {
                         normalPlayers.add(pd.uuid);
                         // and unfreeze
                         frozen.remove(pd.uuid);
+                        msg.createUpdater()
+                                .setEmbed(
+                                        eb.toBuilder()
+                                                .setFooter("Normal")
+                                                .addField("Status", "Normal", true)
+                                                .setColor(DiscordPalette.SUCCESS)
+                                )
+                                .removeAllComponents()
+                                .applyChanges();
                         event.getInteraction().createImmediateResponder()
-                                .setContent("Set status of player " + escapeEverything(Query.findPlayerInfo(pd.uuid).lastName) + " to normal.")
+                                .addEmbed(new EmbedBuilder().setTitle("Set status of player " + escapeEverything(Query.findPlayerInfo(pd.uuid).lastName) + " to normal.").setTimestampToNow().setColor(DiscordPalette.SUCCESS))
                                 .setFlags(MessageFlag.EPHEMERAL).respond();
+                    } else {
+                        msg.createUpdater()
+                                .setEmbed(
+                                        eb.toBuilder()
+                                                .setFooter("Player not found")
+                                                .setColor(DiscordPalette.ERROR))
+                                .removeAllComponents()
+                                .applyChanges();
                     }
                 }
                 case "report-discuss" -> {
@@ -370,9 +402,23 @@ public class Ranks implements MiniMod {
                     var pd = Database.getPlayerDataByPhash(phash);
                     if (pd == null) return;
                     var name = Objects.requireNonNull(getNames(pd.uuid)).get(0);
-                    msg.createThread(name, 60);
+                    try {
+                        var thread = msg.createThread(name, 60).join();
+                        thread.sendMessage(new EmbedBuilder().setTitle("Thread created").addField("Thread created by", "<@" + event.getInteraction().getUser().getIdAsString() + ">").setColor(DiscordPalette.SUCCESS));
+                    } catch (Exception e) {
+                        Log.info("Couldn't load Thread");
+                        e.printStackTrace();
+                    }
+                    msg.createUpdater()
+                            .removeAllComponents()
+                            .applyChanges();
+                    msg.createUpdater().addActionRow(
+                            Button.danger("ban-" + randomKey, "Banish"),
+                            Button.success("normal-" + randomKey, "Normal"),
+                            Button.secondary("report-discuss-" + randomKey, "Report Discussion")
+                    ).applyChanges();
                     event.getInteraction().createImmediateResponder()
-                            .setContent("Created discussion thread for " + name + ".")
+                            .addEmbed(new EmbedBuilder().setTitle("Created discussion thread for " + name + ".").setColor(DiscordPalette.SUCCESS).setTimestampToNow())
                             .setFlags(MessageFlag.EPHEMERAL).respond();
                 }
             }

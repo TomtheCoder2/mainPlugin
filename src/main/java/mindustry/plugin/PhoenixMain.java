@@ -30,8 +30,7 @@ import org.json.JSONTokener;
 import java.time.Instant;
 import java.util.Objects;
 
-import static arc.util.Log.err;
-import static arc.util.Log.info;
+import static arc.util.Log.*;
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.state;
 import static mindustry.plugin.database.Database.*;
@@ -131,7 +130,7 @@ public class PhoenixMain extends Plugin {
             String dbPwd = databaseData.getString("password");
             String playerTable = databaseData.getString("table_player");
 
-            System.out.printf("database url: %s, user: %s%n\n", dbURL, dbUser);
+            debug("database url: @, user: @", dbURL, dbUser);
 
             try { // test connection
                 Database.connect(dbURL, dbUser, dbPwd, playerTable);

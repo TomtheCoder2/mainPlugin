@@ -10,10 +10,13 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 
+import java.awt.image.BufferedImage;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static arc.util.Log.debug;
 
 public class DiscordLog {
     /**
@@ -72,7 +75,13 @@ public class DiscordLog {
         Channels.LOG.sendMessage(eb);
     }
 
-    public static void moderationLogColonel(String action, String mod, Administration.PlayerInfo info, String reason, String additionalInfo, List<MessageAttachment> images) {
+    public static void moderationLogColonel(String action, String mod, Administration.PlayerInfo info,
+                                            String reason, String additionalInfo, List<MessageAttachment> images) {
+        moderationLogColonel(action, mod, info, reason, additionalInfo, images, null);
+    }
+
+    public static void moderationLogColonel(String action, String mod, Administration.PlayerInfo info,
+                                            String reason, String additionalInfo, List<MessageAttachment> images, BufferedImage image) {
         EmbedBuilder eb = new EmbedBuilder()
                 .setColor(DiscordPalette.WARN)
                 .setTitle(action)
@@ -87,18 +96,42 @@ public class DiscordLog {
         }
         eb.setTimestampToNow();
         MessageBuilder mb = new MessageBuilder();
-        if (images != null) {
-            try {
+        try {
+            if (image != null) {
+                eb.setImage(image);
+                debug("Added image");
+                if (images != null) {
+                    for (MessageAttachment img : images) {
+                        if (image == img.downloadAsImage().get()) continue;
+                        debug("Added image: @", img.getFileName());
+                        mb.addAttachment(img.downloadAsInputStream(), "image_" + img.getFileName());
+                    }
+                }
+            } else if (images != null) {
                 eb.setImage(images.get(0).downloadAsInputStream());
                 for (MessageAttachment i : images) {
                     if (images.get(0) == i) continue;
                     mb.addAttachment(i.downloadAsInputStream(), "image_" + i.getFileName());
                 }
-            } catch (Exception e) {
-                Log.info("Could not load images.");
-                e.printStackTrace();
+            } else {
+                Log.info("No images given.");
             }
+        } catch (Exception e) {
+            Log.info("Could not load images.");
+            e.printStackTrace();
         }
+//        if (images != null && image == null) {
+//            try {
+//                eb.setImage(images.get(0).downloadAsInputStream());
+//                for (MessageAttachment i : images) {
+//                    if (images.get(0) == i) continue;
+//                    mb.addAttachment(i.downloadAsInputStream(), "image_" + i.getFileName());
+//                }
+//            } catch (Exception e) {
+//                Log.info("Could not load images.");
+//                e.printStackTrace();
+//            }
+//        }
         mb.addEmbed(eb);
         mb.send(Channels.COLONEL_LOG);
     }
