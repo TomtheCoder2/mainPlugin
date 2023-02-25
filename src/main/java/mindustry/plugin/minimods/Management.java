@@ -36,6 +36,7 @@ import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
+import static arc.util.Log.debug;
 import static mindustry.Vars.*;
 import static mindustry.plugin.PhoenixMain.contentHandler;
 
@@ -387,28 +388,38 @@ public class Management implements MiniMod {
                         }
                         ip = name;
                     }
+                    debug("url: " + "http://api.ipapi.com/" + ip + "?access_key=");
+                    try {
+                        Http.get("http://api.ipapi.com/" + ip + "?access_key=" + Config.ipApiKey, resp -> {
+                            JSONObject json = new JSONObject(resp.getResultAsString());
+                            try {
+                                EmbedBuilder eb = new EmbedBuilder()
+                                        .setTitle("Lookup " + ip)
+                                        .setColor(DiscordPalette.INFO)
+                                        .addField("Continent", json.getString("continent_name"), true)
+                                        .addField("City", json.getString("city"), true)
+                                        .addField("Country", json.getString("country_name"), true)
+                                        .addField("Region", json.getString("region_name"), true)
+                                        .addField("Latitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("latitude")).floatValue())), true)
+                                        .addField("Longitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("longitude")).floatValue())), true);
 
-                    Http.get("http://api.ipapi.com/" + ip + "?access_key=" + Config.ipApiKey, resp -> {
-                        JSONObject json = new JSONObject(resp.getResultAsString());
-                        EmbedBuilder eb = new EmbedBuilder()
-                                .setTitle("Lookup " + ip)
-                                .setColor(DiscordPalette.INFO)
-                                .addField("Continent", json.getString("continent_name"), true)
-                                .addField("City", json.getString("city"), true)
-                                .addField("Country", json.getString("country_name"), true)
-                                .addField("Region", json.getString("region_name"), true)
-                                .addField("Latitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("latitude")).floatValue())), true)
-                                .addField("Longitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("longitude")).floatValue())), true);
+                                if (json.has("zip")) {
+                                    eb.addInlineField("Zip Code", json.get("zip").toString());
+                                }
 
-                        if (json.has("zip")) {
-                            eb.addInlineField("Zip Code", json.get("zip").toString());
-                        }
-
-                        ctx.sendEmbed(eb);
-                    }, err -> {
-                        Log.err(err);
-                        DiscordLog.error("IpApi lookup failed", err.getMessage(), null);
-                    });
+                                ctx.sendEmbed(eb);
+                            } catch (Exception e) {
+                                ctx.sendEmbed(new EmbedBuilder().setTitle("There was an error...").setColor(DiscordPalette.ERROR));
+                                DiscordLog.error("IpApi lookup failed", e.getMessage(), null);
+                            }
+                        }, err -> {
+                            Log.err(err);
+                            DiscordLog.error("IpApi lookup failed", err.getMessage(), null);
+                        });
+                    } catch (Exception e) {
+                        ctx.sendEmbed(new EmbedBuilder().setTitle("There was an error...").setColor(DiscordPalette.ERROR));
+                        DiscordLog.error("IpApi lookup failed", e.getMessage(), null);
+                    }
                 }
         );
 

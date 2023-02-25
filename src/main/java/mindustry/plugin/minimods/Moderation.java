@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static mindustry.plugin.database.Database.getNames;
+import static mindustry.plugin.database.Database.getPlayerData;
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
 import static mindustry.plugin.utils.Utils.split;
 
@@ -142,9 +143,9 @@ public class Moderation implements MiniMod {
                         ctx.error("Missing Attachment(s)", "Please provide a picture as evidence for the ban");
                         return;
                     }
-                    Administration.PlayerInfo info = Query.findPlayerInfo(ctx.args.get("player"));
+                    Administration.PlayerInfo info = Query.findPlayerDiscord(ctx.args.get("player"), ctx);
                     if (info == null) {
-                        ctx.error("Error", "Player " + ctx.args.get("player") + " not found.");
+//                        ctx.error("Error", "Player " + ctx.args.get("player") + " not found.");
                         return;
                     }
                     String uuid = info.id;
@@ -192,13 +193,17 @@ public class Moderation implements MiniMod {
                     data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
                 },
                 ctx -> {
-                    var info = Query.findPlayerInfo(ctx.args.get("player"));
-                    String uuid = ctx.args.get("player");
-                    if (info != null) {
-                        uuid = info.id;
-                    }
+                    var info = Query.findPlayerDiscord(ctx.args.get("player"), ctx);
+//                    String uuid = ctx.args.get("player");
+//                    if (info != null) {
+//                        uuid = info.id;
+//                    }
+//
+//                    var pd = Database.getPlayerData(uuid);
 
-                    var pd = Database.getPlayerData(uuid);
+                    if (info == null) return;
+                    var pd = getPlayerData(info.id);
+                    var uuid = info.id;
                     if (pd == null) {
                         ctx.error("Player not found", ctx.args.get("player") + " was not found");
                         return;
@@ -344,9 +349,9 @@ public class Moderation implements MiniMod {
                     data.roles = new long[]{Roles.ADMIN, Roles.MOD, Roles.APPRENTICE};
                 },
                 ctx -> {
-                    var info = Query.findPlayerInfo(ctx.args.get("player"));
+                    var info = Query.findPlayerDiscord(ctx.args.get("player"), ctx);
                     if (info == null) {
-                        ctx.error("No such player", ctx.args.get("player") + " is not saved in the netserver data");
+//                        ctx.error("No such player", ctx.args.get("player") + " is not saved in the netserver data");
                         return;
                     }
                     if (info.lastKicked == 0) {

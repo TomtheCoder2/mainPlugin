@@ -107,7 +107,7 @@ public class Query {
 //        if (found != null) {
 //            return netServer.admins.getInfo(found.uuid());
 //        }
-        var uuids = getUUIDs(ctx.args.get("player"));
+        var uuids = getUUIDs(target);
         if (uuids != null && (uuids.size > 1 || (uuids.size == 1 && found != null))) {
             EmbedBuilder eb = new EmbedBuilder();
             eb.setTitle("Multiple Players Found");
@@ -120,7 +120,7 @@ public class Query {
                 var info = Vars.netServer.admins.getInfo(uuid);
                 if (info == null) continue;
                 if (uuids_list.contains(uuid)) continue;
-                // TODO: there could be a problem if the server doesnt know any names. but thats very unlikely
+                // TODO: there could be a problem if the server doesnt know any names. but that's very unlikely
                 if (info.lastName == null || info.lastName.equals("<unknown>")) continue;
                 sb.append(String.format("%s (`%s`)" + (ctx.channel() == Channels.APPRENTICE_BOT ? "" : " - %s") + "\n", escapeEverything(info.lastName), calculatePhash(uuid), (ctx.channel() == Channels.APPRENTICE_BOT ? "" : info.lastIP)));
                 uuids_list.add(uuid);
@@ -134,16 +134,16 @@ public class Query {
             ctx.channel().sendMessage(eb);
             return null;
         }
-        var info = Query.findPlayerInfo(ctx.args.get("player"));
+        var info = Query.findPlayerInfo(target);
         if (info == null && uuids != null && uuids.size == 1) {
             info = Vars.netServer.admins.getInfo(uuids.first());
         }
         if (info == null) {
-            ctx.error("No such player", ctx.args.get("player") + " is not in the database");
+            ctx.error("No such player", target+ " is not in the database");
             return null;
         }
         if (info.names.size == 0) {
-            ctx.error("Unknown Player", "Could not find player " + ctx.args.get("player"));
+            ctx.error("Unknown Player", "Could not find player " + target);
             return null;
         }
         return info;

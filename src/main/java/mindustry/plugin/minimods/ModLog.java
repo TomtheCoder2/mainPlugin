@@ -59,9 +59,9 @@ public class ModLog implements MiniMod {
                     data.roles = new long[]{Roles.MOD, Roles.APPRENTICE, Roles.ADMIN};
                 },
                 ctx -> {
-                    var info = Query.findPlayerInfo(ctx.args.get("mod"));
+                    var info = Query.findPlayerDiscord(ctx.args.get("mod"), ctx);
                     if (info == null) {
-                        ctx.error("No such player", "That player is not in player info");
+//                        ctx.error("No such player", "That player is not in player info");
                         return;
                     }
 

@@ -60,7 +60,7 @@ public class Ranks implements MiniMod {
     public static final ObjectSet<String> normalPlayers = new ObjectSet<>();
     public static final ObjectSet<SimpleBuild> deconstructionStarted = new ObjectSet<>();
     // creating a random key that gets appended to the button internal names for the discord interaction, so that its possible to run multiple servers with the same bot
-    private static final double randomKey = ThreadLocalRandom.current().nextInt(0, 1000 + 1);
+    private static final int randomKey = ThreadLocalRandom.current().nextInt(0, 1000 + 1);
     private final static String promotionMessage = """
             [sky]%player%, you have been promoted to [sky]<%rank%>[]!
             [#4287f5]You reached a playtime of - %playtime% minutes!
@@ -921,9 +921,9 @@ public class Ranks implements MiniMod {
                     data.roles = new long[]{Roles.ADMIN, Roles.MOD};
                 },
                 ctx -> {
-                    var info = Query.findPlayerInfo(ctx.args.get("player"));
+                    var info = Query.findPlayerDiscord(ctx.args.get("player"), ctx);
                     if (info == null) {
-                        ctx.error("No such player", "There is no such player in the database");
+//                        ctx.error("No such player", "There is no such player in the database");
                         return;
                     }
 
