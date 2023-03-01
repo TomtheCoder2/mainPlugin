@@ -24,7 +24,6 @@ import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.Config;
-import mindustry.plugin.utils.ContentServer;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
@@ -106,8 +105,8 @@ public class Management implements MiniMod {
                             .setColor(Color.YELLOW)
                             .setTitle("Garbage Collected")
                             .setDescription((pre - post) + " MB of garbage collected")
-                            .addInlineField("Pre-GC usage", pre + " MB")
-                            .addInlineField("Post-GC usage", post + " MB")
+                            .addInlineField("Pre-GC usage", (int) pre + " MB")
+                            .addInlineField("Post-GC usage", (int) post + " MB")
                     );
                 }
         );

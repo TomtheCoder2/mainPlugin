@@ -1,7 +1,9 @@
 package mindustry.plugin.minimods;
 
+import arc.Core;
 import arc.Events;
 import arc.struct.Seq;
+import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
@@ -89,7 +91,12 @@ public class Logs implements MiniMod {
         });
 
         Timer.schedule(() -> {
+            int pre = (int) (Core.app.getJavaHeap() / 1024.0 / 1024.0);
             System.gc();
+            int post = (int) (Core.app.getJavaHeap() / 1024.0 / 1024.0);
+
+            Log.info("Garbage collection: @ mb - @ mb= @ mb", pre, post, pre - post);
+
             if (joinPlayers.size == 0 && leftPlayers.size == 0) return;
 
             EmbedBuilder eb = new EmbedBuilder()

@@ -24,6 +24,7 @@ import mindustry.world.blocks.storage.CoreBlock;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -743,10 +744,10 @@ public class Utils {
             // first get max and min of x and y values
             int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, maxX = 0, maxY = 0;
             for (Ranks.SimpleBuild tile : tiles) {
-                if (tile.x < minX) minX = tile.x;
-                if (tile.y < minY) minY = tile.y;
-                if (tile.x > maxX) maxX = tile.x;
-                if (tile.y > maxY) maxY = tile.y;
+                if (tile.tileX < minX) minX = tile.tileX;
+                if (tile.tileY < minY) minY = tile.tileY;
+                if (tile.tileX > maxX) maxX = tile.tileX;
+                if (tile.tileY > maxY) maxY = tile.tileY;
             }
             minX -= 1;
             minY -= 1;
@@ -759,32 +760,32 @@ public class Utils {
             IntSet counted = new IntSet();
             for (Ranks.SimpleBuild build : tiles) {
                 // we first have to check if it's a multiblock, cause then we only need to specify the top left corner of the block, cause the block is larger than 1x1
-                if (build.isMultiblock) {
 
-                }
-
-                if (build.blockName.contains("build")) continue;
+                if (build.block.localizedName.contains("build")) continue;
 //                debug("x: " + build.x + " y: " + build.y + " block: " + build.blockName);
                 // (Block block, int x, int y, Object config, byte rotation
 //                stiles.add(new Schematic.Stile(Vars.content.block(build.blockName), build.x - minX, build.y - minY, build.config, build.rotation));
                 // log the place where the block was placed in the schem
-                Building tile = build.building;
-                Block realBlock = tile == null ? null : tile instanceof ConstructBlock.ConstructBuild cons ? cons.current : tile.block;
+                Block realBlock = build.realBlock;
 
-                if (tile != null && !counted.contains(tile.pos()) && realBlock != null
+                if (build != null && !counted.contains(build.pos()) && realBlock != null
                         && (realBlock.isVisible() || realBlock instanceof CoreBlock)) {
-                    Object config = tile instanceof ConstructBlock.ConstructBuild cons ? cons.lastConfig : tile.config();
-
-                    stiles.add(new Schematic.Stile(realBlock, tile.tileX() - minX, tile.tileY() - minY, config, (byte) tile.rotation));
-                    counted.add(tile.pos());
+                    Object config = build.config;
+                    stiles.add(new Schematic.Stile(realBlock, build.tileX - minX, build.tileY - minY, config, (byte) build.rotation));
+                    counted.add(build.pos());
                 }
-//                                        Log.info("[Anti-griefer-system] " + event.unit.getPlayer().name + " destroyed " + building.block.localizedName + " at " + (tile.x - minX) + ", " + (tile.y - minY) + " rotation: " + building.rotation);
+//                                        Log.info("[Anti-griefer-system] " + event.unit.getPlayer().name + " destroyed " + building.block.localizedName + " at " + (tile.tileX - minX) + ", " + (tile.tileY - minY) + " rotation: " + building.rotation);
             }
             Schematic schematic = new Schematic(stiles, new StringMap(), maxX + 2, maxY + 2);
             debug(new Schematics().writeBase64(schematic));
             try {
-                // render the image
-                BufferedImage image = contentHandler.previewSchematic(schematic);
+                BufferedImage image;
+                if (Config.autoBanSystem) {
+                    // render the image
+                    image = contentHandler.previewSchematic(schematic);
+                } else {
+                    image = ImageIO.read(new File(Config.assetsDir + "/sprites/error.png"));
+                }
                 return new SchemImage(image, minX, minY, maxX + minX, maxY + minY);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -826,17 +827,16 @@ public class Utils {
             }
         }
 
-        for (Ranks.SimpleBuild t : dBuilds) {
-            Building linked = t.building;
-            Block realBlock = linked == null ? null : linked instanceof ConstructBlock.ConstructBuild cons ? cons.current : linked.block;
+        for (Ranks.SimpleBuild tile : dBuilds) {
+            Block realBlock = tile.realBlock;
 
-            if (linked != null && realBlock != null && (realBlock.isVisible() || realBlock instanceof CoreBlock)) {
+            if (tile != null && realBlock != null && (realBlock.isVisible() || realBlock instanceof CoreBlock)) {
                 int top = realBlock.size / 2;
                 int bot = realBlock.size % 2 == 1 ? -realBlock.size / 2 : -(realBlock.size - 1) / 2;
-                minx = Math.min(linked.tileX() + bot, minx);
-                miny = Math.min(linked.tileY() + bot, miny);
-                maxx = Math.max(linked.tileX() + top, maxx);
-                maxy = Math.max(linked.tileY() + top, maxy);
+                minx = Math.min(tile.tileX + bot, minx);
+                miny = Math.min(tile.tileY + bot, miny);
+                maxx = Math.max(tile.tileX + top, maxx);
+                maxy = Math.max(tile.tileY + top, maxy);
                 found = true;
             }
         }
@@ -869,15 +869,14 @@ public class Utils {
         }
 
         for (Ranks.SimpleBuild b : dBuilds) {
-            Building tile = b.building;
-            Block realBlock = tile == null ? null : tile instanceof ConstructBlock.ConstructBuild cons ? cons.current : tile.block;
+            Block realBlock = b.realBlock;
 
-            if (tile != null && !counted.contains(tile.pos()) && realBlock != null
+            if (b != null && !counted.contains(b.pos()) && realBlock != null
                     && (realBlock.isVisible() || realBlock instanceof CoreBlock)) {
-                Object config = tile instanceof ConstructBlock.ConstructBuild cons ? cons.lastConfig : tile.config();
+                Object config = b.config;
 
-                tiles.add(new Schematic.Stile(realBlock, tile.tileX() + offsetX, tile.tileY() + offsetY, config, (byte) tile.rotation));
-                counted.add(tile.pos());
+                tiles.add(new Schematic.Stile(realBlock, b.tileX() + offsetX, b.tileY() + offsetY, config, (byte) b.rotation));
+                counted.add(b.pos());
             }
         }
 

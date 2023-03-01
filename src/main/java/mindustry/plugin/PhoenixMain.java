@@ -36,10 +36,10 @@ import static mindustry.Vars.state;
 import static mindustry.plugin.database.Database.*;
 import static mindustry.plugin.discord.Channels.LIVE_LOG;
 import static mindustry.plugin.minimods.Communication.autoScreenMessages;
+import static mindustry.plugin.minimods.Logs.live_log_message;
 import static mindustry.plugin.minimods.Ranks.newPlayers;
 import static mindustry.plugin.utils.Utils.escapeEverything;
 import static mindustry.plugin.utils.Utils.getArrayListFromString;
-import static mindustry.plugin.minimods.Logs.live_log_message;
 
 public class PhoenixMain extends Plugin {
     //    public static final File prefsFile = new File("prefs.properties");
@@ -121,6 +121,9 @@ public class PhoenixMain extends Plugin {
             }
             if (configData.has("beta")) {
                 Config.beta = configData.getBoolean("beta");
+            }
+            if (configData.has("img_auto_ban_system")) {
+                Config.autoBanSystem = configData.getBoolean("img_auto_ban_system");
             }
 
             // connect to database
@@ -229,7 +232,7 @@ public class PhoenixMain extends Plugin {
         // delete all duplicate names
         Database.deleteAllDuplicateNames();
         Events.on(EventType.ServerLoadEvent.class, event -> {
-            contentHandler = new ContentHandler();
+            if (Config.autoBanSystem) contentHandler = new ContentHandler();
             DiscordVars.api.updateActivity(
                     Strings.stripColors(Vars.state.map.name()) +
                             " with " + Groups.player.size() +

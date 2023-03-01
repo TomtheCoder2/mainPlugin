@@ -11,4 +11,5 @@ public class Config {
     public static boolean mapRating;
     public static String assetsDir;
     public static boolean beta;
+    public static boolean autoBanSystem;
 }

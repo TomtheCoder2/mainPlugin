@@ -107,7 +107,7 @@ public class Report implements MiniMod {
                                 Button.secondary("report-discuss", "Report Discussion")
                         );
 //                        .send(Channels.GR_REPORT);
-                warnDiscord(player, player.uuid(), Utils.escapeEverything(player.name), reason);
+                warnDiscord(found, found.uuid(), Utils.escapeEverything(player.name), reason);
                 Call.sendMessage(found.name + "[sky] is reported to discord.");
             }
         });

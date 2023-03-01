@@ -1,6 +1,8 @@
 package mindustry.plugin.minimods;
 
+import arc.Core;
 import arc.Events;
+import arc.math.geom.Point2;
 import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.struct.Seq;
@@ -24,6 +26,7 @@ import mindustry.plugin.utils.*;
 import mindustry.ui.Menus;
 import mindustry.world.Block;
 import mindustry.world.Tile;
+import mindustry.world.blocks.ConstructBlock;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.Button;
@@ -40,7 +43,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static arc.util.Log.debug;
 import static java.lang.Math.max;
-import static java.lang.Math.random;
 import static mindustry.Vars.world;
 import static mindustry.plugin.database.Database.getNames;
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
@@ -60,7 +62,7 @@ public class Ranks implements MiniMod {
     public static final ObjectSet<String> normalPlayers = new ObjectSet<>();
     public static final ObjectSet<SimpleBuild> deconstructionStarted = new ObjectSet<>();
     // creating a random key that gets appended to the button internal names for the discord interaction, so that its possible to run multiple servers with the same bot
-    private static final int randomKey = ThreadLocalRandom.current().nextInt(0, 1000 + 1);
+    private static int randomKey = 0;
     private final static String promotionMessage = """
             [sky]%player%, you have been promoted to [sky]<%rank%>[]!
             [#4287f5]You reached a playtime of - %playtime% minutes!
@@ -151,7 +153,7 @@ public class Ranks implements MiniMod {
                         for (int y = minY - n; y < maxY + n; y++) {
                             var tile = world.tile(x, y);
                             if (tile != null && tile.build != null) {
-                                blocks.add(new SimpleBuild(tile.build.block().localizedName, tile.x, tile.y, (byte) tile.build.rotation, tile.build.config(), tile.build.block.isMultiblock(), world.build(tile.x, tile.y)));
+                                blocks.add(new SimpleBuild(world.build(tile.x, tile.y)));
 //                                debug("Added block: " + tile.build.block().localizedName + " at " + tile.x + ", " + tile.y);
                             }
                         }
@@ -197,7 +199,7 @@ public class Ranks implements MiniMod {
                 }
 
                 // warn mods
-                EmbedBuilder eb = new EmbedBuilder().setTitle("Potential Griefer Online (Auto Ban System)")
+                EmbedBuilder eb = new EmbedBuilder().setTitle("Potential Griefer Online (" + reporter + ")")
                         .addField("Name", Utils.escapeEverything(p.name))
                         .addField("Phash", Utils.calculatePhash(uuid))
                         .addField("Coords", "Player: **" + p.tileX() + "**, **" + p.tileY() + "**\n" +
@@ -236,6 +238,16 @@ public class Ranks implements MiniMod {
 
     @Override
     public void registerEvents() {
+        // load random key from settings
+        var randKey = Core.settings.getInt("randomKey");
+        if (randKey == 0) {
+            randKey = randomKey = ThreadLocalRandom.current().nextInt(0, 100000 + 1);
+            Log.info("Set randomKey = " + randomKey);
+            Core.settings.put("randomKey", randKey);
+        } else {
+            randomKey = randKey;
+            Log.info("Loaded randomKey = " + randomKey);
+        }
         // -- MAP SECTION -- //
         Events.on(EventType.WorldLoadEvent.class, event -> {
             // reset start time
@@ -429,8 +441,8 @@ public class Ranks implements MiniMod {
             try {
                 if (event.tile.build == null) return;
 //                debug("TilePreChangeEvent, block: " + event.tile.build.block().localizedName + ", name: " + event.tile.block().name);
-                deconstructionStarted.remove(new SimpleBuild("", event.tile.x, event.tile.y, (byte) 0, null, false, world.build(event.tile.x, event.tile.y)));
-                deconstructionStarted.add(new SimpleBuild(event.tile.build.block().localizedName, event.tile.x, event.tile.y, (byte) event.tile.build.rotation, event.tile.build.config(), event.tile.build.block.isMultiblock(), world.build(event.tile.x, event.tile.y)));
+                deconstructionStarted.remove(new SimpleBuild(world.build(event.tile.x, event.tile.y)));
+                deconstructionStarted.add(new SimpleBuild(world.build(event.tile.x, event.tile.y)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -439,6 +451,7 @@ public class Ranks implements MiniMod {
         // clear the deconstructionStarted map after game over, so there are no problems with the next game and no memory leak
         Events.on(EventType.GameOverEvent.class, event -> {
             deconstructionStarted.clear();
+            buildingsDestroyedCache.clear();
         });
 
         Events.on(EventType.WorldLoadEvent.class, event -> {
@@ -448,7 +461,7 @@ public class Ranks implements MiniMod {
                     if (tile.build != null) {
                         if (tile.build.team.isAI()) continue;
                         if (!Arrays.asList(excludedBlocksAntiGriefSystem).contains(tile.block())) continue;
-                        deconstructionStarted.add(new SimpleBuild(tile.build.block().localizedName, tile.x, tile.y, (byte) tile.build.rotation, tile.build.config(), tile.build.block.isMultiblock(), world.build(tile.x, tile.y)));
+                        deconstructionStarted.add(new SimpleBuild(world.build(tile.x, tile.y)));
                     }
                 }
             } catch (Exception e) {
@@ -462,6 +475,7 @@ public class Ranks implements MiniMod {
             try {
                 if (event.unit.getPlayer() == null) return;
                 String uuid = event.unit.getPlayer().uuid();
+//                debug("current size of deconstruction cache: " + deconstructionStarted.size);
 
                 if (event.tile.block() != null) {
                     if (!event.breaking) {
@@ -469,7 +483,8 @@ public class Ranks implements MiniMod {
                         // this will increase the buildingsbuilt stats but its more important to stop griefing
 //                    if (!Arrays.asList(excludedBlocks).contains(event.tile.block())) {
                         buildingsBuiltCache.put(uuid, buildingsBuiltCache.get(uuid, 0) + 1);
-                        deconstructionStarted.add(new SimpleBuild(tile.build.block().localizedName, tile.x, tile.y, (byte) tile.build.rotation, tile.build.config(), tile.build.block.isMultiblock(), world.build(event.tile.x, event.tile.y)));
+                        deconstructionStarted.remove(new SimpleBuild(world.build(event.tile.x, event.tile.y)));
+                        deconstructionStarted.add(new SimpleBuild(world.build(event.tile.x, event.tile.y)));
 //                    }
                     } else {
                         if (!Arrays.asList(excludedBlocksAntiGriefSystem).contains(event.tile.block())) {
@@ -479,14 +494,14 @@ public class Ranks implements MiniMod {
                             // search event.tile in deconstructionStarted
                             var found = false;
                             for (SimpleBuild build : deconstructionStarted) {
-                                if (build.x == event.tile.x && build.y == event.tile.y) {
-                                    if (build.blockName.contains("build")) {
+                                if (build.tileX == event.tile.x && build.tileY == event.tile.y) {
+                                    if (build.block.localizedName.contains("build")) {
                                         // this is an invalid block so we remove it
                                         deconstructionStarted.remove(build);
                                         continue;
                                     }
                                     // if the tile is found, save the name of the block
-//                                    debug("DS: Building destroyed: " + deconstructionStarted.get(build));
+                                    debug("DS: Building destroyed: " + deconstructionStarted.get(build));
                                     cache.add(deconstructionStarted.get(build));
                                     buildingsDestroyedCache.put(uuid, cache);
                                     deconstructionStarted.remove(build);
@@ -495,8 +510,8 @@ public class Ranks implements MiniMod {
                                 }
                             }
                             if (!found) {
-//                                debug("Building destroyed: " + event.tile.block().localizedName);
-                                cache.add(new SimpleBuild(event.tile.block().localizedName, event.tile.x, event.tile.y, (byte) 0, null, false, world.build(event.tile.x, event.tile.y)));
+                                debug("Building destroyed: " + world.build(event.tile.x, event.tile.y).block.localizedName);
+                                cache.add(new SimpleBuild(world.build(event.tile.x, event.tile.y)));
                             }
                             buildingsDestroyedCache.put(uuid, cache);
                         }
@@ -950,55 +965,49 @@ public class Ranks implements MiniMod {
 
     public static class SimpleBuild {
 
-        public final Building building;
-        public short x;
-        public short y;
-        public String blockName;
-        public byte rotation;
+        public Block block;
+        public int tileX, tileY;
+        public Block realBlock;
         public Object config;
-        public boolean isMultiblock;
+        public int rotation;
 
-        public SimpleBuild(String blockName, short x, short y, byte rotation, Object config, boolean isMultiblock, Building building) {
-            this.blockName = blockName;
-            this.x = x;
-            this.y = y;
-            this.rotation = rotation;
-            this.config = config;
-            this.isMultiblock = isMultiblock;
-            this.building = building;
+        public SimpleBuild(Building building) {
+            this.block = building.block;
+            this.tileX = building.tileX();
+            this.tileY = building.tileY();
+            realBlock = building == null ? null : building instanceof ConstructBlock.ConstructBuild cons ? cons.current : building.block;
+            config = building instanceof ConstructBlock.ConstructBuild cons ? cons.lastConfig : building.config();
+            rotation = building.rotation;
         }
 
-        public SimpleBuild() {
-            this.blockName = "";
-            this.x = 0;
-            this.y = 0;
-            this.rotation = 0;
-            this.config = null;
-            this.isMultiblock = false;
-            this.building = null;
+        public int pos() {
+            return Point2.pack(tileX, tileY);
+        }
+
+        public int tileX() {
+            return tileX;
+        }
+
+        public int tileY() {
+            return tileY;
         }
 
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof SimpleBuild that)) return false;
-            return x == that.x && y == that.y;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(blockName, x, y);
+            return tileX == that.tileX && tileY == that.tileY;
         }
 
         @Override
         public String toString() {
             return "SimpleBuild{" +
-                    "x=" + x +
-                    ", y=" + y +
-                    ", blockName='" + blockName + '\'' +
-                    ", rotation=" + rotation +
+                    "block=" + block +
+                    ", tileX=" + tileX +
+                    ", tileY=" + tileY +
+                    ", realBlock=" + realBlock +
                     ", config=" + config +
-                    ", isMultiblock=" + isMultiblock +
+                    ", rotation=" + rotation +
                     '}';
         }
     }
