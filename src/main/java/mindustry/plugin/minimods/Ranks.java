@@ -12,6 +12,7 @@ import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.content.Blocks;
+import mindustry.core.GameState;
 import mindustry.game.EventType;
 import mindustry.gen.Building;
 import mindustry.gen.Call;
@@ -244,6 +245,7 @@ public class Ranks implements MiniMod {
             randKey = randomKey = ThreadLocalRandom.current().nextInt(0, 100000 + 1);
             Log.info("Set randomKey = " + randomKey);
             Core.settings.put("randomKey", randKey);
+            Core.settings.autosave();
         } else {
             randomKey = randKey;
             Log.info("Loaded randomKey = " + randomKey);
@@ -264,6 +266,7 @@ public class Ranks implements MiniMod {
         });
 
         Events.on(EventType.PlayerJoin.class, event -> {
+            Vars.state.set(GameState.State.playing);
             Timer.schedule(() -> {
                 if (event.player.con == null || !event.player.con.isConnected()) return;
                 rateMenu(event.player);
@@ -558,6 +561,12 @@ public class Ranks implements MiniMod {
             newPlayers.remove(event.player.uuid());
             // also from warned
             warned.remove(event.player.uuid());
+            // pause game if no one is online
+            debug("player online: @", Groups.player.size());
+            if (Groups.player.size() <= 1) {
+                debug("Pausing server cause no one is online");
+                Vars.state.set(GameState.State.paused);
+            }
         });
 
         Timer.schedule(new Timer.Task() {
