@@ -40,6 +40,7 @@ public class Communication implements MiniMod {
     public static ArrayList<String> autoScreenMessages = new ArrayList<>();
     private final Seq<String> screenMessages = new Seq<>();
     private Announcement announcement = null;
+    private Seq<String> disabledScreenMessages = new Seq<>();
 
     private static void showAnnouncement(Announcement msg, Player target) {
         int id = Menus.registerMenu((player, selection) -> {
@@ -90,13 +91,22 @@ public class Communication implements MiniMod {
         Timer.schedule(() -> {
             int ypos = 300;
             for (String message : screenMessages) {
-                Call.infoPopup(message, 10f, Align.topRight, ypos, 0, 0, 0);
+//                Call.infoPopup(message, 10f, Align.topRight, ypos, 0, 0, 0);
+                for (Player p : Groups.player) {
+                    if (!disabledScreenMessages.contains(p.uuid())) {
+                        Call.infoPopup(p.con, message, 10f, Align.topRight, ypos, 0, 0, 0);
+                    }
+                }
                 ypos += message.split("\n").length * 20;
                 ypos += 20;
             }
 
             for (String message : autoScreenMessages) {
-                Call.infoPopup(message, 10f, Align.topRight, ypos, 0, 0, 0);
+                for (Player p : Groups.player) {
+                    if (!disabledScreenMessages.contains(p.uuid())) {
+                        Call.infoPopup(p.con, message, 10f, Align.topRight, ypos, 0, 0, 0);
+                    }
+                }
                 ypos += message.split("\n").length * 20;
                 ypos += 20;
             }
@@ -414,6 +424,15 @@ public class Communication implements MiniMod {
 
             if (Vars.state.rules.mode() != Gamemode.pvp) {
                 Channels.CHAT.sendMessage("<T> **" + Utils.escapeEverything(player.name) + "**: " + Strings.stripGlyphs(message));
+            }
+        });
+        handler.<Player>register("screenMessages", "<true|false>", "Toggle screen messages", (args, player) -> {
+            if (args[0].equals("true")) {
+                player.sendMessage("[green]Screen messages enabled");
+                disabledScreenMessages.remove(player.uuid());
+            } else {
+                player.sendMessage("[scarlet]Screen messages disabled");
+                disabledScreenMessages.add(player.uuid());
             }
         });
     }
