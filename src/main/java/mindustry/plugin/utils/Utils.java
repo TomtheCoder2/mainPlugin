@@ -148,7 +148,7 @@ public class Utils {
     public static String subRankMarker(ArrayList<Integer> ranks) {
         StringBuilder sb = new StringBuilder();
         for (Integer rank : ranks) {
-            sb.append("[accent]|[#" + SubRank.all[rank].color.toString().substring(0, 6) + "]" + SubRank.all[rank].tag + "[accent]|");
+            sb.append("[accent][#" + SubRank.all[rank].color.toString().substring(0, 6) + "]" + SubRank.all[rank].tag + "[accent]|");
         }
         return sb.toString();
     }
