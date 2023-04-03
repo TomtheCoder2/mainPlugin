@@ -181,7 +181,9 @@ public class PhoenixMain extends Plugin {
         });
 
         // Initialize discord stuff
-        Channels.BOT.addMessageCreateListener(registrar::dispatchEvent);
+        for (var b : Channels.BOT) {
+            b.addMessageCreateListener(registrar::dispatchEvent);
+        }
         Channels.ADMIN_BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.APPRENTICE_BOT.addMessageCreateListener(registrar::dispatchEvent);
         Channels.MOD_BOT.addMessageCreateListener(registrar::dispatchEvent);
@@ -353,7 +355,9 @@ public class PhoenixMain extends Plugin {
             if (Groups.player.size() > 0) {
                 EmbedBuilder gameOverEmbed = new EmbedBuilder().setTitle("Game over!").setDescription("Map " + escapeEverything(state.map.name()) + " ended with " + state.wave + " waves and " + Groups.player.size() + " players!").setColor(DiscordPalette.INFO);
                 Channels.LOG.sendMessage(gameOverEmbed);
-                Channels.CHAT.sendMessage(gameOverEmbed);
+                for (var c : Channels.CHAT) {
+                    c.sendMessage(gameOverEmbed);
+                }
             }
         });
 

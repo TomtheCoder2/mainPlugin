@@ -4,6 +4,7 @@ import arc.Core;
 import arc.files.Fi;
 import arc.struct.Seq;
 import arc.util.Log;
+import arc.util.Strings;
 import mindustry.Vars;
 import mindustry.mod.Mods.LoadedMod;
 import mindustry.mod.Plugin;
@@ -22,9 +23,13 @@ import java.util.concurrent.CompletableFuture;
 
 public class Mods implements MiniMod {
     private static LoadedMod findModByName(String name) {
-        return Vars.mods.list().find(m ->
-                Utils.escapeColorCodes(m.meta.displayName).equalsIgnoreCase(name) ||
-                        Utils.escapeColorCodes(m.meta.name).equalsIgnoreCase(name));
+        return Vars.mods.list().find(m -> {
+            if (m.meta.displayName == null) {
+                return Strings.stripColors(m.meta.name).equalsIgnoreCase(name);
+            }
+            return Strings.stripColors(m.meta.displayName).equalsIgnoreCase(name) ||
+                    Strings.stripColors(m.meta.name).equalsIgnoreCase(name);
+        });
     }
 
     @Override

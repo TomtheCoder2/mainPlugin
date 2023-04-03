@@ -84,7 +84,9 @@ public class Communication implements MiniMod {
                         message = message.replace(bw, genRandomString(bw.length()));
                     }
                 }
-                Channels.CHAT.sendMessage("**" + Utils.escapeEverything(event.player.name) + "**: " + message);
+                for (var c : Channels.CHAT) {
+                    c.sendMessage("**" + Utils.escapeEverything(player.name) + "**: " + message);
+                }
             }
         });
 
@@ -111,23 +113,24 @@ public class Communication implements MiniMod {
                 ypos += 20;
             }
         }, 10f, 10f);
+        for (var c : Channels.CHAT) {
+            c.addMessageCreateListener(event -> {
+                if (!event.getMessageAuthor().isRegularUser()) {
+                    return;
+                }
 
-        Channels.CHAT.addMessageCreateListener(event -> {
-            if (!event.getMessageAuthor().isRegularUser()) {
-                return;
-            }
+                var server = event.getServer().get();
+                var author = event.getMessageAuthor().asUser().get();
+                String name = "";
+                if (author.getNickname(server).isPresent()) {
+                    name = author.getNickname(server) + " (" + author.getDiscriminatedName() + ")";
+                } else {
+                    name = author.getDiscriminatedName();
+                }
 
-            var server = event.getServer().get();
-            var author = event.getMessageAuthor().asUser().get();
-            String name = "";
-            if (author.getNickname(server).isPresent()) {
-                name = author.getNickname(server) + " (" + author.getDiscriminatedName() + ")";
-            } else {
-                name = author.getDiscriminatedName();
-            }
-
-            Call.sendMessage("[sky]" + name + ":[white] " + event.getMessageContent());
-        });
+                Call.sendMessage("[sky]" + name + ":[white] " + event.getMessageContent());
+            });
+        }
 
         Events.on(EventType.PlayerJoin.class, event -> {
             Timer.schedule(() -> {
@@ -423,7 +426,9 @@ public class Communication implements MiniMod {
             Groups.player.each(p -> p.team() == player.team(), o -> o.sendMessage(raw, player, message));
 
             if (Vars.state.rules.mode() != Gamemode.pvp) {
-                Channels.CHAT.sendMessage("<T> **" + Utils.escapeEverything(player.name) + "**: " + Strings.stripGlyphs(message));
+                for (var c : Channels.CHAT) {
+                    c.sendMessage("<T> **" + Utils.escapeEverything(player.name) + "**: " + Strings.stripGlyphs(message));
+                }
             }
         });
         handler.<Player>register("screenMessages", "<true|false>", "Toggle screen messages", (args, player) -> {
