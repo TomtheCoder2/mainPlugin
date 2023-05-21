@@ -172,7 +172,7 @@ public class Pets implements MiniMod {
     @Override
     public void registerEvents() {
         for (UnitType unit : Vars.content.units()) {
-            if (unit.itemCapacity <= 0) {
+            if (unit.itemCapacity == 0) {
                 unit.itemCapacity = 10;
             }
         }
