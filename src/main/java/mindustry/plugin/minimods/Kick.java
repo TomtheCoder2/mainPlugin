@@ -2,10 +2,7 @@ package mindustry.plugin.minimods;
 
 import arc.Events;
 import arc.struct.ObjectMap;
-import arc.util.CommandHandler;
-import arc.util.Log;
-import arc.util.Strings;
-import arc.util.Timer;
+import arc.util.*;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -17,6 +14,7 @@ import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.utils.*;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.time.Instant;
@@ -73,6 +71,7 @@ public class Kick implements MiniMod {
         if (plaintiff != null) {
             plaintiffName = plaintiff.name;
         }
+        Events.fire(new KickEvent(session.target, session.startTicks));
 
         long banUntil = Instant.now().getEpochSecond() + KICK_DURATION;
         Database.Player pd = Database.getPlayerData(session.target);
@@ -292,6 +291,10 @@ public class Kick implements MiniMod {
         public String plaintiff = null;
 
         /**
+         * When the votekick started, in ticks
+         */
+        public float startTicks = Time.time;
+        /**
          * Time in which votekick ends
          */
         public long endTime = -1;
@@ -395,6 +398,17 @@ public class Kick implements MiniMod {
                         .addField("Plaintiff:", Utils.escapeEverything(plaintiff != null ? plaintiff.name + "\n" : "") + session.plaintiff);
                 Channels.LOG.sendMessage(eb);
             }
+        }
+    }
+
+    public static class KickEvent {
+        public float startTicks;
+        public String uuid;
+
+
+        public KickEvent(@NotNull String uuid, float startTicks) {
+            this.uuid = uuid;
+            this.startTicks = startTicks;
         }
     }
 }

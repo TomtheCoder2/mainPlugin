@@ -57,6 +57,7 @@ public class PhoenixMain extends Plugin {
             new mindustry.plugin.minimods.Inspector(),
             new mindustry.plugin.minimods.JS(),
             new mindustry.plugin.minimods.Kick(),
+            new mindustry.plugin.minimods.Undo(),
             new mindustry.plugin.minimods.Logs(),
             new mindustry.plugin.minimods.Management(),
             new mindustry.plugin.minimods.Maps(),
