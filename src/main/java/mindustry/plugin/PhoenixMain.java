@@ -92,40 +92,41 @@ public class PhoenixMain extends Plugin {
             JSONObject data = new JSONObject(new JSONTokener(pureJson));
 
             // url to connect to the MindServ
-            Config.mapsURL = data.getString("maps_url");
+//            Config.mapsURL = data.getString("maps_url");
 
             JSONObject discordData = data.getJSONObject("discord");
-            DiscordVars.invite = discordData.getString("invite");
+            DiscordVars.invite = discordData.optString("invite");
             String discordToken = discordData.getString("token");
             try {
                 api = new DiscordApiBuilder().setToken(discordToken).login().join();
                 Log.info("Logged in as: " + api.getYourself());
+                DiscordVars.api = api;
             } catch (Exception e) {
                 Log.err("Couldn't log into discord.");
                 Core.app.exit();
                 return;
             }
-            Channels.load(api, discordData.getJSONObject("channels"));
-            Roles.load(api, discordData.getJSONObject("roles"));
-            String discordPrefix = discordData.getString("prefix");
+            Channels.load(api, discordData.optJSONObject("channels"));
+//            Roles.load(api, discordData.getJSONObject("roles"));
+            String discordPrefix = discordData.optString("prefix", "%");
             DiscordVars.prefix = discordPrefix;
             registrar = new DiscordRegistrar(discordPrefix);
 
             Config.serverName = data.getString("server_name");
-            Config.ipApiKey = data.getString("ipapi_key");
+            Config.ipApiKey = data.optString("ipapi_key");
 
-            JSONObject configData = data.getJSONObject("config");
-            Config.previewSchem = configData.getBoolean("preview_schem");
-            Config.assetsDir = configData.getString("assets_dir");
-            if (configData.has("map_rating")) {
-                Config.mapRating = configData.getBoolean("map_rating");
-            }
-            if (configData.has("beta")) {
-                Config.beta = configData.getBoolean("beta");
-            }
-            if (configData.has("img_auto_ban_system")) {
-                Config.autoBanSystem = configData.getBoolean("img_auto_ban_system");
-            }
+//            JSONObject configData = data.getJSONObject("config");
+//            Config.previewSchem = configData.getBoolean("preview_schem");
+//            Config.assetsDir = configData.getString("assets_dir");
+//            if (configData.has("map_rating")) {
+//                Config.mapRating = configData.getBoolean("map_rating");
+//            }
+//            if (configData.has("beta")) {
+//                Config.beta = configData.getBoolean("beta");
+//            }
+//            if (configData.has("img_auto_ban_system")) {
+//                Config.autoBanSystem = configData.getBoolean("img_auto_ban_system");
+//            }
 
             // connect to database
             JSONObject databaseData = data.getJSONObject("database");
@@ -159,7 +160,6 @@ public class PhoenixMain extends Plugin {
         }
 
         try {
-            DiscordVars.api = api;
             for (MiniMod mod : minimods) {
                 mod.registerDiscordCommands(registrar);
             }

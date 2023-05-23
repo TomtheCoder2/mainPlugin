@@ -30,6 +30,7 @@ public final class Database {
      */
     public static void connect(String url, String user, String password, String playerTable) throws SQLException {
         try {
+            Class.forName("org.sqlite.JDBC");
             Class.forName("org.postgresql.Driver");
         } catch (Exception e) {
             e.printStackTrace();
