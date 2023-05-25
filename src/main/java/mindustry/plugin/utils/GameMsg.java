@@ -1,5 +1,7 @@
 package mindustry.plugin.utils;
 
+import arc.util.Strings;
+
 /**
  * Utility package for formatting in-game messages.
  */
@@ -27,12 +29,24 @@ public class GameMsg {
         return "[scarlet]<[blue]" + category + "[scarlet]>: " + msg;
     }
 
+    public static String error(String category, String msg, Object... args) {
+        return "[scarlet]<[blue]" + category + "[scarlet]>: " + Strings.format(msg, args);
+    }
+
     public static String info(String category, String msg) {
         return "[accent]<[blue]" + category + "[accent]>: " + msg;
     }
 
+    public static String info(String category, String msg, Object... args) {
+        return "[accent]<[blue]" + category + "[accent]>: " + Strings.format(msg, args);
+    }
+
     public static String success(String category, String msg) {
         return "[green]<[blue]" + category + "[green]>: " + msg;
+    }
+
+    public static String success(String category, String msg, Object... args) {
+        return "[green]<[blue]" + category + "[green]>: " + String.format(msg, args);
     }
 
     public static String custom(String category, String color, String msg) {
