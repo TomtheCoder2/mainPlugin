@@ -17,6 +17,7 @@ import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.utils.*;
+import mindustry.plugin.minimods.Sessions;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
@@ -71,7 +72,9 @@ public class PhoenixMain extends Plugin {
             new mindustry.plugin.minimods.ServerInfo(),
             new mindustry.plugin.minimods.Skipwave(),
             new mindustry.plugin.minimods.Translate(),
-            new mindustry.plugin.minimods.Weapon()
+            new mindustry.plugin.minimods.Weapon(),
+            new Sessions() {
+            }
     );
 
     // register event handlers and create variables in the constructor

@@ -71,8 +71,7 @@ public class Kick implements MiniMod {
         if (plaintiff != null) {
             plaintiffName = plaintiff.name;
         }
-        Events.fire(new KickEvent(session.target, session.startTicks));
-
+        Undo.instance.rollback(session.target, session.startTime - (3 * 60 * 1000L));
         long banUntil = Instant.now().getEpochSecond() + KICK_DURATION;
         Database.Player pd = Database.getPlayerData(session.target);
         if (pd == null) {
@@ -291,9 +290,9 @@ public class Kick implements MiniMod {
         public String plaintiff = null;
 
         /**
-         * When the votekick started, in ticks
+         * When the votekick started
          */
-        public float startTicks = Time.time;
+        public long startTime = Time.millis();
         /**
          * Time in which votekick ends
          */
@@ -398,17 +397,6 @@ public class Kick implements MiniMod {
                         .addField("Plaintiff:", Utils.escapeEverything(plaintiff != null ? plaintiff.name + "\n" : "") + session.plaintiff);
                 Channels.LOG.sendMessage(eb);
             }
-        }
-    }
-
-    public static class KickEvent {
-        public float startTicks;
-        public String uuid;
-
-
-        public KickEvent(@NotNull String uuid, float startTicks) {
-            this.uuid = uuid;
-            this.startTicks = startTicks;
         }
     }
 }
