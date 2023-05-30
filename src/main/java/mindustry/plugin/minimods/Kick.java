@@ -141,7 +141,7 @@ public class Kick implements MiniMod {
                 return;
             }
 
-            if (Groups.player.size() < 3 && false) {
+            if (Groups.player.size() < 3) {
                 player.sendMessage(GameMsg.error("Kick", "At least 3 people are required to start a votekick."));
                 return;
             }

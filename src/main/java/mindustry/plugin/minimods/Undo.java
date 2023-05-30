@@ -60,7 +60,7 @@ public class Undo implements MiniMod {
 				player.sendMessage(GameMsg.error("Undo", "You can't undo actions of other players, because you are flagged as a potential griefer!"));
 				return;
 			}
-			if (Groups.player.size() < 3 && false) {
+			if (Groups.player.size() < 3) {
 				player.sendMessage(GameMsg.error("Undo", "At least 3 people are required to start an undo."));
 				return;
 			}
