@@ -7,6 +7,7 @@ import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.plugin.MiniMod;
+import mindustry.plugin.database.Database;
 import mindustry.plugin.utils.Cooldowns;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
@@ -15,7 +16,6 @@ import static mindustry.plugin.minimods.Ranks.warned;
 
 public class Undo implements MiniMod {
 	public static TileStore instance;
-
 
 	/**
 	 * Default undo duration in minutes
@@ -90,7 +90,7 @@ public class Undo implements MiniMod {
 		@Override
 		public void addVote(Player player, boolean vote) {
 			if (player.uuid().equals(target)) {
-				player.sendMessage(GameMsg.error("Undo", "You can't vote for your own trail"));
+				player.sendMessage(GameMsg.error("Undo", "You can't vote for your own trial"));
 				return;
 			}
 			super.addVote(player, vote);
@@ -107,19 +107,21 @@ public class Undo implements MiniMod {
 		}
 
 		@Override
-		public boolean onVote(int yes, int no, int players) {
+		public boolean onVote(int yes, int no, int players,@Nullable Player player) {
 			int score = yes-no;
-			if (score > (players/2) || (players <= 3 && score > 2)) {
+			int required = (players/2) + 1;
+			if (score >= required) {
 				instance.rollback(this.target, this.startTime - this.duration * (60 * 1000L));
 				Call.sendMessage(GameMsg.info("Undo", "Vote passed, undoing(@ min)", this.duration));
 				return true;
 			}
+			Call.sendMessage(GameMsg.info("Undo", "@ has voted, (@/@)", player.name, score, required));
 			return false;
 		}
 
 		@Override
 		public String desc() {
-			return Strings.format("Undo session(@ min)", /*Database.getPlayerData(this.target).,*/ this.duration);
+			return Strings.format("Undo for @(@ min)", Query.findPlayerInfo(this.target).lastName, this.duration);
 		}
 	}
 }

@@ -26,9 +26,9 @@ public class Sessions implements MiniMod {
 			player.sendMessage(GameMsg.error("Sessions", "Session \"@\" already exists", found.desc()));
 			return;
 		}
-
 		sessions.put(session.sessionName, session);
 		Call.sendMessage(GameMsg.info("Sessions", session.desc() + " started by " + player.name));
+		session.addVote(player, true);
 	}
 
 	@Override
@@ -96,7 +96,6 @@ public class Sessions implements MiniMod {
 			this.plaintiff = plaintiff.uuid();
 			this.endTime = Time.millis() + voteTime * 1000L;
 			Timer.schedule(this::timerFinished, voteTime);
-			this.addVote(plaintiff, true);
 		}
 
 		public void addVote(Player player, boolean vote) {
@@ -113,7 +112,7 @@ public class Sessions implements MiniMod {
 					no++;
 				}
 			}
-			if (onVote(yes, no, Groups.player.size())) {
+			if (onVote(yes, no, Groups.player.size(), player)) {
 				this.end();
 			}
 		}
@@ -129,7 +128,7 @@ public class Sessions implements MiniMod {
 		 * @param players Total number of players
 		 * @return If true, the Session is marked complete
 		 */
-		public abstract boolean onVote(int yes, int no, int players);
+		public abstract boolean onVote(int yes, int no, int players, Player player);
 
 		public void end() {
 			this.ended = true;
