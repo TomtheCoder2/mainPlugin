@@ -287,7 +287,8 @@ public class PhoenixMain extends Plugin {
                 }
 
                 Rank rank = Rank.all[pd.rank];
-                Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
+                Call.sendMessage(Strings.format("[#@]@ []@[][@] [accent]joined the front!",
+                        rank.color.toString().substring(0, 6), rank.name, player.name, Utils.calculatePhash(player.uuid())));
                 player.name = Utils.formatName(pd, player);
 
 //                // Give Marshals admin

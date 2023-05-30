@@ -154,13 +154,7 @@ public class Kick implements MiniMod {
             }
 
             if (args.length == 0) {
-                StringBuilder builder = new StringBuilder();
-                builder.append("[orange]Players to kick: \n");
-
-                Groups.player.each(p -> !p.admin && p.con != null && p != player, p -> {
-                    builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id()).append(")\n");
-                });
-                player.sendMessage(builder.toString());
+                player.sendMessage(Utils.playerList(p -> !p.admin && p.con != null && p != player));
                 return;
             }
 

@@ -36,7 +36,12 @@ public class Sessions implements MiniMod {
 		final String[] votes = {"y", "n", "c"};
 		for (String voteType : votes) {
 			handler.<Player>register(voteType, "<session>", "Vote for a session", (args, player) -> {
-				Session found = args.length == 0 ? null : sessions.get(args[0]);
+				Session found;
+				if (args.length == 0 && sessions.size == 1) {
+					found = sessions.values().next();
+				} else {
+					found = sessions.get(args[0]);
+				}
 				if (found == null) {
 					String allSessions = String.join("\n", sessions.keys().toSeq());
 					player.sendMessage("Current sessions:\n" + allSessions);

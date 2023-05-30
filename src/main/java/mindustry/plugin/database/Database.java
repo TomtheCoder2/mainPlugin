@@ -30,7 +30,6 @@ public final class Database {
      */
     public static void connect(String url, String user, String password, String playerTable) throws SQLException {
         try {
-//            Class.forName("org.sqlite.JDBC");
             Class.forName("org.postgresql.Driver");
         } catch (Exception e) {
             e.printStackTrace();
@@ -358,8 +357,8 @@ public final class Database {
 
         if (getPlayerData(pd.uuid) == null) {
             // define all variables
-            String sql = "INSERT INTO " + playerTable + "(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid, subranks) "
-                    + "VALUES(?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + playerTable + " (uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid, subranks) "
+                    + "VALUES (?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 // set all variables
