@@ -17,7 +17,6 @@ import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.effect.EffectHelper;
 import mindustry.plugin.utils.*;
-import mindustry.plugin.minimods.Sessions;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
@@ -73,8 +72,7 @@ public class PhoenixMain extends Plugin {
             new mindustry.plugin.minimods.Skipwave(),
             new mindustry.plugin.minimods.Translate(),
             new mindustry.plugin.minimods.Weapon(),
-            new Sessions() {
-            }
+            new mindustry.plugin.minimods.Sessions()
     );
 
     // register event handlers and create variables in the constructor
@@ -110,7 +108,7 @@ public class PhoenixMain extends Plugin {
                 return;
             }
             Channels.load(api, discordData.optJSONObject("channels"));
-//            Roles.load(api, discordData.getJSONObject("roles"));
+            Roles.load(api, discordData.getJSONObject("roles"));
             String discordPrefix = discordData.optString("prefix", "%");
             DiscordVars.prefix = discordPrefix;
             registrar = new DiscordRegistrar(discordPrefix);
@@ -118,18 +116,18 @@ public class PhoenixMain extends Plugin {
             Config.serverName = data.getString("server_name");
             Config.ipApiKey = data.optString("ipapi_key");
 
-//            JSONObject configData = data.getJSONObject("config");
-//            Config.previewSchem = configData.getBoolean("preview_schem");
-//            Config.assetsDir = configData.getString("assets_dir");
-//            if (configData.has("map_rating")) {
-//                Config.mapRating = configData.getBoolean("map_rating");
-//            }
-//            if (configData.has("beta")) {
-//                Config.beta = configData.getBoolean("beta");
-//            }
-//            if (configData.has("img_auto_ban_system")) {
-//                Config.autoBanSystem = configData.getBoolean("img_auto_ban_system");
-//            }
+            JSONObject configData = data.getJSONObject("config");
+            Config.previewSchem = configData.getBoolean("preview_schem");
+            Config.assetsDir = configData.getString("assets_dir");
+            if (configData.has("map_rating")) {
+                Config.mapRating = configData.getBoolean("map_rating");
+            }
+            if (configData.has("beta")) {
+                Config.beta = configData.getBoolean("beta");
+            }
+            if (configData.has("img_auto_ban_system")) {
+                Config.autoBanSystem = configData.getBoolean("img_auto_ban_system");
+            }
 
             // connect to database
             JSONObject databaseData = data.getJSONObject("database");
