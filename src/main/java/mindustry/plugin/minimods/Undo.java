@@ -1,6 +1,7 @@
 package mindustry.plugin.minimods;
 
 import arc.Events;
+import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.util.CommandHandler;
 import arc.util.Log;
@@ -8,8 +9,8 @@ import arc.util.Nullable;
 import arc.util.Strings;
 import me.mars.rollback.RollbackPlugin;
 import me.mars.rollback.TileStore;
-import mindustry.game.EventType.PlayerJoin;
-import mindustry.game.EventType.WorldLoadEvent;
+import mindustry.game.EventType.*;
+import mindustry.game.Team;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
@@ -28,7 +29,7 @@ public class Undo implements MiniMod {
 	 */
 	private static final int UNDO_DURATION = 3;
 	public static TileStore instance;
-	private static ObjectSet<String> players = new ObjectSet<>();
+	private static ObjectMap<String, Team> players = new ObjectMap<>();
 
 	public Undo() {
 		instance = RollbackPlugin.getTileStore();
@@ -38,11 +39,15 @@ public class Undo implements MiniMod {
 	public void registerEvents() {
 		Events.on(WorldLoadEvent.class, worldLoadEvent -> {
 			players.clear();
-			Groups.player.each(p -> players.add(p.uuid()));
+			Groups.player.each(p -> players.put(p.uuid(), p.team()));
 		});
 
 		Events.on(PlayerJoin.class, playerJoin -> {
-			players.add(playerJoin.player.uuid());
+			players.put(playerJoin.player.uuid(), playerJoin.player.team());
+		});
+
+		Events.on(PlayerLeave.class, playerLeave -> {
+			players.put(playerLeave.player.uuid(), playerLeave.player.team());
 		});
 	}
 
@@ -60,7 +65,7 @@ public class Undo implements MiniMod {
 				player.sendMessage(GameMsg.error("Undo", "You can't undo actions of other players, because you are flagged as a potential griefer!"));
 				return;
 			}
-			if (Groups.player.size() < 3) {
+			if (Groups.player.size() < 3 && false) {
 				player.sendMessage(GameMsg.error("Undo", "At least 3 people are required to start an undo."));
 				return;
 			}
@@ -83,13 +88,16 @@ public class Undo implements MiniMod {
 				}
 				target = found.uuid();
 			} else if (info != null){
-				if (!players.contains(info.id)) {
+				Team team  = players.get(info.id, (Team) null);
+				if (info.admin) {
+					player.sendMessage(GameMsg.error("Undo", "Can't undo an admin."));
+					return;
+				} else if (team == null) {
 					Log.info("Id is @", info.id);
 					player.sendMessage(GameMsg.error("Undo", "That player has not joined this round."));
 					return;
-				}
-				if (info.admin) {
-					player.sendMessage(GameMsg.error("Undo", "Can't undo an admin."));
+				} else if (team != player.team()) {
+					player.sendMessage(GameMsg.error("Undo", "Can't undo players on opposing teams."));
 					return;
 				}
 				target = info.id;
@@ -101,7 +109,10 @@ public class Undo implements MiniMod {
 			String finalTarget = target;
 			Sessions.newSession(player, () -> new UndoSession(player, finalTarget, duration));
 		});
+
+//		handler.<Player>register()
 	}
+
 }
 
 class UndoSession extends Sessions.Session {
