@@ -2,13 +2,15 @@ package mindustry.plugin.minimods;
 
 import arc.Events;
 import arc.struct.ObjectMap;
-import arc.struct.ObjectSet;
-import arc.util.CommandHandler;
-import arc.util.Log;
-import arc.util.Nullable;
-import arc.util.Strings;
+import arc.struct.OrderedMap;
+import arc.struct.Seq;
+import arc.util.*;
 import me.mars.rollback.RollbackPlugin;
 import me.mars.rollback.TileStore;
+import me.mars.rollback.actions.Action;
+import me.mars.rollback.actions.BuildAction;
+import me.mars.rollback.actions.ConfigAction;
+import mindustry.Vars;
 import mindustry.game.EventType.*;
 import mindustry.game.Team;
 import mindustry.gen.Call;
@@ -20,6 +22,9 @@ import mindustry.plugin.utils.Cooldowns;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
+import mindustry.world.Tile;
+
+import java.util.Comparator;
 
 import static mindustry.plugin.minimods.Ranks.warned;
 
@@ -30,6 +35,7 @@ public class Undo implements MiniMod {
 	private static final int UNDO_DURATION = 3;
 	public static TileStore instance;
 	private static ObjectMap<String, Team> players = new ObjectMap<>();
+	public static OrderedMap<Player, String> inspectorCache = new OrderedMap<>();
 
 	public Undo() {
 		instance = RollbackPlugin.getTileStore();
@@ -49,6 +55,41 @@ public class Undo implements MiniMod {
 		Events.on(PlayerLeave.class, playerLeave -> {
 			players.put(playerLeave.player.uuid(), playerLeave.player.team());
 		});
+
+		Cooldowns.instance.set("inspector-tap", 1);
+		Events.on(TapEvent.class, tapEvent -> {
+			// TODO: Unsure if this can be out of bounds
+			Player player = tapEvent.player;
+			if (!inspectorCache.containsKey(player)) return;
+			if (!Cooldowns.instance.canRun("inspector-tap", player.uuid())) return;
+			Cooldowns.instance.run("inspector-tap", player.uuid());
+			Tile tile = tapEvent.tile;
+			Seq<Action> actions = instance.get(tile.pos()).all().sort(Comparator.comparingInt(Action::getId)).copy();
+			StringBuilder sb = new StringBuilder("[orange]");
+			sb.append(tile.x).append("[], [orange]").append(tile.y);
+			for (Action action : actions) {
+				sb.append("\n[accent]");
+				sb.append(Strings.formatMillis(Time.timeSinceMillis(action.getTime()))).append(" ago: [white]");
+				String name = Vars.netServer.admins.getInfo(action.getUuid()).lastName;
+				sb.append(name).append(" [sky]- ").append(Utils.calculatePhash(action.getUuid())).append("\n[white]");
+				if (action instanceof BuildAction) {
+					sb.append("Built ").append(((BuildAction)action).getBlock().name);
+				} else {
+					BuildAction prevBuild = (BuildAction) actions.select(a -> a instanceof BuildAction && a.getId() < action.getId())
+							.selectRanked(Comparator.comparingInt(a -> -a.getId()), 1);
+
+					sb.append(action instanceof ConfigAction ? "Configured " : "Deleted ");
+					sb.append(prevBuild != null ? prevBuild.getBlock() : "<???>");
+				}
+			}
+			inspectorCache.put(player, sb.toString());
+		});
+
+		Timer.schedule(() -> {
+			for (var entry : inspectorCache) {
+				Call.infoPopup(entry.key.con, entry.value, 1f, Align.bottomRight, 0, 0, 400, 0);
+			}
+		}, 0f, 1f);
 	}
 
 	@Override
@@ -65,7 +106,7 @@ public class Undo implements MiniMod {
 				player.sendMessage(GameMsg.error("Undo", "You can't undo actions of other players, because you are flagged as a potential griefer!"));
 				return;
 			}
-			if (Groups.player.size() < 3 && false) {
+			if (Groups.player.size() < 3 /*&& false*/) {
 				player.sendMessage(GameMsg.error("Undo", "At least 3 people are required to start an undo."));
 				return;
 			}
@@ -110,7 +151,15 @@ public class Undo implements MiniMod {
 			Sessions.newSession(player, () -> new UndoSession(player, finalTarget, duration));
 		});
 
-//		handler.<Player>register()
+		handler.<Player>register("toggleinspector", "Toggles the tile inspector", (args, player) -> {
+			if (inspectorCache.containsKey(player)) {
+				inspectorCache.remove(player);
+				player.sendMessage(GameMsg.info("Undo", "Inspector disabled"));
+			} else {
+				inspectorCache.put(player, "Click a tile");
+				player.sendMessage(GameMsg.info("Undo", "Inspector enabled"));
+			}
+		});
 	}
 
 }
