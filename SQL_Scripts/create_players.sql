@@ -10,5 +10,6 @@ CREATE TABLE playerdata
     bannedUntil BIGINT,
     banReason VARCHAR,
     discordLink BIGINT,
-    hid VARCHAR
+    hid VARCHAR,
+    subranks INT[]
 )

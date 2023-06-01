@@ -57,6 +57,7 @@ public class PhoenixMain extends Plugin {
             new mindustry.plugin.minimods.Inspector(),
             new mindustry.plugin.minimods.JS(),
             new mindustry.plugin.minimods.Kick(),
+            new mindustry.plugin.minimods.Undo(),
             new mindustry.plugin.minimods.Logs(),
             new mindustry.plugin.minimods.Management(),
             new mindustry.plugin.minimods.Maps(),
@@ -70,7 +71,8 @@ public class PhoenixMain extends Plugin {
             new mindustry.plugin.minimods.ServerInfo(),
             new mindustry.plugin.minimods.Skipwave(),
             new mindustry.plugin.minimods.Translate(),
-            new mindustry.plugin.minimods.Weapon()
+            new mindustry.plugin.minimods.Weapon(),
+            new mindustry.plugin.minimods.Sessions()
     );
 
     // register event handlers and create variables in the constructor
@@ -91,27 +93,28 @@ public class PhoenixMain extends Plugin {
             JSONObject data = new JSONObject(new JSONTokener(pureJson));
 
             // url to connect to the MindServ
-            Config.mapsURL = data.getString("maps_url");
+//            Config.mapsURL = data.getString("maps_url");
 
             JSONObject discordData = data.getJSONObject("discord");
-            DiscordVars.invite = discordData.getString("invite");
+            DiscordVars.invite = discordData.optString("invite");
             String discordToken = discordData.getString("token");
             try {
                 api = new DiscordApiBuilder().setToken(discordToken).login().join();
                 Log.info("Logged in as: " + api.getYourself());
+                DiscordVars.api = api;
             } catch (Exception e) {
                 Log.err("Couldn't log into discord.");
                 Core.app.exit();
                 return;
             }
-            Channels.load(api, discordData.getJSONObject("channels"));
+            Channels.load(api, discordData.optJSONObject("channels"));
             Roles.load(api, discordData.getJSONObject("roles"));
-            String discordPrefix = discordData.getString("prefix");
+            String discordPrefix = discordData.optString("prefix", "%");
             DiscordVars.prefix = discordPrefix;
             registrar = new DiscordRegistrar(discordPrefix);
 
             Config.serverName = data.getString("server_name");
-            Config.ipApiKey = data.getString("ipapi_key");
+            Config.ipApiKey = data.optString("ipapi_key");
 
             JSONObject configData = data.getJSONObject("config");
             Config.previewSchem = configData.getBoolean("preview_schem");
@@ -158,7 +161,6 @@ public class PhoenixMain extends Plugin {
         }
 
         try {
-            DiscordVars.api = api;
             for (MiniMod mod : minimods) {
                 mod.registerDiscordCommands(registrar);
             }
@@ -284,7 +286,8 @@ public class PhoenixMain extends Plugin {
                 }
 
                 Rank rank = Rank.all[pd.rank];
-                Call.sendMessage("[#" + rank.color.toString().substring(0, 6) + "]" + rank.name + "[] " + player.name + "[accent] joined the front!");
+                Call.sendMessage(Strings.format("[#@]@ []@[][@] [accent]joined the front!",
+                        rank.color.toString().substring(0, 6), rank.name, player.name, Utils.calculatePhash(player.uuid())));
                 player.name = Utils.formatName(pd, player);
 
 //                // Give Marshals admin

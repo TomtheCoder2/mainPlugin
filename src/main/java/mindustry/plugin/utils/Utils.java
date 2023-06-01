@@ -2,6 +2,7 @@ package mindustry.plugin.utils;
 
 import arc.Core;
 import arc.Events;
+import arc.func.Boolf;
 import arc.struct.*;
 import arc.util.CommandHandler;
 import arc.util.Strings;
@@ -85,6 +86,18 @@ public class Utils {
 
         // Compile the ReGex
         ipValidationPattern = Pattern.compile(regex);
+    }
+
+    public static String playerList(Boolf<Player> pred) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[orange]List of players: \n");
+        for (Player p : Groups.player) {
+            if (!pred.get(p)) continue;
+            sb.append("[lightgray] ").append(p.name);
+            sb.append("[accent] - ").append(Utils.calculatePhash(p.uuid()));
+            sb.append(" (#").append(p.id()).append(")\n");
+        }
+        return sb.toString();
     }
 
     /**

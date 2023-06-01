@@ -357,8 +357,8 @@ public final class Database {
 
         if (getPlayerData(pd.uuid) == null) {
             // define all variables
-            String sql = "INSERT INTO " + playerTable + "(uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid, subranks) "
-                    + "VALUES(?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO " + playerTable + " (uuid, rank, playTime, buildingsBuilt, gamesPlayed, verified, banned, bannedUntil, banReason, discordLink, hid, subranks) "
+                    + "VALUES (?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 // set all variables

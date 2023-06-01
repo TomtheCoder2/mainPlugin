@@ -2,10 +2,7 @@ package mindustry.plugin.minimods;
 
 import arc.Events;
 import arc.struct.ObjectMap;
-import arc.util.CommandHandler;
-import arc.util.Log;
-import arc.util.Strings;
-import arc.util.Timer;
+import arc.util.*;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -17,6 +14,7 @@ import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.utils.*;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.time.Instant;
@@ -73,7 +71,7 @@ public class Kick implements MiniMod {
         if (plaintiff != null) {
             plaintiffName = plaintiff.name;
         }
-
+        Undo.instance.rollback(session.target, session.startTime - (3 * 60 * 1000L));
         long banUntil = Instant.now().getEpochSecond() + KICK_DURATION;
         Database.Player pd = Database.getPlayerData(session.target);
         if (pd == null) {
@@ -156,13 +154,7 @@ public class Kick implements MiniMod {
             }
 
             if (args.length == 0) {
-                StringBuilder builder = new StringBuilder();
-                builder.append("[orange]Players to kick: \n");
-
-                Groups.player.each(p -> !p.admin && p.con != null && p != player, p -> {
-                    builder.append("[lightgray] ").append(p.name).append("[accent] (#").append(p.id()).append(")\n");
-                });
-                player.sendMessage(builder.toString());
+                player.sendMessage(Utils.playerList(p -> !p.admin && p.con != null && p != player));
                 return;
             }
 
@@ -292,6 +284,10 @@ public class Kick implements MiniMod {
         public String plaintiff = null;
 
         /**
+         * When the votekick started
+         */
+        public long startTime = Time.millis();
+        /**
          * Time in which votekick ends
          */
         public long endTime = -1;
@@ -309,7 +305,7 @@ public class Kick implements MiniMod {
 
         public int requiredVotes() {
             if (Groups.player.size() <= 3) {
-                return 2;
+                return 2 - 1;
             } else {
                 return 3;
             }
