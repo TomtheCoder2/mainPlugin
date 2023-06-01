@@ -431,7 +431,7 @@ public class Communication implements MiniMod {
                 }
             }
         });
-        handler.<Player>register("screenMessages", "<true|false>", "Toggle screen messages", (args, player) -> {
+        handler.<Player>register("screenmessages", "<true|false>", "Toggle screen messages", (args, player) -> {
             if (args[0].equals("true")) {
                 player.sendMessage("[green]Screen messages enabled");
                 disabledScreenMessages.remove(player.uuid());
