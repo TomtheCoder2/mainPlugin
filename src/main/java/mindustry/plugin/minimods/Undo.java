@@ -94,8 +94,8 @@ public class Undo implements MiniMod {
 
 	@Override
 	public void registerCommands(CommandHandler handler) {
-		Cooldowns.instance.set("undo", 3 * 60 * 1000L);
-		handler.<Player>register("undo", "<name> [duration=1]", "Undo the actions of a player", (args, player)-> {
+		Cooldowns.instance.set("undo", 60);
+		handler.<Player>register("undo", Strings.format("[name] [duration=@]", UNDO_DURATION), "Undo the actions of a player", (args, player)-> {
 			String uuid = player.uuid();
 			if (!Cooldowns.instance.canRun("undo", uuid)) {
 				player.sendMessage(GameMsg.ratelimit("Undo", "undo"));
@@ -147,8 +147,10 @@ public class Undo implements MiniMod {
 				return;
 			}
 			int duration = args.length == 2 ? Strings.parseInt(args[1], UNDO_DURATION) : UNDO_DURATION;
+			duration = Math.min(duration, 120);
 			String finalTarget = target;
-			Sessions.newSession(player, () -> new UndoSession(player, finalTarget, duration));
+			int finalDuration = duration;
+			Sessions.newSession(player, () -> new UndoSession(player, finalTarget, finalDuration));
 		});
 
 		handler.<Player>register("toggleinspector", "Toggles the tile inspector", (args, player) -> {
@@ -162,6 +164,39 @@ public class Undo implements MiniMod {
 		});
 	}
 
+	@Override
+	public void registerServerCommands(CommandHandler handler) {
+		handler.register("undo", "<time> [player...]", "Force undo the actions of a player", arg -> {
+			if (arg.length < 2) {
+				Log.info("Current players:");
+				Log.info(Utils.playerList(p -> true));
+				Log.info("Players that have joined this round:");
+				Log.info(players.keys().toSeq().toString());
+				return;
+			}
+			int time = Strings.parseInt(arg[0], -1);
+			if (time <= 0) {
+				Log.warn("Invalid time provided");
+			}
+			long start = Time.millis() - time * 1000L;
+			String target = arg[1];
+			Player found = Query.findPlayerEntity(target);
+			Administration.PlayerInfo info = Query.findPlayerInfo(target);
+			if (found == null && (info == null || !players.containsKey(info.id))) {
+				Log.warn("Player not found. However, an undo using the string as the uuid will be done");
+			}
+			if (found != null) {
+				instance.rollback(found.uuid(), start);
+				Call.sendMessage(GameMsg.info("Undo", "Forced undo of " + found.name));
+			} else if (info != null) {
+				instance.rollback(info.id, start);
+				Call.sendMessage(GameMsg.info("Undo", "Forced undo of " + info.lastName));
+			} else {
+				instance.rollback(target, start);
+				Call.sendMessage(GameMsg.info("Undo", "Forced undo done"));
+			}
+		});
+	}
 }
 
 class UndoSession extends Sessions.Session {
@@ -200,7 +235,7 @@ class UndoSession extends Sessions.Session {
 		int score = yes-no;
 		int required = (players/2) + 1;
 		if (score >= required) {
-			Undo.instance.rollback(this.target, this.startTime - this.duration * (60 * 1000L));
+			Undo.instance.rollback(this.target, this.startTime - (this.duration * 60 * 1000L));
 			Call.sendMessage(GameMsg.info("Undo", "Vote passed, undoing(@ min)", this.duration));
 			return true;
 		}
@@ -210,6 +245,6 @@ class UndoSession extends Sessions.Session {
 
 	@Override
 	public String desc() {
-		return Strings.format("Undo player \"@\"(@ min)", Query.findPlayerInfo(this.target).lastName, this.duration);
+		return Strings.format("Undo actions of @[white](@ min)", Query.findPlayerInfo(this.target).lastName, this.duration);
 	}
 }

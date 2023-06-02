@@ -3,10 +3,7 @@ package mindustry.plugin.minimods;
 import arc.Events;
 import arc.func.Prov;
 import arc.struct.ObjectMap;
-import arc.util.CommandHandler;
-import arc.util.Log;
-import arc.util.Time;
-import arc.util.Timer;
+import arc.util.*;
 import mindustry.game.EventType;
 import mindustry.gen.Call;
 import mindustry.gen.Groups;
@@ -27,7 +24,12 @@ public class Sessions implements MiniMod {
 			return;
 		}
 		sessions.put(session.sessionName, session);
-		Call.sendMessage(GameMsg.info("Sessions", session.desc() + " started by " + player.name));
+		String text = session.desc() + " started by" + player.name + "[white]\n" +
+				"Vote with /y " + session.sessionName + " or /n " + session.sessionName +
+				"\n vote ends in " + Strings.formatMillis(-Time.timeSinceMillis(session.endTime));
+		Call.sendMessage(GameMsg.info("Sessions", text));
+		player.sendMessage(GameMsg.info("Sessions", "Cancel this session with /c " + session.sessionName));
+
 		session.addVote(player, true);
 	}
 
@@ -35,7 +37,11 @@ public class Sessions implements MiniMod {
 	public void registerCommands(CommandHandler handler) {
 		final String[] votes = {"y", "n", "c"};
 		for (String voteType : votes) {
-			handler.<Player>register(voteType, "<session>", "Vote for a session", (args, player) -> {
+			handler.<Player>register(voteType, "[session]", "Vote for a session", (args, player) -> {
+				if (sessions.size == 0) {
+					Call.sendMessage(GameMsg.error("Sessions", "No vote sessions currently active"));
+					return;
+				}
 				Session found;
 				if (args.length == 0 && sessions.size == 1) {
 					found = sessions.values().next();
@@ -143,6 +149,7 @@ public class Sessions implements MiniMod {
 		protected void timerFinished() {
 			if (this.endTime < Time.millis()) {
 				Timer.schedule(this::timerFinished, (this.endTime - Time.millis())/1000f);
+				Call.sendMessage(GameMsg.info("Sessions", "Session @ has failed", this.sessionName));
 			} else {
 				this.end();
 			}
