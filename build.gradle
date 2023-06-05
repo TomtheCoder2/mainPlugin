@@ -9,7 +9,7 @@ buildscript {
 }
 plugins {
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.10'
+//    id 'org.openjfx.javafxplugin' version '0.0.10'
 //    id "nebula.lint" version "18.0.3"
 }
 apply plugin: "java"
@@ -17,10 +17,10 @@ apply plugin: 'kotlin'
 apply plugin: 'application'
 //gradleLint.rules = ['all-dependency']
 version '1.0'
-javafx {
-    version = "18.0.2"
-    modules = ['javafx.controls']
-}
+//javafx {
+//    version = "18.0.2"
+//    modules = ['javafx.controls']
+//}
 sourceCompatibility = 16
 
 repositories {
@@ -100,7 +100,7 @@ dependencies {
 //    implementation 'org.openjfx:javafx-swing:20-ea+1'
 //    implementation 'org.openjfx:javafx-swing:11-ea+24'
 
-    compileOnly "com.github.7003Mars:rollback:1.0"
+    compileOnly "com.github.7003Mars:rollback:1.1"
 }
 
 jar {

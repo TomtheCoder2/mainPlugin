@@ -51,6 +51,8 @@ public class Utils {
     public static Boolean verification = false;
     public static Pattern ipValidationPattern;
 
+    public static ObjectMap<String, String> hashCache = new ObjectMap<>();
+
     public static String[] split(String str, int chunkSize) {
 //        return str.split("(?<=\\G.{" + chunkSize + "})");
         StringBuilder sb = new StringBuilder();
@@ -733,22 +735,23 @@ public class Utils {
 
     /**
      * Calculates the Phash for a given UUID.
-     * Intentionally long name to indicate that computational expensiveness.
      *
      * @param uuid the UUID
      * @return the Phash
      */
     public static String calculatePhash(String uuid) {
-        try {
-            byte[] bytes = Base64.getDecoder().decode(uuid);
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA3-256");
-            messageDigest.update(bytes);
-            byte[] hash = messageDigest.digest();
-            return Base64.getEncoder().encodeToString(hash).substring(0, 13).replace("+", "-").replace("/", "=");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return hashCache.get(uuid, () -> {
+            try {
+                byte[] bytes = Base64.getDecoder().decode(uuid);
+                MessageDigest messageDigest = MessageDigest.getInstance("SHA3-256");
+                messageDigest.update(bytes);
+                byte[] hash = messageDigest.digest();
+                return Base64.getEncoder().encodeToString(hash).substring(0, 13).replace("+", "-").replace("/", "=");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        });
     }
 
     public static SchemImage convertToSchemImage(ObjectSet<Ranks.SimpleBuild> tiles) {

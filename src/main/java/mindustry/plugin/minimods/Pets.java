@@ -197,14 +197,10 @@ public class Pets implements MiniMod {
                 return;
             }
 
-            if (args.length == 0) {
-                player.sendMessage(GameMsg.custom("Pet", "sky", Seq.with(pets).toString(", ", p -> p.name)));
-                return;
-            }
-
-            var pet = Structs.find(pets, p -> p.name.equalsIgnoreCase(args[0]));
+            var pet = args.length == 0 ? null : Structs.find(pets, p -> p.name.equalsIgnoreCase(args[0]));
             if (pet == null) {
-                player.sendMessage(GameMsg.error("Pet", "Pet '" + args[0] + "' doesn't exist"));
+                player.sendMessage(GameMsg.custom("Pet", "sky",
+                        "Your pets:" + Seq.with(pets).toString(", ", p -> p.name)));
                 return;
             }
 
