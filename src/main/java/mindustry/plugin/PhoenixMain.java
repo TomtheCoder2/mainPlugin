@@ -255,8 +255,9 @@ public class PhoenixMain extends Plugin {
                     "IgruhaOrg",
                     "андрей",
                     "THIS IS MY KINGDOM CUM, THIS IS MY CUM",
-                    "HITLER"
-                    "WMF Builder" //dont tell wmf
+                    "HITLER",
+                    "WMF Builder", //dont tell wmf
+                    "Goldberg"
             };
             if (Structs.contains(bannedNames, s -> s.toLowerCase().equals(escapeEverything(player.name.toLowerCase())))) {
                 player.con.kick("[scarlet]Please change your name.");
