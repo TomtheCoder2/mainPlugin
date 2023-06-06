@@ -370,7 +370,7 @@ public class PhoenixMain extends Plugin {
         Events.on(EventType.ServerLoadEvent.class, event -> {
             Vars.netServer.admins.addActionFilter(action -> {
                 Player player = action.player;
-                if (player == null) return true;
+//                if (player == null) return true; // Play should never be null
                 if (player.admin) return true;
 
                 switch (action.type) {
