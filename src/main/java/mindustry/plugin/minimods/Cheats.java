@@ -178,7 +178,7 @@ public class Cheats implements MiniMod {
                     int amount = ctx.args.getInt("amount", 1);
                     Team team = p.team();
                     if (Math.random() < 0.1) {
-                        // hehe
+                        // hehe <- who, why just why
                         var data = Vars.state.teams.active.find(x -> x.team.id != p.team().id);
                         if (data != null) {
                             team = data.team;
@@ -235,7 +235,7 @@ public class Cheats implements MiniMod {
                     case "t", "true" -> shouldEnable = true;
                     case "f", "false" -> shouldEnable = false;
                     default -> {
-                        player.sendMessage(GameMsg.error("Cheat", "Second argument to [" + GameMsg.CMD + "]/enablecheats[] must be 'true' or 'false'"));
+                        player.sendMessage(GameMsg.error("Cheat", "Second argument to [" + GameMsg.CMD + "]/enable-cheats[] must be 'true' or 'false'"));
                         return;
                     }
                 }
@@ -270,7 +270,7 @@ public class Cheats implements MiniMod {
                 return;
             }
 
-            if (args[0].length() <= 0 || args[1].length() <= 0) {
+            if (args[0].length() == 0 || args[1].length() == 0) {
                 player.sendMessage("[scarlet]Invalid arguments provided.");
                 return;
             }

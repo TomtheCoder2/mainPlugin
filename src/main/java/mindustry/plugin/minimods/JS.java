@@ -28,22 +28,19 @@ public class JS implements MiniMod {
         }, ctx -> {
             String nickname = ctx.author().getDisplayName(ctx.server());
             switch (ctx.args.get("true/false")) {
-                case "true":
-                case "t":
+                case "true", "t" -> {
                     long minutes = 10;
                     if (ctx.args.containsKey("minutes")) {
                         minutes = ctx.args.getLong("minutes", 10);
                     }
                     enableJS(minutes * 60, nickname);
                     ctx.success("Enabled JS", "Enabled /js command for " + minutes + " minutes.");
-                    break;
-                case "false":
-                case "f":
+                }
+                case "false", "f" -> {
                     disableJS(nickname);
                     ctx.success("Disabled JS", "Disabled /js command.");
-                    break;
-                default:
-                    ctx.error("Error", "First argument must be true or false");
+                }
+                default -> ctx.error("Error", "First argument must be true or false");
             }
         });
 

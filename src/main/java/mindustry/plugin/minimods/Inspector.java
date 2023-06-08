@@ -123,7 +123,7 @@ public class Inspector implements MiniMod {
         public String configuredByName;
 
         /**
-         * Only set for blocks that are Blocks.air
+         * Only set for blocks that are Air blocks.
          */
         public Block previousBlock;
     }

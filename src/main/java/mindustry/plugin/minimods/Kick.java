@@ -14,7 +14,7 @@ import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.utils.*;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.jetbrains.annotations.NotNull;
+// import org.jetbrains.annotations.NotNull; not used
 
 import java.awt.*;
 import java.time.Instant;
