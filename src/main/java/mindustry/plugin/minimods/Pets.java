@@ -48,29 +48,21 @@ public class Pets implements MiniMod {
     ObjectMap<String, Seq<String>> spawnedPets = new ObjectMap<>();
 
     protected static int maxPets(int rank) {
-        if (rank <= 1) {
-            return 0;
-        } else if (rank <= 3) {
-            return 1;
-        } else if (rank == 4) {
-            return 2;
-        } else {
-            return 3;
-        }
+        return switch (rank) {
+            case 0, 1 -> 0;
+            case 2, 3 -> 1;
+            case 4 -> 2;
+            default -> 3;
+        };
     }
-
     protected static int maxTier(int rank) {
-        if (rank <= 1) {
-            return 0;
-        } else if (rank == 2) {
-            return 1;
-        } else if (rank <= 4) {
-            return 2;
-        } else if (rank == 5) {
-            return 3;
-        } else {
-            return 4;
-        }
+        return switch (rank) {
+            case 0, 1 -> 0;
+            case 2 -> 1;
+            case 3, 4 -> 2;
+            case 5 -> 3;
+            default -> 4;
+        };
     }
 
     protected static int tierOf(UnitType type) {
@@ -103,7 +95,6 @@ public class Pets implements MiniMod {
             return new Item[]{Items.copper, Items.lead, Items.titanium};
         }
     }
-
     protected static int rank(PetDatabase.Pet pet) {
         var items = possibleFoods(pet.species);
         long min = Long.MAX_VALUE;
@@ -121,7 +112,6 @@ public class Pets implements MiniMod {
                 min = value;
             }
         }
-
 
         if (min > 1000000) {
             return 5;
