@@ -106,7 +106,7 @@ public class Undo implements MiniMod {
 				player.sendMessage(GameMsg.error("Undo", "You can't undo actions of other players, because you are flagged as a potential griefer!"));
 				return;
 			}
-			if (Groups.player.size() < 3 /*&& false*/) {
+			if (Groups.player.size() < 3) {
 				player.sendMessage(GameMsg.error("Undo", "At least 3 people are required to start an undo."));
 				return;
 			}
@@ -200,7 +200,8 @@ public class Undo implements MiniMod {
 }
 
 class UndoSession extends Sessions.Session {
-	public final static int Vote_Time = 3 * 60;
+	public final static int Vote_Time = 30;
+	public final static int Extend_Time = 15;
 
 	public String target;
 	public int duration;
@@ -232,6 +233,7 @@ class UndoSession extends Sessions.Session {
 
 	@Override
 	public boolean onVote(int yes, int no, int players,@Nullable Player player) {
+		this.endTime += Extend_Time*1000L;
 		int score = yes-no;
 		int required = (players/2) + 1;
 		if (score >= required) {
@@ -239,7 +241,8 @@ class UndoSession extends Sessions.Session {
 			Call.sendMessage(GameMsg.info("Undo", "Vote passed, undoing(@ min)", this.duration));
 			return true;
 		}
-		Call.sendMessage(GameMsg.info("Undo", "@ has voted, (@/@)", player.name, score, required));
+		Call.sendMessage(GameMsg.info("Undo", "@ has voted, (@/@) @ left",
+				player.name, score, required, Strings.formatMillis(-Time.timeSinceMillis(this.endTime))));
 		return false;
 	}
 
