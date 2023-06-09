@@ -255,7 +255,9 @@ public class PhoenixMain extends Plugin {
                     "IgruhaOrg",
                     "андрей",
                     "THIS IS MY KINGDOM CUM, THIS IS MY CUM",
-                    "HITLER"
+                    "HITLER",
+                    "WMF Builder", //dont tell wmf
+                    "Goldberg"
             };
             if (Structs.contains(bannedNames, s -> s.toLowerCase().equals(escapeEverything(player.name.toLowerCase())))) {
                 player.con.kick("[scarlet]Please change your name.");
@@ -266,16 +268,16 @@ public class PhoenixMain extends Plugin {
             Database.Player pd = Database.getPlayerData(player.uuid());
 
             // check if he's impersonating a rank
-            for (int i = 0; i < Rank.all.length; i++) {
-                if (i == 0) continue;
-
-                Rank rank = Rank.all[i];
-                if (player.name.toLowerCase().contains(rank.tag)) {
-                    player.con.kick("[scarlet]Dont impersonate a rank.");
-                    Log.warn("Player " + Strings.stripColors(player.name) + " tried to impersonate rank: " + rank.name);
-                    return;
-                }
-            }
+//            for (int i = 0; i < Rank.all.length; i++) {
+//                if (i == 0) continue;
+//
+//                Rank rank = Rank.all[i];
+//                if (player.name.toLowerCase().contains(rank.tag)) {
+//                    player.con.kick("[scarlet]Dont impersonate a rank.");
+//                   Log.warn("Player " + Strings.stripColors(player.name) + " tried to impersonate rank: " + rank.name);
+//                    return;
+//               }
+//            }
 
             // check for ban & give name
             if (pd != null) {
