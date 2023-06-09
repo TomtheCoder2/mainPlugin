@@ -15,7 +15,6 @@ import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
-import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
 import mindustry.type.Item;
 import mindustry.type.UnitType;
@@ -23,8 +22,6 @@ import mindustry.world.Block;
 import mindustry.world.Tile;
 
 public class Cheats implements MiniMod {
-    private boolean cheatsEnabled = false;
-
 
     private boolean fillcore(Team team) {
         if (team.core() == null) {
@@ -226,45 +223,10 @@ public class Cheats implements MiniMod {
         );
     }
 
-    @Override
-    public void registerCommands(CommandHandler handler) {
-        Utils.registerRankCommand(handler, "enablecheats", "[true/false]", Rank.MOD, "Enable cheats for all player", (args, player) -> {
-            boolean shouldEnable = false;
-            if (args.length == 1) {
-                switch (args[0]) {
-                    case "t", "true" -> shouldEnable = true;
-                    case "f", "false" -> shouldEnable = false;
-                    default -> {
-                        player.sendMessage(GameMsg.error("Cheat", "Second argument to [" + GameMsg.CMD + "]/enable-cheats[] must be 'true' or 'false'"));
-                        return;
-                    }
-                }
-            }
+       @Override
+      public void registerCommands(CommandHandler handler) {
 
-            if (shouldEnable && cheatsEnabled) {
-                player.sendMessage(GameMsg.error("Cheat", "Cheats already enabled"));
-                return;
-            }
-            if (!shouldEnable && !cheatsEnabled) {
-                player.sendMessage(GameMsg.error("Cheat", "Cheats already disabled"));
-                return;
-            }
-
-            cheatsEnabled = shouldEnable;
-
-            Call.sendMessage(GameMsg.info("Cheat", "Cheats are now " + (cheatsEnabled ? "enabled" : "disabled") + " for everyone by [white]" + player.name + "[" + GameMsg.INFO + "]!"));
-        });
-
-        handler.<Player>register("team", "<team> [player]", "Switch a player's team", (args, player) -> {
-            if (!player.admin && !cheatsEnabled) {
-                player.sendMessage(GameMsg.error("Cheat", "You must be an admin to use this command!"));
-            }
-
-            // TODO
-        });
-
-
-        handler.<Player>register("label", "<duration> <text...>", "[admin only] Create an in-world label at the current position.", (args, player) -> {
+    handler.<Player>register("label", "<duration> <text...>", "[admin only] Create an in-world label at the current position.", (args, player) -> {
             if (!player.admin) {
                 player.sendMessage(GameMsg.noPerms("Cheat"));
                 return;
