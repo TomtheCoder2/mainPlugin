@@ -1,11 +1,13 @@
 package mindustry.plugin.discord;
 
+import arc.util.Log;
+import com.electronwill.nightconfig.core.Config;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.TextChannel;
-import org.json.JSONObject;
+import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Channels {
     /**
@@ -38,40 +40,35 @@ public class Channels {
         return api.getTextChannelById(id).get();
     }
 
-    public static void load(DiscordApi api, JSONObject obj) {
-        if (obj == null) return;
-        if (obj.has("chat")) {
-            CHAT = new ArrayList<>();
+    public static void load(DiscordApi api, @NotNull Config obj) {
+        for (String channelId : obj.<ArrayList<String>>get("CHAT")) {
             try {
-                for (Object o : obj.getJSONArray("chat")) {
-                    CHAT.add(getChannel(api, o.toString()));
-                }
+                CHAT.add(getChannel(api, channelId));
             } catch (Exception e) {
-                CHAT.add(getChannel(api, obj.getString("chat")));
+                Log.err("Error loading channel: @", channelId);
+                throw e;
             }
         }
-        WARNINGS = getChannel(api, obj.getString("warnings"));
-        APPEAL = getChannel(api, obj.getString("appeal"));
-        BUG_REPORT = getChannel(api, obj.getString("bug_report"));
-        GR_REPORT = getChannel(api, obj.getString("gr_report"));
-        MAP_SUBMISSIONS = getChannel(api, obj.getString("map_submissions"));
-        MAP_RATING = getChannel(api, obj.getString("map_rating"));
-
-        LOG = getChannel(api, obj.getString("log"));
-        ERROR_LOG = getChannel(api, obj.getString("error_log"));
-        COLONEL_LOG = getChannel(api, obj.getString("colonel_log"));
-
-        try {
-            BOT = new ArrayList<>();
-            for (Object o : obj.getJSONArray("bot")) {
-                BOT.add(getChannel(api, o.toString()));
+        for (String channelId: obj.<ArrayList<String>>get("BOT")) {
+            try {
+                BOT.add(getChannel(api, channelId));
+            } catch (Exception e) {
+                Log.err("Error loading channel: @", channelId);
+                throw e;
             }
-        } catch (Exception e) {
-            BOT.add(getChannel(api, obj.getString("bot")));
         }
-        MOD_BOT = getChannel(api, obj.getString("mod_bot"));
-        APPRENTICE_BOT = getChannel(api, obj.getString("apprentice_bot"));
-        ADMIN_BOT = getChannel(api, obj.getString("admin_bot"));
-        LIVE_LOG = getChannel(api, obj.getString("live_log"));
+        for (Field f : Channels.class.getDeclaredFields()) {
+            if (f.getType() == TextChannel.class) {
+                String channelId = obj.get(f.getName());
+                try {
+                    f.set(null, getChannel(api, channelId));
+                } catch (IllegalAccessException e) {
+                    // Should never happen
+                    throw new RuntimeException(e);
+                } catch (Exception e) {
+                    Log.err("Error loading channel: @", channelId);
+                }
+            }
+        }
     }
 }

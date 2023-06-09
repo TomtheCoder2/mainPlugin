@@ -44,7 +44,7 @@ public class Report implements MiniMod {
 
         Cooldowns.instance.set("gr", 5 * 60);
         handler.<Player>register("gr", "[player] [reason...]", "Report a griefer by id (use '/Players' to get a list of ids)", (args, player) -> {
-            if (!Config.beta && !Cooldowns.instance.canRun("gr", player.uuid())) {
+            if (!PluginConfig.beta && !Cooldowns.instance.canRun("gr", player.uuid())) {
                 player.sendMessage(GameMsg.ratelimit("Mod", "gr"));
                 return;
             }
@@ -82,7 +82,7 @@ public class Report implements MiniMod {
                     player.sendMessage("[scarlet]Only players on your team can be reported.");
                     return;
                 }
-                if (!Config.beta && Objects.equals(found.uuid(), player.uuid())) {
+                if (!PluginConfig.beta && Objects.equals(found.uuid(), player.uuid())) {
                     player.sendMessage("[scarlet]You can't report yourself anymore");
                     return;
                 }

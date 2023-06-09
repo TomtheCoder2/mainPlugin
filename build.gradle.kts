@@ -23,7 +23,7 @@ dependencies {
     compileOnly("com.github.Anuken.Arc:arc-core:$arcVer")
 
     // REMOVEME
-    implementation(group = "org.json", name = "json", version = "20210307")
+    implementation("com.electronwill.night-config:toml:3.6.6")
     implementation("org.javacord:javacord:3.5.0")
     implementation("net.dv8tion:JDA:4.3.0_277")
     implementation("jfree:jfreechart:1.0.13")

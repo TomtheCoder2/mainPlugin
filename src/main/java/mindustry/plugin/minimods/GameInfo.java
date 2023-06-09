@@ -20,7 +20,7 @@ import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
-import mindustry.plugin.utils.Config;
+import mindustry.plugin.utils.PluginConfig;
 import mindustry.plugin.utils.ContentServer;
 import mindustry.plugin.utils.Rank;
 import mindustry.plugin.utils.Utils;
@@ -154,7 +154,7 @@ public class GameInfo implements MiniMod {
                     }
 
                     EmbedBuilder eb = new EmbedBuilder()
-                            .setTitle(Config.serverName)
+                            .setTitle(PluginConfig.serverName)
                             .addInlineField("Players", Groups.player.size() + "")
                             .addInlineField("Map", Vars.state.map.name())
                             .addInlineField("Wave", Vars.state.wave + "")
@@ -165,7 +165,7 @@ public class GameInfo implements MiniMod {
                             .setColor(DiscordPalette.INFO);
 
                     Fi tempDir = new Fi("temp/");
-                    Fi mapFile = tempDir.child(Config.serverName + "_" + escapeEverything(Vars.state.map.name()).replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msav");
+                    Fi mapFile = tempDir.child(PluginConfig.serverName + "_" + escapeEverything(Vars.state.map.name()).replaceAll("[^a-zA-Z0-9\\.\\-]", "_") + ".msav");
                     Core.app.post(() -> {
                         try {
                             SaveIO.write(mapFile);

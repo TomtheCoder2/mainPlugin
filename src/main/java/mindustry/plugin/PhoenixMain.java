@@ -2,9 +2,14 @@ package mindustry.plugin;
 
 import arc.Core;
 import arc.Events;
+import arc.files.Fi;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.*;
+import arc.util.serialization.Jval;
+import com.electronwill.nightconfig.core.Config;
+import com.electronwill.nightconfig.core.ConfigSpec;
+import com.electronwill.nightconfig.core.file.FileConfig;
 import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.game.EventType;
@@ -16,21 +21,25 @@ import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.effect.EffectHelper;
+import mindustry.plugin.minimods.Pets;
+import mindustry.plugin.minimods.RTV;
 import mindustry.plugin.utils.*;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.activity.ActivityType;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.util.logging.FallbackLoggerConfiguration;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
+import java.lang.reflect.Field;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Objects;
 
-import static arc.util.Log.*;
+import static arc.util.Log.err;
+import static arc.util.Log.info;
 import static mindustry.Vars.netServer;
 import static mindustry.Vars.state;
 import static mindustry.plugin.database.Database.*;
@@ -42,9 +51,7 @@ import static mindustry.plugin.utils.Utils.escapeEverything;
 import static mindustry.plugin.utils.Utils.getArrayListFromString;
 
 public class PhoenixMain extends Plugin {
-    //    public static final File prefsFile = new File("prefs.properties");
 //    public static Net net = new Net();
-//    public static Prefs prefs = new Prefs(prefsFile);
 //    public GetMap map = new GetMap();
     private static final String lennyFace = "( \u0361\u00B0 \u035C\u0296 \u0361\u00B0)";
     public static ContentHandler contentHandler;
@@ -86,78 +93,98 @@ public class PhoenixMain extends Plugin {
         Log.level = Log.LogLevel.debug;
 
         DiscordApi api;
-        DiscordRegistrar registrar = null;
+        DiscordRegistrar registrar;
+        // The TOML specification
+        ConfigSpec spec = new ConfigSpec();
+        // Discord config
+        spec.define("discord.invite", "<Place discord invite here>");
+        spec.define("discord.token", "<Place bot token here>");
+        spec.define("discord.bot_prefix", "%");
+        // Discord channels, found using reflection
+        for (Field f : Channels.class.getDeclaredFields()) {
+            if (f.getType() == TextChannel.class) {
+                spec.define("channels."+f.getName(), "<Place channel id here>");
+            }
+        }
+        // Don't want to wipe everything out when one is invalid
+        ArrayList<String> defArray = new ArrayList<>();
+        defArray.add("<Place channel ids here>");
+        spec.defineList("channels.BOT", defArray, obj -> true);
+        spec.defineList("channels.CHAT", defArray, obj -> true);
+        // Discord Roles
+        for (Field f : Roles.class.getDeclaredFields()) {
+            spec.define("role."+f.getName(), "<Place role id here>");
+        }
+        // Plugin configs
+        spec.define("plugin.server_name", "<Place server name here>");
+        spec.define("plugin.ipapi_key", "<Place api key here>");
+        spec.define("plugin.preview_schem", true);
+        spec.define("plugin.assets_dir", "<Location of the assets dir. Place empty string for default>");
+        spec.define("plugin.map_rating", true);
+        spec.define("plugin.beta", false);
+        spec.define("plugin.img_auto_ban_system", true);
+        ArrayList<String> extraMinimods = new ArrayList<>();
+        extraMinimods.add("pets");
+        extraMinimods.add("rtv");
+        spec.defineList("plugin.extra_minimods", extraMinimods, obj -> true);
+        // Database
+        spec.define("database.url", "<Place db url here>");
+        spec.define("database.user", "<Place db user here>");
+        spec.define("database.password", "<Place db password here>");
+        spec.define("database.table_player", "<Place name of player table here>");
         // read settings
-        try {
-            String pureJson = Core.settings.getDataDirectory().child("mods/settings.json").readString();
-            JSONObject data = new JSONObject(new JSONTokener(pureJson));
-
-            // url to connect to the MindServ
-//            Config.mapsURL = data.getString("maps_url");
-
-            JSONObject discordData = data.getJSONObject("discord");
-            DiscordVars.invite = discordData.optString("invite");
-            String discordToken = discordData.getString("token");
+        Fi file = Core.settings.getDataDirectory().child("mods/settings.toml");
+        try (FileConfig config = FileConfig.of(file.file())) {
+            config.load();
+            spec.correct(config);
+            // Load discord data
+            Config discordData = config.get("discord");
+            DiscordVars.invite = discordData.get("invite");
+            DiscordVars.prefix = discordData.get("bot_prefix");
+            String discordToken = discordData.get("token");
             try {
                 api = new DiscordApiBuilder().setToken(discordToken).login().join();
                 Log.info("Logged in as: " + api.getYourself());
                 DiscordVars.api = api;
             } catch (Exception e) {
                 Log.err("Couldn't log into discord.");
+                // TODO: Not a neat place for config.save()
+                config.save();
                 Core.app.exit();
                 return;
             }
-            Channels.load(api, discordData.optJSONObject("channels"));
-            Roles.load(api, discordData.getJSONObject("roles"));
-            String discordPrefix = discordData.optString("prefix", "%");
-            DiscordVars.prefix = discordPrefix;
-            registrar = new DiscordRegistrar(discordPrefix);
-
-            Config.serverName = data.getString("server_name");
-            Config.ipApiKey = data.optString("ipapi_key");
-
-            JSONObject configData = data.getJSONObject("config");
-            Config.previewSchem = configData.getBoolean("preview_schem");
-            Config.assetsDir = configData.getString("assets_dir");
-            if (configData.has("map_rating")) {
-                Config.mapRating = configData.getBoolean("map_rating");
-            }
-            if (configData.has("beta")) {
-                Config.beta = configData.getBoolean("beta");
-            }
-            if (configData.has("img_auto_ban_system")) {
-                Config.autoBanSystem = configData.getBoolean("img_auto_ban_system");
-            }
-
-            // connect to database
-            JSONObject databaseData = data.getJSONObject("database");
-            String dbURL = databaseData.getString("url");
-            String dbUser = databaseData.getString("user");
-            String dbPwd = databaseData.getString("password");
-            String playerTable = databaseData.getString("table_player");
-
-            debug("database url: @, user: @", dbURL, dbUser);
-
+            registrar = new DiscordRegistrar(DiscordVars.prefix);
+            // Load channels. Can't add a transform mapping to the ObjectBinder so we have to do it the long way
+            Config channelConfig = config.get("channels");
+            Channels.load(api, channelConfig);
+            // Load roles
+            Config roleConfig = config.get("role");
+//            Roles.load(api, roleConfig);
+            // Load plugin config
+            Config pluginConfig = config.get("plugin");
+            PluginConfig.serverName = pluginConfig.get("server_name");
+            PluginConfig.ipApiKey = pluginConfig.get("ipapi_key");
+            PluginConfig.previewSchem = pluginConfig.get("preview_schem");
+            String assetsDir = pluginConfig.get("assets_dir");
+            PluginConfig.assetsDir = assetsDir.isEmpty() ? null : assetsDir;
+            PluginConfig.mapRating = pluginConfig.get("map_rating");
+            PluginConfig.beta = pluginConfig.get("beta");
+            PluginConfig.autoBanSystem = pluginConfig.get("img_auto_ban_system");
+            // Load db config
+            Config dbConfig = config.get("database");
+            String url = dbConfig.get("url");
+            String user = dbConfig.get("user");
+            Log.debug("Url @, User @", url, user);
             try { // test connection
-                Database.connect(dbURL, dbUser, dbPwd, playerTable);
+                Database.connect(url, user,dbConfig.get("password"), dbConfig.get("table_player"));
             } catch (Exception e) {
-                err(e.toString());
-                err("Could not login to PostgresSQL database!");
+                err("Could not login to PostgresSQL database!", e);
             }
+            ArrayList<String> configMinimods = pluginConfig.get("extra_minimods");
+            if (configMinimods.contains("rtv")) minimods.add(new RTV());
+            if (configMinimods.contains("pets")) minimods.add(new Pets());
 
-            if (data.has("minimods")) {
-                JSONObject minimodsData = data.getJSONObject("minimods");
-                if (!(minimodsData.has("pets") && !minimodsData.getBoolean("pets"))) {
-                    minimods.add(new mindustry.plugin.minimods.Pets());
-                }
-                if (!(minimodsData.has("rtv") && !minimodsData.getBoolean("rtv"))) {
-                    minimods.add(new mindustry.plugin.minimods.RTV());
-                }
-            }
-        } catch (Exception e) {
-            Log.err("Couldn't read settings.json file.");
-            e.printStackTrace();
-            return;
+            config.save();
         }
 
         try {
@@ -236,7 +263,7 @@ public class PhoenixMain extends Plugin {
         // delete all duplicate names
         Database.deleteAllDuplicateNames();
         Events.on(EventType.ServerLoadEvent.class, event -> {
-            if (Config.autoBanSystem) contentHandler = new ContentHandler();
+            if (PluginConfig.autoBanSystem) contentHandler = new ContentHandler();
             DiscordVars.api.updateActivity(
                     Strings.stripColors(Vars.state.map.name()) +
                             " with " + Groups.player.size() +
@@ -464,7 +491,7 @@ public class PhoenixMain extends Plugin {
             var target = Database.getPlayerData(p.uuid());
             if (target == null) return;
 
-            JSONObject data = new JSONObject();
+            Jval data = Jval.newObject();
 
             data.put("id", p.id);
             data.put("name", p.name);

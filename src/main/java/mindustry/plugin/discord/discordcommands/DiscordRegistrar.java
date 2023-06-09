@@ -8,9 +8,7 @@ import mindustry.plugin.discord.Channels;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.DiscordVars;
 import mindustry.plugin.discord.Roles;
-import mindustry.plugin.utils.Config;
-import net.dv8tion.jda.api.events.message.GenericMessageEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import mindustry.plugin.utils.PluginConfig;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.permission.Role;
@@ -193,7 +191,7 @@ public class DiscordRegistrar {
             LongSeq cmdRoles = LongSeq.with(entry.data.roles);
             if (
                     (entry.data.roles != null && userRoles.stream().noneMatch(x -> cmdRoles.contains(x.getId()))) &&
-                            !(userRoles.stream().anyMatch(x -> x.getId() == Roles.DEV) && Config.serverName.contains("Beta"))
+                            !(userRoles.stream().anyMatch(x -> x.getId() == Roles.DEV) && PluginConfig.serverName.contains("Beta"))
             ) {
                 Context ctx = new Context(event, null);
                 ctx.error("Lack of permission", "Required to have one of the following roles: <@&" + cmdRoles.toString("><@&") + ">");

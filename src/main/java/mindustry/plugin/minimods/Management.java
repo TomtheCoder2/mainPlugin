@@ -8,6 +8,7 @@ import arc.util.Http;
 import arc.util.Log;
 import arc.util.Strings;
 import arc.util.Time;
+import arc.util.serialization.Jval;
 import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.game.Gamemode;
@@ -23,16 +24,14 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
 import mindustry.plugin.discord.*;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
-import mindustry.plugin.utils.Config;
+import mindustry.plugin.utils.PluginConfig;
 import mindustry.plugin.utils.Query;
 import mindustry.plugin.utils.Utils;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.json.JSONObject;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.math.BigDecimal;
 import java.util.Arrays;
 
 import static arc.util.Log.debug;
@@ -389,8 +388,8 @@ public class Management implements MiniMod {
                     }
                     debug("url: " + "http://api.ipapi.com/" + ip + "?access_key=");
                     try {
-                        Http.get("http://api.ipapi.com/" + ip + "?access_key=" + Config.ipApiKey, resp -> {
-                            JSONObject json = new JSONObject(resp.getResultAsString());
+                        Http.get("http://api.ipapi.com/" + ip + "?access_key=" + PluginConfig.ipApiKey, resp -> {
+                            Jval json = Jval.read(resp.getResultAsString());
                             try {
                                 EmbedBuilder eb = new EmbedBuilder()
                                         .setTitle("Lookup " + ip)
@@ -399,11 +398,10 @@ public class Management implements MiniMod {
                                         .addField("City", json.getString("city"), true)
                                         .addField("Country", json.getString("country_name"), true)
                                         .addField("Region", json.getString("region_name"), true)
-                                        .addField("Latitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("latitude")).floatValue())), true)
-                                        .addField("Longitude", String.valueOf(Float.valueOf(BigDecimal.valueOf(json.getDouble("longitude")).floatValue())), true);
-
+                                        .addField("Latitude", String.valueOf(json.getFloat("latitude", 0f)), true)
+                                        .addField("Longitude", String.valueOf(json.getFloat("longitude", 0f)), true);
                                 if (json.has("zip")) {
-                                    eb.addInlineField("Zip Code", json.get("zip").toString());
+                                    eb.addInlineField("Zip Code", json.getString("zip"));
                                 }
 
                                 ctx.sendEmbed(eb);
