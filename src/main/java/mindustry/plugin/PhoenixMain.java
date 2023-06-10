@@ -157,7 +157,7 @@ public class PhoenixMain extends Plugin {
             Channels.load(api, channelConfig);
             // Load roles
             Config roleConfig = config.get("role");
-//            Roles.load(api, roleConfig);
+            Roles.load(api, roleConfig);
             // Load plugin config
             Config pluginConfig = config.get("plugin");
             PluginConfig.serverName = pluginConfig.get("server_name");

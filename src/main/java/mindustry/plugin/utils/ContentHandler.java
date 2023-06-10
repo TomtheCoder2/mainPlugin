@@ -12,7 +12,6 @@ import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Strings;
 import mindustry.Vars;
-import mindustry.core.ContentLoader;
 import mindustry.core.GameState;
 import mindustry.core.Version;
 import mindustry.ctype.Content;
@@ -28,7 +27,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import static arc.util.Log.debug;
@@ -48,8 +46,6 @@ public class ContentHandler {
         new Fi("cache").deleteDirectory();
 
         Version.enabled = false;
-        Vars.content = new ContentLoader();
-        Vars.content.createBaseContent();
         for (ContentType type : ContentType.all) {
             for (Content content : Vars.content.getBy(type)) {
                 try {
@@ -69,6 +65,7 @@ public class ContentHandler {
         Vars.state = new GameState();
         Fi atlas = new Fi(assets + "/sprites/sprites.aatls"), sprites = new Fi(assets + "sprites");
         if (!(atlas.exists() && sprites.exists())) {
+            // TOOD: Uncomment
             throw new RuntimeException(Strings.format("The file @ or folder @ could not be found", atlas, sprites));
         }
         TextureAtlasData data = new TextureAtlasData(atlas, sprites, false);
