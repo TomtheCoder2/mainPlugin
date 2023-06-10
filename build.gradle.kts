@@ -1,3 +1,4 @@
+import java.time.LocalTime
 plugins {
     kotlin("jvm") version "1.8.0"
     java
@@ -22,7 +23,6 @@ dependencies {
     compileOnly("com.github.Anuken.mindustryjitpack:core:$mindustryVer")
     compileOnly("com.github.Anuken.Arc:arc-core:$arcVer")
 
-    // REMOVEME
     implementation("com.electronwill.night-config:toml:3.6.6")
     implementation("org.javacord:javacord:3.5.0")
     implementation("net.dv8tion:JDA:4.3.0_277")
@@ -37,7 +37,20 @@ tasks.jar {
     // As from https://stackoverflow.com/a/52818011
     from(configurations.runtimeClasspath.get()
         .filter { !it.name.endsWith("pom") }.map {if (it.isDirectory) it else zipTree(it)})
+}
 
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    // Always update the mod version
+    // If doing other jank in the future, remove this
+    outputs.upToDateWhen { false }
+    val buildVer: String = project.findProperty("buildVersion") as String? ?: "build-${LocalTime.now()}"
+    with(copySpec {
+        from("plugin.hjson")
+        filter {
+            if (it.contains("version")) "version: \"$buildVer\"" else it
+        }
+    })
 }
 
 

@@ -51,8 +51,6 @@ import static mindustry.plugin.utils.Utils.escapeEverything;
 import static mindustry.plugin.utils.Utils.getArrayListFromString;
 
 public class PhoenixMain extends Plugin {
-//    public static Net net = new Net();
-//    public GetMap map = new GetMap();
     private static final String lennyFace = "( \u0361\u00B0 \u035C\u0296 \u0361\u00B0)";
     public static ContentHandler contentHandler;
 
