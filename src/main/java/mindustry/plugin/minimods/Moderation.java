@@ -56,7 +56,7 @@ public class Moderation implements MiniMod {
                 return message;
             });
             Vars.netServer.admins.addActionFilter(action -> {
-                assert action.player != null;
+//                assert action.player != null; // Player should never be null
                 boolean isFrozen = frozen.contains(action.player.uuid());
                 if (isFrozen && !warnedFrozen.contains(action.player.uuid())) {
                     action.player.sendMessage("[cyan]You are frozen! Ask a mod to unfreeze you.");

@@ -71,13 +71,16 @@ public class Undo implements MiniMod {
 				sb.append("\n[accent]");
 				sb.append(Strings.formatMillis(Time.timeSinceMillis(action.getTime()))).append(" ago: [white]");
 				String name = Vars.netServer.admins.getInfo(action.getUuid()).lastName;
-				sb.append(name).append(" [sky]- ").append(Utils.calculatePhash(action.getUuid())).append("\n[white]");
+				sb.append(name);
+				if (!action.getUuid().equals("")) {
+					sb.append(" [sky]- ").append(Utils.calculatePhash(action.getUuid()));
+				}
+				sb.append("\n[white]");
 				if (action instanceof BuildAction) {
 					sb.append("Built ").append(((BuildAction)action).getBlock().name);
 				} else {
-					BuildAction prevBuild = (BuildAction) actions.select(a -> a instanceof BuildAction && a.getId() < action.getId())
-							.selectRanked(Comparator.comparingInt(a -> -a.getId()), 1);
-
+					BuildAction prevBuild = action.getTileInfo().select(-1, BuildAction.class,
+							a -> a.getId() < action.getId());
 					sb.append(action instanceof ConfigAction ? "Configured " : "Deleted ");
 					sb.append(prevBuild != null ? prevBuild.getBlock() : "<???>");
 				}

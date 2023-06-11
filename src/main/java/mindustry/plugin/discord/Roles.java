@@ -1,7 +1,10 @@
 package mindustry.plugin.discord;
 
+import arc.util.Strings;
+import com.electronwill.nightconfig.core.Config;
 import org.javacord.api.DiscordApi;
-import org.json.JSONObject;
+
+import java.lang.reflect.Field;
 
 
 public class Roles {
@@ -21,17 +24,16 @@ public class Roles {
 
     public static long Auto;
 
-    public static void load(DiscordApi api, JSONObject data) {
-        ADMIN = Long.parseLong(data.getString("admin"));
-        MOD = Long.parseLong(data.getString("mod"));
-        MAP_SUBMISSIONS = Long.parseLong(data.getString("map_submissions"));
-        APPRENTICE = Long.parseLong(data.getString("apprentice"));
-        APPEAL = Long.parseLong(data.getString("appeal"));
-        DONATOR = Long.parseLong(data.getString("donator"));
-        ACTIVE_PLAYER = Long.parseLong(data.getString("active_player"));
-        MVP = Long.parseLong(data.getString("mvp"));
-        DEV = Long.parseLong(data.getString("dev"));
-        RI = Long.parseLong(data.getString("ri"));
-        Auto = Long.parseLong(data.getString("auto"));
+    public static void load(DiscordApi api, Config data) {
+        for (Field f : Roles.class.getDeclaredFields()) {
+            try {
+                long parsed = Strings.parseLong(data.get(f.getName()), Long.MIN_VALUE);
+                if (parsed == Long.MIN_VALUE) throw new IllegalArgumentException("Role id must be a number");
+                f.set(null, Strings.parseLong(data.get(f.getName()), 0));
+            } catch (IllegalAccessException e) {
+                // Should never happen
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

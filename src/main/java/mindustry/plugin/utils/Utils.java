@@ -3,9 +3,11 @@ package mindustry.plugin.utils;
 import arc.Core;
 import arc.Events;
 import arc.func.Boolf;
+import arc.func.Func;
 import arc.struct.*;
 import arc.util.CommandHandler;
 import arc.util.Strings;
+import com.electronwill.nightconfig.core.Config;
 import mindustry.game.EventType;
 import mindustry.game.Schematic;
 import mindustry.game.Schematics;
@@ -456,33 +458,6 @@ public class Utils {
 //        ctx.sendMessage(eb);
 //    }
 
-    public static String hsvToRgb(double hue, float saturation, float value) {
-
-        int h = (int) (hue * 6);
-        float f = (float) (hue * 6 - h);
-        float p = value * (1 - saturation);
-        float q = value * (1 - f * saturation);
-        float t = value * (1 - (1 - f) * saturation);
-
-        return switch (h) {
-            case 0 -> rgbToString(value, t, p);
-            case 1 -> rgbToString(q, value, p);
-            case 2 -> rgbToString(p, value, t);
-            case 3 -> rgbToString(p, q, value);
-            case 4 -> rgbToString(t, p, value);
-            case 5 -> rgbToString(value, p, q);
-            default ->
-                    throw new RuntimeException("Something went wrong when converting from HSV to RGB. Input was " + hue + ", " + saturation + ", " + value);
-        };
-    }
-
-    public static String rgbToString(float r, float g, float b) {
-        String rs = Integer.toHexString((int) (r * 256));
-        String gs = Integer.toHexString((int) (g * 256));
-        String bs = Integer.toHexString((int) (b * 256));
-        return rs + gs + bs;
-    }
-
 
 //    /**
 //     * Get a png from map (InputStream)
@@ -796,11 +771,11 @@ public class Utils {
             debug(new Schematics().writeBase64(schematic));
             try {
                 BufferedImage image;
-                if (Config.autoBanSystem) {
+                if (PluginConfig.autoBanSystem) {
                     // render the image
                     image = contentHandler.previewSchematic(schematic);
                 } else {
-                    image = ImageIO.read(new File(Config.assetsDir + "/sprites/error.png"));
+                    image = ImageIO.read(new File(PluginConfig.assetsDir + "/sprites/error.png"));
                 }
                 return new SchemImage(image, minX, minY, maxX + minX, maxY + minY);
             } catch (Exception e) {

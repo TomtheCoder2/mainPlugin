@@ -7,6 +7,7 @@ import arc.struct.ObjectSet;
 import arc.struct.StringMap;
 import arc.util.CommandHandler;
 import arc.util.Log;
+import arc.util.serialization.Jval;
 import mindustry.game.EventType;
 import mindustry.gen.Groups;
 import mindustry.gen.Player;
@@ -14,12 +15,9 @@ import mindustry.plugin.MiniMod;
 import mindustry.plugin.discord.DiscordLog;
 import mindustry.plugin.discord.DiscordPalette;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
-import mindustry.plugin.utils.Config;
 import mindustry.plugin.utils.GameMsg;
+import mindustry.plugin.utils.PluginConfig;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -224,7 +222,7 @@ class TranslateApi {
     public static Resp translate(String text, String fromLang, String toLang) {
         String response = null;
         try {
-            JSONObject reqObj = new JSONObject()
+            Jval reqObj = Jval.newObject()
                     .put("q", text)
                     .put("source", fromLang)
                     .put("target", toLang);
@@ -232,13 +230,13 @@ class TranslateApi {
             HttpRequest req = HttpRequest.newBuilder()
                     .POST(HttpRequest.BodyPublishers.ofString(reqObj.toString()))
                     .uri(URI.create(SERVER + "/translate"))
-                    .setHeader("User-Agent", Config.serverName)
+                    .setHeader("User-Agent", PluginConfig.serverName)
                     .setHeader("Content-Type", "application/json")
                     .build();
 
             HttpResponse<String> resp = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build().send(req, HttpResponse.BodyHandlers.ofString());
             response = resp.body();
-            JSONObject respObj = new JSONObject(new JSONTokener(resp.body()));
+            Jval respObj = Jval.read(resp.body());
             if (respObj.has("error")) {
                 DiscordLog.error("Translate: Translate Server Error", respObj.getString("error"), null);
                 return new Resp(respObj.getString("error"), false);
@@ -261,20 +259,22 @@ class TranslateApi {
             HttpRequest req = HttpRequest.newBuilder()
                     .POST(BodyPublishers.ofString("q=" + URLEncoder.encode(text, StandardCharsets.UTF_8)))
                     .uri(URI.create(SERVER + "/detect"))
-                    .setHeader("User-Agent", Config.serverName)
+                    .setHeader("User-Agent", PluginConfig.serverName)
                     .setHeader("Content-Type", "application/x-www-form-urlencoded")
                     .build();
             HttpResponse<String> resp = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build().send(req, HttpResponse.BodyHandlers.ofString());
             response = resp.body();
-            Object respObj = new JSONTokener(response).nextValue();
-            if (respObj instanceof JSONObject) {
-                String error = ((JSONObject) respObj).getString("error");
+            Jval respObj = Jval.read(response);
+            if (respObj.isObject()) {
+                String error = respObj.getString("error");
                 Log.err("Translate error: " + error);
                 DiscordLog.error("Translate: Detect Server Error", error, null);
                 return null;
             }
-            JSONArray array = (JSONArray) respObj;
-            return array.getJSONObject(0).getString("language");
+            if (respObj.isArray()) {
+                return respObj.asArray().get(0).getString("language");
+            }
+            return null;
         } catch (Exception error) {
             DiscordLog.error("Translate: Detect Internal Error", error.getMessage(),
                     StringMap.of("Response", response == null ? "Unavailable" : "```\n" + response + "\n```"));

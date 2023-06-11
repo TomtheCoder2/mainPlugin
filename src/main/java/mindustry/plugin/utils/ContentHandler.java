@@ -10,8 +10,8 @@ import arc.graphics.g2d.TextureAtlas.TextureAtlasData;
 import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
+import arc.util.Strings;
 import mindustry.Vars;
-import mindustry.core.ContentLoader;
 import mindustry.core.GameState;
 import mindustry.core.Version;
 import mindustry.ctype.Content;
@@ -46,8 +46,6 @@ public class ContentHandler {
         new Fi("cache").deleteDirectory();
 
         Version.enabled = false;
-        Vars.content = new ContentLoader();
-        Vars.content.createBaseContent();
         for (ContentType type : ContentType.all) {
             for (Content content : Vars.content.getBy(type)) {
                 try {
@@ -57,16 +55,20 @@ public class ContentHandler {
             }
         }
 
-        String assets = Config.assetsDir;
-        if (Config.assetsDir == null) {
+        String assets = PluginConfig.assetsDir;
+        if (PluginConfig.assetsDir == null) {
             assets = "./assets";
         }
         debug("Loading assets from " + assets);
         var assets_raw = assets.replace("/assets", "").replace("\\assets", "") + "/assets-raw/sprites_out";
         debug("Loading assets from " + assets_raw);
         Vars.state = new GameState();
-
-        TextureAtlasData data = new TextureAtlasData(new Fi(assets + "/sprites/sprites.aatls"), new Fi(assets + "sprites"), false);
+        Fi atlas = new Fi(assets + "/sprites/sprites.aatls"), sprites = new Fi(assets + "sprites");
+        if (!(atlas.exists() && sprites.exists())) {
+            // TOOD: Uncomment
+            throw new RuntimeException(Strings.format("The file @ or folder @ could not be found", atlas, sprites));
+        }
+        TextureAtlasData data = new TextureAtlasData(atlas, sprites, false);
         Core.atlas = new TextureAtlas();
 
         new Fi(assets_raw).walk(f -> {

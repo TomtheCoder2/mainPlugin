@@ -1,9 +1,0 @@
-{
-  "name": "DiscordPlugin",
-  "displayName": "[cyan]Phoenix Plugin",
-  "author": "Nautilus & Allen-B1",
-  "main": "mindustry.plugin.PhoenixMain",
-  "description": "General-purpose server plugin, including interaction with discord",
-  "version": "1.4.3",
-  "dependencies": ["rollback"]
-}
