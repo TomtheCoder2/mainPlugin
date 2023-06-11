@@ -2,6 +2,7 @@ package mindustry.plugin.minimods;
 
 import arc.Events;
 import arc.func.Prov;
+import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.util.*;
 import mindustry.game.EventType;
@@ -24,9 +25,9 @@ public class Sessions implements MiniMod {
 			return;
 		}
 		sessions.put(session.sessionName, session);
-		String text = session.desc() + " started by" + player.name + "[white]\n" +
+		String text = session.desc() + " started by " + player.name + "[white]\n" +
 				"Vote with /y " + session.sessionName + " or /n " + session.sessionName +
-				"\n vote ends in " + Strings.formatMillis(-Time.timeSinceMillis(session.endTime));
+				"\nVote ends in " + Strings.formatMillis(-Time.timeSinceMillis(session.endTime));
 		Call.sendMessage(GameMsg.info("Sessions", text));
 		player.sendMessage(GameMsg.info("Sessions", "Cancel this session with /c " + session.sessionName));
 
@@ -147,10 +148,10 @@ public class Sessions implements MiniMod {
 		}
 
 		protected void timerFinished() {
-			if (this.endTime < Time.millis()) {
-				Timer.schedule(this::timerFinished, (this.endTime - Time.millis())/1000f);
-				Call.sendMessage(GameMsg.info("Sessions", "Session @ has failed", this.sessionName));
+			if (this.endTime > Time.millis()) {
+				Timer.schedule(this::timerFinished, Mathf.ceil(-Time.timeSinceMillis(this.endTime) / 1000f));
 			} else {
+				Call.sendMessage(GameMsg.info("Sessions", "Session @ has failed", this.sessionName));
 				this.end();
 			}
 		}
