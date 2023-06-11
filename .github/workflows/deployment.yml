@@ -20,8 +20,7 @@ jobs:
         run: ./gradlew jar -Pbuildversion=${RELEASE_VERSION:1}
 
       - name: Upload built jar file
-        uses: svenstaro/upload-release-action@v2
+        uses: actions/upload-artifact@v2
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ github.event.repository.name }}
           file: build/libs/DiscordPlugin.jar
-          tag: ${{ github.ref }}
