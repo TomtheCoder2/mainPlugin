@@ -23,4 +23,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ github.event.repository.name }}
-          file: build/libs/DiscordPlugin.jar
+          path: build/libs/DiscordPlugin.jar
