@@ -25,7 +25,6 @@ dependencies {
 
     implementation("com.electronwill.night-config:toml:3.6.6")
     implementation("org.javacord:javacord:3.5.0")
-    implementation("net.dv8tion:JDA:4.3.0_277")
     implementation("jfree:jfreechart:1.0.13")
     implementation("org.postgresql:postgresql:42.5.4")
     compileOnly("com.github.7003Mars:rollback:b1.2")
