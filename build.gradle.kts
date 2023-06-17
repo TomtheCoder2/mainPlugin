@@ -1,4 +1,5 @@
 import arc.files.Fi
+import arc.files.ZipFi
 import arc.graphics.Color
 import arc.graphics.Pixmap
 import arc.math.Mathf
@@ -76,9 +77,10 @@ tasks.processResources {
 
     if (!hasProperty("exclude-sprites")) {
         dependsOn(":genSprites")
+        dependsOn(":extractAtlas")
         with(copySpec {
             from("$buildDir/tmp/")
-            include("aa-sprites/")
+            include("aa-sprites/", "atlas/sprites.aatls")
         })
     }
     val buildVer: String = project.findProperty("buildVersion") as String? ?: "build-${LocalTime.now()}"
@@ -121,7 +123,6 @@ tasks.register("downloadSprites") {
         }
         getAll("$api/contents/core/assets-raw/sprites/blocks?ref=$mindustryVer", downloadUrls)
         downloadUrls.filter { it.endsWith("png") }
-//        downloadUrls.removeRange(120, downloadUrls.size-1)
         logger.lifecycle("Total size ${downloadUrls.size}")
 
         val downloadBuilder: HttpRequest.Builder = with(HttpRequest.newBuilder()) {
@@ -150,7 +151,23 @@ tasks.register("genSprites") {
             antiAliasing(it.toFile(), File("$outputDir/${it.fileName}"))
         }
     }
+}
 
+tasks.register("extractAtlas") {
+    inputs.property("release-ver", mindustryVer)
+    val taskDir = "$buildDir/tmp/atlas"
+    outputs.file("$taskDir/sprites.aatls")
+    doLast {
+        val releaseUrl = "https://github.com/Anuken/Mindustry/releases/download/$mindustryVer/Mindustry.jar"
+        val client: HttpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build()
+        val req: HttpRequest = with(HttpRequest.newBuilder()) {
+            uri(URI.create(releaseUrl))
+            header("Accept", "application/octet-stream")
+        }.build()
+        val resp = client.send(req, BodyHandlers.ofFile(Path("$taskDir/game.jar")))
+        val gameJar: ZipFi = ZipFi(Fi(resp.body().toFile()))
+        gameJar.child("sprites").child("sprites.aatls").copyTo(Fi("$taskDir/sprites.aatls"))
+    }
 }
 
 
