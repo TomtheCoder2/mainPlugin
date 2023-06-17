@@ -6,10 +6,7 @@ import arc.math.geom.Point2;
 import arc.struct.ObjectMap;
 import arc.struct.ObjectSet;
 import arc.struct.Seq;
-import arc.util.CommandHandler;
-import arc.util.Log;
-import arc.util.Strings;
-import arc.util.Timer;
+import arc.util.*;
 import mindustry.Vars;
 import mindustry.content.Blocks;
 import mindustry.core.GameState;
@@ -231,7 +228,7 @@ public class Ranks implements MiniMod {
                     }
                 }, 10 * 60);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.err("Something went wrong generating the image!", e);
             }
         });
         t.start();
@@ -364,6 +361,8 @@ public class Ranks implements MiniMod {
                                         p.kick(Packets.KickReason.banned);
                                     }
                                 }
+                                long undoStart = msg.getCreationTimestamp().toEpochMilli() - 5 * 60 * 1000L;
+                                Undo.instance.rollback(pd.uuid, undoStart);
                                 msg.createUpdater()
                                         .setEmbed(
                                                 eb.toBuilder()

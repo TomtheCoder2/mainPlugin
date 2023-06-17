@@ -14,6 +14,7 @@ import java.util.*
 import java.util.concurrent.Semaphore
 import kotlin.io.path.Path
 import kotlin.io.path.forEachDirectoryEntry
+import kotlin.io.path.nameWithoutExtension
 
 
 val mindustryVer = "v144.3"
@@ -147,7 +148,10 @@ tasks.register("genSprites") {
     val outputDir = "$buildDir/tmp/aa-sprites"
     outputs.dir(outputDir)
     doLast {
+        // Make an empty file
+        val names: Fi = Fi("$outputDir/names.txt").also { it.delete() }
         Path("$buildDir/tmp/assets").forEachDirectoryEntry("**.png") {
+            names.writeString(it.nameWithoutExtension+"\n", true)
             antiAliasing(it.toFile(), File("$outputDir/${it.fileName}"))
         }
     }
