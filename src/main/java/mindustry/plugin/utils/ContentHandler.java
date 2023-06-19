@@ -167,8 +167,11 @@ public class ContentHandler {
 
         try {
             BufferedImage image = ImageIO.read(new File(assets + "/sprites/block_colors.png"));
-
+            int width = image.getWidth(), blocksSize = Vars.content.blocks().size;
+            Log.info("Block colors: @, Blocks: @", width, blocksSize);
+            if (width < blocksSize) Log.err("Image width less than content size! @/@");
             for (Block block : Vars.content.blocks()) {
+                if (block.id > width-1) break;
                 block.mapColor.argb8888(image.getRGB(block.id, 0));
                 if (block instanceof OreBlock) {
                     block.mapColor.set(block.itemDrop.color);

@@ -75,7 +75,7 @@ public class Mods implements MiniMod {
         handler.register("uploadmod", "[.zip|jar]", d -> {
             d.help = "Upload mod (include .zip file in message)";
             d.category = "Mods";
-            d.roles = new long[]{Roles.ADMIN};
+            d.roles = new long[]{Roles.ADMIN, Roles.DEV};
             d.aliases = new String[]{"umod"};
         }, ctx -> {
             Seq<MessageAttachment> ml = new Seq<>();
@@ -128,7 +128,7 @@ public class Mods implements MiniMod {
 
         handler.register("removemod", "<modname/id...>", d -> {
             d.help = "Remove a mod from the folder";
-            d.roles = new long[]{Roles.ADMIN};
+            d.roles = new long[]{Roles.ADMIN, Roles.DEV};
             d.category = "Mods";
             d.aliases = new String[]{"rmod"};
         }, ctx -> {

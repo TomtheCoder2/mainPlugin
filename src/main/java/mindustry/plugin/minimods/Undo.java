@@ -54,6 +54,7 @@ public class Undo implements MiniMod {
 
 		Events.on(PlayerLeave.class, playerLeave -> {
 			players.put(playerLeave.player.uuid(), playerLeave.player.team());
+			inspectorCache.remove(playerLeave.player);
 		});
 
 		Cooldowns.instance.set("inspector-tap", 1);
