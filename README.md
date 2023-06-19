@@ -1,4 +1,4 @@
-# Pheonix Plugin
+# Phoenix Plugin
 [comment]: <> ([![Discord]&#40;https://img.shields.io/discord/391020510269669376.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48&#41;]&#40;https://discord.gg/W3eYUjGbce&#41;)
 
 [comment]: <> ([![Join our Discord server!]&#40;https://invidget.switchblade.xyz/qtjqCUbbdR&#41;]&#40;http://discord.gg/qtjqCUbbdR&#41;)
@@ -10,7 +10,7 @@
 
 ## Run
 * Create a `settings.json` file in the same location as the plugin file.
-* Use ~~the same format as the example in the `./config/mods/exampleSettings.json` file~~ the format specified in the `PheonixMain.java` file.
+* Use ~~the same format as the example in the `./config/mods/exampleSettings.json` file~~ the format specified in the `PhoenixMain.java` file.
 * SQL database is required
 * Run a mindustry server JAR file, and include relevant JDBC jars (postgres, sqlite, etc; whatever your SQL database is)
 

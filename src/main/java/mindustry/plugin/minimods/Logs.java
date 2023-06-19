@@ -95,7 +95,7 @@ public class Logs implements MiniMod {
             System.gc();
             int post = (int) (Core.app.getJavaHeap() / 1024.0 / 1024.0);
 
-            Log.info("Garbage collection: @ mb - @ mb= @ mb", pre, post, pre - post);
+//            Log.info("Garbage collection: @ mb - @ mb= @ mb", pre, post, pre - post);
 
             if (joinPlayers.size == 0 && leftPlayers.size == 0) return;
 
