@@ -18,6 +18,8 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew jar -Pbuildversion=${RELEASE_VERSION:1}
+        env:
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload built jar file
         uses: actions/upload-artifact@v2

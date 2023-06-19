@@ -11,7 +11,6 @@ import arc.math.Mathf;
 import arc.struct.ObjectMap;
 import arc.struct.Seq;
 import arc.util.Log;
-import arc.util.Strings;
 import mindustry.Vars;
 import mindustry.core.GameState;
 import mindustry.core.Version;
@@ -20,6 +19,7 @@ import mindustry.ctype.ContentType;
 import mindustry.entities.units.BuildPlan;
 import mindustry.game.Schematic;
 import mindustry.game.Schematics;
+import mindustry.plugin.PhoenixMain;
 import mindustry.world.Block;
 import mindustry.world.blocks.environment.OreBlock;
 
@@ -27,8 +27,9 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.util.Objects;
 
 import static arc.util.Log.debug;
 import static mindustry.Vars.schematicBaseStart;
@@ -40,6 +41,8 @@ public class ContentHandler {
     Graphics2D currentGraphics;
     BufferedImage currentImage;
     ObjectMap<String, Fi> imageFiles = new ObjectMap<>();
+    public boolean usingInternal = false;
+    ObjectMap<String, URL> imageUrls = new ObjectMap<>();
     ObjectMap<String, BufferedImage> regions = new ObjectMap<>();
 
     public ContentHandler() {
@@ -55,28 +58,57 @@ public class ContentHandler {
                 }
             }
         }
+        // Is this required?
+        Vars.state = new GameState();
 
         String assets = PluginConfig.assetsDir;
         if (PluginConfig.assetsDir == null) {
             assets = "./assets";
         }
         debug("Loading assets from " + assets);
-        var assets_raw = assets.replace("/assets", "").replace("\\assets", "") + "/assets-raw/sprites_out";
-        debug("Loading assets from " + assets_raw);
-        Vars.state = new GameState();
-        Fi atlas = new Fi(assets + "/sprites/sprites.aatls"), sprites = new Fi(assets + "sprites");
-        if (!(atlas.exists() && sprites.exists())) {
-            // TOOD: Uncomment
-            throw new RuntimeException(Strings.format("The file @ or folder @ could not be found", atlas, sprites));
+        Fi assets_raw = new Fi(assets).parent().child("assets-raw/sprites_out");
+        if (!assets_raw.exists()) {
+            Log.warn("Raw asset folder @ not found", assets_raw.absolutePath());
+            usingInternal = true;
         }
-        TextureAtlasData data = new TextureAtlasData(atlas, sprites, false);
+        Fi atlas = new Fi(assets + "/sprites/sprites.aatls");
+        if (!atlas.exists()) {
+            Log.warn("Aatls file not found at: @", atlas.absolutePath());
+            usingInternal = true;
+        }
+//        usingInternal = true;
+        TextureAtlasData data;
+        if (usingInternal) {
+            Log.info("Using internal sprites");
+            Class<?> cls = PhoenixMain.class;
+            atlas = new Fi("") {
+                @Override
+                public InputStream read() {
+                    return Objects.requireNonNull(cls.getResourceAsStream("/atlas/sprites.aatls"));
+                }
+            };
+            try (InputStream stream = cls.getResourceAsStream("/aa-sprites/names.txt")) {
+                InputStreamReader isr = new InputStreamReader(stream);
+                BufferedReader reader = new BufferedReader(isr);
+                Log.info("Assets generated from version @", reader.readLine());
+                String name;
+                while ((name = reader.readLine()) != null) {
+                    imageUrls.put(name, Objects.requireNonNull(cls.getResource("/aa-sprites/"+name+".png")));
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Aatls needed for sprite sizing, sprites not needed as sprites_raw is used?
+            assets_raw.walk(f -> {
+                if (f.extEquals("png")) {
+                    imageFiles.put(f.nameWithoutExtension(), f);
+                }
+            });
+        }
+        data = new TextureAtlasData(atlas, new Fi(""), false);
         Core.atlas = new TextureAtlas();
 
-        new Fi(assets_raw).walk(f -> {
-            if (f.extEquals("png")) {
-                imageFiles.put(f.nameWithoutExtension(), f);
-            }
-        });
 
         data.getPages().each(page -> {
             page.texture = Texture.createEmpty(null);
@@ -135,12 +167,18 @@ public class ContentHandler {
         }
 
         try {
-            BufferedImage image = ImageIO.read(new File(assets + "/sprites/block_colors.png"));
-            int width = image.getWidth(), blocksSize = Vars.content.blocks().size;
+            BufferedImage image = null;
+            File file = new File(assets + "/sprites/block_colors.png");
+            if (file.exists()) image = ImageIO.read(file);
+            if (image == null) Log.warn("Block color file not found at @", file.getPath());
+            int width = image != null ? image.getWidth() : -1, blocksSize = Vars.content.blocks().size;
             Log.info("Block colors: @, Blocks: @", width, blocksSize);
-            if (width < blocksSize) Log.err("Image width less than content size! @/@");
+            if (width < blocksSize) {
+                Log.err("Image width less than content size! \n Using builtin block colors");
+                image = ImageIO.read(PhoenixMain.class.getResourceAsStream("/atlas/block_colors.png"));
+                Log.info("Builtin color size: @", image.getWidth());
+            }
             for (Block block : Vars.content.blocks()) {
-                if (block.id > width-1) break;
                 block.mapColor.argb8888(image.getRGB(block.id, 0));
                 if (block instanceof OreBlock) {
                     block.mapColor.set(block.itemDrop.color);
@@ -165,8 +203,11 @@ public class ContentHandler {
     private BufferedImage getImage(String name) {
         return regions.get(name, () -> {
             try {
-//                System.out.println(imageFiles);
-                return ImageIO.read(imageFiles.get(name, imageFiles.get("error")).file());
+                if (usingInternal) {
+                    return ImageIO.read(imageUrls.get(name, imageUrls.get("error")));
+                } else {
+                    return ImageIO.read(imageFiles.get(name, imageFiles.get("error")).file());
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
