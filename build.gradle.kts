@@ -17,7 +17,7 @@ import kotlin.io.path.forEachDirectoryEntry
 import kotlin.io.path.nameWithoutExtension
 
 
-val mindustryVer = "v144.3"
+val mindustryVer = "v145"
 val arcVer = mindustryVer
 
 
@@ -29,7 +29,7 @@ buildscript {
         /** Referencing [arcVer] seems to break the entire script.
         Remember to update this whenever arcVer is updated too
          */
-        classpath("com.github.Anuken.Arc:arc-core:v144.3")
+        classpath("com.github.Anuken.Arc:arc-core:v145")
     }
 }
 
@@ -81,7 +81,8 @@ tasks.processResources {
         dependsOn(":extractAtlas")
         with(copySpec {
             from("$buildDir/tmp/")
-            include("aa-sprites/", "atlas/sprites.aatls")
+            include("aa-sprites/")
+            include("atlas/sprites.aatls", "atlas/block_colors.png")
         })
     }
     val buildVer: String = project.findProperty("buildVersion") as String? ?: "build-${LocalTime.now()}"
@@ -150,6 +151,7 @@ tasks.register("genSprites") {
     doLast {
         // Make an empty file
         val names: Fi = Fi("$outputDir/names.txt").also { it.delete() }
+        names.writeString(mindustryVer+"\n");
         Path("$buildDir/tmp/assets").forEachDirectoryEntry("**.png") {
             names.writeString(it.nameWithoutExtension+"\n", true)
             antiAliasing(it.toFile(), File("$outputDir/${it.fileName}"))
@@ -171,6 +173,7 @@ tasks.register("extractAtlas") {
         val resp = client.send(req, BodyHandlers.ofFile(Path("$taskDir/game.jar")))
         val gameJar: ZipFi = ZipFi(Fi(resp.body().toFile()))
         gameJar.child("sprites").child("sprites.aatls").copyTo(Fi("$taskDir/sprites.aatls"))
+        gameJar.child("sprites").child("block_colors.png").copyTo(Fi("$taskDir/block_colors.png"))
     }
 }
 

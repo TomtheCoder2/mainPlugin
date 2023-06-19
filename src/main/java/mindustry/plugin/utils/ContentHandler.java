@@ -90,6 +90,7 @@ public class ContentHandler {
             try (InputStream stream = cls.getResourceAsStream("/aa-sprites/names.txt")) {
                 InputStreamReader isr = new InputStreamReader(stream);
                 BufferedReader reader = new BufferedReader(isr);
+                Log.info("Assets generated from version @", reader.readLine());
                 String name;
                 while ((name = reader.readLine()) != null) {
                     imageUrls.put(name, Objects.requireNonNull(cls.getResource("/aa-sprites/"+name+".png")));
@@ -166,12 +167,18 @@ public class ContentHandler {
         }
 
         try {
-            BufferedImage image = ImageIO.read(new File(assets + "/sprites/block_colors.png"));
-            int width = image.getWidth(), blocksSize = Vars.content.blocks().size;
+            BufferedImage image = null;
+            File file = new File(assets + "/sprites/block_colors.png");
+            if (file.exists()) image = ImageIO.read(file);
+            if (image == null) Log.warn("Block color file not found at @", file.getPath());
+            int width = image != null ? image.getWidth() : -1, blocksSize = Vars.content.blocks().size;
             Log.info("Block colors: @, Blocks: @", width, blocksSize);
-            if (width < blocksSize) Log.err("Image width less than content size! @/@");
+            if (width < blocksSize) {
+                Log.err("Image width less than content size! \n Using builtin block colors");
+                image = ImageIO.read(PhoenixMain.class.getResourceAsStream("/atlas/block_colors.png"));
+                Log.info("Builtin color size: @", image.getWidth());
+            }
             for (Block block : Vars.content.blocks()) {
-                if (block.id > width-1) break;
                 block.mapColor.argb8888(image.getRGB(block.id, 0));
                 if (block instanceof OreBlock) {
                     block.mapColor.set(block.itemDrop.color);
