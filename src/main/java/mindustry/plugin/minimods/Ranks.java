@@ -25,6 +25,7 @@ import mindustry.ui.Menus;
 import mindustry.world.Block;
 import mindustry.world.Tile;
 import mindustry.world.blocks.ConstructBlock;
+import mindustry.world.blocks.environment.Prop;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageFlag;
 import org.javacord.api.entity.message.component.Button;
@@ -79,39 +80,7 @@ public class Ranks implements MiniMod {
             Blocks.underflowGate,
             Blocks.overflowGate
     };
-    /**
-     * Boulder
-     * Snow Boulder
-     * Shale Boulder
-     * Sand Boulder
-     * Dacite Boulder
-     * Basalt Boulder
-     * Carbon Boulder
-     * Ferric Boulder
-     * Beryllic Boulder
-     * Yellow stone Boulder
-     * Crystaline Boulder
-     * Red Ice Boulder
-     * Rhyolite Boulder
-     * Red stone Boulder
-     * Boulder Boulder
-     */
-    private final static Block[] excludedBlocksAntiGriefSystem = new Block[]{
-            Blocks.boulder,
-            Blocks.snowBoulder,
-            Blocks.shaleBoulder,
-            Blocks.sandBoulder,
-            Blocks.daciteBoulder,
-            Blocks.basaltBoulder,
-            Blocks.carbonBoulder,
-            Blocks.ferricBoulder,
-            Blocks.beryllicBoulder,
-            Blocks.yellowStoneBoulder,
-            Blocks.crystallineBoulder,
-            Blocks.redIceBoulder,
-            Blocks.rhyoliteBoulder,
-            Blocks.redStoneBoulder,
-    };
+    private static Block[] excludedBlocksAntiGriefSystem = {};
     /**
      * For auto ban system
      */
@@ -247,6 +216,10 @@ public class Ranks implements MiniMod {
             randomKey = randKey;
             Log.info("Loaded randomKey = " + randomKey);
         }
+
+        Events.on(EventType.ContentInitEvent.class, contentInitEvent -> {
+            excludedBlocksAntiGriefSystem = Vars.content.blocks().select(b -> b instanceof Prop).toArray(Block.class);
+        });
         // -- MAP SECTION -- //
         Events.on(EventType.WorldLoadEvent.class, event -> {
             // reset start time
