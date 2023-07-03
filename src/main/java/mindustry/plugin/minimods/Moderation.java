@@ -442,7 +442,7 @@ public class Moderation implements MiniMod {
                     }
 
                     String oldName = Utils.escapeEverything(p.name);
-                    p.name = ctx.args.get("name");
+                    p.name = Vars.netServer.fixName(ctx.args.get("name"));
 
                     p.sendMessage("Your name was changed to [orange]" + p.name + "[white] by a moderator");
                     ctx.success("Renamed player", "Renamed " + oldName + " to " + Strings.stripColors(p.name));
