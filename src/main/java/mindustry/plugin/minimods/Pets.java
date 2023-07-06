@@ -66,7 +66,7 @@ public class Pets implements MiniMod {
     }
 
     protected static int tierOf(UnitType type) {
-        if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela || type == UnitTypes.arkyid || type == UnitTypes.alpha || type == UnitTypes.beta || type == UnitTypes.gamma) {
+        if (type == UnitTypes.quad || type == UnitTypes.scepter || type == UnitTypes.vela || type == UnitTypes.alpha || type == UnitTypes.beta || type == UnitTypes.gamma) {
             return 4;
         } else if (type == UnitTypes.fortress || type == UnitTypes.quasar || type == UnitTypes.spiroct || type == UnitTypes.zenith || type == UnitTypes.mega ||
                 type == UnitTypes.precept || type == UnitTypes.anthicus || type == UnitTypes.obviate
