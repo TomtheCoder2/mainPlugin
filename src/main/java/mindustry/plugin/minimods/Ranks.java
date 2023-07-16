@@ -534,6 +534,7 @@ public class Ranks implements MiniMod {
             // also from warned
             warned.remove(event.player.uuid());
             // pause game if no one is online
+            if (world.isGenerating()) return;
             debug("player online: @", Groups.player.size());
             if (Groups.player.size() <= 1) {
                 debug("Pausing server cause no one is online");
