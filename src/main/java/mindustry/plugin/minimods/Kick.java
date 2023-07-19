@@ -123,7 +123,7 @@ public class Kick implements MiniMod {
     @Override
     public void registerCommands(CommandHandler handler) {
         Cooldowns.instance.set("votekick", 5);
-        handler.<Player>register("votekick", "[player...]", "votekick a player.", (args, player) -> {
+        handler.<Player>register("votekick", "[player] [reason...]", "votekick a player.", (args, player) -> {
             if (!Cooldowns.instance.canRun("votekick", player.uuid())) {
                 player.sendMessage(GameMsg.ratelimit("Kick", "votekick"));
                 return;
@@ -157,16 +157,15 @@ public class Kick implements MiniMod {
                 player.sendMessage(Utils.playerList(p -> !p.admin && p.con != null && p != player));
                 return;
             }
-
-            Player found = Query.findPlayerEntity(args[0]);
-            if (found == null) {
-                if (args[0].length() > 1 && args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))) {
-                    int id = Strings.parseInt(args[0].substring(1));
-                    found = Groups.player.find(p -> p.id() == id);
-                } else {
-                    found = Groups.player.find(p -> p.name.equalsIgnoreCase(args[0]));
-                }
+            // Find by id first
+            Player found = null;
+            String reason = args.length > 1 ? args[1] : "";
+            if (args[0].startsWith("#") && Strings.canParseInt(args[0].substring(1))) {
+                int id = Strings.parseInt(args[0].substring(1));
+                found = Groups.player.find(p -> p.id == id);
             }
+            if (found == null) found = Query.findPlayerEntity(args[0]);
+            if (found == null) found = Groups.player.find(p -> p.name.equalsIgnoreCase(args[0]));
 
             if (found == null) {
                 player.sendMessage(GameMsg.error("Kick", "No player [orange]" + args[0] + "[scarlet] found."));
@@ -202,9 +201,8 @@ public class Kick implements MiniMod {
             session.endTime = System.currentTimeMillis() + VOTE_TIME;
             session.addVote(player.uuid(), 1);
             Timer.schedule(new VoteSession.Task(session), VOTE_TIME / 1000);
-
-            Call.sendMessage(GameMsg.info("Kick", "Plaintiff [white]" + player.name + "[" + GameMsg.INFO + "] has voted to kick defendant [white]" + found.name + "[" + GameMsg.INFO + "] " +
-                    "(1/" + session.requiredVotes() + "). " +
+            Call.sendMessage(GameMsg.info("Kick", "Plaintiff [white]" + player.name + "[" + GameMsg.INFO + "] has voted to kick defendant [white]" + found.name + "[white] for:" + reason +
+                    "[" + GameMsg.INFO + "] " + "(1/" + session.requiredVotes() + "). " +
                     "Type [" + GameMsg.CMD + "]/vote y[" + GameMsg.INFO + "] to agree and [" + GameMsg.CMD + "]/vote n[" + GameMsg.INFO + "] to disagree."));
 
             // freeze the player

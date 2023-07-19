@@ -17,7 +17,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew jar -Pbuildversion=${RELEASE_VERSION:1}
+        run: ./gradlew jar -Pbuildversion=${{startsWith(github.ref, 'refs/tags/') && github.ref_name || github.run_number}}
         env:
           gh_token: ${{ secrets.GITHUB_TOKEN }}
 
