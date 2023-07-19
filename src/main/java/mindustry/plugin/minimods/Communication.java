@@ -123,12 +123,12 @@ public class Communication implements MiniMod {
                 var author = event.getMessageAuthor().asUser().get();
                 String name = "";
                 if (author.getNickname(server).isPresent()) {
-                    name = author.getNickname(server) + " (" + author.getDiscriminatedName() + ")";
+                    name = author.getNickname(server) + " (" + author.getName() + ")";
                 } else {
-                    name = author.getDiscriminatedName();
+                    name = author.getName();
                 }
 
-                Call.sendMessage("[sky]" + name + ":[white] " + event.getMessageContent());
+                Call.sendMessage("[sky]\uE80D " + name + ":[white] " + event.getMessageContent());
             });
         }
 
