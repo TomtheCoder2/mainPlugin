@@ -51,8 +51,8 @@ repositories {
 
 dependencies {
     // Mindustry
-    compileOnly("com.github.Anuken.mindustryjitpack:server:$mindustryVer")
-    compileOnly("com.github.Anuken.mindustryjitpack:core:$mindustryVer")
+    compileOnly("com.github.Anuken.mindustry:server:$mindustryVer")
+    compileOnly("com.github.Anuken.mindustry:core:$mindustryVer")
     compileOnly("com.github.Anuken.Arc:arc-core:$arcVer")
 
     implementation("com.electronwill.night-config:toml:3.6.6")
