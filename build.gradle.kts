@@ -17,7 +17,7 @@ import kotlin.io.path.forEachDirectoryEntry
 import kotlin.io.path.nameWithoutExtension
 
 
-val mindustryVer = "v145"
+val mindustryVer = "v145.1"
 val arcVer = mindustryVer
 
 
@@ -29,7 +29,7 @@ buildscript {
         /** Referencing [arcVer] seems to break the entire script.
         Remember to update this whenever arcVer is updated too
          */
-        classpath("com.github.Anuken.Arc:arc-core:v145")
+        classpath("com.github.Anuken.Arc:arc-core:v145.1")
     }
 }
 
