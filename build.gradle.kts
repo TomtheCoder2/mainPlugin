@@ -29,7 +29,7 @@ buildscript {
         /** Referencing [arcVer] seems to break the entire script.
         Remember to update this whenever arcVer is updated too
          */
-        classpath("com.github.Anuken.Arc:arc-core:v145.1")
+        classpath("com.github.anuken.Arc:arc-core:v145.1")
     }
 }
 
@@ -51,8 +51,8 @@ repositories {
 
 dependencies {
     // Mindustry
-    compileOnly("com.github.Anuken.mindustry:server:$mindustryVer")
-    compileOnly("com.github.Anuken.mindustry:core:$mindustryVer")
+    compileOnly("com.github.anuken.mindustry:server:$mindustryVer")
+    compileOnly("com.github.anuken.mindustry:core:$mindustryVer")
     compileOnly("com.github.Anuken.Arc:arc-core:$arcVer")
 
     implementation("com.electronwill.night-config:toml:3.6.6")
