@@ -18,10 +18,8 @@ import mindustry.gen.Groups;
 import mindustry.gen.Player;
 import mindustry.net.Administration;
 import mindustry.plugin.MiniMod;
-import mindustry.plugin.utils.Cooldowns;
-import mindustry.plugin.utils.GameMsg;
-import mindustry.plugin.utils.Query;
-import mindustry.plugin.utils.Utils;
+import mindustry.plugin.database.Database;
+import mindustry.plugin.utils.*;
 import mindustry.world.Tile;
 
 import java.util.Comparator;
@@ -71,10 +69,15 @@ public class Undo implements MiniMod {
 			for (Action action : actions) {
 				sb.append("\n[accent]");
 				sb.append(Strings.formatMillis(Time.timeSinceMillis(action.getTime()))).append(" ago: [white]");
-				String name = Vars.netServer.admins.getInfo(action.getUuid()).lastName;
-				sb.append(name);
-				if (!action.getUuid().equals("")) {
-					sb.append(" [sky]- ").append(Utils.calculatePhash(action.getUuid()));
+				String uuid = action.getUuid();
+				switch (uuid) {
+					case "world" -> sb.append("The world");
+					case "" -> sb.append("<unknown>");
+					default -> {
+						String name = Vars.netServer.admins.getInfo(uuid).lastName;
+						sb.append(name);
+						sb.append(" [sky]- ").append(Utils.calculatePhash(action.getUuid()));
+					}
 				}
 				sb.append("\n[white]");
 				if (action instanceof BuildAction) {
@@ -151,7 +154,10 @@ public class Undo implements MiniMod {
 				return;
 			}
 			int duration = args.length == 2 ? Strings.parseInt(args[1], UNDO_DURATION) : UNDO_DURATION;
-			duration = Math.min(duration, 120);
+			// Playerdata shouldn't be null?
+			Database.Player pd = Database.getPlayerData(player.uuid());
+			int maxDuration = pd != null ? (pd.rank >= 1 ? 60 : 5) : 5;
+			duration = Math.min(duration, maxDuration);
 			String finalTarget = target;
 			int finalDuration = duration;
 			Sessions.newSession(player, () -> new UndoSession(player, finalTarget, finalDuration));
@@ -236,7 +242,7 @@ class UndoSession extends Sessions.Session {
 	}
 
 	@Override
-	public boolean onVote(int yes, int no, int players,@Nullable Player player) {
+	public boolean onVote(int yes, int no, int players, @Nullable Player player) {
 		this.endTime += Extend_Time*1000L;
 		int score = yes-no;
 		int required = (players/2) + 1;
@@ -245,7 +251,7 @@ class UndoSession extends Sessions.Session {
 			Call.sendMessage(GameMsg.info("Undo", "Vote passed, undoing(@ min)", this.duration));
 			return true;
 		}
-		Call.sendMessage(GameMsg.info("Undo", "@ has voted, (@/@) @ left",
+		Call.sendMessage(GameMsg.info("Undo", "@ [white]has voted, (@/@) @ left",
 				player.name, score, required, Strings.formatMillis(-Time.timeSinceMillis(this.endTime))));
 		return false;
 	}
