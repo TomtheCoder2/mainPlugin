@@ -17,7 +17,7 @@ import kotlin.io.path.forEachDirectoryEntry
 import kotlin.io.path.nameWithoutExtension
 
 
-val mindustryVer = "v145"
+val mindustryVer = "v145.1"
 val arcVer = mindustryVer
 
 
@@ -29,7 +29,7 @@ buildscript {
         /** Referencing [arcVer] seems to break the entire script.
         Remember to update this whenever arcVer is updated too
          */
-        classpath("com.github.Anuken.Arc:arc-core:v145")
+        classpath("com.github.anuken.Arc:arc-core:v145.1")
     }
 }
 
@@ -51,15 +51,15 @@ repositories {
 
 dependencies {
     // Mindustry
-    compileOnly("com.github.Anuken.mindustryjitpack:server:$mindustryVer")
-    compileOnly("com.github.Anuken.mindustryjitpack:core:$mindustryVer")
+    compileOnly("com.github.anuken.mindustry:server:$mindustryVer")
+    compileOnly("com.github.anuken.mindustry:core:$mindustryVer")
     compileOnly("com.github.Anuken.Arc:arc-core:$arcVer")
 
     implementation("com.electronwill.night-config:toml:3.6.6")
     implementation("org.javacord:javacord:3.5.0")
     implementation("jfree:jfreechart:1.0.13")
     implementation("org.postgresql:postgresql:42.5.4")
-    compileOnly("com.github.7003Mars:rollback:b1.2")
+    compileOnly("com.github.7003mars:rollback:b1.4.3")
 }
 
 tasks.jar {
