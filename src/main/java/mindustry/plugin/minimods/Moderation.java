@@ -26,6 +26,7 @@ import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -33,6 +34,7 @@ import java.util.stream.StreamSupport;
 import static mindustry.plugin.database.Database.getNames;
 import static mindustry.plugin.database.Database.getPlayerData;
 import static mindustry.plugin.discord.DiscordLog.moderationLogColonel;
+import static mindustry.plugin.utils.Utils.calculatePhash;
 import static mindustry.plugin.utils.Utils.split;
 
 
@@ -43,6 +45,7 @@ public class Moderation implements MiniMod {
     public static final ObjectSet<String> frozen = new ObjectSet<>();
     public final ObjectSet<String> muted = new ObjectSet<>();
     private final ObjectSet<String> warnedFrozen = new ObjectSet<>();
+    private ArrayList<Utils.Pair<String, String>> leftPlayers = new ArrayList<>();
 
     @Override
     public void registerEvents() {
@@ -588,6 +591,24 @@ public class Moderation implements MiniMod {
                         p.name = Utils.formatName(Rank.all[pd.rank], "[#" + player.color.toString().substring(0, 6) + "]" + Vars.netServer.admins.getInfo(pd.uuid).lastName);
                     }
                     player.sendMessage("[cyan]Reset names!");
+                });
+        Events.on(EventType.PlayerLeave.class, event -> {
+            Player player = event.player;
+            if (player == null) return;
+            if (leftPlayers.size() > 10) leftPlayers.remove(0);
+            leftPlayers.add(new Utils.Pair<>(player.name, calculatePhash(player.uuid())));
+        });
+        Utils.registerRankCommand(handler, "left", "", 0,
+                "Show the name and phash of the 10 last left players.", (args, player) -> {
+                    if (leftPlayers.isEmpty()) {
+                        player.sendMessage("[red]No players left yet!");
+                    } else {
+                        StringBuilder sb = new StringBuilder("[cyan]Last left players:\n");
+                        for (int i = 0; i < leftPlayers.size(); i++) {
+                            sb.append("[accent] #").append(i).append(" ").append(leftPlayers.get(i).first).append("[accent] - ").append(leftPlayers.get(i).second).append("\n");
+                        }
+                        player.sendMessage(sb.toString());
+                    }
                 });
     }
 }
