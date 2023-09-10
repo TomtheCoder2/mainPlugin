@@ -17,8 +17,8 @@ import kotlin.io.path.forEachDirectoryEntry
 import kotlin.io.path.nameWithoutExtension
 
 
-val mindustryVer = "v145.1"
-val arcVer = mindustryVer
+val mindustryVer by extra("v146")
+val arcVer by extra("v146")
 
 
 buildscript {
@@ -29,7 +29,7 @@ buildscript {
         /** Referencing [arcVer] seems to break the entire script.
         Remember to update this whenever arcVer is updated too
          */
-        classpath("com.github.anuken.Arc:arc-core:v145.1")
+        classpath("com.github.anuken.Arc:arc-core:v146")
     }
 }
 
@@ -46,6 +46,15 @@ repositories {
     maven {
         name = "m2-dv8tion"
         url = uri("https://m2.dv8tion.net/releases")
+    }
+    maven("https://maven.xpdustry.com/anuken")
+}
+
+configurations.all{
+    resolutionStrategy.eachDependency {
+        if(this.requested.group == "com.github.Anuken.Arc"){
+            this.useVersion("v146")
+        }
     }
 }
 
@@ -170,6 +179,7 @@ tasks.register("extractAtlas") {
             uri(URI.create(releaseUrl))
             header("Accept", "application/octet-stream")
         }.build()
+        println("Downloading game jar from $releaseUrl")
         val resp = client.send(req, BodyHandlers.ofFile(Path("$taskDir/game.jar")))
         val gameJar: ZipFi = ZipFi(Fi(resp.body().toFile()))
         gameJar.child("sprites").child("sprites.aatls").copyTo(Fi("$taskDir/sprites.aatls"))

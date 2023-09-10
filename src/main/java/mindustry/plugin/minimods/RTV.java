@@ -28,8 +28,8 @@ public final class RTV implements MiniMod {
     private static void changeMap(Map map) {
         for (ApplicationListener listener : Core.app.getListeners()) {
             if (listener instanceof ServerControl) {
-                Reflect.set(listener, "nextMapOverride", map);
-                Events.fire(new EventType.GameOverEvent(Team.crux));
+                Call.updateGameOver(Team.crux);
+                ((ServerControl)listener).play(() -> Vars.world.loadMap(map));
                 return;
             }
         }
