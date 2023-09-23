@@ -1,11 +1,10 @@
 package mindustry.plugin.minimods;
 
-import arc.ApplicationListener;
-import arc.Core;
 import arc.Events;
 import arc.struct.ObjectSet;
+import arc.struct.Seq;
 import arc.util.CommandHandler;
-import arc.util.Reflect;
+import arc.util.Strings;
 import arc.util.Timer;
 import mindustry.Vars;
 import mindustry.game.EventType;
@@ -19,20 +18,14 @@ import mindustry.plugin.discord.Roles;
 import mindustry.plugin.discord.discordcommands.DiscordRegistrar;
 import mindustry.plugin.utils.GameMsg;
 import mindustry.plugin.utils.Query;
-import mindustry.server.ServerControl;
 
 public final class RTV implements MiniMod {
     public static long VOTE_TIME = 60 * 1000;
     private Session session;
 
     private static void changeMap(Map map) {
-        for (ApplicationListener listener : Core.app.getListeners()) {
-            if (listener instanceof ServerControl) {
-                Call.updateGameOver(Team.crux);
-                ((ServerControl)listener).play(() -> Vars.world.loadMap(map));
-                return;
-            }
-        }
+        Vars.maps.setNextMapOverride(map);
+        Events.fire(new EventType.GameOverEvent(Team.crux));
     }
 
     private String randomMap() {
@@ -44,12 +37,12 @@ public final class RTV implements MiniMod {
      * Returns a map for a given query. Return value may be null.
      */
     private Map queryMap(String query) {
-        for (Map map : Vars.maps.all()) {
-            if (map.name().replaceAll(" ", "").toLowerCase().contains(query.replaceAll(" ", "").toLowerCase())) {
-                return map;
-            }
-        }
-
+        String normalisedQuery = Strings.stripColors(query.replaceAll(" ", "")).toLowerCase();
+        Seq<Map> matched = Vars.maps.all().select(map -> {
+            String mapName = Strings.stripColors(map.name().replaceAll(" ", "")).toLowerCase();
+            return mapName.contains(normalisedQuery);
+        });
+        if (matched.size == 1) return matched.first();
         return null;
     }
 
