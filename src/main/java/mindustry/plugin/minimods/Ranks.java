@@ -496,7 +496,7 @@ public class Ranks implements MiniMod {
                     // check if its suspicious
                     if (newPlayers.containsKey(uuid) && !normalPlayers.contains(uuid)) {
                         if (buildingsBuiltCache.get(uuid, 0) < buildingsDestroyedCache.get(uuid, new ObjectSet<>()).size) {
-                            int warnThreshold = max(10, (buildingsBuiltCache.get(uuid, 0) + newPlayers.get(uuid).second / 5) * newPlayers.get(uuid).first / 2);
+                            int warnThreshold = max(20, (buildingsBuiltCache.get(uuid, 0) + newPlayers.get(uuid).second / 5) * newPlayers.get(uuid).first / 2);
 //                            debug("calculation of warnThreshold: " + warnThreshold + " = max(10, (" + buildingsBuiltCache.get(uuid, 0) + " + " + newPlayers.get(uuid).second / 5 + ") * " + newPlayers.get(uuid).first / 2 + ")");
 //                            debug("Warn threshold: " + warnThreshold + ", buildings destroyed: " + buildingsDestroyedCache.get(uuid, new ObjectSet<>()).size);
                             if (buildingsDestroyedCache.get(uuid, new ObjectSet<>()).size > warnThreshold) {
