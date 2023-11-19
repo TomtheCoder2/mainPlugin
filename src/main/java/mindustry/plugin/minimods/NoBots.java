@@ -63,6 +63,7 @@ public class NoBots implements MiniMod {
 			for (int i = 0; i < ips.length; i++) {
 				if (ips[i] == (ip >>> masks[i])) {
 					Call.kick(con, "This ip is blocked, try disabling any vpn\ndiscord.phoenix-network.dev");
+					con.kicked = true;
 					con.close();
 					return;
 				}
