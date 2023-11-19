@@ -3,12 +3,10 @@ package mindustry.plugin.minimods;
 import arc.Events;
 import arc.files.Fi;
 import arc.util.Log;
-import arc.util.Reflect;
 import arc.util.Strings;
 import mindustry.Vars;
-import mindustry.game.EventType.ConnectionEvent;
+import mindustry.game.EventType.ConnectPacketEvent;
 import mindustry.gen.Call;
-import mindustry.net.Net;
 import mindustry.net.NetConnection;
 import mindustry.plugin.MiniMod;
 import mindustry.plugin.database.Database;
@@ -56,7 +54,7 @@ public class NoBots implements MiniMod {
 
 	@Override
 	public void registerEvents() {
-		Events.on(ConnectionEvent.class, connectionEvent -> {
+		Events.on(ConnectPacketEvent.class, connectionEvent -> {
 			// The code is probably blocking and a long db query could tank tps
 			NetConnection con = connectionEvent.connection;
 			Database.Player pd = Database.getPlayerData(con.uuid);
