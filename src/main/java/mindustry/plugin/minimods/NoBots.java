@@ -31,12 +31,18 @@ public class NoBots implements MiniMod {
 			Log.err("No ip blacklist file specified");
 			return -1;
 		}
+		Log.info("Parsing blacklist file...");
 		String[] lines = file.readString().split("\n");
 		ips = new int[lines.length];
 		masks = new short[lines.length];
 		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i];
+			if (line.startsWith("#")) continue;
 			int slash = line.indexOf('/');
+			if (slash == -1) {
+				Log.warn("Line at @ has no mask: @\n Consider adding a /0 if you wish to block that specific ip", i, line);
+				continue;
+			}
 			String subnet = line.substring(0, slash);
 			int maskBits = 32-Strings.parseInt(line.substring(slash+1));
 			ips[i] = convertIp(subnet) >>> maskBits;
