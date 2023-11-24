@@ -57,7 +57,7 @@ public class NoBots implements MiniMod {
 		Events.on(ConnectPacketEvent.class, connectionEvent -> {
 			// The code is probably blocking and a long db query could tank tps
 			NetConnection con = connectionEvent.connection;
-			Database.Player pd = Database.getPlayerData(con.uuid);
+			Database.Player pd = Database.getPlayerData(connectionEvent.packet.uuid);
 			if (pd != null && pd.verified) return;
 			int ip = convertIp(con.address);
 			for (int i = 0; i < ips.length; i++) {
