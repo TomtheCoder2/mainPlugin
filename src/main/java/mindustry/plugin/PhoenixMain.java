@@ -78,7 +78,8 @@ public class PhoenixMain extends Plugin {
             new mindustry.plugin.minimods.Skipwave(),
             new mindustry.plugin.minimods.Translate(),
             new mindustry.plugin.minimods.Weapon(),
-            new mindustry.plugin.minimods.Sessions()
+            new mindustry.plugin.minimods.Sessions(),
+            new mindustry.plugin.minimods.NoBots()
     );
 
     // register event handlers and create variables in the constructor
