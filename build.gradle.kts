@@ -133,6 +133,7 @@ tasks.register("downloadSprites") {
             }.join()
         }
         getAll("$api/contents/core/assets-raw/sprites/blocks?ref=$mindustryVer", downloadUrls)
+        downloadUrls.add("https://raw.githubusercontent.com/Anuken/Mindustry/$mindustryVer/core/assets-raw/sprites/effects/error.png")
         downloadUrls.filter { it.endsWith("png") }
         logger.lifecycle("Total size ${downloadUrls.size}")
 

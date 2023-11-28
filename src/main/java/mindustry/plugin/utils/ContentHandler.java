@@ -71,9 +71,9 @@ public class ContentHandler {
             Log.warn("Raw asset folder @ not found", assets_raw.absolutePath());
             usingInternal = true;
         }
-        Fi atlas = new Fi(assets + "/sprites/sprites.aatls");
-        if (!atlas.exists()) {
-            Log.warn("Aatls file not found at: @", atlas.absolutePath());
+        Fi atlasFile = new Fi(assets + "/sprites/sprites.aatls");
+        if (!atlasFile.exists()) {
+            Log.warn("Aatls file not found at: @", atlasFile.absolutePath());
             usingInternal = true;
         }
 //        usingInternal = true;
@@ -81,7 +81,7 @@ public class ContentHandler {
         if (usingInternal) {
             Log.info("Using internal sprites");
             Class<?> cls = PhoenixMain.class;
-            atlas = new Fi("") {
+            atlasFile = new Fi("") {
                 @Override
                 public InputStream read() {
                     return Objects.requireNonNull(cls.getResourceAsStream("/atlas/sprites.aatls"));
@@ -106,8 +106,8 @@ public class ContentHandler {
                 }
             });
         }
-        data = new TextureAtlasData(atlas, new Fi(""), false);
-        Core.atlas = new TextureAtlas();
+        data = new TextureAtlasData(atlasFile, new Fi(""), false);
+        Core.atlas = TextureAtlas.blankAtlas();
 
 
         data.getPages().each(page -> {
@@ -228,7 +228,7 @@ public class ContentHandler {
         return copy;
     }
 
-    public Schematic parseSchematic(String text) throws Exception {
+    public Schematic parseSchematic(String text) {
         return Schematics.readBase64(text);
     }
 
