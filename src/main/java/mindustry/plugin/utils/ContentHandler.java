@@ -107,7 +107,7 @@ public class ContentHandler {
             });
         }
         data = new TextureAtlasData(atlasFile, new Fi(""), false);
-        Core.atlas = TextureAtlas.blankAtlas();
+        Core.atlas = new TextureAtlas();
 
 
         data.getPages().each(page -> {
