@@ -56,7 +56,7 @@ public final class RTV implements MiniMod {
     @Override
     public void registerEvents() {
         // Clear votes when a new game occurs.
-        Events.on(EventType.GameOverEvent.class, event -> {
+        Events.on(EventType.WorldLoadEvent.class, event -> {
             if (session != null) {
                 session.clear();
             }
