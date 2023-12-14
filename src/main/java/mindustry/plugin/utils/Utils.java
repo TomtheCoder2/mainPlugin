@@ -3,11 +3,10 @@ package mindustry.plugin.utils;
 import arc.Core;
 import arc.Events;
 import arc.func.Boolf;
-import arc.func.Func;
 import arc.struct.*;
 import arc.util.CommandHandler;
+import arc.util.Log;
 import arc.util.Strings;
-import com.electronwill.nightconfig.core.Config;
 import mindustry.game.EventType;
 import mindustry.game.Schematic;
 import mindustry.game.Schematics;
@@ -27,7 +26,6 @@ import mindustry.world.blocks.storage.CoreBlock;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -775,11 +773,11 @@ public class Utils {
                     // render the image
                     image = contentHandler.previewSchematic(schematic);
                 } else {
-                    image = ImageIO.read(new File(PluginConfig.assetsDir + "/sprites/error.png"));
+                    image = contentHandler.getImage("error");
                 }
                 return new SchemImage(image, minX, minY, maxX + minX, maxY + minY);
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.err("Something went wrong creating SchemImage:\n", e);
                 return new SchemImage(null, minX, minY, maxX + minX, maxY + minY);
             }
         } catch (Exception e) {
