@@ -18,7 +18,7 @@ import java.util.List;
 
 public class NoBots implements MiniMod {
 	Fi filePath = Vars.dataDirectory.child("mods").child("ipv4.txt");
-	static int[] ips;
+	static int[] ips = {};
 	static short[] masks;
 	public NoBots() {
 		parseBlacklist(filePath);
