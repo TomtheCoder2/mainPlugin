@@ -204,7 +204,18 @@ public class ContentHandler {
         return regions.get(name, () -> {
             try {
                 if (usingInternal) {
-                    return ImageIO.read(imageUrls.get(name, imageUrls.get("error")));
+                    String blockName = name;
+                    if (blockName.endsWith("-full")) {
+                        // Hack for team cores. Horrible Horrible Horrible
+                        blockName = blockName.substring(6, blockName.length()-5);
+                        BufferedImage image = ImageIO.read(imageUrls.get(blockName, imageUrls.get("error")));
+                        Graphics2D g = image.createGraphics();
+                        BufferedImage teamImage = ImageIO.read(imageUrls.get(blockName+"-team", imageUrls.get("error")));
+                        g.drawImage(teamImage, 0, 0, null);
+                        g.dispose();
+                        return image;
+                    }
+                    return ImageIO.read(imageUrls.get(blockName, imageUrls.get("error")));
                 } else {
                     return ImageIO.read(imageFiles.get(name, imageFiles.get("error")).file());
                 }
