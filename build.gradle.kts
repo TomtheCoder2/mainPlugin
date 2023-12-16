@@ -85,7 +85,7 @@ tasks.processResources {
     // If doing other jank in the future, remove this
     outputs.upToDateWhen { false }
 
-    if (!hasProperty("exclude-sprites")) {
+    if (!hasProperty("exclude-sprites") || true) {
         dependsOn(":genSprites")
         dependsOn(":extractAtlas")
         with(copySpec {
