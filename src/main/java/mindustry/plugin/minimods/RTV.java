@@ -36,14 +36,15 @@ public final class RTV implements MiniMod {
     /**
      * Returns a map for a given query. Return value may be null.
      */
-    private Map queryMap(String query) {
+    private Seq<Map> queryMaps(String query) {
         String normalisedQuery = Strings.stripColors(query.replaceAll(" ", "")).toLowerCase();
         Seq<Map> matched = Vars.maps.all().select(map -> {
             String mapName = Strings.stripColors(map.name().replaceAll(" ", "")).toLowerCase();
             return mapName.contains(normalisedQuery);
         });
-        if (matched.size == 1) return matched.first();
-        return null;
+        Map exact = matched.find(m -> Strings.stripColors(m.name().replaceAll(" ", "")).toLowerCase().equals(normalisedQuery));
+        if (exact != null) return Seq.with(exact);
+        return matched;
     }
 
     /**
@@ -69,12 +70,19 @@ public final class RTV implements MiniMod {
             if (session == null) {
                 String map = randomMap();
                 if (args.length != 0) {
-                    Map mapObj = queryMap(args[0]);
-                    if (mapObj == null) {
+                    Seq<Map> maps = queryMaps(args[0]);
+                    if (maps.isEmpty()) {
                         player.sendMessage(GameMsg.error("RTV", "Could not find map [orange]" + args[0]));
                         return;
+                    } else if (maps.size > 1) {
+                        StringBuilder sb = new StringBuilder("Multiple maps found, please specify the full name:\n[white]");
+                        maps.each(matched -> sb.append(matched.name()).append("[white], "));
+                        sb.deleteCharAt(sb.length()-1);
+                        player.sendMessage(GameMsg.error("RTV", sb.toString()));
+                        return;
+                    } else {
+                        map = maps.first().name();
                     }
-                    map = mapObj.name();
                 }
 
                 session = new Session(map);
