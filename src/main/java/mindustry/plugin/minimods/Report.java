@@ -52,7 +52,7 @@ public class Report implements MiniMod {
 
             if (args.length == 0) {
                 StringBuilder builder = new StringBuilder();
-                builder.append("[orange]List or reportable players: \n");
+                builder.append("[orange]List of reportable players: \n");
                 for (Player p : Groups.player) {
                     if (p.admin() || p.con == null) continue;
 
